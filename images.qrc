@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>images/application-exit.png</file>
+        <file>images/code-context.png</file>
+        <file>images/configure.png</file>
+        <file>images/document-export.png</file>
+        <file>images/document-new.png</file>
+        <file>images/document-open.png</file>
+        <file>images/document-save-all.png</file>
+        <file>images/document-save-as.png</file>
+        <file>images/document-save.png</file>
+        <file>images/edit-redo.png</file>
+        <file>images/edit-undo.png</file>
+        <file>images/tab-new.png</file>
+        <file>images/edit-clear.png</file>
+        <file>images/edit-text-frame-update.png</file>
+        <file>images/edit-copy.png</file>
+        <file>images/edit-cut.png</file>
+        <file>images/edit-paste.png</file>
+        <file>images/document-open-recent.png</file>
+        <file>images/dialog-close.png</file>
+    </qresource>
+    <qresource prefix="/">
+        <file alias="splash">images/splash.png</file>
+    </qresource>
+</RCC>
