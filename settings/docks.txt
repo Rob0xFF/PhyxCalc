@@ -1,0 +1,5 @@
+Symbols;symbols.txt
+Functions;functionsDock.cfg
+Numbers;numbersDock.cfg
+Operators;operatorsDock.cfg
+Electronic Functions;electronicFunctions.cfg
