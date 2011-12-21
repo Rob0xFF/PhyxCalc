@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QStringList>
-#include <QMultiMap>
+#include <QMultiHash>
 #include <QDebug>
 
 typedef struct {
@@ -33,7 +33,7 @@ public:
 
 private:
 
-    QMultiMap<QString, EarleyRule>   rules;     //mapping of all rules, for quick finding rules with the key (premise, member of nonTerminals)
+    QMultiHash<QString, EarleyRule>   rules;     //mapping of all rules, for quick finding rules with the key (premise, member of nonTerminals)
     QStringList         terminals;              //contains all terminals
     QStringList         nonTerminals;           //contains all nonTerminals
     QString             startSymbol;            //the start symbol
