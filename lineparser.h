@@ -13,6 +13,7 @@
 #include <cmath>
 #include "unitloader.h"
 #include "global.h"
+#include "qearleyparser.h"
 //#include "phexparser.h"
 
 enum LineType {DefinitionLine, ExpressionLine, CommentLine, OutputLine, EmptyLine, UnknownLine};
@@ -75,6 +76,9 @@ private:
     /* Writes the expression with numbers and units instead of variables */
     QString replaceVariables(QString expression, bool insertValue = true, bool insertUnit = true);
 
+
+    /* just for testing the parser */
+    void testParser();
 public slots:
     void clearAllVariables();
 };

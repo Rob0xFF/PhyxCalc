@@ -8,6 +8,7 @@ LineParser::LineParser(UnitLoader *loader, QTableWidget *tableWidget, QTextEdit 
     appSettings = settings;
 
     //phexParser = new PhexParser();
+    testParser();
 }
 
 LineParser::~LineParser()
@@ -630,4 +631,26 @@ void LineParser::clearAllVariables()
 {
     variableMap.clear();
     showVariables();
+}
+
+void LineParser::testParser()
+{
+    QEarleyParser earleyParser;
+
+    QStringList list;
+    list.append("S=|E|");
+    list.append("E=|E|+|T|");
+    list.append("E=|E|-|T|");
+    list.append("E=|T|");
+    list.append("T=|T|*|F|");
+    list.append("T=|T|/|F|");
+    list.append("T=|F|");
+    list.append("F=n");
+    list.append("F=-|F|");
+    list.append("F=+|F|");
+    list.append("F=(|E|)");
+
+    earleyParser.loadRules(list);
+
+    earleyParser.parseWord("n+n", "S");
 }

@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     unitloader.cpp \
     exportdialog.cpp \
     flowlayout.cpp \
-    settingsdialog.cpp
+    settingsdialog.cpp \
+    qearleyparser.cpp
  #   phexparser.cpp
 
 HEADERS  += mainwindow.h \
@@ -47,7 +48,8 @@ HEADERS  += mainwindow.h \
     exportdialog.h \
     flowlayout.h \
     settingsdialog.h \
-    global.h
+    global.h \
+    qearleyparser.h
 #   phexparser.h
 
 FORMS    += mainwindow.ui \
@@ -68,3 +70,5 @@ RESOURCES += \
 #DEPENDPATH += /usr/local/lib64
 
 #unix:!macx:!symbian: PRE_TARGETDEPS += /usr/local/lib64/libudunits2.a
+
+
