@@ -7,7 +7,7 @@ LineParser::LineParser(UnitLoader *loader, QTableWidget *tableWidget, QTextEdit 
     calculationEdit = textEdit;
     appSettings = settings;
 
-    phexParser = new PhexParser();
+    //phexParser = new PhexParser();
 }
 
 LineParser::~LineParser()
@@ -69,7 +69,7 @@ LineType LineParser::checkLineType(QString text)
         return ExpressionLine;*/
 }
 
-void LineParser::readExpression(QString line, QString varName)
+/*void LineParser::readExpression(QString line, QString varName)
 {
     QString expression,
             outputUnit,
@@ -214,7 +214,7 @@ void LineParser::readDefinition(QString line)
     qDebug() << "Variable name:" << variableName << "Expression:" << expression;
 
     readExpression(expression, variableName);
-}
+}*/
 
 void LineParser::parseLine()
 {
@@ -224,7 +224,7 @@ void LineParser::parseLine()
     //read current line
     QString curLineText = getCurrentLine();
 
-    LineType lineType = checkLineType(curLineText);
+    /*LineType lineType = checkLineType(curLineText);
 
     if (lineType == DefinitionLine)
     {
@@ -235,7 +235,7 @@ void LineParser::parseLine()
     {
         readExpression(curLineText);
         showVariables();
-    }
+    }*/
     /*else if (lineType == OutputLine)
     {
         OutputVariable(curLineText, calculationEdit);

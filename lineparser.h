@@ -13,7 +13,7 @@
 #include <cmath>
 #include "unitloader.h"
 #include "global.h"
-#include "phexparser.h"
+//#include "phexparser.h"
 
 enum LineType {DefinitionLine, ExpressionLine, CommentLine, OutputLine, EmptyLine, UnknownLine};
 
@@ -45,14 +45,14 @@ private:
     UnitLoader      *unitLoader;
     AppSettings     *appSettings;
     QMap<QString, physicalVariable> variableMap;
-    PhexParser      *phexParser;
+    //PhexParser      *phexParser;
 
     /* Check the type of a line */
     LineType checkLineType(QString text);
     /* Reads a definition line */
-    void readDefinition(QString line);
+    //void readDefinition(QString line);
     /* Reads an expression line */
-    void readExpression(QString line, QString varName = "");
+    //void readExpression(QString line, QString varName = "");
     /* Reads an output line and outputs a variable) */
     //void OutputVariable(QString line, QTextEdit *text);
 

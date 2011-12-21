@@ -25,8 +25,8 @@ SOURCES += main.cpp\
     unitloader.cpp \
     exportdialog.cpp \
     flowlayout.cpp \
-    settingsdialog.cpp \
-    phexparser.cpp
+    settingsdialog.cpp
+ #   phexparser.cpp
 
 HEADERS  += mainwindow.h \
     muParser/muParserTokenReader.h \
@@ -47,8 +47,8 @@ HEADERS  += mainwindow.h \
     exportdialog.h \
     flowlayout.h \
     settingsdialog.h \
-    global.h \
-    phexparser.h
+    global.h
+#   phexparser.h
 
 FORMS    += mainwindow.ui \
     exportdialog.ui \
@@ -57,14 +57,14 @@ FORMS    += mainwindow.ui \
 RESOURCES += \
     images.qrc
 
-LIBS += -ludunits2
+#LIBS += -ludunits2
 
 
 
 
-unix:!macx:!symbian: LIBS += -L/usr/local/lib64/ -ludunits2
+#unix:!macx:!symbian: LIBS += -L/usr/local/lib64/ -ludunits2
 
-INCLUDEPATH += /usr/local/lib64
-DEPENDPATH += /usr/local/lib64
+#INCLUDEPATH += /usr/local/lib64
+#DEPENDPATH += /usr/local/lib64
 
-unix:!macx:!symbian: PRE_TARGETDEPS += /usr/local/lib64/libudunits2.a
+#unix:!macx:!symbian: PRE_TARGETDEPS += /usr/local/lib64/libudunits2.a
