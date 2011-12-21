@@ -9,6 +9,7 @@
 #include <QEvent>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QListWidget>
 #include "lineparser.h"
 #include "unitloader.h"
 #include "exportdialog.h"

@@ -373,7 +373,16 @@ void MainWindow::loadDock(QString name, QStringList items)
     QWidget *widget = new QWidget(dockWidget);
     QButtonGroup *buttonGroup = new QButtonGroup(this);
     FlowLayout *flowLayout = new FlowLayout;
+    QBoxLayout *boxLayout = new QBoxLayout(QBoxLayout::TopToBottom, widget);
     QAction *menuAction = new QAction(ui->menuDocks);
+
+    QListWidget *listWidget = new QListWidget(widget);
+    listWidget->setViewMode(QListView::IconMode);
+    listWidget->setIconSize(QSize(16,16));
+    listWidget->setSpacing(20);
+    QFont font = listWidget->font();
+    font.setPointSize(12);
+    listWidget->setFont(font);
 
     dockWidget->setObjectName(name);
     this->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
@@ -398,11 +407,13 @@ void MainWindow::loadDock(QString name, QStringList items)
         button->setToolTip(toolTip + ": " + function);
         buttonGroup->addButton(button);
 
+        listWidget->addItem(buttonName);
+
         //calculate row and column
         row = i / rowSize;
         column = i % rowSize;
 
-        flowLayout->addWidget(button);
+        //flowLayout->addWidget(button);
 
         //save the maximum width
         QFontMetrics fontMetrics = button->fontMetrics();
@@ -417,7 +428,8 @@ void MainWindow::loadDock(QString name, QStringList items)
 
     //put the dock togheter
     dockWidget->setWidget(widget);
-    widget->setLayout(flowLayout);
+    widget->setLayout(boxLayout);
+    boxLayout->addWidget(listWidget);
 
     //add an menu entry for the dock
     menuAction->setCheckable(true);
