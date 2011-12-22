@@ -81,7 +81,6 @@ void QEarleyParser::parse()
         {
             oldcount = earleyItemLists.at(currentIndex).size();
 
-            //Predictor:
             foreach (EarleyItem item, earleyItemLists.at(currentIndex))
             {
                 if (!item.beta.isEmpty())
@@ -89,19 +88,29 @@ void QEarleyParser::parse()
                     QString firstSymbol = item.beta.at(0);
                     if (nonTerminals.contains(firstSymbol))
                     {
+                        //Predictor
                         foreach (EarleyRule rule, rules.values(firstSymbol))
                         {
                             appendEarleyItem(currentIndex, firstSymbol, QStringList(), rule.conclusio, currentIndex);
                         }
                     }
-                }
-            }
+                    else if (currentIndex < (itemListCount-1))
+                    {
+                        //Scanner
+                        if (terminals.contains(firstSymbol) && (word.at(currentIndex) == firstSymbol))
+                        {
+                            QStringList newAlpha = item.alpha;
+                            QStringList newBeta = item.beta;
+                                        newAlpha.append(newBeta.first());
+                                        newBeta.removeFirst();
 
-            //Completer:
-            foreach (EarleyItem item, earleyItemLists.at(currentIndex))
-            {
-                if (item.beta.isEmpty())
+                            appendEarleyItem(currentIndex+1, item.A, newAlpha, newBeta, item.K);
+                        }
+                    }
+                }
+                else
                 {
+                    //Completer
                     foreach (EarleyItem item2, earleyItemLists.at(item.K))
                     {
                         if (!item2.beta.isEmpty() && (item2.beta.at(0) == item.A))
@@ -116,29 +125,7 @@ void QEarleyParser::parse()
                     }
                 }
             }
-
-            //Scanner:
-            if (currentIndex < (itemListCount - 1))
-            {
-                foreach (EarleyItem item, earleyItemLists.at(currentIndex))
-                {
-                    if (!item.beta.isEmpty())
-                    {
-                        QString firstSymbol = item.beta.at(0);
-                        if (terminals.contains(firstSymbol) && (word.at(currentIndex) == firstSymbol))
-                        {
-                            QStringList newAlpha = item.alpha;
-                            QStringList newBeta = item.beta;
-                                        newAlpha.append(newBeta.first());
-                                        newBeta.removeFirst();
-
-                            appendEarleyItem(currentIndex+1, item.A, newAlpha, newBeta, item.K);
-                        }
-                    }
-                }
-            }
         }
-
         currentIndex++;
     }
 }
