@@ -652,5 +652,5 @@ void LineParser::testParser()
 
     earleyParser.loadRules(list);
 
-    earleyParser.parseWord("n+n", "S");
+    earleyParser.parseWord("n+n/n-n", "S");
 }

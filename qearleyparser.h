@@ -45,8 +45,12 @@ private:
 
     /* initializes variables and lists for the parser*/
     void initialize();
-    /* starts to parse */
-    void parse();
+    /* starts to parse from start position*/
+    void parse(int startPosition = 0);
+    /* recursive function to create the binary tree */
+    void treeRecursion(int listIndex, int itemIndex, EarleyItemList *tree);
+    /* creates the binary tree*/
+    void createTree();
 
     /* appends an item to the given ItemList (index), checks also for duplicates */
     void appendEarleyItem(int index, QString A, QStringList alpha, QStringList beta, int K);
