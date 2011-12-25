@@ -7,9 +7,12 @@ QEarleyParser::QEarleyParser(QObject *parent) :
 
 bool QEarleyParser::loadRules(QStringList ruleList)
 {
-    terminals.clear();
     nonTerminals.clear();
     rules.clear();
+
+    //fixing the nonTerminal 0 problem, 0 is already a terminal
+    nonTerminals.append(QString());
+    rules.append(QList<EarleyRule>());
 
     foreach (QString rule, ruleList)
     {
@@ -20,37 +23,53 @@ bool QEarleyParser::loadRules(QStringList ruleList)
             return false;
         }
 
+        //split premise and conclusio
         QString premise = rule.left(equalPos);
         QString conclusio = rule.mid(equalPos+1);
 
-        //split conclusio, check terminal or not terminal and append to rule
-        QStringList conclusioList = conclusio.split('|');
+        QList<qint32> conclusioConverted;
+        qint32 premiseConverted;
 
-        EarleyRule earleyRule;
-        for (int i = 0; i < conclusioList.size(); i++)
+        premiseConverted = addNonTerminal(premise);         //convert premise
+
+        //convert conclusio
+        bool isNonTerminal = false;
+        int nonTerminalPos;
+        for (int i = 0; i < conclusio.size(); i++)
         {
-            QString currentSymbol = conclusioList.at(i);
-            if (!currentSymbol.isEmpty())
+            if (conclusio.at(i) == '|')
             {
-                if (((i+1)%2) == 0)
-                {
-                    if (!nonTerminals.contains(currentSymbol))
-                        nonTerminals.append(currentSymbol);
-                }
+                if (!isNonTerminal)
+                    nonTerminalPos = i+1;
                 else
                 {
-                    if (!terminals.contains(currentSymbol))
-                        terminals.append(currentSymbol);
+                    QString tmpNonTerminal = conclusio.mid(nonTerminalPos, i-nonTerminalPos);
+                    conclusioConverted.append(addNonTerminal(tmpNonTerminal));
                 }
-
-                earleyRule.conclusio.append(currentSymbol);
+                isNonTerminal = !isNonTerminal;
+            }
+            else if (!isNonTerminal)
+            {
+                conclusioConverted.append(conclusio.at(i).unicode());
             }
         }
-        rules.insert(premise, earleyRule);
+
+        rules[(-1)*premiseConverted].append(conclusioConverted);
     }
 
-            qDebug() << "non terminals:" << nonTerminals;
-            qDebug() << "terminals:" << terminals;
+    qDebug() << "non terminals:" << nonTerminals;
+}
+
+qint32 QEarleyParser::addNonTerminal(QString nonTerminal)
+{
+    if (nonTerminals.contains(nonTerminal))
+        return (-1)*nonTerminals.indexOf(nonTerminal);
+    else
+    {
+        nonTerminals.append(nonTerminal);
+        rules.append(QList<EarleyRule>());
+        return (-1)*(nonTerminals.size()-1);
+    }
 }
 
 void QEarleyParser::initialize()
@@ -69,9 +88,9 @@ void QEarleyParser::parse(int startPosition)
     int currentIndex = startPosition;
 
     //predictor special case
-    foreach (EarleyRule rule, rules.values(startSymbol))
+    foreach (EarleyRule rule, rules.at((-1)*startSymbol))
     {
-        appendEarleyItem(0, startSymbol, QStringList(), rule.conclusio, 0);
+        appendEarleyItem(0, startSymbol, EarleyRule(), rule, 0);
     }
 
     for (int i = 0; i < itemListCount; i++)
@@ -85,22 +104,22 @@ void QEarleyParser::parse(int startPosition)
             {
                 if (!item.beta.isEmpty())
                 {
-                    QString firstSymbol = item.beta.at(0);
-                    if (nonTerminals.contains(firstSymbol))
+                    EarleySymbol firstSymbol = item.beta.at(0);
+                    if (firstSymbol < 0)    //if symbol < 0, symbol = nonTerminal
                     {
                         //Predictor
-                        foreach (EarleyRule rule, rules.values(firstSymbol))
+                        foreach (EarleyRule rule, rules.at((-1)*firstSymbol))
                         {
-                            appendEarleyItem(currentIndex, firstSymbol, QStringList(), rule.conclusio, currentIndex);
+                            appendEarleyItem(currentIndex, firstSymbol, EarleyRule(), rule, currentIndex);
                         }
                     }
                     else if (currentIndex < (itemListCount-1))
                     {
                         //Scanner
-                        if (terminals.contains(firstSymbol) && (word.at(currentIndex) == firstSymbol))
+                        if ((firstSymbol >= 0) && (word.at(currentIndex) == firstSymbol))
                         {
-                            QStringList newAlpha = item.alpha;
-                            QStringList newBeta = item.beta;
+                            EarleyRule newAlpha = item.alpha;
+                            EarleyRule newBeta = item.beta;
                             newAlpha.append(newBeta.takeFirst());   //move point right
 
                             appendEarleyItem(currentIndex+1, item.A, newAlpha, newBeta, item.K);
@@ -114,8 +133,8 @@ void QEarleyParser::parse(int startPosition)
                     {
                         if (!item2.beta.isEmpty() && (item2.beta.at(0) == item.A))
                         {
-                            QStringList newAlpha = item2.alpha;
-                            QStringList newBeta = item2.beta;
+                            EarleyRule newAlpha = item2.alpha;
+                            EarleyRule newBeta = item2.beta;
                             newAlpha.append(newBeta.takeFirst());   //move point right
 
                             appendEarleyItem(currentIndex, item2.A, newAlpha, newBeta, item2.K);
@@ -134,17 +153,17 @@ void QEarleyParser::parseWord(QString earleyWord, QString earleyStartSymbol)
     word.clear();
     foreach (QChar character, earleyWord)
     {
-        word.append(QString(character));
+        word.append(character.unicode());
     }
 
-    startSymbol = earleyStartSymbol;
+    startSymbol = (-1)*nonTerminals.indexOf(earleyStartSymbol);
 
     initialize();
     parse();
     createTree();
 }
 
-void QEarleyParser::appendEarleyItem(int index, QString A, QStringList alpha, QStringList beta, int K)
+void QEarleyParser::appendEarleyItem(int index, EarleySymbol A, EarleyRule alpha, EarleyRule beta, int K)
 {
     bool match = false;
     foreach (EarleyItem item, earleyItemLists.at(index))
@@ -171,8 +190,8 @@ void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *
     {
         if (!tree->at(itemIndex).alpha.isEmpty())
         {
-            QString lastSymbol = tree->at(itemIndex).alpha.last();
-            if (nonTerminals.contains(lastSymbol))
+            EarleySymbol lastSymbol = tree->at(itemIndex).alpha.last();
+            if (lastSymbol < 0)     //if symbol < 0, symbol = nonTerminal
             {
                 //backward predictor
                 foreach (EarleyItem item, earleyItemLists.at(listIndex))
@@ -204,6 +223,18 @@ void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *
 void QEarleyParser::createTree()
 {
     EarleyItemList tree;
+
+    //remove unneeded items
+    foreach (EarleyItemList list, earleyItemLists)
+    {
+        for (int i = list.size()-1; i >= 0 ; i--)
+        {
+            if (!list.at(i).beta.isEmpty())
+                list.removeAt(i);
+        }
+    }
+
+    //add the final item
     foreach (EarleyItem item, earleyItemLists.last())
     {
         if ((item.A == startSymbol) && item.beta.isEmpty())

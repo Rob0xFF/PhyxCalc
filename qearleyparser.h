@@ -6,16 +6,14 @@
 #include <QMultiHash>
 #include <QDebug>
 
-typedef struct {
-    QStringList conclusio;    //containing nonTerminals and terminals
-    int type;               //the type of the rule, for calling the right function
-} EarleyRule;
+typedef qint32                  EarleySymbol; //datatype of one symbol
+typedef QList<EarleySymbol>     EarleyRule;   //a list containing symbols (nonTerminals and terminals)
 
 typedef struct {
-    QString A;              //premise
-    QStringList alpha;      //recognized part of the rule
-    QStringList beta;       //not recognized part of the rule
-    int K;                  //backpointer of the item
+    EarleySymbol    A;          //premise
+    EarleyRule      alpha;      //recognized part of the rule
+    EarleyRule      beta;       //not recognized part of the rule
+    int             K;          //backpointer of the item
 } EarleyItem;
 
 typedef QList<EarleyItem> EarleyItemList;
@@ -33,15 +31,16 @@ public:
 
 private:
 
-    QMultiHash<QString, EarleyRule>   rules;     //mapping of all rules, for quick finding rules with the key (premise, member of nonTerminals)
-    QStringList         terminals;              //contains all terminals
-    QStringList         nonTerminals;           //contains all nonTerminals
-    QString             startSymbol;            //the start symbol
+    QVector<QList<EarleyRule> >     rules;
+    //QMultiHash<QString, EarleyRule>   rules;     //mapping of all rules, for quick finding rules with the key (premise, member of nonTerminals)
+    //QStringList         terminals;              //contains all terminals, not needed, because terminals are represented by unicode value
+    QStringList                     nonTerminals;           //contains all nonTerminals
+    EarleySymbol                    startSymbol;            //the start symbol
 
-    QList<EarleyItemList> earleyItemLists;      //holds the item lists
-    int                 itemListCount;          //the count of item lists needed for pasing
+    QList<EarleyItemList>           earleyItemLists;      //holds the item lists
+    int                             itemListCount;          //the count of item lists needed for pasing
 
-    QStringList word;
+    EarleyRule word;
 
     /* initializes variables and lists for the parser*/
     void initialize();
@@ -53,7 +52,10 @@ private:
     void createTree();
 
     /* appends an item to the given ItemList (index), checks also for duplicates */
-    void appendEarleyItem(int index, QString A, QStringList alpha, QStringList beta, int K);
+    void appendEarleyItem(int index, EarleySymbol A, EarleyRule alpha, EarleyRule beta, int K);
+
+    /* checks for duplicates and adds a NonTerminal, return NonTerminal-Index*/
+    qint32 addNonTerminal(QString nonTerminal);
 
 signals:
 
