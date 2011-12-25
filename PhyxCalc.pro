@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     exportdialog.cpp \
     flowlayout.cpp \
     settingsdialog.cpp \
-    qearleyparser.cpp
+    qearleyparser.cpp \
+    phyxcalculator.cpp
  #   phexparser.cpp
 
 HEADERS  += mainwindow.h \
@@ -49,7 +50,8 @@ HEADERS  += mainwindow.h \
     flowlayout.h \
     settingsdialog.h \
     global.h \
-    qearleyparser.h
+    qearleyparser.h \
+    phyxcalculator.h
 #   phexparser.h
 
 FORMS    += mainwindow.ui \

@@ -14,6 +14,7 @@
 #include "unitloader.h"
 #include "global.h"
 #include "qearleyparser.h"
+#include "phyxcalculator.h"
 //#include "phexparser.h"
 
 enum LineType {DefinitionLine, ExpressionLine, CommentLine, OutputLine, EmptyLine, UnknownLine};

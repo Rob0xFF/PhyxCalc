@@ -5,6 +5,49 @@ QEarleyParser::QEarleyParser(QObject *parent) :
 {
 }
 
+bool QEarleyParser::loadRule(QString rule)
+{
+    int equalPos = rule.indexOf('=');
+    if (equalPos == -1)
+    {
+        qDebug() << "Not a valid rule";
+        return false;
+    }
+
+    //split premise and conclusio
+    QString premise = rule.left(equalPos);
+    QString conclusio = rule.mid(equalPos+1);
+
+    QList<qint32> conclusioConverted;
+    qint32 premiseConverted;
+
+    premiseConverted = addNonTerminal(premise);         //convert premise
+
+    //convert conclusio
+    bool isNonTerminal = false;
+    int nonTerminalPos;
+    for (int i = 0; i < conclusio.size(); i++)
+    {
+        if (conclusio.at(i) == '|')
+        {
+            if (!isNonTerminal)
+                nonTerminalPos = i+1;
+            else
+            {
+                QString tmpNonTerminal = conclusio.mid(nonTerminalPos, i-nonTerminalPos);
+                conclusioConverted.append(addNonTerminal(tmpNonTerminal));
+            }
+            isNonTerminal = !isNonTerminal;
+        }
+        else if (!isNonTerminal)
+        {
+            conclusioConverted.append(conclusio.at(i).unicode());
+        }
+    }
+
+    rules[-premiseConverted].append(conclusioConverted);
+}
+
 bool QEarleyParser::loadRules(QStringList ruleList)
 {
     nonTerminals.clear();
@@ -16,59 +59,24 @@ bool QEarleyParser::loadRules(QStringList ruleList)
 
     foreach (QString rule, ruleList)
     {
-        int equalPos = rule.indexOf('=');
-        if (equalPos == -1)
-        {
-            qDebug() << "Not a valid rule";
+        if (!loadRule(rule))
             return false;
-        }
-
-        //split premise and conclusio
-        QString premise = rule.left(equalPos);
-        QString conclusio = rule.mid(equalPos+1);
-
-        QList<qint32> conclusioConverted;
-        qint32 premiseConverted;
-
-        premiseConverted = addNonTerminal(premise);         //convert premise
-
-        //convert conclusio
-        bool isNonTerminal = false;
-        int nonTerminalPos;
-        for (int i = 0; i < conclusio.size(); i++)
-        {
-            if (conclusio.at(i) == '|')
-            {
-                if (!isNonTerminal)
-                    nonTerminalPos = i+1;
-                else
-                {
-                    QString tmpNonTerminal = conclusio.mid(nonTerminalPos, i-nonTerminalPos);
-                    conclusioConverted.append(addNonTerminal(tmpNonTerminal));
-                }
-                isNonTerminal = !isNonTerminal;
-            }
-            else if (!isNonTerminal)
-            {
-                conclusioConverted.append(conclusio.at(i).unicode());
-            }
-        }
-
-        rules[(-1)*premiseConverted].append(conclusioConverted);
     }
 
     qDebug() << "non terminals:" << nonTerminals;
+
+    return true;
 }
 
 qint32 QEarleyParser::addNonTerminal(QString nonTerminal)
 {
     if (nonTerminals.contains(nonTerminal))
-        return (-1)*nonTerminals.indexOf(nonTerminal);
+        return -nonTerminals.indexOf(nonTerminal);
     else
     {
         nonTerminals.append(nonTerminal);
         rules.append(QList<EarleyRule>());
-        return (-1)*(nonTerminals.size()-1);
+        return -(nonTerminals.size()-1);
     }
 }
 
@@ -83,7 +91,7 @@ void QEarleyParser::initialize()
     }
 }
 
-void QEarleyParser::parse(int startPosition)
+bool QEarleyParser::parse(int startPosition)
 {
     int currentIndex = startPosition;
 
@@ -145,6 +153,15 @@ void QEarleyParser::parse(int startPosition)
         }
         currentIndex++;
     }
+
+    //check wheter parsing was successful or not
+    foreach (EarleyItem item, earleyItemLists.last())
+    {
+        if ((item.A == startSymbol) && item.beta.isEmpty())
+            return true;
+    }
+
+    return false;
 }
 
 // this function is only for testing purposes
@@ -156,11 +173,13 @@ void QEarleyParser::parseWord(QString earleyWord, QString earleyStartSymbol)
         word.append(character.unicode());
     }
 
-    startSymbol = (-1)*nonTerminals.indexOf(earleyStartSymbol);
+    startSymbol = -nonTerminals.indexOf(earleyStartSymbol);
 
     initialize();
-    parse();
-    createTree();
+    if (parse())
+        createTree();
+    else
+        qDebug() << "Syntax Error!";
 }
 
 void QEarleyParser::appendEarleyItem(int index, EarleySymbol A, EarleyRule alpha, EarleyRule beta, int K)
@@ -198,8 +217,8 @@ void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *
                 {
                     if (item.beta.isEmpty() && (item.A == lastSymbol))
                     {
-                        tree->append(item);
-                        treeRecursion(listIndex, tree->size()-1, tree);
+                        tree->insert(itemIndex+1,item);
+                        treeRecursion(listIndex, itemIndex+1, tree);
                     }
                 }
             }
@@ -220,7 +239,7 @@ void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *
     }
 }
 
-void QEarleyParser::createTree()
+QList<EarleyTreeItem> QEarleyParser::createTree()
 {
     EarleyItemList tree;
 
@@ -241,16 +260,34 @@ void QEarleyParser::createTree()
             tree.append(item);
     }
 
-    if (!tree.isEmpty())    //this check should be in parsing function, returns wheter parsing was successful or not
-        treeRecursion(itemListCount-1,0,&tree);
-    else
+    treeRecursion(itemListCount-1,0,&tree);
+
+    //creating the binary tree for output
+    QList<EarleyTreeItem> outputTree;
+    foreach (EarleyItem item, tree)
     {
-        qDebug() << "Syntax Error";
+        QString rule;
+        rule.append(nonTerminals.at(-item.A));
+        rule.append("=");
+        item.alpha.append(item.beta);
+        foreach (EarleySymbol symbol, item.alpha)
+        {
+            if (symbol < 0)
+                rule.append("|" + nonTerminals.at(-symbol) + "|");
+            else
+                rule.append(QChar(symbol));
+        }
+
+        outputTree.append(EarleyTreeItem());
+        outputTree.last().rule = rule;
+        outputTree.last().pos = item.K;
     }
 
     //for testing purposes only
-    foreach (EarleyItem item, tree)
+    foreach (EarleyTreeItem item, outputTree)
     {
-        qDebug() << item.A << item.alpha << item.beta << item.K;
+        qDebug() << item.rule << item.pos;
     }
+
+    return outputTree;
 }

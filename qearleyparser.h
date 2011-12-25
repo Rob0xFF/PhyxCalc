@@ -18,6 +18,11 @@ typedef struct {
 
 typedef QList<EarleyItem> EarleyItemList;
 
+typedef struct {
+    QString rule;
+    int     pos;
+} EarleyTreeItem;
+
 class QEarleyParser : public QObject
 {
     Q_OBJECT
@@ -26,8 +31,12 @@ public:
 
     /* loads the rules from a string list and fills nonTerminals and terminals */
     bool loadRules(QStringList ruleList);
+    /* loads one rule */
+    bool loadRule(QString rule);
     /* parse the word starting with the given start symbol */
     void parseWord(QString earleyWord, QString earleyStartSymbol);
+    /* creates the binary tree*/
+    QList<EarleyTreeItem> createTree();
 
 private:
 
@@ -44,12 +53,10 @@ private:
 
     /* initializes variables and lists for the parser*/
     void initialize();
-    /* starts to parse from start position*/
-    void parse(int startPosition = 0);
+    /* starts to parse from start position, return wheter parsing was successful or not*/
+    bool parse(int startPosition = 0);
     /* recursive function to create the binary tree */
     void treeRecursion(int listIndex, int itemIndex, EarleyItemList *tree);
-    /* creates the binary tree*/
-    void createTree();
 
     /* appends an item to the given ItemList (index), checks also for duplicates */
     void appendEarleyItem(int index, EarleySymbol A, EarleyRule alpha, EarleyRule beta, int K);

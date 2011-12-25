@@ -649,8 +649,11 @@ void LineParser::testParser()
     list.append("F=-|F|");
     list.append("F=+|F|");
     list.append("F=(|E|)");
+    list.append("T=sin(|F|)");
 
     earleyParser.loadRules(list);
 
-    earleyParser.parseWord("n+n/n-n", "S");
+    earleyParser.parseWord("n+sin(n)*n", "S");
+
+    PhyxCalculator phyxCalculator;
 }
