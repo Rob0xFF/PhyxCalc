@@ -24,25 +24,32 @@ bool QEarleyParser::loadRule(QString rule)
     premiseConverted = addNonTerminal(premise);         //convert premise
 
     //convert conclusio
-    bool isNonTerminal = false;
-    int nonTerminalPos;
-    for (int i = 0; i < conclusio.size(); i++)
+    if (!conclusio.isEmpty())   //check for epsilon rule
     {
-        if (conclusio.at(i) == '|')
+        bool isNonTerminal = false;
+        int nonTerminalPos;
+        for (int i = 0; i < conclusio.size(); i++)
         {
-            if (!isNonTerminal)
-                nonTerminalPos = i+1;
-            else
+            if (conclusio.at(i) == '|')
             {
-                QString tmpNonTerminal = conclusio.mid(nonTerminalPos, i-nonTerminalPos);
-                conclusioConverted.append(addNonTerminal(tmpNonTerminal));
+                if (!isNonTerminal)
+                    nonTerminalPos = i+1;
+                else
+                {
+                    QString tmpNonTerminal = conclusio.mid(nonTerminalPos, i-nonTerminalPos);
+                    conclusioConverted.append(addNonTerminal(tmpNonTerminal));
+                }
+                isNonTerminal = !isNonTerminal;
             }
-            isNonTerminal = !isNonTerminal;
+            else if (!isNonTerminal)
+            {
+                conclusioConverted.append(conclusio.at(i).unicode());
+            }
         }
-        else if (!isNonTerminal)
-        {
-            conclusioConverted.append(conclusio.at(i).unicode());
-        }
+    }
+    else
+    {
+        isNullableVector[-premiseConverted] = true;     //if epsilon rule, nonTerminal is nullable
     }
 
     rules[-premiseConverted].append(conclusioConverted);
@@ -54,10 +61,12 @@ bool QEarleyParser::loadRules(QStringList ruleList)
 {
     nonTerminals.clear();
     rules.clear();
+    isNullableVector.clear();
 
     //fixing the nonTerminal 0 problem, 0 is already a terminal
     nonTerminals.append(QString());
     rules.append(QList<EarleyRule>());
+    isNullableVector.append(false);
 
     foreach (QString rule, ruleList)
     {
@@ -78,6 +87,7 @@ qint32 QEarleyParser::addNonTerminal(QString nonTerminal)
     {
         nonTerminals.append(nonTerminal);
         rules.append(QList<EarleyRule>());
+        isNullableVector.append(false);
         return -(nonTerminals.size()-1);
     }
 }
@@ -98,7 +108,7 @@ bool QEarleyParser::parse(int startPosition)
     int currentIndex = startPosition;
 
     //predictor special case
-    foreach (EarleyRule rule, rules.at((-1)*startSymbol))
+    foreach (EarleyRule rule, rules.at(-startSymbol))
     {
         appendEarleyItem(0, startSymbol, EarleyRule(), rule, 0);
     }
@@ -118,9 +128,18 @@ bool QEarleyParser::parse(int startPosition)
                     if (firstSymbol < 0)    //if symbol < 0, symbol = nonTerminal
                     {
                         //Predictor
-                        foreach (EarleyRule rule, rules.at((-1)*firstSymbol))
+                        foreach (EarleyRule rule, rules.at(-firstSymbol))
                         {
                             appendEarleyItem(currentIndex, firstSymbol, EarleyRule(), rule, currentIndex);
+                        }
+                        //Aycock and Horspool Epsilon solution
+                        if (isNullableVector.at(-firstSymbol))  //if B is nullable
+                        {
+                            EarleyRule newAlpha = item.alpha;
+                            EarleyRule newBeta = item.beta;
+                            newAlpha.append(newBeta.takeFirst());   //move point right
+
+                            appendEarleyItem(currentIndex, item.A, newAlpha, newBeta, item.K);
                         }
                     }
                     else if (currentIndex < (itemListCount-1))

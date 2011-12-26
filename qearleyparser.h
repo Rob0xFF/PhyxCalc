@@ -41,10 +41,12 @@ public:
 private:
 
     QVector<QList<EarleyRule> >     rules;
-    //QMultiHash<QString, EarleyRule>   rules;     //mapping of all rules, for quick finding rules with the key (premise, member of nonTerminals)
-    //QStringList         terminals;              //contains all terminals, not needed, because terminals are represented by unicode value
+    //QMultiHash<QString, EarleyRule>   rules;              //mapping of all rules, for quick finding rules with the key (premise, member of nonTerminals)
+    QVector<bool>                   isNullableVector;       //vector holding wheter a nonTerminal at index is nullable or not, needed for epsilon rules
+    //QStringList         terminals;                        //contains all terminals, not needed, because terminals are represented by unicode value
     QStringList                     nonTerminals;           //contains all nonTerminals
     EarleySymbol                    startSymbol;            //the start symbol
+
 
     QList<EarleyItemList>           earleyItemLists;      //holds the item lists
     int                             itemListCount;          //the count of item lists needed for pasing

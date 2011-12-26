@@ -638,7 +638,7 @@ void LineParser::testParser()
     QEarleyParser earleyParser;
 
     QStringList list;
-    list.append("S=|E|");
+    /*list.append("S=|E|");
     list.append("E=|E|+|T|");
     list.append("E=|E|-|T|");
     list.append("E=|T|");
@@ -650,10 +650,16 @@ void LineParser::testParser()
     list.append("F=+|F|");
     list.append("F=(|E|)");
     list.append("T=sin(|F|)");
+    list.append("T=");*/
+    list.append("S=|E|");
+    list.append("E=|A||A||A||A|");
+    list.append("A=a");
+    list.append("A=|X|");
+    list.append("X=");
 
     earleyParser.loadRules(list);
 
-    earleyParser.parseWord("n+sin(n)*n", "S");
+    earleyParser.parseWord("a", "S");
 
     PhyxCalculator phyxCalculator;
 }
