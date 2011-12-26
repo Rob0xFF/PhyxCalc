@@ -46,6 +46,8 @@ bool QEarleyParser::loadRule(QString rule)
     }
 
     rules[-premiseConverted].append(conclusioConverted);
+
+    return true;
 }
 
 bool QEarleyParser::loadRules(QStringList ruleList)

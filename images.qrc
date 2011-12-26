@@ -23,4 +23,7 @@
     <qresource prefix="/">
         <file alias="splash">images/splash.png</file>
     </qresource>
+    <qresource prefix="/appicon">
+        <file alias="icon">images/PhyxCalc.png</file>
+    </qresource>
 </RCC>

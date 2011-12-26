@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>PhyxCalc</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="images.qrc">
+    <normaloff>:/appicon/icon</normaloff>:/appicon/icon</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_5">
     <property name="margin">
@@ -57,7 +61,7 @@
      <x>0</x>
      <y>0</y>
      <width>611</width>
-     <height>20</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuWindow">
