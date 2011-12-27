@@ -8,7 +8,6 @@
 #include <QStringList>
 #include <QDebug>
 #include <cmath>
-#include "muParser/muParser.h"
 #include "global.h"
 
 /*struct SIUnit {

@@ -275,15 +275,17 @@ void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *
             if (lastSymbol < 0)     //if symbol < 0, symbol = nonTerminal
             {
                 //backward predictor
+                int k = tree->at(itemIndex).K;
+                int p = tree->at(itemIndex).alpha.size();
                 for (int i = 0; i < earleyItemLists.at(listIndex).size(); i++)//foreach (EarleyItem item, earleyItemLists.at(listIndex))
                 {
                     EarleyItem *item = &earleyItemLists[listIndex][i];
-                    if (item->A == lastSymbol)  //item.beta.isEmpty() is now unnessecary here
+                    if ((item->A == lastSymbol) && (item->K >= k+p-1))  //item.beta.isEmpty() is now unnessecary here
                     {
                         tree->insert(itemIndex+1,*item);
                         treeRecursion(listIndex, itemIndex+1, tree);
-                        earleyItemLists[listIndex].removeAt(i);
-                        i--;
+                        //earleyItemLists[listIndex].removeAt(i);
+                        //i--;
                     }
                 }
             }
@@ -338,6 +340,17 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
     }
 
     treeRecursion(itemListCount-1,0,&tree);
+
+    /*for (int i = 0; i < tree.size(); i++)
+    {
+        EarleyItem item = tree.at(i);
+         int index = tree.lastIndexOf(item);
+        while (index != i)
+        {
+            tree.removeAt(index);
+            index = tree.lastIndexOf(item);
+        }
+    }*/
 
     //creating the binary tree for output
     QList<EarleyTreeItem> outputTree;

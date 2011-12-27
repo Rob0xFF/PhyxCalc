@@ -8,7 +8,7 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
     earleyParser.setStartSymbol("S");
     qDebug() << setExpression("1.4+4.7*3");
     qDebug() << setExpression("1.4+4.7*3+1");
-    qDebug() << setExpression("1.4+sin(4.7)*3");
+    qDebug() << setExpression("34+5");
     evaluate();
 }
 
@@ -94,8 +94,8 @@ void PhyxCalculator::initialize()
     addRule("F=(|F|)");
     addRule("T=sin(|F|)",   "valueSin");
     addRule("N=|Z|",        "numberPush");
-    addRule("N=|Z||Z|",     "numberPush");
-    addRule("N=|Z||D||Z|",  "numberPush");
+    addRule("N=|Z||N|",     "numberPush");
+    //addRule("N=|Z||D||Z|",  "numberPush");
     addRule("D=.",          "", "numberBuf",".");
     addRule("Z=0",          "", "numberBuf","0");
     addRule("Z=1",          "", "numberBuf","1");
