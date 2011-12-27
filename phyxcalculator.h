@@ -23,8 +23,9 @@ typedef struct PhysicalVariableStruct {
 } PhysicalVariable;
 
 typedef struct {
-    void (PhyxCalculator::*valueFunction)();
-    void (PhyxCalculator::*unitFunction)();
+    QStringList functions;                          /// a list of functions to call
+    QString     paramFunction;                      /// the parameter function to call
+    QString     parameter;                          /// the parameter for the parameter function
 } PhyxRule;
 
 class PhyxCalculator : public QObject
@@ -33,30 +34,32 @@ class PhyxCalculator : public QObject
 public:
     explicit PhyxCalculator(QObject *parent = 0);
 
-    bool setExpression (QString m_expression);                                   ///< sets the expression, checks what must be parsed and returns wheter the expression is parsable or not
+    bool setExpression (QString m_expression);                                  ///< sets the expression, checks what must be parsed and returns wheter the expression is parsable or not
     bool evaluate();                                                            ///< evaluates the expression
 
 private:
-    QStack<PhyxValueDataType>   valueStack;             /// stack for value calculation
-    QStack<PhyxUnitDataType>    unitStack;              /// stack for unit calculation
-    QString                     numberBuffer;           /// string for buffering numbers
-    QString                     stringBuffer;           /// string for buffering strings
+    QStack<PhyxValueDataType>   valueStack;                                     /// stack for value calculation
+    QStack<PhyxUnitDataType>    unitStack;                                      /// stack for unit calculation
+    QString                     numberBuffer;                                   /// string for buffering numbers
+    QString                     stringBuffer;                                   /// string for buffering strings
 
-    QHash<QString, PhyxRule>    phyxRules;              /// map of all rules, key is rule
+    QHash<QString, PhyxRule>    phyxRules;                                      /// map of all rules, key is rule
 
-    QEarleyParser               earleyParser;           /// the earley parser
+    QEarleyParser               earleyParser;                                   /// the earley parser
 
-    QString                     expression;             /// currently set expression
-    bool                        expressionIsParsable;   /// holds wheter currently set expression is parsable or not
+    QString                     expression;                                     /// currently set expression
+    bool                        expressionIsParsable;                           /// holds wheter currently set expression is parsable or not
 
-    QMap<QString, PhysicalVariable> variableMap;        /// variables mapped with their name
-    QMap<QString, PhysicalVariable> constantMap;        /// constants mapped with their name
+    QMap<QString, PhysicalVariable> variableMap;                                /// variables mapped with their name
+    QMap<QString, PhysicalVariable> constantMap;                                /// constants mapped with their name
 
+    QHash<QString, void (PhyxCalculator::*)()> functionMap;                     /// functions mapped with their names
+    QHash<QString, void (PhyxCalculator::*)(QString)> paramFunctionMap;         /// function with one paramter mapped to their names
 
     void initialize();                                                                                              ///< initializes PhyxCalculator
 
     void raiseException(QString exception);                                                                         ///< raises an exception
-    void addRule(QString rule, void (PhyxCalculator::*valueFunction)(), void (PhyxCalculator::*unitFunction)());    ///< adds a rule
+    void addRule(QString rule, QString functions = "", QString paramFunction = "", QString parameter = "");    ///< adds a rule
 
     /** functions for value calculation */
     void valueAdd()         {valueStack.push(valueStack.pop() + valueStack.pop());}
@@ -122,24 +125,14 @@ private:
     void unitSqrt()         {unitStack.push(unitStack.pop() / 2);}
 
     /** functions for number generation */
-    void number0()          {numberBuffer.prepend('0');}
-    void number1()          {numberBuffer.prepend('1');}
-    void number2()          {numberBuffer.prepend('2');}
-    void number3()          {numberBuffer.prepend('3');}
-    void number4()          {numberBuffer.prepend('4');}
-    void number5()          {numberBuffer.prepend('5');}
-    void number6()          {numberBuffer.prepend('6');}
-    void number7()          {numberBuffer.prepend('7');}
-    void number8()          {numberBuffer.prepend('8');}
-    void number9()          {numberBuffer.prepend('9');}
-    void numberDot()        {numberBuffer.prepend('.');}
-    void numberPush()       {valueStack.push(numberBuffer.toDouble());
-                             numberBuffer.clear();}
+    void numberBuf(QString number)          {numberBuffer.prepend(number);}
+    void numberPush()                       {valueStack.push(numberBuffer.toDouble());
+                                            numberBuffer.clear();}
 
     /** functions for variable handling */
     void variableAdd();
     void variableRemove();
-    void variablePush();
+    void variablePush(QString name);
 signals:
     
 public slots:

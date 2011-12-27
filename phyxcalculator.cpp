@@ -21,32 +21,92 @@ void PhyxCalculator::initialize()
     //initialize random number generator
     qsrand(QDateTime::currentMSecsSinceEpoch());
 
-    addRule("S=|E|",        NULL, NULL);
-    addRule("E=|E|+|T|",    &PhyxCalculator::valueAdd, NULL);
-    addRule("E=|E|-|T|",    &PhyxCalculator::valueSub, NULL);
-    addRule("E=|T|",        NULL, NULL);
-    addRule("T=|T|*|F|",    &PhyxCalculator::valueMul, NULL);
-    addRule("T=|T|/|F|",    &PhyxCalculator::valueDiv, NULL);
-    addRule("T=|F|",        NULL, NULL);
-    addRule("F=|N|",        NULL, NULL);
-    addRule("F=-|F|",       NULL, NULL);
-    addRule("F=+|F|",       NULL, NULL);
-    addRule("F=(|F|)",      NULL, NULL);
-    addRule("T=sin(|F|)",   &PhyxCalculator::valueSin, NULL);
-    addRule("N=|Z|",        &PhyxCalculator::numberPush, NULL);
-    addRule("N=|Z||Z|",     &PhyxCalculator::numberPush, NULL);
-    addRule("N=|Z||D||Z|",  &PhyxCalculator::numberPush, NULL);
-    addRule("D=.",          &PhyxCalculator::numberDot, NULL);
-    addRule("Z=0",          &PhyxCalculator::number0, NULL);
-    addRule("Z=1",          &PhyxCalculator::number1, NULL);
-    addRule("Z=2",          &PhyxCalculator::number2, NULL);
-    addRule("Z=3",          &PhyxCalculator::number3, NULL);
-    addRule("Z=4",          &PhyxCalculator::number4, NULL);
-    addRule("Z=5",          &PhyxCalculator::number5, NULL);
-    addRule("Z=6",          &PhyxCalculator::number6, NULL);
-    addRule("Z=7",          &PhyxCalculator::number7, NULL);
-    addRule("Z=8",          &PhyxCalculator::number8, NULL);
-    addRule("Z=9",          &PhyxCalculator::number9, NULL);
+    //map functions
+    functionMap.insert("valueAdd",      &PhyxCalculator::valueAdd);
+    functionMap.insert("valueSub",      &PhyxCalculator::valueSub);
+    functionMap.insert("valueMul",      &PhyxCalculator::valueMul);
+    functionMap.insert("valueDiv",      &PhyxCalculator::valueDiv);
+    functionMap.insert("valueNeg",      &PhyxCalculator::valueNeg);
+    functionMap.insert("valueExponent", &PhyxCalculator::valueExponent);
+    functionMap.insert("valueExp2",     &PhyxCalculator::valueExp2);
+    functionMap.insert("valueExp3",     &PhyxCalculator::valueExp3);
+    functionMap.insert("valueSin",      &PhyxCalculator::valueSin);
+    functionMap.insert("valueArcsin",   &PhyxCalculator::valueArcsin);
+    functionMap.insert("valueCos",      &PhyxCalculator::valueCos);
+    functionMap.insert("valueArccos",   &PhyxCalculator::valueArccos);
+    functionMap.insert("valueTan",      &PhyxCalculator::valueTan);
+    functionMap.insert("valueArctan",   &PhyxCalculator::valueArctan);
+    functionMap.insert("valueSinh",     &PhyxCalculator::valueSinh);
+    functionMap.insert("valueArcsinh",  &PhyxCalculator::valueArcsinh);
+    functionMap.insert("valueCosh",     &PhyxCalculator::valueCosh);
+    functionMap.insert("valueArccosh",  &PhyxCalculator::valueArccosh);
+    functionMap.insert("valueTanh",     &PhyxCalculator::valueTanh);
+    functionMap.insert("valueArctanh",  &PhyxCalculator::valueArctanh);
+    functionMap.insert("valueExp",      &PhyxCalculator::valueExp);
+    functionMap.insert("valueLn",       &PhyxCalculator::valueLn);
+    functionMap.insert("valueLog10",    &PhyxCalculator::valueLog10);
+    functionMap.insert("valueLog2",     &PhyxCalculator::valueLog2);
+    functionMap.insert("valueLogn",     &PhyxCalculator::valueLogn);
+    functionMap.insert("valueSqrt",     &PhyxCalculator::valueSqrt);
+    functionMap.insert("valueAbs",      &PhyxCalculator::valueAbs);
+    functionMap.insert("valueMax",      &PhyxCalculator::valueMax);
+    functionMap.insert("valueMin",      &PhyxCalculator::valueMin);
+    functionMap.insert("valuePi",       &PhyxCalculator::valuePi);
+    functionMap.insert("valueInt",      &PhyxCalculator::valueInt);
+    functionMap.insert("valueTrunc",    &PhyxCalculator::valueTrunc);
+    functionMap.insert("valueFloor",    &PhyxCalculator::valueFloor);
+    functionMap.insert("valueRound",    &PhyxCalculator::valueRound);
+    functionMap.insert("valueCeil",     &PhyxCalculator::valueCeil);
+    functionMap.insert("valueSign",     &PhyxCalculator::valueSign);
+    functionMap.insert("valueHeaviside",&PhyxCalculator::valueHeaviside);
+    functionMap.insert("valueRand",     &PhyxCalculator::valueRand);
+    functionMap.insert("valueRandint",  &PhyxCalculator::valueRandint);
+    functionMap.insert("valueRandg",    &PhyxCalculator::valueRandg);
+
+    functionMap.insert("unit0",         &PhyxCalculator::unit0);
+    functionMap.insert("unitCheckEqual",&PhyxCalculator::unitCheckEqual);
+    functionMap.insert("unitCheck0",    &PhyxCalculator::unitCheck0);
+    functionMap.insert("unitCheck0k",   &PhyxCalculator::unitCheck0k);
+    functionMap.insert("unitMul",       &PhyxCalculator::unitMul);
+    functionMap.insert("unitDiv",       &PhyxCalculator::unitDiv);
+    functionMap.insert("unitExponent",  &PhyxCalculator::unitExponent);
+    functionMap.insert("unitExp2",      &PhyxCalculator::unitExp2);
+    functionMap.insert("unitExp3",      &PhyxCalculator::unitExp3);
+    functionMap.insert("unitSqrt",      &PhyxCalculator::unitSqrt);
+
+    functionMap.insert("numberPush",    &PhyxCalculator::numberPush);
+    functionMap.insert("variableAdd",   &PhyxCalculator::variableAdd);
+    functionMap.insert("variableRemove",&PhyxCalculator::variableRemove);
+
+    paramFunctionMap.insert("numberBuf",        &PhyxCalculator::numberBuf);
+    paramFunctionMap.insert("variablePush",      &PhyxCalculator::variablePush);
+
+    addRule("S=|E|");
+    addRule("E=|E|+|T|",    "valueAdd");
+    addRule("E=|E|-|T|",    "valueSub");
+    addRule("E=|T|");
+    addRule("T=|T|*|F|",    "valueMul");
+    addRule("T=|T|/|F|",    "valueDiv");
+    addRule("T=|F|");
+    addRule("F=|N|");
+    addRule("F=-|F|");
+    addRule("F=+|F|");
+    addRule("F=(|F|)");
+    addRule("T=sin(|F|)",   "valueSin");
+    addRule("N=|Z|",        "numberPush");
+    addRule("N=|Z||Z|",     "numberPush");
+    addRule("N=|Z||D||Z|",  "numberPush");
+    addRule("D=.",          "", "numberBuf",".");
+    addRule("Z=0",          "", "numberBuf","0");
+    addRule("Z=1",          "", "numberBuf","1");
+    addRule("Z=2",          "", "numberBuf","2");
+    addRule("Z=3",          "", "numberBuf","3");
+    addRule("Z=4",          "", "numberBuf","4");
+    addRule("Z=5",          "", "numberBuf","5");
+    addRule("Z=6",          "", "numberBuf","6");
+    addRule("Z=7",          "", "numberBuf","7");
+    addRule("Z=8",          "", "numberBuf","8");
+    addRule("Z=9",          "", "numberBuf","9");
 }
 
 void PhyxCalculator::raiseException(QString exception)
@@ -54,11 +114,13 @@ void PhyxCalculator::raiseException(QString exception)
     qDebug() << exception;
 }
 
-void PhyxCalculator::addRule(QString rule, void (PhyxCalculator::*valueFunction)(), void (PhyxCalculator::*unitFunction)())
+void PhyxCalculator::addRule(QString rule, QString functions, QString paramFunction, QString parameter)
 {
     PhyxRule phyxRule;
-    phyxRule.valueFunction = valueFunction;
-    phyxRule.unitFunction = unitFunction;
+    if (!functions.isEmpty())
+        phyxRule.functions = functions.split(',');
+    phyxRule.paramFunction = paramFunction;
+    phyxRule.parameter = parameter;
     phyxRules.insert(rule, phyxRule);
 
     earleyParser.loadRule(rule);
@@ -108,10 +170,15 @@ bool PhyxCalculator::evaluate()
             EarleyTreeItem *earleyTreeItem = &earleyTree[i];
             PhyxRule phyxRule = phyxRules.value(earleyTreeItem->rule);
 
-            if (phyxRule.valueFunction != NULL)
-                (this->*phyxRule.valueFunction)();
-            if (phyxRule.unitFunction != NULL)
-                (this->*phyxRule.unitFunction)();
+            if (!phyxRule.functions.isEmpty())
+            {
+                foreach (QString function, phyxRule.functions)
+                {
+                    (this->*functionMap.value(function))();
+                }
+            }
+            if (!phyxRule.paramFunction.isEmpty())
+                (this->*paramFunctionMap.value(phyxRule.paramFunction))(phyxRule.parameter);
         }
         qDebug() << (double)valueStack.pop();
         return true;
@@ -155,10 +222,9 @@ void PhyxCalculator::variableRemove()
     stringBuffer.clear();
 }
 
-void PhyxCalculator::variablePush()
+void PhyxCalculator::variablePush(QString name)
 {
-    PhysicalVariable variable = variableMap.value(stringBuffer);
+    PhysicalVariable variable = variableMap.value(name);
     valueStack.push(variable.value);
     valueStack.push(variable.unit);
-    stringBuffer.clear();
 }
