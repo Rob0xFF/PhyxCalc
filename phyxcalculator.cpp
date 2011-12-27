@@ -8,7 +8,7 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
     earleyParser.setStartSymbol("S");
     qDebug() << setExpression("1.4+4.7*3");
     qDebug() << setExpression("1.4+4.7*3+1");
-    qDebug() << setExpression("1.4+4.7*3");
+    qDebug() << setExpression("1.4+sin(4.7)*3");
     evaluate();
 }
 
@@ -138,4 +138,27 @@ void PhyxCalculator::valueFaculty()
         value *= i;
 
     valueStack.push(value);
+}
+
+void PhyxCalculator::variableAdd()
+{
+    PhysicalVariable variable;
+    variable.value = valueStack.pop();
+    variable.unit = unitStack.pop();
+    variableMap.insert(stringBuffer, variable);
+    stringBuffer.clear();
+}
+
+void PhyxCalculator::variableRemove()
+{
+    variableMap.remove(stringBuffer);
+    stringBuffer.clear();
+}
+
+void PhyxCalculator::variablePush()
+{
+    PhysicalVariable variable = variableMap.value(stringBuffer);
+    valueStack.push(variable.value);
+    valueStack.push(variable.unit);
+    stringBuffer.clear();
 }

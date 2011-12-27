@@ -10,6 +10,18 @@
 
 class PhyxCalculator;
 
+typedef long double         PhyxValueDataType;      /// the base data type for values
+typedef float               PhyxUnitDataType;       /// the base data type for units
+
+typedef struct PhysicalVariableStruct {
+    PhyxValueDataType  value;
+    PhyxUnitDataType unit;
+    bool operator ==(const PhysicalVariableStruct &item) const
+    {
+        return (value == item.value) && (unit == item.unit);
+    }
+} PhysicalVariable;
+
 typedef struct {
     void (PhyxCalculator::*valueFunction)();
     void (PhyxCalculator::*unitFunction)();
@@ -25,11 +37,10 @@ public:
     bool evaluate();                                                            ///< evaluates the expression
 
 private:
-    typedef long double         PhyxValueDataType;      /// the base data type for values
-    typedef float               PhyxUnitDataType;       /// the base data type for units
     QStack<PhyxValueDataType>   valueStack;             /// stack for value calculation
     QStack<PhyxUnitDataType>    unitStack;              /// stack for unit calculation
     QString                     numberBuffer;           /// string for buffering numbers
+    QString                     stringBuffer;           /// string for buffering strings
 
     QHash<QString, PhyxRule>    phyxRules;              /// map of all rules, key is rule
 
@@ -37,6 +48,10 @@ private:
 
     QString                     expression;             /// currently set expression
     bool                        expressionIsParsable;   /// holds wheter currently set expression is parsable or not
+
+    QMap<QString, PhysicalVariable> variableMap;        /// variables mapped with their name
+    QMap<QString, PhysicalVariable> constantMap;        /// constants mapped with their name
+
 
     void initialize();                                                                                              ///< initializes PhyxCalculator
 
@@ -120,6 +135,11 @@ private:
     void numberDot()        {numberBuffer.prepend('.');}
     void numberPush()       {valueStack.push(numberBuffer.toDouble());
                              numberBuffer.clear();}
+
+    /** functions for variable handling */
+    void variableAdd();
+    void variableRemove();
+    void variablePush();
 signals:
     
 public slots:
