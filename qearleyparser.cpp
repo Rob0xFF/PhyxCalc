@@ -221,7 +221,7 @@ void QEarleyParser::appendEarleyItem(int index, EarleySymbol A, EarleyRule alpha
 
     earleyItemLists[index].append(earleyItem);
 
-    qDebug() << index << A << alpha << beta << K;
+    //qDebug() << index << A << alpha << beta << K;
 }
 
 void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *tree)
@@ -234,12 +234,14 @@ void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *
             if (lastSymbol < 0)     //if symbol < 0, symbol = nonTerminal
             {
                 //backward predictor
-                foreach (EarleyItem item, earleyItemLists.at(listIndex))
+                for (int i = 0; i < earleyItemLists.at(listIndex).size(); i++)//foreach (EarleyItem item, earleyItemLists.at(listIndex))
                 {
-                    if (item.beta.isEmpty() && (item.A == lastSymbol))
+                    if (earleyItemLists.at(listIndex).at(i).A == lastSymbol)  //item.beta.isEmpty() is now unnessecary here
                     {
-                        tree->insert(itemIndex+1,item);
+                        tree->insert(itemIndex+1,earleyItemLists.at(listIndex).at(i));
                         treeRecursion(listIndex, itemIndex+1, tree);
+                        earleyItemLists[listIndex].removeAt(i);
+                        i--;
                     }
                 }
             }
@@ -253,9 +255,12 @@ void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *
         else
         {
             //backward completer
-            if (!tree->at(itemIndex-1).alpha.isEmpty())
-                (*tree)[itemIndex-1].beta.prepend((*tree)[itemIndex-1].alpha.takeLast());
-            treeRecursion(listIndex, itemIndex-1, tree);
+            if (itemIndex > 0)
+            {
+                if (!tree->at(itemIndex-1).alpha.isEmpty())
+                    (*tree)[itemIndex-1].beta.prepend((*tree)[itemIndex-1].alpha.takeLast());
+                treeRecursion(listIndex, itemIndex-1, tree);
+            }
         }
     }
 }
@@ -265,12 +270,21 @@ QList<EarleyTreeItem> QEarleyParser::createTree()
     EarleyItemList tree;
 
     //remove unneeded items
-    foreach (EarleyItemList list, earleyItemLists)
+    for (int listIndex = 0; listIndex < itemListCount; listIndex++)
     {
-        for (int i = list.size()-1; i >= 0 ; i--)
+        for (int i = earleyItemLists.at(listIndex).size()-1; i >= 0 ; i--)
         {
-            if (!list.at(i).beta.isEmpty())
-                list.removeAt(i);
+            if (!earleyItemLists.at(listIndex).at(i).beta.isEmpty())
+                earleyItemLists[listIndex].removeAt(i);
+        }
+    }
+
+    //for testing purposes only
+    for (int i = 0; i < itemListCount; i++)
+    {
+        foreach (EarleyItem item, earleyItemLists.at(i))
+        {
+            qDebug() << i << item.A << item.alpha << item.beta << item.K;
         }
     }
 

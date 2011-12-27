@@ -638,28 +638,40 @@ void LineParser::testParser()
     QEarleyParser earleyParser;
 
     QStringList list;
-    /*list.append("S=|E|");
+    list.append("S=|E|");
     list.append("E=|E|+|T|");
     list.append("E=|E|-|T|");
     list.append("E=|T|");
     list.append("T=|T|*|F|");
     list.append("T=|T|/|F|");
     list.append("T=|F|");
-    list.append("F=n");
+    list.append("F=|N|");
     list.append("F=-|F|");
     list.append("F=+|F|");
     list.append("F=(|E|)");
     list.append("T=sin(|F|)");
-    list.append("T=");*/
-    list.append("S=|E|");
+    list.append("N=|Z|");
+    list.append("N=|Z||N|");
+    list.append("Z=1");
+    list.append("Z=2");
+    list.append("Z=3");
+    list.append("Z=4");
+    list.append("Z=5");
+    list.append("Z=6");
+    list.append("Z=7");
+    list.append("Z=8");
+    list.append("Z=9");
+    list.append("Z=0");
+
+    /*list.append("S=|E|");
     list.append("E=|A||A||A||A|");
     list.append("A=a");
     list.append("A=|X|");
-    list.append("X=");
+    list.append("X=");*/
 
     earleyParser.loadRules(list);
 
-    earleyParser.parseWord("a", "S");
+    earleyParser.parseWord("14+5", "S");
 
     PhyxCalculator phyxCalculator;
 }
