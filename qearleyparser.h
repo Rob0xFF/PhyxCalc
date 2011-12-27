@@ -6,14 +6,14 @@
 #include <QMultiHash>
 #include <QDebug>
 
-typedef qint32                  EarleySymbol; //datatype of one symbol
-typedef QList<EarleySymbol>     EarleyRule;   //a list containing symbols (nonTerminals and terminals)
+typedef qint32                  EarleySymbol; /// datatype of one symbol
+typedef QList<EarleySymbol>     EarleyRule;   /// a list containing symbols (nonTerminals and terminals)
 
 typedef struct EarleyItemStruct{
-    EarleySymbol    A;          //premise
-    EarleyRule      alpha;      //recognized part of the rule
-    EarleyRule      beta;       //not recognized part of the rule
-    int             K;          //backpointer of the item
+    EarleySymbol    A;          /// premise
+    EarleyRule      alpha;      /// recognized part of the rule
+    EarleyRule      beta;       /// not recognized part of the rule
+    int             K;          /// backpointer of the item
 
     bool operator ==(const EarleyItemStruct &item) const
     {
@@ -34,46 +34,38 @@ class QEarleyParser : public QObject
 public:
     explicit QEarleyParser(QObject *parent = 0);
 
-    /* loads the rules from a string list and fills nonTerminals and terminals */
-    bool loadRules(QStringList ruleList);
-    /* loads one rule */
-    bool loadRule(QString rule);
-    /* sets the word for pasing */
-    void setWord(QString earleyWord);
-    /* sets the start symbol */
-    void setStartSymbol(QString earleyStartSymbol);
-    /* starts to parse from start position, return wheter parsing was successful or not*/
-    bool parse(int startPosition = 0);
-    /* parse the word starting with the given start symbol */
-    void parseWord(QString earleyWord, QString earleyStartSymbol);
-    /* creates the binary tree*/
-    QList<EarleyTreeItem> createTree();
+    bool loadRules(QStringList ruleList);                               ///< loads the rules from a string list and fills nonTerminals and terminals
+    bool loadRule(QString rule);                                        ///< loads one rule
+    void setStartSymbol(QString earleyStartSymbol);                     ///< sets the start symbol
+    bool parse(int startPosition = 0);                                  ///< starts to parse from start position, return wheter parsing was successful or not
+    bool parseWord(QString earleyWord);                                 ///< parse the given word, returns wheter word can be build with the given grammar or not
+    void clearWord();                                                   ///< clears the word
+    bool addSymbol(QChar earleySymbol);                                 ///< adds one symbol to word and parses it, return is same as parseWord
+    bool removeSymbol();                                                ///< removes one symbol from word and parses it, return is same as parseWord
+    QList<EarleyTreeItem> getTree();                                    ///< creates and returns the binary tree
 
 private:
 
-    QVector<QList<EarleyRule> >     rules;
-    //QMultiHash<QString, EarleyRule>   rules;              //mapping of all rules, for quick finding rules with the key (premise, member of nonTerminals)
-    QVector<bool>                   isNullableVector;       //vector holding wheter a nonTerminal at index is nullable or not, needed for epsilon rules
-    //QStringList         terminals;                        //contains all terminals, not needed, because terminals are represented by unicode value
-    QStringList                     nonTerminals;           //contains all nonTerminals
-    EarleySymbol                    startSymbol;            //the start symbol
+    QVector<QList<EarleyRule> >     rules;                  /// vector holding all rules, index is index in nonTerminals
+    //QMultiHash<QString, EarleyRule>   rules;
+    QVector<bool>                   isNullableVector;       /// vector holding wheter a nonTerminal at index is nullable or not, needed for epsilon rules
+    //QStringList         terminals;                        /// contains all terminals, not needed, because terminals are represented by unicode value
+    QStringList                     nonTerminals;           /// contains all nonTerminals
+    EarleySymbol                    startSymbol;            /// the start symbol
 
 
-    QList<EarleyItemList>           earleyItemLists;      //holds the item lists
-    int                             itemListCount;          //the count of item lists needed for pasing
+    QList<EarleyItemList>           earleyItemLists;        /// holds the item lists
+    int                             itemListCount;          /// the count of item lists needed for pasing
 
     EarleyRule word;
 
-    /* initializes variables and lists for the parser*/
-    void initialize();
-    /* recursive function to create the binary tree */
-    void treeRecursion(int listIndex, int itemIndex, EarleyItemList *tree);
 
-    /* appends an item to the given ItemList (index), checks also for duplicates */
-    void appendEarleyItem(int index, EarleySymbol A, EarleyRule alpha, EarleyRule beta, int K);
-
-    /* checks for duplicates and adds a NonTerminal, return NonTerminal-Index*/
-    qint32 addNonTerminal(QString nonTerminal);
+    void initialize();                                                                              ///< initializes variables and lists for the parser
+    void setWord(QString earleyWord);                                                               ///< sets the word for pasing
+    void treeRecursion(int listIndex, int itemIndex, EarleyItemList *tree);                         ///< recursive function to create the binary tree
+    void appendEarleyItem(int index, EarleySymbol A, EarleyRule alpha, EarleyRule beta, int K);     ///< appends an item to the given ItemList (index), checks also for duplicates
+    bool checkSuccessful();                                                                         ///< checks wheter parsing was successful or not
+    EarleySymbol addNonTerminal(QString nonTerminal);                                               ///< checks for duplicates and adds a NonTerminal, return NonTerminal-Index
 
 signals:
 

@@ -82,7 +82,7 @@ bool QEarleyParser::loadRules(QStringList ruleList)
     return true;
 }
 
-qint32 QEarleyParser::addNonTerminal(QString nonTerminal)
+EarleySymbol QEarleyParser::addNonTerminal(QString nonTerminal)
 {
     if (nonTerminals.contains(nonTerminal))
         return -nonTerminals.indexOf(nonTerminal);
@@ -116,7 +116,7 @@ bool QEarleyParser::parse(int startPosition)
         appendEarleyItem(0, startSymbol, EarleyRule(), rule, 0);
     }
 
-    for (int i = 0; i < itemListCount; i++)
+    for (int i = startPosition; i < itemListCount; i++)
     {
         int oldcount = -1;
         while (earleyItemLists.at(currentIndex).size() != oldcount)
@@ -179,13 +179,16 @@ bool QEarleyParser::parse(int startPosition)
     }
 
     //check wheter parsing was successful or not
+    return checkSuccessful();
+}
+
+bool QEarleyParser::checkSuccessful()
+{
     foreach (EarleyItem item, earleyItemLists.last())
     {
         if ((item.A == startSymbol) && item.beta.isEmpty())
             return true;
     }
-
-    return false;
 }
 
 void QEarleyParser::setWord(QString earleyWord)
@@ -205,15 +208,37 @@ void QEarleyParser::setStartSymbol(QString earleyStartSymbol)
 }
 
 // this function is only for testing purposes
-void QEarleyParser::parseWord(QString earleyWord, QString earleyStartSymbol)
+bool QEarleyParser::parseWord(QString earleyWord)
 {
     setWord(earleyWord);
-    setStartSymbol(earleyStartSymbol);
+    return parse();
+}
 
-    if (parse())
-        createTree();
+void QEarleyParser::clearWord()
+{
+    itemListCount = 0;
+    earleyItemLists.clear();
+}
+
+bool QEarleyParser::addSymbol(QChar earleySymbol)
+{
+    word.append(earleySymbol.unicode());
+    itemListCount++;
+    earleyItemLists.append(EarleyItemList());
+
+    return parse(itemListCount-2);
+}
+
+bool QEarleyParser::removeSymbol()
+{
+    if (itemListCount > 1)
+    {
+        itemListCount--;
+        earleyItemLists.removeLast();
+        return checkSuccessful();
+    }
     else
-        qDebug() << "Syntax Error!";
+        return false;
 }
 
 void QEarleyParser::appendEarleyItem(int index, EarleySymbol A, EarleyRule alpha, EarleyRule beta, int K)
@@ -265,7 +290,7 @@ void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *
             else
             {
                 //backward scanner
-                (*tree)[itemIndex].beta.prepend((*tree)[itemIndex].alpha.takeLast());
+                (*tree)[itemIndex].beta.prepend((*tree)[itemIndex].alpha.takeLast());       //move point left
                 treeRecursion(listIndex-1, itemIndex, tree);
             }
         }
@@ -282,7 +307,7 @@ void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *
     }
 }
 
-QList<EarleyTreeItem> QEarleyParser::createTree()
+QList<EarleyTreeItem> QEarleyParser::getTree()
 {
     EarleyItemList tree;
 

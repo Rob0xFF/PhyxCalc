@@ -21,34 +21,29 @@ class PhyxCalculator : public QObject
 public:
     explicit PhyxCalculator(QObject *parent = 0);
 
-    /* sets the expression */
-    void setExpression (QString m_expression) {expression = m_expression;}
-    /* evaluates the expression */
-    bool evaluate();
+    bool setExpression (QString m_expression);                                   ///< sets the expression, checks what must be parsed and returns wheter the expression is parsable or not
+    bool evaluate();                                                            ///< evaluates the expression
 
 private:
-    typedef long double         PhyxValueDataType;      //the base data type for values
-    typedef float               PhyxUnitDataType;       //the base data type for units
-    QStack<PhyxValueDataType>   valueStack;             //stack for value calculation
-    QStack<PhyxUnitDataType>    unitStack;              //stack for unit calculation
-    QString                     numberBuffer;           //string for buffering numbers
+    typedef long double         PhyxValueDataType;      /// the base data type for values
+    typedef float               PhyxUnitDataType;       /// the base data type for units
+    QStack<PhyxValueDataType>   valueStack;             /// stack for value calculation
+    QStack<PhyxUnitDataType>    unitStack;              /// stack for unit calculation
+    QString                     numberBuffer;           /// string for buffering numbers
 
-    QHash<QString, PhyxRule>    phyxRules;              //map of all rules, key is rule
+    QHash<QString, PhyxRule>    phyxRules;              /// map of all rules, key is rule
 
-    QEarleyParser               earleyParser;           //the earley parser
+    QEarleyParser               earleyParser;           /// the earley parser
 
-    QString                     expression;             //currently set expression
+    QString                     expression;             /// currently set expression
+    bool                        expressionIsParsable;   /// holds wheter currently set expression is parsable or not
 
-    /* initializes PhyxCalculator */
-    void initialize();
+    void initialize();                                                                                              ///< initializes PhyxCalculator
 
-    /* raises an exception */
-    void raiseException(QString exception);
+    void raiseException(QString exception);                                                                         ///< raises an exception
+    void addRule(QString rule, void (PhyxCalculator::*valueFunction)(), void (PhyxCalculator::*unitFunction)());    ///< adds a rule
 
-    /* adds a rule */
-    void addRule(QString rule, void (PhyxCalculator::*valueFunction)(), void (PhyxCalculator::*unitFunction)());
-
-    /* functions for value calculation */
+    /** functions for value calculation */
     void valueAdd()         {valueStack.push(valueStack.pop() + valueStack.pop());}
     void valueSub()         {valueStack.push(valueStack.pop() - valueStack.pop());}
     void valueMul()         {valueStack.push(valueStack.pop() * valueStack.pop());}
@@ -94,7 +89,7 @@ private:
                              valueStack.push(min + qrand()%(max-min+1));}
     void valueFaculty();
 
-    /* functions for unit calculation */
+    /** functions for unit calculation */
     void unit0()            {/* ?? */}
     void unitCheckEqual()   {PhyxUnitDataType unit = unitStack.pop();
                             if (unit != unitStack.pop())
@@ -111,7 +106,7 @@ private:
     void unitExp3()         {unitStack.push(unitStack.pop() * 3);}
     void unitSqrt()         {unitStack.push(unitStack.pop() / 2);}
 
-    /* functions for number generation */
+    /** functions for number generation */
     void number0()          {numberBuffer.prepend('0');}
     void number1()          {numberBuffer.prepend('1');}
     void number2()          {numberBuffer.prepend('2');}
