@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include "cmath"
+#include "qearleyparser.h"
 
 class PhyxCalculator;
 
@@ -20,13 +21,23 @@ class PhyxCalculator : public QObject
 public:
     explicit PhyxCalculator(QObject *parent = 0);
 
-private:
-    typedef long double PhyxValueDataType;      //the base data type for values
-    typedef float       PhyxUnitDataType;       //the base data type for units
-    QStack<PhyxValueDataType>   valueStack;     //stack for value calculation
-    QStack<PhyxUnitDataType>    unitStack;      //stack for unit calculation
+    /* sets the expression */
+    void setExpression (QString m_expression) {expression = m_expression;}
+    /* evaluates the expression */
+    bool evaluate();
 
-    QHash<QString, PhyxRule> phyxRules;         //map of all rules, key is rule
+private:
+    typedef long double         PhyxValueDataType;      //the base data type for values
+    typedef float               PhyxUnitDataType;       //the base data type for units
+    QStack<PhyxValueDataType>   valueStack;             //stack for value calculation
+    QStack<PhyxUnitDataType>    unitStack;              //stack for unit calculation
+    QString                     numberBuffer;           //string for buffering numbers
+
+    QHash<QString, PhyxRule>    phyxRules;              //map of all rules, key is rule
+
+    QEarleyParser               earleyParser;           //the earley parser
+
+    QString                     expression;             //currently set expression
 
     /* initializes PhyxCalculator */
     void initialize();
@@ -36,7 +47,7 @@ private:
 
     /* adds a rule */
     void addRule(QString rule, void (PhyxCalculator::*valueFunction)(), void (PhyxCalculator::*unitFunction)());
-    
+
     /* functions for value calculation */
     void valueAdd()         {valueStack.push(valueStack.pop() + valueStack.pop());}
     void valueSub()         {valueStack.push(valueStack.pop() - valueStack.pop());}
@@ -99,6 +110,21 @@ private:
     void unitExp2()         {unitStack.push(unitStack.pop() * 2);}
     void unitExp3()         {unitStack.push(unitStack.pop() * 3);}
     void unitSqrt()         {unitStack.push(unitStack.pop() / 2);}
+
+    /* functions for number generation */
+    void number0()          {numberBuffer.prepend('0');}
+    void number1()          {numberBuffer.prepend('1');}
+    void number2()          {numberBuffer.prepend('2');}
+    void number3()          {numberBuffer.prepend('3');}
+    void number4()          {numberBuffer.prepend('4');}
+    void number5()          {numberBuffer.prepend('5');}
+    void number6()          {numberBuffer.prepend('6');}
+    void number7()          {numberBuffer.prepend('7');}
+    void number8()          {numberBuffer.prepend('8');}
+    void number9()          {numberBuffer.prepend('9');}
+    void numberDot()        {numberBuffer.prepend('.');}
+    void numberPush()       {valueStack.push(numberBuffer.toDouble());
+                             numberBuffer.clear();}
 signals:
     
 public slots:

@@ -7,6 +7,14 @@ QEarleyParser::QEarleyParser(QObject *parent) :
 
 bool QEarleyParser::loadRule(QString rule)
 {
+    //fixing the nonTerminal 0 problem, 0 is already a terminal
+    if (nonTerminals.isEmpty())
+    {
+        nonTerminals.append(QString());
+        rules.append(QList<EarleyRule>());
+        isNullableVector.append(false);
+    }
+
     int equalPos = rule.indexOf('=');
     if (equalPos == -1)
     {
@@ -62,11 +70,6 @@ bool QEarleyParser::loadRules(QStringList ruleList)
     nonTerminals.clear();
     rules.clear();
     isNullableVector.clear();
-
-    //fixing the nonTerminal 0 problem, 0 is already a terminal
-    nonTerminals.append(QString());
-    rules.append(QList<EarleyRule>());
-    isNullableVector.append(false);
 
     foreach (QString rule, ruleList)
     {
@@ -185,8 +188,7 @@ bool QEarleyParser::parse(int startPosition)
     return false;
 }
 
-// this function is only for testing purposes
-void QEarleyParser::parseWord(QString earleyWord, QString earleyStartSymbol)
+void QEarleyParser::setWord(QString earleyWord)
 {
     word.clear();
     foreach (QChar character, earleyWord)
@@ -194,9 +196,20 @@ void QEarleyParser::parseWord(QString earleyWord, QString earleyStartSymbol)
         word.append(character.unicode());
     }
 
-    startSymbol = -nonTerminals.indexOf(earleyStartSymbol);
-
     initialize();
+}
+
+void QEarleyParser::setStartSymbol(QString earleyStartSymbol)
+{
+    startSymbol = -nonTerminals.indexOf(earleyStartSymbol);
+}
+
+// this function is only for testing purposes
+void QEarleyParser::parseWord(QString earleyWord, QString earleyStartSymbol)
+{
+    setWord(earleyWord);
+    setStartSymbol(earleyStartSymbol);
+
     if (parse())
         createTree();
     else
@@ -205,13 +218,13 @@ void QEarleyParser::parseWord(QString earleyWord, QString earleyStartSymbol)
 
 void QEarleyParser::appendEarleyItem(int index, EarleySymbol A, EarleyRule alpha, EarleyRule beta, int K)
 {
-    bool match = false;
+    /*bool match = false;
     foreach (EarleyItem item, earleyItemLists.at(index))
     {
         match |= (item.A == A) && (item.alpha == alpha) && (item.beta == beta) && (item.K == K);
         if (match)
             return;
-    }
+    }*/
 
     EarleyItem earleyItem;
     earleyItem.A = A;
@@ -219,9 +232,12 @@ void QEarleyParser::appendEarleyItem(int index, EarleySymbol A, EarleyRule alpha
     earleyItem.beta = beta;
     earleyItem.K = K;
 
-    earleyItemLists[index].append(earleyItem);
+    if (!earleyItemLists.at(index).contains(earleyItem))
+        earleyItemLists[index].append(earleyItem);
+    else
+        return;
 
-    //qDebug() << index << A << alpha << beta << K;
+//    qDebug() << index << A << alpha << beta << K;
 }
 
 void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *tree)
@@ -236,9 +252,10 @@ void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *
                 //backward predictor
                 for (int i = 0; i < earleyItemLists.at(listIndex).size(); i++)//foreach (EarleyItem item, earleyItemLists.at(listIndex))
                 {
-                    if (earleyItemLists.at(listIndex).at(i).A == lastSymbol)  //item.beta.isEmpty() is now unnessecary here
+                    EarleyItem *item = &earleyItemLists[listIndex][i];
+                    if (item->A == lastSymbol)  //item.beta.isEmpty() is now unnessecary here
                     {
-                        tree->insert(itemIndex+1,earleyItemLists.at(listIndex).at(i));
+                        tree->insert(itemIndex+1,*item);
                         treeRecursion(listIndex, itemIndex+1, tree);
                         earleyItemLists[listIndex].removeAt(i);
                         i--;

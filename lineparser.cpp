@@ -635,7 +635,7 @@ void LineParser::clearAllVariables()
 
 void LineParser::testParser()
 {
-    QEarleyParser earleyParser;
+    /*QEarleyParser earleyParser;
 
     QStringList list;
     list.append("S=|E|");
@@ -651,7 +651,7 @@ void LineParser::testParser()
     list.append("F=(|E|)");
     list.append("T=sin(|F|)");
     list.append("N=|Z|");
-    list.append("N=|Z||N|");
+    list.append("N=|Z||Z|");
     list.append("Z=1");
     list.append("Z=2");
     list.append("Z=3");
@@ -661,7 +661,7 @@ void LineParser::testParser()
     list.append("Z=7");
     list.append("Z=8");
     list.append("Z=9");
-    list.append("Z=0");
+    list.append("Z=0");*/
 
     /*list.append("S=|E|");
     list.append("E=|A||A||A||A|");
@@ -669,9 +669,9 @@ void LineParser::testParser()
     list.append("A=|X|");
     list.append("X=");*/
 
-    earleyParser.loadRules(list);
+    //earleyParser.loadRules(list);
 
-    earleyParser.parseWord("14+5", "S");
+    //earleyParser.parseWord("10+5", "S");
 
     PhyxCalculator phyxCalculator;
 }
