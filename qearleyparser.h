@@ -11,13 +11,16 @@ typedef QList<EarleySymbol>     EarleyRule;   /// a list containing symbols (non
 
 typedef struct EarleyItemStruct{
     EarleySymbol    A;          /// premise
-    EarleyRule      alpha;      /// recognized part of the rule
-    EarleyRule      beta;       /// not recognized part of the rule
+    //EarleyRule      alpha;      /// recognized part of the rule
+    //EarleyRule      beta;       /// not recognized part of the rule
+    EarleyRule      *rule;      /// a pointer to the rule
+    int             dotPos;        /// the position of the dot, left side recognized, right side not recognized
     int             K;          /// backpointer of the item
 
     bool operator ==(const EarleyItemStruct &item) const
     {
-        return (A == item.A) && (alpha == item.alpha) && (beta == item.beta) && (K == item.K);
+        //return (A == item.A) && (alpha == item.alpha) && (beta == item.beta) && (K == item.K);
+        return (A == item.A) && (rule == item.rule) && (dotPos == item.dotPos) && (K == item.K);
     }
 } EarleyItem;
 
@@ -64,7 +67,7 @@ private:
     void initialize();                                                                              ///< initializes variables and lists for the parser
     void setWord(QString earleyWord);                                                               ///< sets the word for pasing
     void treeRecursion(int listIndex, int itemIndex, EarleyItemList *tree);                         ///< recursive function to create the binary tree
-    void appendEarleyItem(int index, EarleySymbol A, EarleyRule alpha, EarleyRule beta, int K);     ///< appends an item to the given ItemList (index), checks also for duplicates
+    void appendEarleyItem(int index, EarleySymbol A, EarleyRule *rule, int dotPos, int K);          ///< appends an item to the given ItemList (index), checks also for duplicates
     bool checkSuccessful();                                                                         ///< checks wheter parsing was successful or not
     EarleySymbol addNonTerminal(QString nonTerminal);                                               ///< checks for duplicates and adds a NonTerminal, return NonTerminal-Index
 

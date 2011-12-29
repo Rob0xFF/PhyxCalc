@@ -197,38 +197,35 @@ bool QEarleyParser::parse(int startPosition)
     int currentIndex = startPosition;
 
     //predictor special case
-    foreach (EarleyRule rule, rules.at(-startSymbol))
+    for (int i = 0; i < rules.at(-startSymbol).size(); i++)
     {
-        appendEarleyItem(0, startSymbol, EarleyRule(), rule, 0);
+        appendEarleyItem(0, startSymbol, &rules[-startSymbol][i] ,0 , 0);
     }
 
-    for (int i = startPosition; i < itemListCount; i++)
+    for (int listIndex = startPosition; listIndex < itemListCount; listIndex++)
     {
         int oldcount = -1;
         while (earleyItemLists.at(currentIndex).size() != oldcount)
         {
             oldcount = earleyItemLists.at(currentIndex).size();
 
-            foreach (EarleyItem item, earleyItemLists.at(currentIndex))
+            for (int itemIndex = 0; itemIndex < earleyItemLists.at(currentIndex).size(); itemIndex++)
             {
-                if (!item.beta.isEmpty())
+                EarleyItem *item = &earleyItemLists[currentIndex][itemIndex];
+                if (!(item->dotPos == item->rule->size()))    //check for final state (beta is empty)
                 {
-                    EarleySymbol firstSymbol = item.beta.at(0);
+                    EarleySymbol firstSymbol = item->rule->at(item->dotPos);
                     if (firstSymbol < 0)    //if symbol < 0, symbol = nonTerminal
                     {
                         //Predictor
-                        foreach (EarleyRule rule, rules.at(-firstSymbol))
+                        for (int i = 0; i < rules.at(-firstSymbol).size(); i++)
                         {
-                            appendEarleyItem(currentIndex, firstSymbol, EarleyRule(), rule, currentIndex);
+                            appendEarleyItem(currentIndex, firstSymbol, &rules[-firstSymbol][i] ,0 , currentIndex);
                         }
                         //Aycock and Horspool Epsilon solution
                         if (isNullableVector.at(-firstSymbol))  //if B is nullable
                         {
-                            EarleyRule newAlpha = item.alpha;
-                            EarleyRule newBeta = item.beta;
-                            newAlpha.append(newBeta.takeFirst());   //move point right
-
-                            appendEarleyItem(currentIndex, item.A, newAlpha, newBeta, item.K);
+                            appendEarleyItem(currentIndex, item->A, item->rule, item->dotPos+1, item->K);   //move point right
                         }
                     }
                     else if (currentIndex < (itemListCount-1))
@@ -236,26 +233,19 @@ bool QEarleyParser::parse(int startPosition)
                         //Scanner
                         if ((firstSymbol >= 0) && (word.at(currentIndex) == firstSymbol))
                         {
-                            EarleyRule newAlpha = item.alpha;
-                            EarleyRule newBeta = item.beta;
-                            newAlpha.append(newBeta.takeFirst());   //move point right
-
-                            appendEarleyItem(currentIndex+1, item.A, newAlpha, newBeta, item.K);
+                            appendEarleyItem(currentIndex+1, item->A, item->rule, item->dotPos+1, item->K);   //move point right
                         }
                     }
                 }
                 else
                 {
                     //Completer
-                    foreach (EarleyItem item2, earleyItemLists.at(item.K))
+                    for (int i = 0; i < earleyItemLists.at(item->K).size(); i++)
                     {
-                        if (!item2.beta.isEmpty() && (item2.beta.at(0) == item.A))
+                        EarleyItem *item2 = &earleyItemLists[item->K][i];
+                        if (!(item2->dotPos == item2->rule->size()) && (item2->rule->at(item2->dotPos) == item->A))  //item2 is not empty and item2 B = item A
                         {
-                            EarleyRule newAlpha = item2.alpha;
-                            EarleyRule newBeta = item2.beta;
-                            newAlpha.append(newBeta.takeFirst());   //move point right
-
-                            appendEarleyItem(currentIndex, item2.A, newAlpha, newBeta, item2.K);
+                            appendEarleyItem(currentIndex, item2->A, item2->rule, item2->dotPos+1, item2->K);   //move point right
                         }
                     }
                 }
@@ -270,9 +260,10 @@ bool QEarleyParser::parse(int startPosition)
 
 bool QEarleyParser::checkSuccessful()
 {
-    foreach (EarleyItem item, earleyItemLists.last())
+    for (int i = 0; i < earleyItemLists.last().size(); i++)
     {
-        if ((item.A == startSymbol) && item.beta.isEmpty())
+        EarleyItem *item = &earleyItemLists.last()[i];
+        if ((item->A == startSymbol) && (item->dotPos == item->rule->size()))
             return true;
     }
 }
@@ -327,7 +318,7 @@ bool QEarleyParser::removeSymbol()
         return false;
 }
 
-void QEarleyParser::appendEarleyItem(int index, EarleySymbol A, EarleyRule alpha, EarleyRule beta, int K)
+void QEarleyParser::appendEarleyItem(int index, EarleySymbol A, EarleyRule *rule, int dotPos, int K)
 {
     /*bool match = false;
     foreach (EarleyItem item, earleyItemLists.at(index))
@@ -339,8 +330,8 @@ void QEarleyParser::appendEarleyItem(int index, EarleySymbol A, EarleyRule alpha
 
     EarleyItem earleyItem;
     earleyItem.A = A;
-    earleyItem.alpha = alpha;
-    earleyItem.beta = beta;
+    earleyItem.rule = rule;
+    earleyItem.dotPos = dotPos;
     earleyItem.K = K;
 
     if (!earleyItemLists.at(index).contains(earleyItem))
@@ -348,37 +339,35 @@ void QEarleyParser::appendEarleyItem(int index, EarleySymbol A, EarleyRule alpha
     else
         return;
 
-//    qDebug() << index << A << alpha << beta << K;
+    //qDebug() << index << A << *rule << dotPos << K;
 }
 
 void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *tree)
 {
     if (listIndex != 0)
     {
-        if (!tree->at(itemIndex).alpha.isEmpty())
+        if (!tree->at(itemIndex).dotPos == 0)   //not alpha is empty
         {
-            EarleySymbol lastSymbol = tree->at(itemIndex).alpha.last();
+            EarleySymbol lastSymbol = tree->at(itemIndex).rule->at(tree->at(itemIndex).dotPos-1);   //symbol before dot
             if (lastSymbol < 0)     //if symbol < 0, symbol = nonTerminal
             {
                 //backward predictor
-                int k = tree->at(itemIndex).K;
-                int p = tree->at(itemIndex).alpha.size();
+                int kj = tree->at(itemIndex).K;
+                int pj = tree->at(itemIndex).dotPos;
                 for (int i = 0; i < earleyItemLists.at(listIndex).size(); i++)//foreach (EarleyItem item, earleyItemLists.at(listIndex))
                 {
                     EarleyItem *item = &earleyItemLists[listIndex][i];
-                    if ((item->A == lastSymbol) && (item->K >= k+p-1))  //item.beta.isEmpty() is now unnessecary here
+                    if ((item->A == lastSymbol) && (item->dotPos == item->rule->size()) && (item->K >= (kj+pj-1)))
                     {
                         tree->insert(itemIndex+1,*item);
                         treeRecursion(listIndex, itemIndex+1, tree);
-                        //earleyItemLists[listIndex].removeAt(i);
-                        //i--;
                     }
                 }
             }
             else
             {
                 //backward scanner
-                (*tree)[itemIndex].beta.prepend((*tree)[itemIndex].alpha.takeLast());       //move point left
+                (*tree)[itemIndex].dotPos--;       //move point left
                 treeRecursion(listIndex-1, itemIndex, tree);
             }
         }
@@ -387,9 +376,14 @@ void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *
             //backward completer
             if (itemIndex > 0)
             {
-                if (!tree->at(itemIndex-1).alpha.isEmpty())
-                    (*tree)[itemIndex-1].beta.prepend((*tree)[itemIndex-1].alpha.takeLast());
-                treeRecursion(listIndex, itemIndex-1, tree);
+                int kj = tree->at(itemIndex).K;
+                int kj1 = tree->at(itemIndex-1).K;
+                int pj1 = tree->at(itemIndex-1).dotPos;
+                if ((pj1 > 1) || ((pj1 == 1) && (kj == kj1)))
+                {
+                    (*tree)[itemIndex-1].dotPos--;                  //move point left
+                    treeRecursion(listIndex, itemIndex-1, tree);
+                }
             }
         }
     }
@@ -404,7 +398,7 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
     {
         for (int i = earleyItemLists.at(listIndex).size()-1; i >= 0 ; i--)
         {
-            if (!earleyItemLists.at(listIndex).at(i).beta.isEmpty())
+            if (!(earleyItemLists.at(listIndex).at(i).dotPos == earleyItemLists.at(listIndex).at(i).rule->size()))  //not beta is empty
                 earleyItemLists[listIndex].removeAt(i);
         }
     }
@@ -414,15 +408,16 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
     {
         foreach (EarleyItem item, earleyItemLists.at(i))
         {
-            qDebug() << i << item.A << item.alpha << item.beta << item.K;
+            qDebug() << i << item.A << *item.rule << item.dotPos << item.K;
         }
     }
 
     //add the final item
-    foreach (EarleyItem item, earleyItemLists.last())
+    for (int i = 0; i < earleyItemLists.last().size(); i++)
     {
-        if ((item.A == startSymbol) && item.beta.isEmpty())
-            tree.append(item);
+        EarleyItem *item = &earleyItemLists.last()[i];
+        if ((item->A == startSymbol) && (item->dotPos == item->rule->size()))
+            tree.append(*item);
     }
 
     treeRecursion(itemListCount-1,0,&tree);
@@ -445,8 +440,7 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
         QString rule;
         rule.append(nonTerminals.at(-item.A));
         rule.append("=");
-        item.alpha.append(item.beta);
-        foreach (EarleySymbol symbol, item.alpha)
+        foreach (EarleySymbol symbol, *item.rule)
         {
             if (symbol < 0)
                 rule.append("|" + nonTerminals.at(-symbol) + "|");
