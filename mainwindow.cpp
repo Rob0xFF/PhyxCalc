@@ -27,8 +27,6 @@ MainWindow::MainWindow(QWidget *parent) :
     addNewTab();
     loadAllDocks();
     loadSettings();
-
-    switchLayout(1);
 }
 
 MainWindow::~MainWindow()
@@ -77,6 +75,8 @@ void MainWindow::loadSettings()
     settings.beginGroup("window");
         this->restoreState(settings.value("state", QByteArray()).toByteArray());
         this->restoreGeometry(settings.value("geometry", QByteArray()).toByteArray());
+        ui->action_Slim_Mode->setChecked(settings.value("slimMode", true).toBool());
+        on_action_Slim_Mode_triggered();
     settings.endGroup();
 
     settings.beginGroup("variableDock");
@@ -109,6 +109,7 @@ void MainWindow::saveSettings()
     settings.beginGroup("window");
         settings.setValue("state",this->saveState());
         settings.setValue("geometry", this->saveGeometry());
+        settings.setValue("slimMode", ui->action_Slim_Mode->isChecked());
     settings.endGroup();
 
     settings.beginGroup("variableDock");
@@ -163,28 +164,20 @@ void MainWindow::initializeGUI()
 
     //initialize special buttons
     QMenu *configureMenu = new QMenu();
+    configureMenu->addMenu(ui->menuFile);
+    configureMenu->addMenu(ui->menuEdit);
+    configureMenu->addMenu(ui->menuCalculation);
     configureMenu->addMenu(ui->menuWindow);
     configureMenu->addMenu(ui->menuTools);
     configureMenu->addMenu(ui->menuHelp);
     ui->actionConfigure_and_control->setMenu(configureMenu);
     QToolButton *configureButton = new QToolButton();
-    configureButton->setText("Configure");
+    configureButton->setText(tr("Configure"));
     configureButton->setIcon(QIcon(":/icons/configure"));
     configureButton->setPopupMode(QToolButton::InstantPopup);
     configureButton->setMenu(configureMenu);
 
-    QMenu *mainMenu = new QMenu();
-    mainMenu->addMenu(ui->menuFile);
-    mainMenu->addMenu(ui->menuEdit);
-    mainMenu->addMenu(ui->menuCalculation);
-    QToolButton *mainButton = new QToolButton();
-    mainButton->setText("PhyxCalc");
-    mainButton->setPopupMode(QToolButton::InstantPopup);
-    mainButton->setMenu(mainMenu);
-
     //initialize Main Toolbar
-    ui->mainToolBar->addWidget(mainButton);
-    ui->mainToolBar->addSeparator();
     ui->mainToolBar->addAction(ui->actionNew);
     ui->mainToolBar->addAction(ui->actionOpen);
     ui->mainToolBar->addSeparator();
@@ -201,22 +194,24 @@ void MainWindow::initializeGUI()
     ui->mainToolBar->addSeparator();
     ui->mainToolBar->addAction(ui->actionClose);
     ui->mainToolBar->addSeparator();
-    ui->mainToolBar->addWidget(configureButton);
+    configureAction = ui->mainToolBar->addWidget(configureButton);
 }
 
 void MainWindow::switchLayout(int number)
 {
     if (number == 0)    //normal layout
     {
-        ui->mainToolBar->setIconSize(QSize(32,32));
+        ui->mainToolBar->setIconSize(QSize(24,24));
         ui->mainToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         ui->menuBar->setVisible(true);
+        configureAction->setVisible(false);
     }
     else                //slim layout
     {
          ui->mainToolBar->setIconSize(QSize(16,16));
          ui->mainToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
          ui->menuBar->setVisible(false);
+         configureAction->setVisible(true);
     }
 }
 
@@ -414,9 +409,9 @@ void MainWindow::dockWidgetPressed(QListWidgetItem *item)
 
 void MainWindow::loadDock(QString name, QStringList items)
 {
-    int row;
-    int column;
-    int rowSize = 4;
+    //int row;
+    //int column;
+    //int rowSize = 4;
     int maximumWidth = 0;
     int currentWidth;
 
@@ -712,4 +707,9 @@ void MainWindow::on_actionRecalculate_All_triggered()
 void MainWindow::on_actionRecalculate_from_Line_triggered()
 {
     documentList.at(activeTab)->lineParser->parseFromCurrentPosition();
+}
+
+void MainWindow::on_action_Slim_Mode_triggered()
+{
+    switchLayout(ui->action_Slim_Mode->isChecked());
 }

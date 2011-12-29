@@ -266,6 +266,7 @@ bool QEarleyParser::checkSuccessful()
         if ((item->A == startSymbol) && (item->dotPos == item->rule->size()))
             return true;
     }
+    return false;
 }
 
 void QEarleyParser::setWord(QString earleyWord)

@@ -45,6 +45,8 @@ protected:
 
 private:
     Ui::MainWindow  *ui;
+    QAction *configureAction;           /// configure action for slim mode
+
     QList<Document*> documentList;
     UnitLoader      *unitLoader;
     int             activeTab;
@@ -113,6 +115,7 @@ private slots:
     void on_actionRecalculate_All_triggered();
 
     void on_actionRecalculate_from_Line_triggered();
+    void on_action_Slim_Mode_triggered();
 };
 
 #endif // MAINWINDOW_H

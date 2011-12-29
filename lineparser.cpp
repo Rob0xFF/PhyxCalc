@@ -398,9 +398,9 @@ void LineParser::insertNewLine(bool force)
 
 QString LineParser::formatValue(double value, QString siPrefix)
 {
-    int     x;
-    double  outputValue,
-            scalingFactor;
+    //int     x;
+    double  outputValue;
+    //        scalingFactor;
 
     /*if (siPrefix.isEmpty() || (!unitLoader->siPrefixes()->contains(siPrefix)))
     {

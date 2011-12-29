@@ -42,5 +42,3 @@ RESOURCES += \
 
 OTHER_FILES += \
     settings/grammar.txt
-
-
