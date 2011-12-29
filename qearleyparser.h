@@ -7,19 +7,16 @@
 #include <QDebug>
 
 typedef qint32                  EarleySymbol; /// datatype of one symbol
-typedef QList<EarleySymbol>     EarleyRule;   /// a list containing symbols (nonTerminals and terminals)
+typedef QVector<EarleySymbol>     EarleyRule;   /// a list containing symbols (nonTerminals and terminals)
 
 typedef struct EarleyItemStruct{
     EarleySymbol    A;          /// premise
-    //EarleyRule      alpha;      /// recognized part of the rule
-    //EarleyRule      beta;       /// not recognized part of the rule
     EarleyRule      *rule;      /// a pointer to the rule
-    int             dotPos;        /// the position of the dot, left side recognized, right side not recognized
+    int             dotPos;     /// the position of the dot, left side recognized, right side not recognized
     int             K;          /// backpointer of the item
 
     bool operator ==(const EarleyItemStruct &item) const
     {
-        //return (A == item.A) && (alpha == item.alpha) && (beta == item.beta) && (K == item.K);
         return (A == item.A) && (rule == item.rule) && (dotPos == item.dotPos) && (K == item.K);
     }
 } EarleyItem;
@@ -51,9 +48,7 @@ public:
 private:
 
     QVector<QList<EarleyRule> >     rules;                  /// vector holding all rules, index is index in nonTerminals
-    //QMultiHash<QString, EarleyRule>   rules;
     QVector<bool>                   isNullableVector;       /// vector holding wheter a nonTerminal at index is nullable or not, needed for epsilon rules
-    //QStringList         terminals;                        /// contains all terminals, not needed, because terminals are represented by unicode value
     QStringList                     nonTerminals;           /// contains all nonTerminals
     EarleySymbol                    startSymbol;            /// the start symbol
 

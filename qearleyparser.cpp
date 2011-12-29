@@ -26,7 +26,7 @@ bool QEarleyParser::loadRule(QString rule)
     QString premise = rule.left(equalPos);
     QString conclusio = rule.mid(equalPos+1);
 
-    QList<EarleySymbol> conclusioConverted;
+    EarleyRule conclusioConverted;
     EarleySymbol premiseConverted;
 
     premiseConverted = addNonTerminal(premise);         //convert premise
@@ -78,7 +78,7 @@ bool QEarleyParser::removeRule(QString rule)
     QString premise = rule.left(equalPos);
     QString conclusio = rule.mid(equalPos+1);
 
-    QList<EarleySymbol> conclusioConverted;
+    EarleyRule conclusioConverted;
     EarleySymbol premiseConverted;
 
     premiseConverted = -nonTerminals.indexOf(premise);      //find premise
