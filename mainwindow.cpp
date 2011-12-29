@@ -525,7 +525,7 @@ void MainWindow::loadAllDocks()
             if (dockFile.open(QIODevice::ReadOnly))
             {
                 //Load the file and split it into string list
-                loadDock(list.at(0), QString::fromLocal8Bit(dockFile.readAll()).split("\n"));
+                loadDock(list.at(0), QString::fromUtf8(dockFile.readAll()).split("\n"));
 
                 dockFile.close();
             }
