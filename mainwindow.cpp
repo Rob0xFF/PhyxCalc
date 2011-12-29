@@ -515,7 +515,7 @@ void MainWindow::loadAllDocks()
     QFile file("./settings/docks.txt");
     if (file.open(QIODevice::ReadOnly))
     {
-        QStringList dockNameList = QString::fromLocal8Bit(file.readAll()).split("\n");
+        QStringList dockNameList = QString::fromUtf8(file.readAll()).split("\n");
 
         for (int i = 0; i < dockNameList.size(); i++)
         {
