@@ -2,7 +2,7 @@
     <qresource prefix="/icons">
         <file>images/application-exit.png</file>
         <file>images/code-context.png</file>
-        <file>images/configure.png</file>
+        <file alias="configure">images/configure.png</file>
         <file>images/document-export.png</file>
         <file>images/document-new.png</file>
         <file>images/document-open.png</file>
@@ -19,6 +19,8 @@
         <file>images/edit-paste.png</file>
         <file>images/document-open-recent.png</file>
         <file>images/dialog-close.png</file>
+        <file>images/run-build-cursor.png</file>
+        <file>images/run-build.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="splash">images/splash.png</file>

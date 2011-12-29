@@ -18,7 +18,8 @@ SOURCES += main.cpp\
         flowlayout.cpp \
         settingsdialog.cpp \
         qearleyparser.cpp \
-        phyxcalculator.cpp
+        phyxcalculator.cpp \
+    qhidingtabwidget.cpp
 
 HEADERS  += mainwindow.h \
             lineparser.h \
@@ -28,7 +29,8 @@ HEADERS  += mainwindow.h \
             settingsdialog.h \
             global.h \
             qearleyparser.h \
-            phyxcalculator.h
+            phyxcalculator.h \
+    qhidingtabwidget.h
 
 FORMS    += mainwindow.ui \
     exportdialog.ui \
@@ -40,3 +42,5 @@ RESOURCES += \
 
 OTHER_FILES += \
     settings/grammar.txt
+
+

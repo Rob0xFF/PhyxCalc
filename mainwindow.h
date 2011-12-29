@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QListWidget>
+#include <QToolButton>
 #include "lineparser.h"
 #include "unitloader.h"
 #include "exportdialog.h"
@@ -42,6 +43,30 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event);
     void closeEvent(QCloseEvent *event);
 
+private:
+    Ui::MainWindow  *ui;
+    QList<Document*> documentList;
+    UnitLoader      *unitLoader;
+    int             activeTab;
+    AppSettings     appSettings;
+    QStringList     recentDocuments;
+
+    void addNewTab();
+    void loadSettings();
+    void saveSettings();
+    bool saveDocument(Document *document, bool force = false, bool exit = false);
+    void openDocument(QString fileName, bool newTab = true);
+
+    void loadAllDocks();
+    void loadDock(QString name, QStringList items);
+
+    void updateRecentDocuments();
+    void addRecentDocument(QString name);
+
+    void initializeGUI();
+
+    void switchLayout(int number);          ///< switches the Layout, 0 = normal, 1 = slim
+
 private slots:
     void tabChanged(int index);
     bool closeTab(int index);
@@ -50,6 +75,7 @@ private slots:
     void documentModified();
 
     void dockButtonPressed(QAbstractButton *button);
+    void dockWidgetPressed(QListWidgetItem *item);
 
     void openRecentDocument();
 
@@ -87,28 +113,6 @@ private slots:
     void on_actionRecalculate_All_triggered();
 
     void on_actionRecalculate_from_Line_triggered();
-
-private:
-    Ui::MainWindow  *ui;
-    QList<Document*> documentList;
-    UnitLoader      *unitLoader;
-    int             activeTab;
-    AppSettings     appSettings;
-    QStringList     recentDocuments;
-
-    void addNewTab();
-    void loadSettings();
-    void saveSettings();
-    bool saveDocument(Document *document, bool force = false, bool exit = false);
-    void openDocument(QString fileName, bool newTab = true);
-
-    void loadAllDocks();
-    void loadDock(QString name, QStringList items);
-
-    void updateRecentDocuments();
-    void addRecentDocument(QString name);
-
-    void initializeGUI();
 };
 
 #endif // MAINWINDOW_H

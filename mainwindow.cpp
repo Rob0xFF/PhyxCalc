@@ -27,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
     addNewTab();
     loadAllDocks();
     loadSettings();
+
+    switchLayout(1);
 }
 
 MainWindow::~MainWindow()
@@ -158,7 +160,31 @@ void MainWindow::initializeGUI()
     connect(ui->variablesDock, SIGNAL(visibilityChanged(bool)),
             ui->actionVariables, SLOT(setChecked(bool)));
 
+
+    //initialize special buttons
+    QMenu *configureMenu = new QMenu();
+    configureMenu->addMenu(ui->menuWindow);
+    configureMenu->addMenu(ui->menuTools);
+    configureMenu->addMenu(ui->menuHelp);
+    ui->actionConfigure_and_control->setMenu(configureMenu);
+    QToolButton *configureButton = new QToolButton();
+    configureButton->setText("Configure");
+    configureButton->setIcon(QIcon(":/icons/configure"));
+    configureButton->setPopupMode(QToolButton::InstantPopup);
+    configureButton->setMenu(configureMenu);
+
+    QMenu *mainMenu = new QMenu();
+    mainMenu->addMenu(ui->menuFile);
+    mainMenu->addMenu(ui->menuEdit);
+    mainMenu->addMenu(ui->menuCalculation);
+    QToolButton *mainButton = new QToolButton();
+    mainButton->setText("PhyxCalc");
+    mainButton->setPopupMode(QToolButton::InstantPopup);
+    mainButton->setMenu(mainMenu);
+
     //initialize Main Toolbar
+    ui->mainToolBar->addWidget(mainButton);
+    ui->mainToolBar->addSeparator();
     ui->mainToolBar->addAction(ui->actionNew);
     ui->mainToolBar->addAction(ui->actionOpen);
     ui->mainToolBar->addSeparator();
@@ -174,6 +200,24 @@ void MainWindow::initializeGUI()
     ui->mainToolBar->addAction(ui->actionExport);
     ui->mainToolBar->addSeparator();
     ui->mainToolBar->addAction(ui->actionClose);
+    ui->mainToolBar->addSeparator();
+    ui->mainToolBar->addWidget(configureButton);
+}
+
+void MainWindow::switchLayout(int number)
+{
+    if (number == 0)    //normal layout
+    {
+        ui->mainToolBar->setIconSize(QSize(32,32));
+        ui->mainToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        ui->menuBar->setVisible(true);
+    }
+    else                //slim layout
+    {
+         ui->mainToolBar->setIconSize(QSize(16,16));
+         ui->mainToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+         ui->menuBar->setVisible(false);
+    }
 }
 
 void MainWindow::addNewTab()
@@ -196,6 +240,7 @@ void MainWindow::addNewTab()
             this, SLOT(documentModified()));
 
     layout->addWidget(newDocument->expressionEdit);
+    layout->setMargin(0);
     newTab->setLayout(layout);
 
     ui->tabWidget->addTab(newTab,QIcon(),tr("Untitled"));
@@ -361,6 +406,12 @@ void MainWindow::dockButtonPressed(QAbstractButton *button)
     documentList.at(activeTab)->expressionEdit->setFocus();
 }
 
+void MainWindow::dockWidgetPressed(QListWidgetItem *item)
+{
+    documentList.at(activeTab)->expressionEdit->insertPlainText(item->toolTip().split(":").at(1).trimmed());
+    documentList.at(activeTab)->expressionEdit->setFocus();
+}
+
 void MainWindow::loadDock(QString name, QStringList items)
 {
     int row;
@@ -371,15 +422,18 @@ void MainWindow::loadDock(QString name, QStringList items)
 
     QDockWidget *dockWidget = new QDockWidget(name, this);
     QWidget *widget = new QWidget(dockWidget);
-    QButtonGroup *buttonGroup = new QButtonGroup(this);
-    FlowLayout *flowLayout = new FlowLayout;
+    //QButtonGroup *buttonGroup = new QButtonGroup(this);
+    //FlowLayout *flowLayout = new FlowLayout;
     QBoxLayout *boxLayout = new QBoxLayout(QBoxLayout::TopToBottom, widget);
+    boxLayout->setMargin(0);
     QAction *menuAction = new QAction(ui->menuDocks);
 
     QListWidget *listWidget = new QListWidget(widget);
     listWidget->setViewMode(QListView::IconMode);
-    listWidget->setIconSize(QSize(16,16));
-    listWidget->setSpacing(20);
+    //listWidget->setIconSize(QSize(16,16));
+    //listWidget->setSpacing(5);
+    listWidget->setResizeMode(QListView::Adjust);
+
     QFont font = listWidget->font();
     font.setPointSize(12);
     listWidget->setFont(font);
@@ -389,7 +443,7 @@ void MainWindow::loadDock(QString name, QStringList items)
 
     for (int i = 0; i < items.size(); i++)
     {
-        QString buttonName, toolTip, function;
+        QString widgetName, toolTip, function;
         QStringList list;
 
         //split the item and read name and tooltip
@@ -398,33 +452,40 @@ void MainWindow::loadDock(QString name, QStringList items)
             list.append(list.at(1));
         if (list.size() < 3)
             return;
-        buttonName = list.at(1);
+        widgetName = list.at(1);
         toolTip = list.at(0);
         function = list.at(2);
 
         //create a new button
-        QPushButton *button = new QPushButton(buttonName);
+        /*QPushButton *button = new QPushButton(buttonName);
         button->setToolTip(toolTip + ": " + function);
-        buttonGroup->addButton(button);
+        buttonGroup->addButton(button);*/
 
-        listWidget->addItem(buttonName);
+        //create a new list widget item
+        QListWidgetItem *item = new QListWidgetItem(widgetName);
+        item->setToolTip(toolTip + ": " + function);
+        listWidget->addItem(item);
 
         //calculate row and column
-        row = i / rowSize;
-        column = i % rowSize;
+        /*row = i / rowSize;
+        column = i % rowSize;*/
 
         //flowLayout->addWidget(button);
 
         //save the maximum width
-        QFontMetrics fontMetrics = button->fontMetrics();
-        currentWidth = fontMetrics.width(buttonName + "MMM");
+        QFontMetrics fontMetrics = listWidget->fontMetrics();
+        currentWidth = fontMetrics.width(widgetName + "M");
         if (currentWidth > maximumWidth)
             maximumWidth = currentWidth;
     }
 
     //set the minimum width
-    foreach (QAbstractButton *button, buttonGroup->buttons())
-        button->setMinimumWidth(maximumWidth);
+    //foreach (QAbstractButton *button, buttonGroup->buttons())
+    //    button->setMinimumWidth(maximumWidth);
+    for (int i = 0; i < listWidget->count(); i++)
+    {
+        listWidget->item(i)->setSizeHint(QSize(maximumWidth, 20));
+    }
 
     //put the dock togheter
     dockWidget->setWidget(widget);
@@ -437,8 +498,10 @@ void MainWindow::loadDock(QString name, QStringList items)
     ui->menuDocks->addAction(menuAction);
 
     //connect all sorts of signals and slots
-    connect(buttonGroup, SIGNAL(buttonClicked(QAbstractButton*)),
-            this, SLOT(dockButtonPressed(QAbstractButton*)));
+    /*connect(buttonGroup, SIGNAL(buttonClicked(QAbstractButton*)),
+            this, SLOT(dockButtonPressed(QAbstractButton*)));*/
+    connect(listWidget, SIGNAL(itemClicked(QListWidgetItem*)),
+            this, SLOT(dockWidgetPressed(QListWidgetItem*)));
     connect(menuAction, SIGNAL(toggled(bool)),
             dockWidget, SLOT(setVisible(bool)));
 
