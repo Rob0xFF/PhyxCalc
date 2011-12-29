@@ -5,6 +5,7 @@
 #include <QStack>
 #include <QDateTime>
 #include <QDebug>
+#include <QFile>
 #include "cmath"
 #include "qearleyparser.h"
 
@@ -56,10 +57,11 @@ private:
     QHash<QString, void (PhyxCalculator::*)()> functionMap;                     /// functions mapped with their names
     QHash<QString, void (PhyxCalculator::*)(QString)> paramFunctionMap;         /// function with one paramter mapped to their names
 
-    void initialize();                                                                                              ///< initializes PhyxCalculator
+    void initialize();                                                                                          ///< initializes PhyxCalculator
+    void loadGrammar(QString fileName);                                                                         ///< loads the grammar from a file
 
-    void raiseException(QString exception);                                                                         ///< raises an exception
-    void addRule(QString rule, QString functions = "", QString paramFunction = "", QString parameter = "");    ///< adds a rule
+    void raiseException(QString exception);                                                                     ///< raises an exception
+    void addRule(QString rule, QString functions = "", QString paramFunction = "", QString parameter = "");     ///< adds a rule
 
     /** functions for value calculation */
     void valueAdd()         {valueStack.push(valueStack.pop() + valueStack.pop());}

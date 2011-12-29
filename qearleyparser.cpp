@@ -26,8 +26,8 @@ bool QEarleyParser::loadRule(QString rule)
     QString premise = rule.left(equalPos);
     QString conclusio = rule.mid(equalPos+1);
 
-    QList<qint32> conclusioConverted;
-    qint32 premiseConverted;
+    QList<EarleySymbol> conclusioConverted;
+    EarleySymbol premiseConverted;
 
     premiseConverted = addNonTerminal(premise);         //convert premise
 
@@ -63,6 +63,92 @@ bool QEarleyParser::loadRule(QString rule)
     rules[-premiseConverted].append(conclusioConverted);
 
     return true;
+}
+
+bool QEarleyParser::removeRule(QString rule)
+{
+    int equalPos = rule.indexOf('=');
+    if (equalPos == -1)
+    {
+        qDebug() << "Not a valid rule";
+        return false;
+    }
+
+    //split premise and conclusio
+    QString premise = rule.left(equalPos);
+    QString conclusio = rule.mid(equalPos+1);
+
+    QList<EarleySymbol> conclusioConverted;
+    EarleySymbol premiseConverted;
+
+    premiseConverted = -nonTerminals.indexOf(premise);      //find premise
+    if (premiseConverted == 1)
+    {
+        qDebug() << "unknown rule";
+        return false;
+    }
+
+    //convert conclusio
+    if (!conclusio.isEmpty())   //check for epsilon rule
+    {
+        bool isNonTerminal = false;
+        int nonTerminalPos;
+        for (int i = 0; i < conclusio.size(); i++)
+        {
+            if (conclusio.at(i) == '|')
+            {
+                if (!isNonTerminal)
+                    nonTerminalPos = i+1;
+                else
+                {
+                    QString         tmpNonTerminal = conclusio.mid(nonTerminalPos, i-nonTerminalPos);
+                    EarleySymbol    tmpNTConverted;
+                    tmpNTConverted = -nonTerminals.indexOf(tmpNonTerminal);      //find non terminal
+                    if (tmpNTConverted == 1)
+                    {
+                        qDebug() << "unknown rule";
+                        return false;
+                    }
+                    else
+                        conclusioConverted.append(tmpNTConverted);
+                }
+                isNonTerminal = !isNonTerminal;
+            }
+            else if (!isNonTerminal)
+            {
+                conclusioConverted.append(conclusio.at(i).unicode());
+            }
+        }
+    }
+
+    //remove the rule
+    QList<EarleyRule> ruleList = rules.at(-premiseConverted);
+    for (int i = (ruleList.size()-1); i >= 0; i--)
+    {
+        bool match = true;
+        if (ruleList.at(i).size() != conclusioConverted.size())
+            match = false;
+        else
+        {
+            for (int i2 = 0; i2 < ruleList.at(i).size(); i2++)
+            {
+                if (ruleList.at(i).at(i2) != conclusioConverted.at(i2))
+                {
+                    match = false;
+                    break;
+                }
+            }
+        }
+
+        if (match)
+        {
+            rules.remove(i);
+            return true;
+        }
+    }
+
+    qDebug() << "unknown rule";
+    return false;
 }
 
 bool QEarleyParser::loadRules(QStringList ruleList)

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/settings">
+        <file alias="grammar">settings/grammar.txt</file>
+    </qresource>
+</RCC>

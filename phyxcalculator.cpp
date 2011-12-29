@@ -6,10 +6,6 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
     initialize();
 
     earleyParser.setStartSymbol("S");
-    qDebug() << setExpression("1.4+4.7*3");
-    qDebug() << setExpression("1.4+4.7*3+1");
-    qDebug() << setExpression("34+5");
-    evaluate();
 }
 
 void PhyxCalculator::initialize()
@@ -81,32 +77,40 @@ void PhyxCalculator::initialize()
     paramFunctionMap.insert("numberBuf",        &PhyxCalculator::numberBuf);
     paramFunctionMap.insert("variablePush",      &PhyxCalculator::variablePush);
 
-    addRule("S=|E|");
-    addRule("E=|E|+|T|",    "valueAdd");
-    addRule("E=|E|-|T|",    "valueSub");
-    addRule("E=|T|");
-    addRule("T=|T|*|F|",    "valueMul");
-    addRule("T=|T|/|F|",    "valueDiv");
-    addRule("T=|F|");
-    addRule("F=|N|");
-    addRule("F=-|F|");
-    addRule("F=+|F|");
-    addRule("F=(|F|)");
-    addRule("T=sin(|F|)",   "valueSin");
-    addRule("N=|Z|",        "numberPush");
-    addRule("N=|Z||N|",     "numberPush");
-    //addRule("N=|Z||D||Z|",  "numberPush");
-    addRule("D=.",          "", "numberBuf",".");
-    addRule("Z=0",          "", "numberBuf","0");
-    addRule("Z=1",          "", "numberBuf","1");
-    addRule("Z=2",          "", "numberBuf","2");
-    addRule("Z=3",          "", "numberBuf","3");
-    addRule("Z=4",          "", "numberBuf","4");
-    addRule("Z=5",          "", "numberBuf","5");
-    addRule("Z=6",          "", "numberBuf","6");
-    addRule("Z=7",          "", "numberBuf","7");
-    addRule("Z=8",          "", "numberBuf","8");
-    addRule("Z=9",          "", "numberBuf","9");
+    loadGrammar(":/settings/grammar");
+}
+
+void PhyxCalculator::loadGrammar(QString fileName)
+{
+    QFile file(fileName);
+
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QStringList lines = QString::fromUtf8(file.readAll()).split('\n');
+        foreach (QString line, lines)
+        {
+            if (line.trimmed().isEmpty() || (line.trimmed().at(0) == '#'))
+                continue;
+
+            QStringList ruleData = line.split(';');
+            QString rule;
+            QString functions;
+            QString paramFunction;
+            QString parameter;
+
+            rule = ruleData.at(0).trimmed();
+            if (ruleData.size() > 1)
+                functions = ruleData.at(1).trimmed();
+            if (ruleData.size() > 2)
+                paramFunction = ruleData.at(2).trimmed();
+            if (ruleData.size() > 3)
+                parameter = ruleData.at(3).trimmed();
+
+            addRule(rule, functions, paramFunction, parameter);
+        }
+    }
+    else
+        qFatal("Can't open file");
 }
 
 void PhyxCalculator::raiseException(QString exception)

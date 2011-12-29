@@ -1,0 +1,53 @@
+# Grammatik-Regeln (kontextfrei, epsilonfrei, sonst allgemein)
+# ------------------------------------------------------------
+# Regeln müssen bezüglich der Rückgabewerte gruppiert sein!
+# Nichtterminierte Symbole in Normklammern z.B. |A|
+# Terminierte Symbole außerhalb der Normklammern
+# Linksseitige Symbole ohne Klammern vor dem =
+# Spezialsymbole (positive Zahlen in Normklammern) sind:
+# (alle ab 3 dürfen nur als einziges Symbol in einer Regel vorkommen)
+# |0| Anfangs- und Endsymbol (automatisch!)
+# |1| Abschnitt aus terminierten Symbolen (automatisch!)
+# |2| N.N. (Groß-/Kleinschreibung)
+# |3| String in Anführungszeichen ""
+# |4| Folge von Leerzeichen
+# |5| Folge von Ziffern
+# |6| Variable
+# |7| Zeichenfolge für neue Variable
+# |8| terminiertes Symbol |
+# |9| si-Präfix
+# |10| 2-Stelliger si-Präfix (nämlich da = Deka)
+# |11| Einheit
+# |12| SI-Einheit
+# |13| Folge von mindestens einer Ziffer mit Basis bis 36, klein
+# |14| Folge von mindestens einer Ziffer mit Basis bis 36, groß
+# |15| Einzelne Ziffer 0-9
+# |16| Offset-Einheit
+#
+# Definition needs following outline:
+#   Rule    |   functions               |   param function  |   parameter
+S=|E|
+E=|E|+|T|   ; valueAdd
+E=|E|-|T|   ; valueSub
+E=|T|
+T=|T|*|F|   ; valueMul
+T=|T|/|F|   ; valueDiv
+T=sin(|F|)  ; valueSin
+T=|F|
+F=|N|
+F=-|F|
+F=+|F|
+F=(|F|)
+N=|Z|       ; numberPush
+N=|Z||N|    ; numberPush
+D=.         ;                           ; numberBuf         ;.
+Z=0         ;                           ; numberBuf         ;0
+Z=1         ;                           ; numberBuf         ;1
+Z=2         ;                           ; numberBuf         ;2
+Z=3         ;                           ; numberBuf         ;3
+Z=4         ;                           ; numberBuf         ;4
+Z=5         ;                           ; numberBuf         ;5
+Z=6         ;                           ; numberBuf         ;6
+Z=7         ;                           ; numberBuf         ;7
+Z=8         ;                           ; numberBuf         ;8
+Z=9         ;                           ; numberBuf         ;9

@@ -13,7 +13,6 @@
 #include <cmath>
 #include "unitloader.h"
 #include "global.h"
-#include "qearleyparser.h"
 #include "phyxcalculator.h"
 //#include "phexparser.h"
 
@@ -47,7 +46,7 @@ private:
     UnitLoader      *unitLoader;
     AppSettings     *appSettings;
     QMap<QString, physicalVariable> variableMap;
-    //PhexParser      *phexParser;
+    PhyxCalculator  *phyxCalculator;
 
     /* Check the type of a line */
     LineType checkLineType(QString text);
@@ -77,9 +76,6 @@ private:
     /* Writes the expression with numbers and units instead of variables */
     QString replaceVariables(QString expression, bool insertValue = true, bool insertUnit = true);
 
-
-    /* just for testing the parser */
-    void testParser();
 public slots:
     void clearAllVariables();
 };

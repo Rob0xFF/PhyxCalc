@@ -36,6 +36,7 @@ public:
 
     bool loadRules(QStringList ruleList);                               ///< loads the rules from a string list and fills nonTerminals and terminals
     bool loadRule(QString rule);                                        ///< loads one rule
+    bool removeRule(QString rule);                                      ///< removes one rule
     void setStartSymbol(QString earleyStartSymbol);                     ///< sets the start symbol
     bool parse(int startPosition = 0);                                  ///< starts to parse from start position, return wheter parsing was successful or not
     bool parseWord(QString earleyWord);                                 ///< parse the given word, returns wheter word can be build with the given grammar or not

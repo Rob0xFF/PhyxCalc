@@ -35,4 +35,8 @@ FORMS    += mainwindow.ui \
     settingsdialog.ui
 
 RESOURCES += \
-    images.qrc
+    images.qrc \
+    settings.qrc
+
+OTHER_FILES += \
+    settings/grammar.txt

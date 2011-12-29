@@ -7,8 +7,7 @@ LineParser::LineParser(UnitLoader *loader, QTableWidget *tableWidget, QTextEdit 
     calculationEdit = textEdit;
     appSettings = settings;
 
-    //phexParser = new PhexParser();
-    testParser();
+    phyxCalculator = new PhyxCalculator();
 }
 
 LineParser::~LineParser()
@@ -224,6 +223,9 @@ void LineParser::parseLine()
 
     //read current line
     QString curLineText = getCurrentLine();
+
+    phyxCalculator->setExpression(curLineText);
+    phyxCalculator->evaluate();
 
     /*LineType lineType = checkLineType(curLineText);
 
@@ -631,15 +633,4 @@ void LineParser::clearAllVariables()
 {
     variableMap.clear();
     showVariables();
-}
-
-void LineParser::testParser()
-{
-    //QEarleyParser earleyParser;
-
-    //earleyParser.loadRules(list);
-
-    //earleyParser.parseWord("10+5", "S");
-
-    PhyxCalculator phyxCalculator;
 }
