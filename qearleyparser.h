@@ -59,8 +59,10 @@ private:
     QList<EarleyItemList>           earleyItemLists;        /// holds the item lists
     EarleyItemList                  earleyItemResultLists;  /// holds the resulting tree of the recursive tree walk
     int                             itemListCount;          /// the count of item lists needed for pasing
+    bool                            isRecursionDone;        /// holds wheter a tree recursion was done or not, needed for partial parsing
 
-    EarleyRule word;
+    EarleyRule word;                                        /// word that should be parsed
+
 
 
     void initialize();                                                                              ///< initializes variables and lists for the parser

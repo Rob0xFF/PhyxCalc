@@ -3,6 +3,7 @@
 QEarleyParser::QEarleyParser(QObject *parent) :
     QObject(parent)
 {
+    isRecursionDone = false;
 }
 
 bool QEarleyParser::loadRule(QString rule)
@@ -196,10 +197,13 @@ bool QEarleyParser::parse(int startPosition)
 {
     int currentIndex = startPosition;
 
-    //predictor special case
-    for (int i = 0; i < rules.at(-startSymbol).size(); i++)
+    if (startPosition == 0)
     {
-        appendEarleyItem(0, startSymbol, &rules[-startSymbol][i] ,0 , 0);
+        //predictor special case
+        for (int i = 0; i < rules.at(-startSymbol).size(); i++)
+        {
+            appendEarleyItem(0, startSymbol, &rules[-startSymbol][i] ,0 , 0);
+        }
     }
 
     for (int listIndex = startPosition; listIndex < itemListCount; listIndex++)
@@ -254,6 +258,8 @@ bool QEarleyParser::parse(int startPosition)
         currentIndex++;
     }
 
+    isRecursionDone = false;        //the itemLists are fine and partial parsing is possible
+
     //check wheter parsing was successful or not
     return checkSuccessful();
 }
@@ -295,6 +301,7 @@ bool QEarleyParser::parseWord(QString earleyWord)
 void QEarleyParser::clearWord()
 {
     itemListCount = 0;
+    word.clear();
     earleyItemLists.clear();
 }
 
@@ -304,7 +311,14 @@ bool QEarleyParser::addSymbol(QChar earleySymbol)
     itemListCount++;
     earleyItemLists.append(EarleyItemList());
 
-    return parse(itemListCount-2);
+    if (isRecursionDone)    // if tree was already created whole parsing needs to be done
+    {
+        for (int i = 0; i < itemListCount; i++)
+            earleyItemLists[i].clear();
+        return parse();
+    }
+    else                    //else partial parsing is possible
+        return parse(itemListCount-2);
 }
 
 bool QEarleyParser::removeSymbol()
@@ -351,7 +365,7 @@ void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList& 
     }
     else
     {
-        if (tree.at(itemIndex).dotPos > 0)   //not alpha is empty
+        if (tree.at(itemIndex).dotPos != 0)   //alpha is not empty
         {
             EarleySymbol lastSymbol = tree.at(itemIndex).rule->at(tree.at(itemIndex).dotPos-1);   //symbol before dot
             if (lastSymbol < 0)     //if symbol < 0, symbol = nonTerminal
@@ -426,6 +440,7 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
                 earleyItemLists[listIndex].removeAt(i);
         }
     }
+    isRecursionDone = true;     //must be set, lists are destroyed and partial parsing is not possible any more
 
     //for testing purposes only
     qDebug() << "Earley items after Parsing:";
