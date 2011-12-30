@@ -74,8 +74,8 @@ void PhyxCalculator::initialize()
     functionMap.insert("variableAdd",   &PhyxCalculator::variableAdd);
     functionMap.insert("variableRemove",&PhyxCalculator::variableRemove);
 
-    paramFunctionMap.insert("numberBuf",        &PhyxCalculator::numberBuf);
-    paramFunctionMap.insert("variablePush",      &PhyxCalculator::variablePush);
+    functionMap.insert("numberBuf",     &PhyxCalculator::numberBuf);
+    functionMap.insert("variablePush",  &PhyxCalculator::variablePush);
 
     loadGrammar(":/settings/grammar");
 }
@@ -95,18 +95,12 @@ void PhyxCalculator::loadGrammar(QString fileName)
             QStringList ruleData = line.split(';');
             QString rule;
             QString functions;
-            QString paramFunction;
-            QString parameter;
 
             rule = ruleData.at(0).trimmed();
             if (ruleData.size() > 1)
                 functions = ruleData.at(1).trimmed();
-            if (ruleData.size() > 2)
-                paramFunction = ruleData.at(2).trimmed();
-            if (ruleData.size() > 3)
-                parameter = ruleData.at(3).trimmed();
 
-            addRule(rule, functions, paramFunction, parameter);
+            addRule(rule, functions);
         }
     }
     else
@@ -118,16 +112,16 @@ void PhyxCalculator::raiseException(QString exception)
     qDebug() << exception;
 }
 
-void PhyxCalculator::addRule(QString rule, QString functions, QString paramFunction, QString parameter)
+void PhyxCalculator::addRule(QString rule, QString functions)
 {
     PhyxRule phyxRule;
     if (!functions.isEmpty())
         phyxRule.functions = functions.split(',');
-    phyxRule.paramFunction = paramFunction;
-    phyxRule.parameter = parameter;
     phyxRules.insert(rule, phyxRule);
 
-    earleyParser.loadRule(rule);
+    QStringList ruleFunctions;
+    foreach (QString function, phyxRule.functions) ruleFunctions.append(function.trimmed());
+    earleyParser.loadRule(rule, ruleFunctions);
 }
 
 bool PhyxCalculator::setExpression(QString m_expression)
@@ -172,17 +166,25 @@ bool PhyxCalculator::evaluate()
         for (int i = (earleyTree.size()-1); i > 0; i--)
         {
             EarleyTreeItem *earleyTreeItem = &earleyTree[i];
-            PhyxRule phyxRule = phyxRules.value(earleyTreeItem->rule);
+            //PhyxRule phyxRule = phyxRules.value(earleyTreeItem->rule);
 
-            if (!phyxRule.functions.isEmpty())
+            //if (!phyxRule.functions.isEmpty())
+            if (!earleyTreeItem->rule->functions.isEmpty())
             {
-                foreach (QString function, phyxRule.functions)
+                foreach (QString function, earleyTreeItem->rule->functions)
                 {
-                    (this->*functionMap.value(function))();
+                    if (function=="setParam")
+                    {
+                        parameterBuffer = expression.mid(earleyTreeItem->startPos, earleyTreeItem->endPos - earleyTreeItem->startPos + 1);
+                    }
+                    else
+                    {
+                        (this->*functionMap.value(function))();
+                    }
                 }
             }
-            if (!phyxRule.paramFunction.isEmpty())
-                (this->*paramFunctionMap.value(phyxRule.paramFunction))(phyxRule.parameter);
+            //if (!phyxRule.paramFunction.isEmpty())
+            //    (this->*paramFunctionMap.value(phyxRule.paramFunction))(phyxRule.parameter);
         }
         qDebug() << (double)valueStack.pop();
         return true;
@@ -226,9 +228,9 @@ void PhyxCalculator::variableRemove()
     stringBuffer.clear();
 }
 
-void PhyxCalculator::variablePush(QString name)
+void PhyxCalculator::variablePush()
 {
-    PhysicalVariable variable = variableMap.value(name);
+    PhysicalVariable variable = variableMap.value(parameterBuffer);
     valueStack.push(variable.value);
     valueStack.push(variable.unit);
 }

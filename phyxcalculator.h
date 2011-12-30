@@ -25,8 +25,6 @@ typedef struct PhysicalVariableStruct {
 
 typedef struct {
     QStringList functions;                          /// a list of functions to call
-    QString     paramFunction;                      /// the parameter function to call
-    QString     parameter;                          /// the parameter for the parameter function
 } PhyxRule;
 
 class PhyxCalculator : public QObject
@@ -42,6 +40,7 @@ private:
     QStack<PhyxValueDataType>   valueStack;                                     /// stack for value calculation
     QStack<PhyxUnitDataType>    unitStack;                                      /// stack for unit calculation
     QString                     numberBuffer;                                   /// string for buffering numbers
+    QString                     parameterBuffer;                                /// string for buffering numbers
     QString                     stringBuffer;                                   /// string for buffering strings
 
     QHash<QString, PhyxRule>    phyxRules;                                      /// map of all rules, key is rule
@@ -55,13 +54,12 @@ private:
     QMap<QString, PhysicalVariable> constantMap;                                /// constants mapped with their name
 
     QHash<QString, void (PhyxCalculator::*)()> functionMap;                     /// functions mapped with their names
-    QHash<QString, void (PhyxCalculator::*)(QString)> paramFunctionMap;         /// function with one paramter mapped to their names
 
     void initialize();                                                                                          ///< initializes PhyxCalculator
     void loadGrammar(QString fileName);                                                                         ///< loads the grammar from a file
 
     void raiseException(QString exception);                                                                     ///< raises an exception
-    void addRule(QString rule, QString functions = "", QString paramFunction = "", QString parameter = "");     ///< adds a rule
+    void addRule(QString rule, QString functions = "");     ///< adds a rule
 
     /** functions for value calculation */
     void valueAdd()         {valueStack.push(valueStack.pop() + valueStack.pop());}
@@ -127,14 +125,14 @@ private:
     void unitSqrt()         {unitStack.push(unitStack.pop() / 2);}
 
     /** functions for number generation */
-    void numberBuf(QString number)          {numberBuffer.prepend(number);}
-    void numberPush()                       {valueStack.push(numberBuffer.toDouble());
-                                            numberBuffer.clear();}
+    void numberBuf()                        {numberBuffer.prepend(parameterBuffer);}
+    void numberPush()                       {valueStack.push(parameterBuffer.toDouble());
+                                             numberBuffer.clear();}
 
     /** functions for variable handling */
     void variableAdd();
     void variableRemove();
-    void variablePush(QString name);
+    void variablePush();
 signals:
     
 public slots:
