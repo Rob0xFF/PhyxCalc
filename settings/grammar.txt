@@ -24,6 +24,8 @@
 # |15| Einzelne Ziffer 0-9
 # |16| Offset-Einheit
 #
+# Z=
+#
 # Definition needs following outline:
 #   Rule    |   functions               |   param function  |   parameter
 S=|E|
@@ -34,20 +36,27 @@ T=|T|*|F|   ; valueMul
 T=|T|/|F|   ; valueDiv
 T=sin(|F|)  ; valueSin
 T=|F|
-F=-|F|
-F=+|F|
+#F=-|F|
+#F=+|F|
 F=(|F|)
-F=|N|       ; numberPush
-N=|Z|
-N=|Z||N|
-D=.         ;                           ; numberBuf         ;.
-Z=0         ;                           ; numberBuf         ;0
-Z=1         ;                           ; numberBuf         ;1
-Z=2         ;                           ; numberBuf         ;2
-Z=3         ;                           ; numberBuf         ;3
-Z=4         ;                           ; numberBuf         ;4
-Z=5         ;                           ; numberBuf         ;5
-Z=6         ;                           ; numberBuf         ;6
-Z=7         ;                           ; numberBuf         ;7
-Z=8         ;                           ; numberBuf         ;8
-Z=9         ;                           ; numberBuf         ;9
+F=|real|       ; numberPush
+uint=|n|
+uint=|n||uint|
+int=|uint|
+int=|-||uint|
+int=|+||uint|
+real=|int|
+real=|int||.||uint|
++=+         ;                           ; numberBuf         ;+
+-=-         ;                           ; numberBuf         ;-
+.=.         ;                           ; numberBuf         ;.
+n=0         ;                           ; numberBuf         ;0
+n=1         ;                           ; numberBuf         ;1
+n=2         ;                           ; numberBuf         ;2
+n=3         ;                           ; numberBuf         ;3
+n=4         ;                           ; numberBuf         ;4
+n=5         ;                           ; numberBuf         ;5
+n=6         ;                           ; numberBuf         ;6
+n=7         ;                           ; numberBuf         ;7
+n=8         ;                           ; numberBuf         ;8
+n=9         ;                           ; numberBuf         ;9
