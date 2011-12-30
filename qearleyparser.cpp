@@ -343,32 +343,37 @@ void QEarleyParser::appendEarleyItem(int index, EarleySymbol A, EarleyRule *rule
     //qDebug() << index << A << *rule << dotPos << K;
 }
 
-void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *tree)
+void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList& tree)
 {
-    if (listIndex != 0)
+    if (tree.at(0).dotPos == 0)  //first element (the start rule) must be backward completed
     {
-        if (!tree->at(itemIndex).dotPos == 0)   //not alpha is empty
+        earleyItemResultLists = tree;  //save tree to global variable
+    }
+    else
+    {
+        if (tree.at(itemIndex).dotPos > 0)   //not alpha is empty
         {
-            EarleySymbol lastSymbol = tree->at(itemIndex).rule->at(tree->at(itemIndex).dotPos-1);   //symbol before dot
+            EarleySymbol lastSymbol = tree.at(itemIndex).rule->at(tree.at(itemIndex).dotPos-1);   //symbol before dot
             if (lastSymbol < 0)     //if symbol < 0, symbol = nonTerminal
             {
                 //backward predictor
-                int kj = tree->at(itemIndex).K;
-                int pj = tree->at(itemIndex).dotPos;
+                int kj = tree.at(itemIndex).K;
+                int pj = tree.at(itemIndex).dotPos;
                 for (int i = 0; i < earleyItemLists.at(listIndex).size(); i++)//foreach (EarleyItem item, earleyItemLists.at(listIndex))
                 {
                     EarleyItem *item = &earleyItemLists[listIndex][i];
                     if ((item->A == lastSymbol) && (item->dotPos == item->rule->size()) && (item->K >= (kj+pj-1)))
                     {
-                        tree->insert(itemIndex+1,*item);
-                        treeRecursion(listIndex, itemIndex+1, tree);
+                        EarleyItemList treeCopy = tree;
+                        treeCopy.insert(itemIndex+1,*item);
+                        treeRecursion(listIndex, itemIndex+1, treeCopy);
                     }
                 }
             }
             else
             {
                 //backward scanner
-                (*tree)[itemIndex].dotPos--;       //move point left
+                tree[itemIndex].dotPos--;       //move dot left
                 treeRecursion(listIndex-1, itemIndex, tree);
             }
         }
@@ -377,17 +382,35 @@ void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList *
             //backward completer
             if (itemIndex > 0)
             {
-                int kj = tree->at(itemIndex).K;
-                int kj1 = tree->at(itemIndex-1).K;
-                int pj1 = tree->at(itemIndex-1).dotPos;
+                int kj = tree.at(itemIndex).K;
+                int kj1 = tree.at(itemIndex-1).K;
+                int pj1 = tree.at(itemIndex-1).dotPos;
                 if ((pj1 > 1) || ((pj1 == 1) && (kj == kj1)))
                 {
-                    (*tree)[itemIndex-1].dotPos--;                  //move point left
+                    tree[itemIndex-1].dotPos--;                  //move point left
                     treeRecursion(listIndex, itemIndex-1, tree);
                 }
             }
         }
     }
+}
+
+QString QEarleyParser::EarleyItemToString(EarleyItem item)
+{
+    QString itemString;
+    itemString.append(nonTerminals.at(-item.A));
+    itemString.append("=");
+    for (int i=0; i<item.rule->size(); i++)
+    {
+        if (item.dotPos == i) itemString.append("@");
+        if ((*item.rule)[i] < 0)
+            itemString.append("|" + nonTerminals.at(-(*item.rule)[i]) + "|");
+        else
+            itemString.append(QChar((*item.rule)[i]));
+    }
+    if (item.dotPos == item.rule->size()) itemString.append("@");
+    //itemString.append(" , " + QString::number(item.K));
+    return itemString;
 }
 
 QList<EarleyTreeItem> QEarleyParser::getTree()
@@ -405,13 +428,15 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
     }
 
     //for testing purposes only
+    qDebug() << "Earley items after Parsing:";
     for (int i = 0; i < itemListCount; i++)
     {
         foreach (EarleyItem item, earleyItemLists.at(i))
         {
-            qDebug() << i << item.A << *item.rule << item.dotPos << item.K;
+            qDebug() << i << EarleyItemToString(item) << item.K;
         }
     }
+    qDebug();
 
     //add the final item
     for (int i = 0; i < earleyItemLists.last().size(); i++)
@@ -421,7 +446,17 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
             tree.append(*item);
     }
 
-    treeRecursion(itemListCount-1,0,&tree);
+    treeRecursion(itemListCount-1,0,tree);
+
+    tree = earleyItemResultLists; //result has been stored in the deepest stack level of recursion
+
+    //for testing purposes only
+    qDebug() << "Earley items after tree recursion:";
+    foreach (EarleyItem item, tree)
+    {
+        qDebug() << EarleyItemToString(item) << item.K;
+    }
+    qDebug();
 
     /*for (int i = 0; i < tree.size(); i++)
     {

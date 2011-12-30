@@ -19,6 +19,7 @@ typedef struct EarleyItemStruct{
     {
         return (A == item.A) && (rule == item.rule) && (dotPos == item.dotPos) && (K == item.K);
     }
+
 } EarleyItem;
 
 typedef QList<EarleyItem> EarleyItemList;
@@ -44,6 +45,8 @@ public:
     bool addSymbol(QChar earleySymbol);                                 ///< adds one symbol to word and parses it, return is same as parseWord
     bool removeSymbol();                                                ///< removes one symbol from word and parses it, return is same as parseWord
     QList<EarleyTreeItem> getTree();                                    ///< creates and returns the binary tree
+    QString EarleyItemToString(EarleyItem item);                        ///< converts an Earley-item into a string for debugging
+
 
 private:
 
@@ -54,6 +57,7 @@ private:
 
 
     QList<EarleyItemList>           earleyItemLists;        /// holds the item lists
+    EarleyItemList                  earleyItemResultLists;  /// holds the resulting tree of the recursive tree walk
     int                             itemListCount;          /// the count of item lists needed for pasing
 
     EarleyRule word;
@@ -61,7 +65,7 @@ private:
 
     void initialize();                                                                              ///< initializes variables and lists for the parser
     void setWord(QString earleyWord);                                                               ///< sets the word for pasing
-    void treeRecursion(int listIndex, int itemIndex, EarleyItemList *tree);                         ///< recursive function to create the binary tree
+    void treeRecursion(int listIndex, int itemIndex, EarleyItemList& tree);                         ///< recursive function to create the binary tree
     void appendEarleyItem(int index, EarleySymbol A, EarleyRule *rule, int dotPos, int K);          ///< appends an item to the given ItemList (index), checks also for duplicates
     bool checkSuccessful();                                                                         ///< checks wheter parsing was successful or not
     EarleySymbol addNonTerminal(QString nonTerminal);                                               ///< checks for duplicates and adds a NonTerminal, return NonTerminal-Index
