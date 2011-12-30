@@ -6,6 +6,35 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
     initialize();
 
     earleyParser.setStartSymbol("S");
+
+    //testing
+    PhysicalVariable variable1;
+    PhysicalVariable variable2;
+
+    //230V
+    variable1.unit.ten  = 0;
+    variable1.unit.L    = 2;
+    variable1.unit.M    = 1;
+    variable1.unit.I    = -1;
+    variable1.unit.T    = -3;
+    variable1.unit.Theta = 0;
+    variable1.unit.J    = 0;
+    variable1.unit.N    = 0;
+    variable1.value     = 230;
+
+    //10kV
+    variable2.unit.ten  = 3;
+    variable2.unit.L    = 2;
+    variable2.unit.M    = 1;
+    variable2.unit.I    = -1;
+    variable2.unit.T    = -3;
+    variable2.unit.Theta = 0;
+    variable2.unit.J    = 0;
+    variable2.unit.N    = 0;
+    variable2.value     = 10;
+
+    variable1 = variable1 + variable2;
+    qDebug() << (double)variable1.value;
 }
 
 void PhyxCalculator::initialize()
@@ -232,5 +261,5 @@ void PhyxCalculator::variablePush()
 {
     PhysicalVariable variable = variableMap.value(parameterBuffer);
     valueStack.push(variable.value);
-    valueStack.push(variable.unit);
+    unitStack.push(variable.unit);
 }

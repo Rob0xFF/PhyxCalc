@@ -22,7 +22,7 @@ typedef struct SiUnitStruct {
     int N;      /// dimension of N, amount of substance
     int J;      /// dimension of J, liminous intensity
 
-    SiUnitStruct operator *(const SiUnitStruct unit) const
+    SiUnitStruct operator *(const SiUnitStruct &unit) const
     {
         SiUnitStruct result;
         result.ten = ten+ unit.ten;
@@ -35,7 +35,7 @@ typedef struct SiUnitStruct {
         result.J   = J  + unit.J;
         return result;
     }
-    SiUnitStruct operator /(const SiUnitStruct unit) const
+    SiUnitStruct operator /(const SiUnitStruct &unit) const
     {
         SiUnitStruct result;
         result.ten = ten- unit.ten;
@@ -48,7 +48,7 @@ typedef struct SiUnitStruct {
         result.J   = J  - unit.J;
         return result;
     }
-    SiUnitStruct pow(const int x) const
+    SiUnitStruct pow(const int &x) const
     {
         SiUnitStruct result;
         result.ten = ten*x;
@@ -61,7 +61,7 @@ typedef struct SiUnitStruct {
         result.J   = J  *x;
         return result;
     }
-    SiUnitStruct root(const int x) const
+    SiUnitStruct root(const int &x) const
     {
         SiUnitStruct result;
         result.ten = ten/x;
@@ -74,31 +74,91 @@ typedef struct SiUnitStruct {
         result.J   = J  /x;
         return result;
     }
-    bool checkEqual(const SiUnitStruct unit) const      //checks wheter 2 units are the same or not (prefix is not compared)
+    bool checkEqual(const SiUnitStruct &unit) const      //checks wheter 2 units are the same or not (prefix is not compared)
     {
         return ((L == unit.L)
                 && (M == unit.M)
                 && (T == unit.T)
-                && (I == unit.T)
+                && (I == unit.I)
                 && (Theta == unit.Theta)
                 && (N == unit.N)
                 && (J == unit.J));
     }
-    int conversionFactor(const SiUnitStruct unit) const //conversion factor between 2 units (eg.: kOhm -> Ohm, factor = 3 -> 10^3)
+    int conversionFactor(const SiUnitStruct &unit) const //conversion factor between 2 units (eg.: kOhm -> Ohm, factor = 3 -> 10^3)
     {
         return ten - unit.ten;
     }
 } SiUnit;
 
 typedef long double         PhyxValueDataType;      /// the base data type for values
-typedef float               PhyxUnitDataType;       /// the base data type for units
+typedef SiUnit               PhyxUnitDataType;       /// the base data type for units
 
 typedef struct PhysicalVariableStruct {
     PhyxValueDataType  value;
-    PhyxUnitDataType unit;
-    bool operator ==(const PhysicalVariableStruct &item) const
+    SiUnit unit;
+    /*bool operator ==(const PhysicalVariableStruct &item) const
     {
         return (value == item.value) && (unit == item.unit);
+    }*/
+    PhysicalVariableStruct operator +(const PhysicalVariableStruct &variable) const
+    {
+        PhysicalVariableStruct result;
+        if (unit.checkEqual(variable.unit))
+        {
+            int conversionFactor = unit.conversionFactor(variable.unit);
+            if (conversionFactor >= 0)
+            {
+                result.value = value * pow(10, conversionFactor);
+                result.value += variable.value;
+                result.unit = variable.unit;
+            }
+            else
+            {
+                result.value = variable.value * pow(10, -conversionFactor);
+                result.value += value;
+                result.unit  = unit;
+            }
+            return result;
+        }
+        else
+            qDebug() << "units not equal";
+    }
+    PhysicalVariableStruct operator -(const PhysicalVariableStruct &variable) const
+    {
+        PhysicalVariableStruct result;
+        if (unit.checkEqual(variable.unit))
+        {
+            int conversionFactor = unit.conversionFactor(variable.unit);
+            if (conversionFactor >= 0)
+            {
+                result.value = value * pow(10, conversionFactor);
+                result.value -= variable.value;
+                result.unit = variable.unit;
+            }
+            else
+            {
+                result.value = variable.value * pow(10, -conversionFactor);
+                result.value -= value;
+                result.unit  = unit;
+            }
+            return result;
+        }
+        else
+            qDebug() << "units not equal";
+    }
+    PhysicalVariableStruct operator *(const PhysicalVariableStruct &variable) const
+    {
+        PhysicalVariableStruct result;
+        result.unit = unit * variable.unit;
+        result.value = value * variable.value;
+        return result;
+    }
+    PhysicalVariableStruct operator /(const PhysicalVariableStruct &variable) const
+    {
+        PhysicalVariableStruct result;
+        result.unit = unit / variable.unit;
+        result.value = value / variable.value;
+        return result;
     }
 } PhysicalVariable;
 
@@ -189,19 +249,19 @@ private:
     /** functions for unit calculation */
     void unit0()            {/* ?? */}
     void unitCheckEqual()   {PhyxUnitDataType unit = unitStack.pop();
-                            if (unit != unitStack.pop())
+                            if (!unit.checkEqual(unitStack.pop()))
                                 raiseException("different units");
                             else
                                 unitStack.push(unit);
                             }
     void unitCheck0()       {}
     void unitCheck0k()      {}
-    void unitMul()          {unitStack.push(unitStack.pop() + unitStack.pop());}
-    void unitDiv()          {unitStack.push(unitStack.pop() + unitStack.pop());}
-    void unitExponent()     {unitStack.push(unitStack.pop() * valueStack.last());}
-    void unitExp2()         {unitStack.push(unitStack.pop() * 2);}
-    void unitExp3()         {unitStack.push(unitStack.pop() * 3);}
-    void unitSqrt()         {unitStack.push(unitStack.pop() / 2);}
+    void unitMul()          {unitStack.push(unitStack.pop() * unitStack.pop());}
+    void unitDiv()          {unitStack.push(unitStack.pop() / unitStack.pop());}
+    void unitExponent()     {unitStack.push(unitStack.pop().pow(valueStack.last()));}
+    void unitExp2()         {unitStack.push(unitStack.pop().pow(2));}
+    void unitExp3()         {unitStack.push(unitStack.pop().pow(3));}
+    void unitSqrt()         {unitStack.push(unitStack.pop().root(2));}
 
     /** functions for number generation */
     void numberBuf()                        {numberBuffer.prepend(parameterBuffer);}
