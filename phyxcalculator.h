@@ -11,6 +11,85 @@
 
 class PhyxCalculator;
 
+/** a si unit is defined as: [Q]=10^n*L^a*M^b*T^c*I^d*Theta^e*N^f*J^g */
+typedef struct SiUnitStruct {
+    int ten;    /// exponent of 10, si prefix
+    int L;      /// dimension of L, length
+    int M;      /// dimension of M, mass
+    int T;      /// dimension of T, time
+    int I;      /// dimension of I, electric current
+    int Theta;  /// dimension of Theta, thermodynamic temperature
+    int N;      /// dimension of N, amount of substance
+    int J;      /// dimension of J, liminous intensity
+
+    SiUnitStruct operator *(const SiUnitStruct unit) const
+    {
+        SiUnitStruct result;
+        result.ten = ten+ unit.ten;
+        result.L   = L  + unit.L;
+        result.M   = M  + unit.M;
+        result.T   = T  + unit.T;
+        result.I   = I  + unit.I;
+        result.Theta = Theta + unit.Theta;
+        result.N   = N  + unit.N;
+        result.J   = J  + unit.J;
+        return result;
+    }
+    SiUnitStruct operator /(const SiUnitStruct unit) const
+    {
+        SiUnitStruct result;
+        result.ten = ten- unit.ten;
+        result.L   = L  - unit.L;
+        result.M   = M  - unit.M;
+        result.T   = T  - unit.T;
+        result.I   = I  - unit.I;
+        result.Theta = Theta - unit.Theta;
+        result.N   = N  - unit.N;
+        result.J   = J  - unit.J;
+        return result;
+    }
+    SiUnitStruct pow(const int x) const
+    {
+        SiUnitStruct result;
+        result.ten = ten*x;
+        result.L   = L  *x;
+        result.M   = M  *x;
+        result.T   = T  *x;
+        result.I   = I  *x;
+        result.Theta = Theta*x;
+        result.N   = N  *x;
+        result.J   = J  *x;
+        return result;
+    }
+    SiUnitStruct root(const int x) const
+    {
+        SiUnitStruct result;
+        result.ten = ten/x;
+        result.L   = L  /x;
+        result.M   = M  /x;
+        result.T   = T  /x;
+        result.I   = I  /x;
+        result.Theta = Theta/x;
+        result.N   = N  /x;
+        result.J   = J  /x;
+        return result;
+    }
+    bool checkEqual(const SiUnitStruct unit) const      //checks wheter 2 units are the same or not (prefix is not compared)
+    {
+        return ((L == unit.L)
+                && (M == unit.M)
+                && (T == unit.T)
+                && (I == unit.T)
+                && (Theta == unit.Theta)
+                && (N == unit.N)
+                && (J == unit.J));
+    }
+    int conversionFactor(const SiUnitStruct unit) const //conversion factor between 2 units (eg.: kOhm -> Ohm, factor = 3 -> 10^3)
+    {
+        return ten - unit.ten;
+    }
+} SiUnit;
+
 typedef long double         PhyxValueDataType;      /// the base data type for values
 typedef float               PhyxUnitDataType;       /// the base data type for units
 
