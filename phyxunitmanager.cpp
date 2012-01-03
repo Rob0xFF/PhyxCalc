@@ -50,7 +50,8 @@ PhyxUnit * PhyxUnitManager::getUnit(QString symbol)
     if (baseUnitsMap.contains(symbol))
     {
         PhyxUnit *unit = new PhyxUnit();
-        unit->appendPower("symbol", 1);
+        unit->appendPower(symbol, 1);
+        unit->setSymbol(symbol);
 
         return unit;
     }

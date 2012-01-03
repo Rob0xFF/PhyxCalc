@@ -51,11 +51,31 @@ bool PhyxVariable::sub(PhyxVariable *variable)
     }
 }
 
+bool PhyxVariable::multiply(PhyxVariable *variable)
+{
+    //must be optimized
+    this->simplifyUnit();
+    variable->simplifyUnit();
+
+    this->m_value *= variable->value();
+    this->unit()->powersMultiply(variable->unit()->powers());
+}
+
+bool PhyxVariable::devide(PhyxVariable *variable)
+{
+    //must be optimized
+    this->simplifyUnit();
+    variable->simplifyUnit();
+
+    this->m_value /= variable->value();
+    this->unit()->powersDevide(variable->unit()->powers());
+}
+
 void PhyxVariable::simplifyUnit()
 {
     //make galilean the transformation y = ax + b
     m_value *= m_unit->scaleFactor();
     m_value -= m_unit->offset();
     m_unit->setOffset(0);
-    m_unit->setScaleFactor(0);
+    m_unit->setScaleFactor(1);
 }

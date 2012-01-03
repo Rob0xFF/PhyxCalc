@@ -21,18 +21,22 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
     PhyxUnit *unit = unitManager.getUnit("K");
     unitManager.addDerivedUnit("°C", unit->powers(), 1, -273.15);
     unitManager.addDerivedUnit("°F", unit->powers(), 5.0/9.0, -459.67*(5.0/9.0));
-
     unitManager.addDerivedUnit("in", unitManager.getUnit("m")->powers(), 0.0254, 0);
+    unitManager.addDerivedUnit("%", PhyxUnit::PowerMap(), 0.01, 0);
 
     PhyxVariable *variable1 = new PhyxVariable();
     variable1->setValue(80);
-    variable1->setUnit(unitManager.getUnit("K"));
+    variable1->setUnit(unitManager.getUnit("%"));
+    qDebug() << "variable1 powers size:" << variable1->unit()->powers().size();
+    qDebug() << "variable1 is ProductUnit:" << variable1->unit()->isProductUnit();
 
     PhyxVariable *variable2 = new PhyxVariable();
     variable2->setValue(20);
     variable2->setUnit(unitManager.getUnit("K"));
+    qDebug() << "variable2 powers size:" << variable2->unit()->powers().size();
+    qDebug() << "variable2 is ProductUnit:" << variable2->unit()->isProductUnit();
 
-    variable1->sub(variable2);
+    variable1->multiply(variable2);
 
     qDebug() << (double)variable1->value();
 
