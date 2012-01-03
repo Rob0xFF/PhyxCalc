@@ -5,10 +5,8 @@ PhyxUnit::PhyxUnit(QObject *parent) :
 {
     m_symbol = "";
     m_name   = "";
-    m_type   = BaseUnitType;
     m_offset = 0;
     m_scaleFactor = 1;
-    m_prefixPower = 0;
     m_flags = 0;
 }
 
@@ -96,7 +94,46 @@ bool PhyxUnit::powersCompare(PhyxUnit::PowerMap powers)
     return m_powers == powers;
 }
 
-void PhyxUnit::prefixMultiply(double factor)
+bool PhyxUnit::isOne()
+{
+    return ((m_scaleFactor == 1) && (m_offset == 0) && (m_powers.isEmpty()));
+}
+
+bool PhyxUnit::isBaseUnit()
+{
+    return ((m_scaleFactor == 1) && (m_offset == 0) && (m_powers.size() == 1));
+}
+
+bool PhyxUnit::isDimensionlessUnit()
+{
+    return ((m_scaleFactor != 1) && (m_offset == 0) && (m_powers.isEmpty()));
+}
+
+bool PhyxUnit::isProductUnit()
+{
+    return ((m_scaleFactor == 1) && (m_offset == 0) && (m_powers.size() >= 1));
+}
+
+bool PhyxUnit::isGalileanUnit()
+{
+    return (((m_scaleFactor != 1) || (m_offset != 0)) && (m_powers.size() >= 1));
+}
+
+bool PhyxUnit::isConvertible(PhyxUnit *unit)
+{
+    return m_powers == unit->powers();
+}
+
+bool PhyxUnit::isSame(PhyxUnit *unit)
+{
+    if (offset() != unit->offset())
+        return false;
+    if (scaleFactor() != unit->scaleFactor())
+        return false;
+    return powersCompare(unit->powers());
+}
+
+/*void PhyxUnit::prefixMultiply(double factor)
 {
     m_prefixPower += factor;
 }
@@ -114,20 +151,4 @@ void PhyxUnit::prefixRaise(double power)
 void PhyxUnit::prefixRoot(double root)
 {
     m_prefixPower /= root;
-}
-
-bool PhyxUnit::isDimensionless()
-{
-    return m_powers.isEmpty();
-}
-
-bool PhyxUnit::operator ==(PhyxUnit unit)
-{
-    if (type() != unit.type())
-        return false;
-    if (offset() != unit.offset())
-        return false;
-    if (scaleFactor() != unit.scaleFactor())
-        return false;
-    return powersCompare(unit.powers());
-}
+}*/

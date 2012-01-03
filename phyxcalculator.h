@@ -8,6 +8,9 @@
 #include <QFile>
 #include "cmath"
 #include "qearleyparser.h"
+#include "phyxunitmanager.h"
+#include "phyxvariable.h"
+#include "phyxunit.h"
 
 class PhyxCalculator;
 

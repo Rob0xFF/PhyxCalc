@@ -9,26 +9,26 @@ class PhyxUnit : public QObject
     Q_OBJECT
     Q_PROPERTY(QString symbol READ symbol WRITE setSymbol)
     Q_PROPERTY(QString name READ name WRITE setName)
-    Q_PROPERTY(UnitType type READ type WRITE setType)
+    //Q_PROPERTY(UnitType type READ type WRITE setType)
     Q_PROPERTY(double offset READ offset WRITE setOffset)
     Q_PROPERTY(double scaleFactor READ scaleFactor WRITE setScaleFactor)
     Q_PROPERTY(PowerMap powers READ powers WRITE setPowers)
-    Q_PROPERTY(double prefixPower READ prefixPower WRITE setPrefixPower)
+    //Q_PROPERTY(double prefixPower READ prefixPower WRITE setPrefixPower)
     Q_PROPERTY(UnitFlags flags READ flags WRITE setFlags)
-    Q_ENUMS(UnitType)
+    //Q_ENUMS(UnitType)
     Q_FLAGS(UnitFlag UnitFlags)
 
 public:
     explicit PhyxUnit(QObject *parent = 0);
 
     /** Possible unit types */
-    enum UnitType {
-        BaseUnitType,       /// BaseUnits and dimensionless units
-        ProductUnit,        /// ProductUnits represented only by the exponents of their BaseUnits
-        OffsetUnitType,     /// OffsetUnits such as °C   (y = x + b)
-        GalileanUnit,       /// GalileanUnits such as °F (y = ax + b)
-        LogarithmicUnit     /// LogarithmicUnits such as dB (y = a * log(x))
-    };
+    /*enum UnitType {
+        DimensionlessUnitType,      /// DimensionlessUnits such as %,°,...
+        ProductUnitType,            /// ProductUnits represented only by the exponents of their BaseUnits such as V,Ohm,...
+        //OffsetUnitType,           /// OffsetUnits such as °C   (y = x + b)
+        GalileanUnitType,           /// GalileanUnits such as °F (y = ax + b), also OffsetUnits such as °C (y = x + b) and ScaledUnits such as min ( y = ax)
+        LogarithmicUnitType         /// LogarithmicUnits such as dB (y = a * log(x))
+    };*/
 
     /** Flags for unit handling*/
     enum UnitFlag {
@@ -46,16 +46,21 @@ public:
     void powersDevide(PowerMap powers);                 /// devides powers of the unit with other powers
     void powersRaise(double power);                     /// raises all powers to power
     void powersRoot(double root);                       /// takes the root of all powers
-    bool powersCompare(PowerMap powers);                /// compares powers of the unit with oder powers and returns ==
+    bool powersCompare(PowerMap powers);                /// compares powers of the unit with other powers and returns ==
 
-    void prefixMultiply(double factor);
+    /*void prefixMultiply(double factor);
     void prefixDevide(double factor);
     void prefixRaise(double power);
-    void prefixRoot(double root);
+    void prefixRoot(double root);*/
 
-    bool isDimensionless();                             /// returns wheter the unit is dimensionless or not
+    bool isOne();                                       /// returns wheter unit is 1 (no unit) or not
+    bool isBaseUnit();                                  /// returns wheter unit is a BaseUnit or not
+    bool isDimensionlessUnit();                         /// returns wheter unit is a DimensionlessUnit or not
+    bool isProductUnit();                               /// returns wheter unit is a ProductUnit or not
+    bool isGalileanUnit();                              /// returns wheter unit is a GalileanUnit or not
 
-    bool operator ==(PhyxUnit unit);
+    bool isConvertible(PhyxUnit *unit);                  /// checks wheter unit convertible to the other unit
+    bool isSame(PhyxUnit *unit);                         /// checks wheter unit is the same the other unit
 
     QString     symbol() const
     {
@@ -64,10 +69,6 @@ public:
     QString     name() const
     {
         return m_name;
-    }
-    UnitType    type() const
-    {
-        return m_type;
     }
     double      offset() const
     {
@@ -81,23 +82,18 @@ public:
     {
         return m_flags;
     }
-    PowerMap powers() const
+    PowerMap    powers() const
     {
         return m_powers;
-    }
-    double prefixPower() const
-    {
-        return m_prefixPower;
     }
 
 private:
     QString     m_symbol;                  /// the symbol of the unit
     QString     m_name;                    /// the name of the unit
-    UnitType    m_type;                    /// the type of the unit
     double      m_offset;                  /// offset for OffsetUnit and GalileanUnit
     double      m_scaleFactor;             /// scale factor for GalileanUnit and LogarithmicUnit
     PowerMap    m_powers;                  /// this map holds the powers of the base units
-    double      m_prefixPower;             /// for Si units -> the power of the prefix (10^x)
+    //double      m_prefixPower;             /// for Si units -> the power of the prefix (10^x)
     UnitFlags   m_flags;                   /// flags of the unit
 
 signals:
@@ -111,10 +107,6 @@ void setSymbol(QString arg)
 void setName(QString arg)
 {
     m_name = arg;
-}
-void setType(UnitType arg)
-{
-    m_type = arg;
 }
 void setOffset(double arg)
 {
@@ -131,10 +123,6 @@ void setFlags(UnitFlags arg)
 void setPowers(PowerMap arg)
 {
     m_powers = arg;
-}
-void setPrefixPower(double arg)
-{
-    m_prefixPower = arg;
 }
 };
 

@@ -8,33 +8,34 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
     earleyParser.setStartSymbol("S");
 
     //testing
-    PhysicalVariable variable1;
-    PhysicalVariable variable2;
+    PhyxUnitManager unitManager;
 
-    //230V
-    variable1.unit.ten  = 0;
-    variable1.unit.L    = 2;
-    variable1.unit.M    = 1;
-    variable1.unit.I    = -1;
-    variable1.unit.T    = -3;
-    variable1.unit.Theta = 0;
-    variable1.unit.J    = 0;
-    variable1.unit.N    = 0;
-    variable1.value     = 230;
+    unitManager.addBaseUnit("m", true);
+    unitManager.addBaseUnit("kg", true);
+    unitManager.addBaseUnit("A", true);
+    unitManager.addBaseUnit("K", true);
+    unitManager.addBaseUnit("s", true);
+    unitManager.addBaseUnit("mol", true);
+    unitManager.addBaseUnit("cd", true);
 
-    //10kV
-    variable2.unit.ten  = 3;
-    variable2.unit.L    = 2;
-    variable2.unit.M    = 1;
-    variable2.unit.I    = -1;
-    variable2.unit.T    = -3;
-    variable2.unit.Theta = 0;
-    variable2.unit.J    = 0;
-    variable2.unit.N    = 0;
-    variable2.value     = 10;
+    PhyxUnit *unit = unitManager.getUnit("K");
+    unitManager.addDerivedUnit("°C", unit->powers(), 1, -273.15);
+    unitManager.addDerivedUnit("°F", unit->powers(), 5.0/9.0, -459.67*(5.0/9.0));
 
-    variable1 = variable1 + variable2;
-    qDebug() << (double)variable1.value;
+    unitManager.addDerivedUnit("in", unitManager.getUnit("m")->powers(), 0.0254, 0);
+
+    PhyxVariable *variable1 = new PhyxVariable();
+    variable1->setValue(80);
+    variable1->setUnit(unitManager.getUnit("K"));
+
+    PhyxVariable *variable2 = new PhyxVariable();
+    variable2->setValue(20);
+    variable2->setUnit(unitManager.getUnit("K"));
+
+    variable1->sub(variable2);
+
+    qDebug() << (double)variable1->value();
+
 }
 
 void PhyxCalculator::initialize()

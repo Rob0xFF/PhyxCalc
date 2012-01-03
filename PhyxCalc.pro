@@ -20,7 +20,9 @@ SOURCES += main.cpp\
         qearleyparser.cpp \
         phyxcalculator.cpp \
     qhidingtabwidget.cpp \
-    phyxunit.cpp
+    phyxunit.cpp \
+    phyxunitmanager.cpp \
+    phyxvariable.cpp
 
 HEADERS  += mainwindow.h \
             lineparser.h \
@@ -32,7 +34,9 @@ HEADERS  += mainwindow.h \
             qearleyparser.h \
             phyxcalculator.h \
     qhidingtabwidget.h \
-    phyxunit.h
+    phyxunit.h \
+    phyxunitmanager.h \
+    phyxvariable.h
 
 FORMS    += mainwindow.ui \
     exportdialog.ui \
