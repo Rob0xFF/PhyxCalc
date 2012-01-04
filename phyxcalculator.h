@@ -12,158 +12,8 @@
 #include "phyxvariable.h"
 #include "phyxunit.h"
 
-class PhyxCalculator;
-
-/** a si unit is defined as: [Q]=10^n*L^a*M^b*T^c*I^d*Theta^e*N^f*J^g */
-typedef struct SiUnitStruct {
-    int ten;    /// exponent of 10, si prefix
-    int L;      /// dimension of L, length
-    int M;      /// dimension of M, mass
-    int T;      /// dimension of T, time
-    int I;      /// dimension of I, electric current
-    int Theta;  /// dimension of Theta, thermodynamic temperature
-    int N;      /// dimension of N, amount of substance
-    int J;      /// dimension of J, liminous intensity
-
-    SiUnitStruct operator *(const SiUnitStruct &unit) const
-    {
-        SiUnitStruct result;
-        result.ten = ten+ unit.ten;
-        result.L   = L  + unit.L;
-        result.M   = M  + unit.M;
-        result.T   = T  + unit.T;
-        result.I   = I  + unit.I;
-        result.Theta = Theta + unit.Theta;
-        result.N   = N  + unit.N;
-        result.J   = J  + unit.J;
-        return result;
-    }
-    SiUnitStruct operator /(const SiUnitStruct &unit) const
-    {
-        SiUnitStruct result;
-        result.ten = ten- unit.ten;
-        result.L   = L  - unit.L;
-        result.M   = M  - unit.M;
-        result.T   = T  - unit.T;
-        result.I   = I  - unit.I;
-        result.Theta = Theta - unit.Theta;
-        result.N   = N  - unit.N;
-        result.J   = J  - unit.J;
-        return result;
-    }
-    SiUnitStruct pow(const int &x) const
-    {
-        SiUnitStruct result;
-        result.ten = ten*x;
-        result.L   = L  *x;
-        result.M   = M  *x;
-        result.T   = T  *x;
-        result.I   = I  *x;
-        result.Theta = Theta*x;
-        result.N   = N  *x;
-        result.J   = J  *x;
-        return result;
-    }
-    SiUnitStruct root(const int &x) const
-    {
-        SiUnitStruct result;
-        result.ten = ten/x;
-        result.L   = L  /x;
-        result.M   = M  /x;
-        result.T   = T  /x;
-        result.I   = I  /x;
-        result.Theta = Theta/x;
-        result.N   = N  /x;
-        result.J   = J  /x;
-        return result;
-    }
-    bool checkEqual(const SiUnitStruct &unit) const      //checks wheter 2 units are the same or not (prefix is not compared)
-    {
-        return ((L == unit.L)
-                && (M == unit.M)
-                && (T == unit.T)
-                && (I == unit.I)
-                && (Theta == unit.Theta)
-                && (N == unit.N)
-                && (J == unit.J));
-    }
-    int conversionFactor(const SiUnitStruct &unit) const //conversion factor between 2 units (eg.: kOhm -> Ohm, factor = 3 -> 10^3)
-    {
-        return ten - unit.ten;
-    }
-} SiUnit;
-
 typedef long double         PhyxValueDataType;      /// the base data type for values
-typedef SiUnit               PhyxUnitDataType;       /// the base data type for units
-
-typedef struct PhysicalVariableStruct {
-    PhyxValueDataType  value;
-    SiUnit unit;
-    /*bool operator ==(const PhysicalVariableStruct &item) const
-    {
-        return (value == item.value) && (unit == item.unit);
-    }*/
-    PhysicalVariableStruct operator +(const PhysicalVariableStruct &variable) const
-    {
-        PhysicalVariableStruct result;
-        if (unit.checkEqual(variable.unit))
-        {
-            int conversionFactor = unit.conversionFactor(variable.unit);
-            if (conversionFactor >= 0)
-            {
-                result.value = value * pow(10, conversionFactor);
-                result.value += variable.value;
-                result.unit = variable.unit;
-            }
-            else
-            {
-                result.value = variable.value * pow(10, -conversionFactor);
-                result.value += value;
-                result.unit  = unit;
-            }
-            return result;
-        }
-        else
-            qDebug() << "units not equal";
-    }
-    PhysicalVariableStruct operator -(const PhysicalVariableStruct &variable) const
-    {
-        PhysicalVariableStruct result;
-        if (unit.checkEqual(variable.unit))
-        {
-            int conversionFactor = unit.conversionFactor(variable.unit);
-            if (conversionFactor >= 0)
-            {
-                result.value = value * pow(10, conversionFactor);
-                result.value -= variable.value;
-                result.unit = variable.unit;
-            }
-            else
-            {
-                result.value = variable.value * pow(10, -conversionFactor);
-                result.value -= value;
-                result.unit  = unit;
-            }
-            return result;
-        }
-        else
-            qDebug() << "units not equal";
-    }
-    PhysicalVariableStruct operator *(const PhysicalVariableStruct &variable) const
-    {
-        PhysicalVariableStruct result;
-        result.unit = unit * variable.unit;
-        result.value = value * variable.value;
-        return result;
-    }
-    PhysicalVariableStruct operator /(const PhysicalVariableStruct &variable) const
-    {
-        PhysicalVariableStruct result;
-        result.unit = unit / variable.unit;
-        result.value = value / variable.value;
-        return result;
-    }
-} PhysicalVariable;
+typedef int               PhyxUnitDataType;       /// the base data type for units
 
 typedef struct {
     QStringList functions;                          /// a list of functions to call
@@ -192,8 +42,8 @@ private:
     QString                     expression;                                     /// currently set expression
     bool                        expressionIsParsable;                           /// holds wheter currently set expression is parsable or not
 
-    QMap<QString, PhysicalVariable> variableMap;                                /// variables mapped with their name
-    QMap<QString, PhysicalVariable> constantMap;                                /// constants mapped with their name
+    //QMap<QString, PhysicalVariable> variableMap;                                /// variables mapped with their name
+    //QMap<QString, PhysicalVariable> constantMap;                                /// constants mapped with their name
 
     QHash<QString, void (PhyxCalculator::*)()> functionMap;                     /// functions mapped with their names
 
@@ -251,7 +101,7 @@ private:
 
     /** functions for unit calculation */
     void unit0()            {/* ?? */}
-    void unitCheckEqual()   {PhyxUnitDataType unit = unitStack.pop();
+/*    void unitCheckEqual()   {PhyxUnitDataType unit = unitStack.pop();
                             if (!unit.checkEqual(unitStack.pop()))
                                 raiseException("different units");
                             else
@@ -264,7 +114,7 @@ private:
     void unitExponent()     {unitStack.push(unitStack.pop().pow(valueStack.last()));}
     void unitExp2()         {unitStack.push(unitStack.pop().pow(2));}
     void unitExp3()         {unitStack.push(unitStack.pop().pow(3));}
-    void unitSqrt()         {unitStack.push(unitStack.pop().root(2));}
+    void unitSqrt()         {unitStack.push(unitStack.pop().root(2));}*/
 
     /** functions for number generation */
     void numberBuf()                        {numberBuffer.prepend(parameterBuffer);}

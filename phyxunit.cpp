@@ -143,6 +143,15 @@ bool PhyxUnit::isSame(PhyxUnit *unit)
     return powersCompare(unit->powers());
 }
 
+void PhyxUnit::copyUnit(PhyxUnit *source, PhyxUnit *destination)
+{
+    destination->setPowers(source->powers());
+    destination->setSymbol(source->symbol());
+    destination->setOffset(source->offset());
+    destination->setScaleFactor(source->scaleFactor());
+    destination->setFlags(source->flags());
+}
+
 /*void PhyxUnit::prefixMultiply(double factor)
 {
     m_prefixPower += factor;

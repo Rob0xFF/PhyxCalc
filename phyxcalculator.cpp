@@ -10,45 +10,64 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
     //testing
     PhyxUnitManager unitManager;
 
-    unitManager.addBaseUnit("m", true);
-    unitManager.addBaseUnit("kg", true);
-    unitManager.addBaseUnit("A", true);
-    unitManager.addBaseUnit("K", true);
-    unitManager.addBaseUnit("s", true);
-    unitManager.addBaseUnit("mol", true);
-    unitManager.addBaseUnit("cd", true);
+    unitManager.addBaseUnit("m", PhyxUnit::SiUnitFlag);
+    unitManager.addBaseUnit("kg", PhyxUnit::SiUnitFlag);
+    unitManager.addBaseUnit("A", PhyxUnit::SiUnitFlag);
+    unitManager.addBaseUnit("K", PhyxUnit::SiUnitFlag);
+    unitManager.addBaseUnit("s", PhyxUnit::SiUnitFlag);
+    unitManager.addBaseUnit("mol", PhyxUnit::SiUnitFlag);
+    unitManager.addBaseUnit("cd", PhyxUnit::SiUnitFlag);
 
-    PhyxUnit *unit = unitManager.getUnit("K");
-    unitManager.addDerivedUnit("°C", unit->powers(), 1, -273.15);
-    unitManager.addDerivedUnit("°F", unit->powers(), 5.0/9.0, -459.67*(5.0/9.0));
-    unitManager.addDerivedUnit("in", unitManager.getUnit("m")->powers(), 0.0254, 0);
-    unitManager.addDerivedUnit("%", PhyxUnit::PowerMap(), 0.01, 0);
+    PhyxUnit *newUnit = new PhyxUnit();
+    newUnit->setPowers(unitManager.unit("K")->powers());
+    newUnit->setOffset(-273.15);
+    newUnit->setSymbol("°C");
+    unitManager.addDerivedUnit(newUnit);
+    newUnit = new PhyxUnit();
+    newUnit->setPowers(unitManager.unit("K")->powers());
+    newUnit->setOffset(-459.67*(5.0/9.0));
+    newUnit->setScaleFactor(5.0/9.0);
+    newUnit->setSymbol("°F");
+    unitManager.addDerivedUnit(newUnit);
+    newUnit = new PhyxUnit();
+    newUnit->setPowers(unitManager.unit("m")->powers());
+    newUnit->setScaleFactor(0.0254);
+    newUnit->setOffset(0);
+    newUnit->setSymbol("in");
+    unitManager.addDerivedUnit(newUnit);
+    newUnit = new PhyxUnit();
+    newUnit->setPowers(PhyxUnit::PowerMap());
+    newUnit->setScaleFactor(0.01);
+    newUnit->setSymbol("%");
+    unitManager.addDerivedUnit(newUnit);
 
     PhyxVariable *variable3 = new PhyxVariable();
     variable3->setValue(60);
-    variable3->setUnit(unitManager.getUnit("s"));
-    unitManager.addDerivedUnit("min", variable3, 0);
-    variable3->setUnit(unitManager.getUnit("min"));
-    unitManager.addDerivedUnit("h", variable3, 0);
+    variable3->setUnit(unitManager.copyUnit("s"));
+    unitManager.addDerivedUnit("min", variable3, 0, 0);
+    variable3->setUnit(unitManager.copyUnit("min"));
+    unitManager.addDerivedUnit("h", variable3, 0, 0);
 
     PhyxVariable *variable1 = new PhyxVariable();
     variable1->setValue(5);
-    variable1->setUnit(unitManager.getUnit("s"));
+    variable1->setUnit(unitManager.copyUnit("s"));
     qDebug() << "variable1 powers size:" << variable1->unit()->powers().size();
     qDebug() << "variable1 is ProductUnit:" << variable1->unit()->isProductUnit();
     qDebug() << "variable1 is DimensionlessUnit:" << variable1->unit()->isDimensionlessUnit();
 
     PhyxVariable *variable2 = new PhyxVariable();
     variable2->setValue(2);
-    variable2->setUnit(unitManager.getUnit("min"));
+    variable2->setUnit(unitManager.copyUnit("min"));
     qDebug() << "variable2 powers size:" << variable2->unit()->powers().size();
     qDebug() << "variable2 is ProductUnit:" << variable2->unit()->isProductUnit();
     qDebug() << "variable2 is DimensionlessUnit:" << variable2->unit()->isDimensionlessUnit();
 
-    variable1->add(variable2);
+    variable1->mathMax(variable2);
+    //variable1->convertUnit(unitManager.unit("min"));
 
     qDebug() << (double)variable1->value();
     qDebug() << variable1->unit()->isOne();
+    qDebug() << variable1->unit()->isBaseUnit();
 
     delete variable1;
     delete variable2;
@@ -107,7 +126,7 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueRandg",    &PhyxCalculator::valueRandg);
 
     functionMap.insert("unit0",         &PhyxCalculator::unit0);
-    functionMap.insert("unitCheckEqual",&PhyxCalculator::unitCheckEqual);
+    /*functionMap.insert("unitCheckEqual",&PhyxCalculator::unitCheckEqual);
     functionMap.insert("unitCheck0",    &PhyxCalculator::unitCheck0);
     functionMap.insert("unitCheck0k",   &PhyxCalculator::unitCheck0k);
     functionMap.insert("unitMul",       &PhyxCalculator::unitMul);
@@ -115,7 +134,7 @@ void PhyxCalculator::initialize()
     functionMap.insert("unitExponent",  &PhyxCalculator::unitExponent);
     functionMap.insert("unitExp2",      &PhyxCalculator::unitExp2);
     functionMap.insert("unitExp3",      &PhyxCalculator::unitExp3);
-    functionMap.insert("unitSqrt",      &PhyxCalculator::unitSqrt);
+    functionMap.insert("unitSqrt",      &PhyxCalculator::unitSqrt);*/
 
     functionMap.insert("numberPush",    &PhyxCalculator::numberPush);
     functionMap.insert("variableAdd",   &PhyxCalculator::variableAdd);
@@ -262,22 +281,22 @@ void PhyxCalculator::valueFaculty()
 
 void PhyxCalculator::variableAdd()
 {
-    PhysicalVariable variable;
+    /*PhysicalVariable variable;
     variable.value = valueStack.pop();
     variable.unit = unitStack.pop();
     variableMap.insert(stringBuffer, variable);
-    stringBuffer.clear();
+    stringBuffer.clear();*/
 }
 
 void PhyxCalculator::variableRemove()
 {
-    variableMap.remove(stringBuffer);
-    stringBuffer.clear();
+   /* variableMap.remove(stringBuffer);
+    stringBuffer.clear();*/
 }
 
 void PhyxCalculator::variablePush()
 {
-    PhysicalVariable variable = variableMap.value(parameterBuffer);
+   /* PhysicalVariable variable = variableMap.value(parameterBuffer);
     valueStack.push(variable.value);
-    unitStack.push(variable.unit);
+    unitStack.push(variable.unit);*/
 }

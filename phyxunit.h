@@ -62,6 +62,8 @@ public:
     bool isConvertible(PhyxUnit *unit);                  /// checks wheter unit convertible to the other unit
     bool isSame(PhyxUnit *unit);                         /// checks wheter unit is the same the other unit
 
+    static void copyUnit(PhyxUnit *source, PhyxUnit *destination);
+
     QString     symbol() const
     {
         return m_symbol;

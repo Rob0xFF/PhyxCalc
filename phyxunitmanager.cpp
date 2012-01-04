@@ -5,47 +5,35 @@ PhyxUnitManager::PhyxUnitManager(QObject *parent) :
 {
 }
 
-void PhyxUnitManager::addBaseUnit(QString symbol, bool isSiUnit)
+void PhyxUnitManager::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags)
 {
-    baseUnitsMap.insert(symbol, isSiUnit);
 
-    if (derivedUnitMap.contains(symbol))
+
+    if (baseUnitsMap.contains(symbol))
+        delete baseUnitsMap.take(symbol);
+
+   PhyxUnit *unit = new PhyxUnit();
+   unit->setSymbol(symbol);
+   unit->appendPower(symbol,1);
+   unit->setFlags(flags);
+   baseUnitsMap.insert(symbol, unit);
+
+    if (derivedUnitsMap.contains(symbol))
     {
-        derivedUnitMap.remove(symbol);
+        delete derivedUnitsMap.take(symbol);
         recalculate();
     }
 }
 
-void PhyxUnitManager::addDerivedUnit(QString symbol, PhyxUnit::PowerMap powers, double scaleFactor, double offset)
+void PhyxUnitManager::addDerivedUnit(QString symbol, PhyxVariable *variable, double offset, PhyxUnit::UnitFlags flags)
 {
     if (baseUnitsMap.contains(symbol))
-        baseUnitsMap.remove(symbol);
+        delete baseUnitsMap.take(symbol);
 
     PhyxUnit *unit;
 
-    if (derivedUnitMap.contains(symbol))
-        unit = derivedUnitMap.value(symbol);
-    else
-        unit = new PhyxUnit();
-
-   unit->setSymbol(symbol);
-   unit->setPowers(powers);
-   unit->setScaleFactor(scaleFactor);
-   unit->setOffset(offset);
-   derivedUnitMap.insert(symbol, unit);
-
-   recalculate();
-}
-
-void PhyxUnitManager::addDerivedUnit(QString symbol, PhyxVariable *variable, double offset)
-{
-    if (baseUnitsMap.contains(symbol))
-        baseUnitsMap.remove(symbol);
-
-    PhyxUnit *unit;
-
-    if (derivedUnitMap.contains(symbol))
-        unit = derivedUnitMap.value(symbol);
+    if (derivedUnitsMap.contains(symbol))
+        unit = derivedUnitsMap.value(symbol);
     else
         unit = new PhyxUnit();
 
@@ -54,8 +42,21 @@ void PhyxUnitManager::addDerivedUnit(QString symbol, PhyxVariable *variable, dou
    unit->setPowers(variable->unit()->powers());
    unit->setScaleFactor(variable->value());
    unit->setOffset(offset);
-   derivedUnitMap.insert(symbol, unit);
+   unit->setFlags(flags);
+   derivedUnitsMap.insert(symbol, unit);
 
+   recalculate();
+}
+
+void PhyxUnitManager::addDerivedUnit(PhyxUnit *unit)
+{
+    if (baseUnitsMap.contains(unit->symbol()))
+        delete baseUnitsMap.take(unit->symbol());
+
+    if (derivedUnitsMap.contains(unit->symbol()))
+        delete derivedUnitsMap.take(unit->symbol());
+
+   derivedUnitsMap.insert(unit->symbol(), unit);
    recalculate();
 }
 
@@ -73,28 +74,30 @@ void PhyxUnitManager::recalculate()
     recalculateVariables();
 }
 
-PhyxUnit * PhyxUnitManager::getUnit(QString symbol)
+PhyxUnit * PhyxUnitManager::copyUnit(QString symbol)
 {
     if (baseUnitsMap.contains(symbol))
     {
         PhyxUnit *unit = new PhyxUnit();
-        unit->appendPower(symbol, 1);
-        unit->setSymbol(symbol);
-
+        PhyxUnit::copyUnit(baseUnitsMap.value(symbol), unit);
         return unit;
     }
-    else if (derivedUnitMap.contains(symbol))
+    else if (derivedUnitsMap.contains(symbol))
     {
         PhyxUnit *unit = new PhyxUnit();
-        unit->setPowers(derivedUnitMap.value(symbol)->powers());
-        unit->setSymbol(symbol);
-        unit->setOffset(derivedUnitMap.value(symbol)->offset());
-        unit->setScaleFactor(derivedUnitMap.value(symbol)->scaleFactor());
-        unit->setFlags(derivedUnitMap.value(symbol)->flags());
+        PhyxUnit::copyUnit(derivedUnitsMap.value(symbol), unit);
         return unit;
     }
     else
-    {
         return new PhyxUnit();
-    }
+}
+
+PhyxUnit *PhyxUnitManager::unit(QString symbol)
+{
+    if (baseUnitsMap.contains(symbol))
+        return baseUnitsMap.value(symbol);
+    else if (derivedUnitsMap.contains(symbol))
+        return derivedUnitsMap.value(symbol);
+    else
+        return new PhyxUnit();
 }
