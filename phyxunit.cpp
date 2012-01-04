@@ -101,12 +101,22 @@ bool PhyxUnit::isOne()
 
 bool PhyxUnit::isBaseUnit()
 {
-    return ((m_scaleFactor == 1) && (m_offset == 0) && (m_powers.size() == 1));
+    if (((m_scaleFactor == 1) && (m_offset == 0) && (m_powers.size() == 1)))
+    {
+        QMapIterator<QString, double> i(m_powers);
+        i.next();
+        if (i.value() == 1)
+            return true;
+        else
+            return false;
+    }
+    else
+        return false;
 }
 
 bool PhyxUnit::isDimensionlessUnit()
 {
-    return ((m_scaleFactor != 1) && (m_offset == 0) && (m_powers.isEmpty()));
+    return ((m_offset == 0) && (m_powers.isEmpty()));
 }
 
 bool PhyxUnit::isProductUnit()
@@ -121,7 +131,7 @@ bool PhyxUnit::isGalileanUnit()
 
 bool PhyxUnit::isConvertible(PhyxUnit *unit)
 {
-    return m_powers == unit->powers();
+    return powersCompare(unit->powers());
 }
 
 bool PhyxUnit::isSame(PhyxUnit *unit)

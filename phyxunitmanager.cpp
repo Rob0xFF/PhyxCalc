@@ -18,17 +18,45 @@ void PhyxUnitManager::addBaseUnit(QString symbol, bool isSiUnit)
 
 void PhyxUnitManager::addDerivedUnit(QString symbol, PhyxUnit::PowerMap powers, double scaleFactor, double offset)
 {
-    PhyxUnit *unit = new PhyxUnit();
-    unit->setSymbol(symbol);
-    unit->setPowers(powers);
-    unit->setScaleFactor(scaleFactor);
-    unit->setOffset(offset);
-
     if (baseUnitsMap.contains(symbol))
         baseUnitsMap.remove(symbol);
 
-    derivedUnitMap.insert(symbol, unit);
-    recalculate();
+    PhyxUnit *unit;
+
+    if (derivedUnitMap.contains(symbol))
+        unit = derivedUnitMap.value(symbol);
+    else
+        unit = new PhyxUnit();
+
+   unit->setSymbol(symbol);
+   unit->setPowers(powers);
+   unit->setScaleFactor(scaleFactor);
+   unit->setOffset(offset);
+   derivedUnitMap.insert(symbol, unit);
+
+   recalculate();
+}
+
+void PhyxUnitManager::addDerivedUnit(QString symbol, PhyxVariable *variable, double offset)
+{
+    if (baseUnitsMap.contains(symbol))
+        baseUnitsMap.remove(symbol);
+
+    PhyxUnit *unit;
+
+    if (derivedUnitMap.contains(symbol))
+        unit = derivedUnitMap.value(symbol);
+    else
+        unit = new PhyxUnit();
+
+   variable->simplifyUnit();
+   unit->setSymbol(symbol);
+   unit->setPowers(variable->unit()->powers());
+   unit->setScaleFactor(variable->value());
+   unit->setOffset(offset);
+   derivedUnitMap.insert(symbol, unit);
+
+   recalculate();
 }
 
 void PhyxUnitManager::recalculateUnits()
@@ -57,7 +85,13 @@ PhyxUnit * PhyxUnitManager::getUnit(QString symbol)
     }
     else if (derivedUnitMap.contains(symbol))
     {
-        return derivedUnitMap.value(symbol);
+        PhyxUnit *unit = new PhyxUnit();
+        unit->setPowers(derivedUnitMap.value(symbol)->powers());
+        unit->setSymbol(symbol);
+        unit->setOffset(derivedUnitMap.value(symbol)->offset());
+        unit->setScaleFactor(derivedUnitMap.value(symbol)->scaleFactor());
+        unit->setFlags(derivedUnitMap.value(symbol)->flags());
+        return unit;
     }
     else
     {

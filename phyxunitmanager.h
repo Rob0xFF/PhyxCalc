@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QMap>
 #include "phyxunit.h"
+#include "phyxvariable.h"
 
 class PhyxUnitManager : public QObject
 {
@@ -13,6 +14,7 @@ public:
 
     void addBaseUnit(QString symbol, bool isSiUnit);    /// adds a base unit
     void addDerivedUnit(QString symbol, PhyxUnit::PowerMap powers, double scaleFactor, double offset);
+    void addDerivedUnit(QString symbol, PhyxVariable *variable, double offset);
     bool removeUnit(QString symbol);                    /// removes a unit, returns successful
     PhyxUnit * getUnit(QString symbol);                   /// get a unit from its symbol
     

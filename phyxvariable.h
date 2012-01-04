@@ -2,6 +2,7 @@
 #define PHYXVARIABLE_H
 
 #include <QObject>
+#include <cmath>
 #include "phyxunit.h"
 
 typedef long double         PhyxValueDataType;      /// the base data type for values
@@ -16,6 +17,7 @@ class PhyxVariable : public QObject
 
 public:
     explicit PhyxVariable(QObject *parent = 0);
+    ~PhyxVariable();
 
     enum VariableError {
         UnitsNotConvertibleError,
