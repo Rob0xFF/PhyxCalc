@@ -152,6 +152,20 @@ void PhyxUnit::copyUnit(PhyxUnit *source, PhyxUnit *destination)
     destination->setFlags(source->flags());
 }
 
+QString PhyxUnit::dimensionString() const
+{
+    QString outputString;
+    QMapIterator<QString, double> i(m_powers);
+    while (i.hasNext())
+    {
+        i.next();
+        if (!outputString.isEmpty())
+            outputString.append("*");
+        outputString.append(QString("%1^%2").arg(i.key()).arg(i.value()));
+    }
+    return outputString;
+}
+
 /*void PhyxUnit::prefixMultiply(double factor)
 {
     m_prefixPower += factor;

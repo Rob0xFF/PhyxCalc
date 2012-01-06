@@ -33,7 +33,8 @@ public:
     /** Flags for unit handling*/
     enum UnitFlag {
         SiUnitFlag = 0x01,              /// flag for Si-Units, needed to handle Si-Prefixes
-        LogarithmicUnitFlag = 0x02      /// flag for logarithmic units (dB)
+        LogarithmicUnitFlag = 0x02,     /// flag for logarithmic units (dB)
+        SystemUnitFlag = 0x04           /// flag for units that should be prefered over others (e.g. W > PS)
     };
     Q_DECLARE_FLAGS(UnitFlags, UnitFlag)
 
@@ -63,6 +64,8 @@ public:
     bool isSame(PhyxUnit *unit);                        ///< checks wheter unit is the same as the other unit
 
     static void copyUnit(PhyxUnit *source, PhyxUnit *destination);
+
+    QString dimensionString() const;                    ///< returns a string with the dimensional representation of the unit (e.g. m^2*kg^-1)
 
     QString     symbol() const
     {

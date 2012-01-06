@@ -66,13 +66,14 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
     qDebug() << "variable2 is DimensionlessUnit:" << variable2->unit()->isDimensionlessUnit();
 
     variable1->mathDiv(variable2);
-    variable1->mathMul(variable3);
+    variable1->mathDiv(variable3);
     //variable1->convertUnit(unitManager.unit("min"));
 
     qDebug() << (double)variable1->value();
     qDebug() << variable1->unit()->isOne();
     qDebug() << variable1->unit()->isBaseUnit();
     qDebug() << variable1->unit()->symbol();
+    qDebug() << variable1->unit()->dimensionString();
 }
 
 void PhyxCalculator::initialize()
