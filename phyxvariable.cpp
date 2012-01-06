@@ -19,6 +19,84 @@ void PhyxVariable::simplifyUnit()
     m_value -= m_unit->offset();
     m_unit->setOffset(0);
     m_unit->setScaleFactor(1);
+
+    updateUnitSymbol();
+}
+
+void PhyxVariable::updateUnitSymbol()
+{
+    if (m_unitManager != NULL)
+    {
+        if (m_unitManager->verifyUnit(m_unit))
+        {
+            m_compounds.clear();
+            appendCompound(m_unit->symbol(),1);
+        }
+        else     // if unit is not in unit manager
+        {
+            //build a nice unit symbol
+            int positiveCompoundsCount = 0;
+            int negativeCompoundsCount = 0;
+            QString positiveCompounds;
+            QString negativeCompounds;
+            QString compoundsString;
+
+            QMapIterator<QString, double> i(m_compounds);
+            while (i.hasNext())
+            {
+                i.next();
+                if (i.value() > 0)
+                {
+                    if (!positiveCompoundsCount == 0)
+                        positiveCompounds.append("*");
+
+                    positiveCompounds.append(i.key());
+
+                    if (i.value() != 1)
+                        positiveCompounds.append(QString("^%1").arg(i.value()));
+
+                    positiveCompoundsCount++;
+                }
+                else
+                {
+                    if (!negativeCompoundsCount == 0)
+                        negativeCompounds.append("*");
+
+                    negativeCompounds.append(i.key());
+
+                    if (i.value() != -1)
+                        negativeCompounds.append(QString("^%1").arg(-i.value()));
+
+                    negativeCompoundsCount++;
+                }
+            }
+
+            if (positiveCompoundsCount == 0)
+                positiveCompounds.append("1");
+
+            if ((positiveCompoundsCount > 1) && (negativeCompoundsCount > 0))
+            {
+                positiveCompounds.prepend("(");
+                positiveCompounds.append(")");
+            }
+
+            if (negativeCompoundsCount > 1)
+            {
+                negativeCompounds.prepend("(");
+                negativeCompounds.append(")");
+            }
+
+            compoundsString.append(positiveCompounds);
+
+            if (negativeCompoundsCount > 0)
+            {
+                compoundsString.append("/");
+                compoundsString.append(negativeCompounds);
+            }
+
+            m_unit->setSymbol(compoundsString);
+        }
+    }
 }
 
 bool PhyxVariable::convertUnit(PhyxUnit *unit)
@@ -105,6 +183,9 @@ bool PhyxVariable::mathMul(PhyxVariable *variable)
 
     this->m_value *= variable->value();
     this->unit()->powersMultiply(variable->unit()->powers());
+    this->compoundsMultiply(variable->compounds());
+
+    this->updateUnitSymbol();
 
     return true;
 }
@@ -126,6 +207,9 @@ bool PhyxVariable::mathDiv(PhyxVariable *variable)
 
     this->m_value /= variable->value();
     this->unit()->powersDevide(variable->unit()->powers());
+    this->compoundsDivide(variable->compounds());
+
+    this->updateUnitSymbol();
 
     return true;
 }
@@ -147,6 +231,9 @@ bool PhyxVariable::mathRaise(PhyxVariable *variable)
 
     this->m_value = pow(this->m_value, variable->value());
     this->unit()->powersRaise(variable->value());
+    this->compoundsRaise(variable->value());
+
+    this->updateUnitSymbol();
 
     return true;
 }
@@ -163,6 +250,9 @@ bool PhyxVariable::mathRoot(PhyxVariable *variable)
 
     this->m_value = pow(this->m_value, 1.0/variable->value());
     this->unit()->powersRoot(variable->value());
+    this->compoundsRoot(variable->value());
+
+    this->updateUnitSymbol();
 
     return true;
 }
@@ -572,4 +662,83 @@ bool PhyxVariable::mathFaculty()
     m_value = value;
 
     return true;
+}
+
+void PhyxVariable::appendCompound(QString base, double power)
+{
+    m_compounds.insert(base, power);
+}
+
+void PhyxVariable::compoundMultiply(QString base, double factor)
+{
+    double power;
+    if (m_compounds.contains(base))
+    {
+        power = m_compounds.value(base);
+        power += factor;
+    }
+    else
+    {
+        power = factor;
+    }
+
+    if (power == 0)
+        m_compounds.remove(base);
+    else
+        m_compounds.insert(base, power);
+}
+
+void PhyxVariable::compoundDevide(QString base, double factor)
+{
+    double power;
+    if (m_compounds.contains(base))
+    {
+        power = m_compounds.value(base);
+        power -= factor;
+    }
+    else
+    {
+        power = -factor;
+    }
+
+    if (power == 0)
+        m_compounds.remove(base);
+    else
+        m_compounds.insert(base, power);
+}
+
+void PhyxVariable::compoundsMultiply(PhyxUnit::PowerMap powers)
+{
+    QMapIterator<QString, double> i(powers);
+     while (i.hasNext()) {
+         i.next();
+         compoundMultiply(i.key(), i.value());
+     }
+}
+
+void PhyxVariable::compoundsDivide(PhyxUnit::PowerMap powers)
+{
+    QMapIterator<QString, double> i(powers);
+     while (i.hasNext()) {
+         i.next();
+         compoundDevide(i.key(), i.value());
+     }
+}
+
+void PhyxVariable::compoundsRaise(double power)
+{
+    QMapIterator<QString, double> i(m_compounds);
+     while (i.hasNext()) {
+         i.next();
+         m_compounds.insert(i.key(), i.value() * power);
+     }
+}
+
+void PhyxVariable::compoundsRoot(double root)
+{
+    QMapIterator<QString, double> i(m_compounds);
+     while (i.hasNext()) {
+         i.next();
+         m_compounds.insert(i.key(), i.value() / root);
+     }
 }

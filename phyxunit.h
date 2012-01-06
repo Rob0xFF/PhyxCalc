@@ -32,8 +32,8 @@ public:
 
     /** Flags for unit handling*/
     enum UnitFlag {
-        SiUnitFlag = 0x01         /// flag for Si-Units, needed to handle Si-Prefixes
-    //    TimeUnitFlag = 0x02        /// flag for time units (min, h, d), to avoid Si-Prefixes beeing used with them
+        SiUnitFlag = 0x01,              /// flag for Si-Units, needed to handle Si-Prefixes
+        LogarithmicUnitFlag = 0x02      /// flag for logarithmic units (dB)
     };
     Q_DECLARE_FLAGS(UnitFlags, UnitFlag)
 
@@ -41,7 +41,7 @@ public:
 
     void appendPower(QString base, double power);       /// adds a power to the map
     void powerMultiply(QString base, double factor);    /// multiplies a power with factor
-    void powerDevide(QString base, double factor);      /// devides a power with factor
+    void powerDivide(QString base, double factor);      /// devides a power with factor
     void powersMultiply(PowerMap powers);               /// multiplies powers of the unit with other powers
     void powersDevide(PowerMap powers);                 /// devides powers of the unit with other powers
     void powersRaise(double power);                     /// raises all powers to power
@@ -53,14 +53,14 @@ public:
     void prefixRaise(double power);
     void prefixRoot(double root);*/
 
-    bool isOne();                                       /// returns wheter unit is 1 (no unit) or not
-    bool isBaseUnit();                                  /// returns wheter unit is a BaseUnit or not
-    bool isDimensionlessUnit();                         /// returns wheter unit is a DimensionlessUnit or not
-    bool isProductUnit();                               /// returns wheter unit is a ProductUnit or not
-    bool isGalileanUnit();                              /// returns wheter unit is a GalileanUnit or not
+    bool isOne();                                       ///< returns wheter unit is 1 (no unit) or not
+    bool isBaseUnit();                                  ///< returns wheter unit is a BaseUnit or not
+    bool isDimensionlessUnit();                         ///< returns wheter unit is a DimensionlessUnit or not
+    bool isProductUnit();                               ///< returns wheter unit is a ProductUnit or not
+    bool isGalileanUnit();                              ///< returns wheter unit is a GalileanUnit or not
 
-    bool isConvertible(PhyxUnit *unit);                  /// checks wheter unit convertible to the other unit
-    bool isSame(PhyxUnit *unit);                         /// checks wheter unit is the same the other unit
+    bool isConvertible(PhyxUnit *unit);                 ///< checks wheter unit convertible to the other unit
+    bool isSame(PhyxUnit *unit);                        ///< checks wheter unit is the same as the other unit
 
     static void copyUnit(PhyxUnit *source, PhyxUnit *destination);
 

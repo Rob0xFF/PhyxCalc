@@ -4,6 +4,9 @@
 #include <QObject>
 #include <cmath>
 #include "phyxunit.h"
+#include "phyxunitmanager.h"
+
+class PhyxUnitManager;
 
 typedef long double         PhyxValueDataType;      /// the base data type for values
 
@@ -13,6 +16,8 @@ class PhyxVariable : public QObject
     Q_PROPERTY(PhyxValueDataType value READ value WRITE setValue)
     Q_PROPERTY(PhyxUnit *unit READ unit WRITE setUnit)
     Q_PROPERTY(VariableError error READ error)
+    Q_PROPERTY(PhyxUnitManager *unitManager READ unitManager WRITE setUnitManager)
+    Q_PROPERTY(PhyxUnit::PowerMap compounds READ compounds)
     Q_ENUMS(VariableError)
 
 public:
@@ -80,13 +85,32 @@ public:
     {
         return m_error;
     }
+    PhyxUnitManager * unitManager() const
+    {
+        return m_unitManager;
+    }
+    PhyxUnit::PowerMap compounds() const
+    {
+        return m_compounds;
+    }
 
 private:
-    
-    PhyxValueDataType m_value;
-    PhyxUnit *m_unit;
+    PhyxValueDataType   m_value;
+    PhyxUnit            *m_unit;
+    VariableError       m_error;
+    PhyxUnitManager     *m_unitManager;
 
-    VariableError m_error;
+    PhyxUnit::PowerMap  m_compounds;    /// holds all compounds of a unit: e.g.: m/s -> compuound 1: m^1, compound 2: s^-1
+    void appendCompound(QString base, double power);       /// adds a power to the map
+    void compoundMultiply(QString base, double factor);    /// multiplies a power with factor
+    void compoundDevide(QString base, double factor);      /// devides a power with factor
+    void compoundsMultiply(PhyxUnit::PowerMap powers);               /// multiplies powers of the unit with other powers
+    void compoundsDivide(PhyxUnit::PowerMap powers);                 /// devides powers of the unit with other powers
+    void compoundsRaise(double power);                     /// raises all powers to power
+    void compoundsRoot(double root);                       /// takes the root of all powers
+
+
+    void updateUnitSymbol();            ///< fills the unit symbol with the correct information
 
 signals:
     
@@ -99,6 +123,12 @@ void setValue(PhyxValueDataType arg)
 void setUnit(PhyxUnit * arg)
 {
     m_unit = arg;
+    m_compounds.clear();
+    appendCompound(m_unit->symbol(),1);
+}
+void setUnitManager(PhyxUnitManager * arg)
+{
+    m_unitManager = arg;
 }
 };
 

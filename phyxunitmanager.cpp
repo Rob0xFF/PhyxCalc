@@ -101,3 +101,39 @@ PhyxUnit *PhyxUnitManager::unit(QString symbol)
     else
         return new PhyxUnit();
 }
+
+bool PhyxUnitManager::verifyUnit(PhyxUnit *unit)
+{
+    if (unit->isBaseUnit())
+    {
+        QMapIterator<QString, PhyxUnit*> i(baseUnitsMap);
+        while (i.hasNext())
+        {
+            i.next();
+            if (i.value()->isSame(unit))
+            {
+                unit->setSymbol(i.value()->symbol());
+                unit->setName(i.value()->name());
+                unit->setFlags(i.value()->flags());
+                return true;
+            }
+        }
+    }
+    else
+    {
+        QMapIterator<QString, PhyxUnit*> i(derivedUnitsMap);
+        while (i.hasNext())
+        {
+            i.next();
+            if (i.value()->isSame(unit))
+            {
+                unit->setSymbol(i.value()->symbol());
+                unit->setName(i.value()->name());
+                unit->setFlags(i.value()->flags());
+                return true;
+            }
+        }
+    }
+
+    return false;
+}

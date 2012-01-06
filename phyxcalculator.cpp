@@ -42,6 +42,7 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
     unitManager.addDerivedUnit(newUnit);
 
     PhyxVariable *variable3 = new PhyxVariable();
+    variable3->setUnitManager(&unitManager);
     variable3->setValue(60);
     variable3->setUnit(unitManager.copyUnit("s"));
     unitManager.addDerivedUnit("min", variable3, 0, 0);
@@ -49,29 +50,29 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
     unitManager.addDerivedUnit("h", variable3, 0, 0);
 
     PhyxVariable *variable1 = new PhyxVariable();
+    variable1->setUnitManager(&unitManager);
     variable1->setValue(5);
-    variable1->setUnit(unitManager.copyUnit("s"));
+    variable1->setUnit(unitManager.copyUnit("m"));
     qDebug() << "variable1 powers size:" << variable1->unit()->powers().size();
     qDebug() << "variable1 is ProductUnit:" << variable1->unit()->isProductUnit();
     qDebug() << "variable1 is DimensionlessUnit:" << variable1->unit()->isDimensionlessUnit();
 
     PhyxVariable *variable2 = new PhyxVariable();
+    variable2->setUnitManager(&unitManager);
     variable2->setValue(2);
-    variable2->setUnit(unitManager.copyUnit("min"));
+    variable2->setUnit(unitManager.copyUnit("kg"));
     qDebug() << "variable2 powers size:" << variable2->unit()->powers().size();
     qDebug() << "variable2 is ProductUnit:" << variable2->unit()->isProductUnit();
     qDebug() << "variable2 is DimensionlessUnit:" << variable2->unit()->isDimensionlessUnit();
 
-    variable1->mathMax(variable2);
+    variable1->mathDiv(variable2);
+    variable1->mathMul(variable3);
     //variable1->convertUnit(unitManager.unit("min"));
 
     qDebug() << (double)variable1->value();
     qDebug() << variable1->unit()->isOne();
     qDebug() << variable1->unit()->isBaseUnit();
-
-    delete variable1;
-    delete variable2;
-    delete variable3;
+    qDebug() << variable1->unit()->symbol();
 }
 
 void PhyxCalculator::initialize()

@@ -34,7 +34,7 @@ void PhyxUnit::powerMultiply(QString base, double factor)
         m_powers.insert(base, power);
 }
 
-void PhyxUnit::powerDevide(QString base, double factor)
+void PhyxUnit::powerDivide(QString base, double factor)
 {
     double power;
     if (m_powers.contains(base))
@@ -44,7 +44,7 @@ void PhyxUnit::powerDevide(QString base, double factor)
     }
     else
     {
-        power = factor;
+        power = -factor;
     }
 
     if (power == 0)
@@ -67,7 +67,7 @@ void PhyxUnit::powersDevide(PhyxUnit::PowerMap powers)
     QMapIterator<QString, double> i(powers);
      while (i.hasNext()) {
          i.next();
-         powerDevide(i.key(), i.value());
+         powerDivide(i.key(), i.value());
      }
 }
 
@@ -136,9 +136,9 @@ bool PhyxUnit::isConvertible(PhyxUnit *unit)
 
 bool PhyxUnit::isSame(PhyxUnit *unit)
 {
-    if (offset() != unit->offset())
+    if (this->offset() != unit->offset())
         return false;
-    if (scaleFactor() != unit->scaleFactor())
+    if (this->scaleFactor() != unit->scaleFactor())
         return false;
     return powersCompare(unit->powers());
 }
