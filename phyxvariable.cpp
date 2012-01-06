@@ -53,7 +53,7 @@ void PhyxVariable::updateUnitSymbol()
                     positiveCompounds.append(i.key());
 
                     if (i.value() != 1)
-                        positiveCompounds.append(QString("^%1").arg(i.value()));
+                        positiveCompounds.append(QString("%1").arg(i.value()));
 
                     positiveCompoundsCount++;
                 }
@@ -65,7 +65,7 @@ void PhyxVariable::updateUnitSymbol()
                     negativeCompounds.append(i.key());
 
                     if (i.value() != -1)
-                        negativeCompounds.append(QString("^%1").arg(-i.value()));
+                        negativeCompounds.append(QString("%1").arg(-i.value()));
 
                     negativeCompoundsCount++;
                 }
@@ -93,6 +93,20 @@ void PhyxVariable::updateUnitSymbol()
                 compoundsString.append("/");
                 compoundsString.append(negativeCompounds);
             }
+
+            // unicodify string
+            compoundsString.replace(QChar('*'), QChar(0x22C5)); //mathematic dot operator
+            compoundsString.replace(QChar('0'), QChar(0x2070));
+            compoundsString.replace(QChar('1'), QChar(0x00B9));
+            compoundsString.replace(QChar('2'), QChar(0x00B2));
+            compoundsString.replace(QChar('3'), QChar(0x00B3));
+            compoundsString.replace(QChar('4'), QChar(0x2074));
+            compoundsString.replace(QChar('5'), QChar(0x2075));
+            compoundsString.replace(QChar('6'), QChar(0x2076));
+            compoundsString.replace(QChar('7'), QChar(0x2077));
+            compoundsString.replace(QChar('8'), QChar(0x2078));
+            compoundsString.replace(QChar('9'), QChar(0x2079));
+            compoundsString.replace(QChar('-'), QChar(0x207B));
 
             m_unit->setSymbol(compoundsString);
         }

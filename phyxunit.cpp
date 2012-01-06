@@ -160,9 +160,23 @@ QString PhyxUnit::dimensionString() const
     {
         i.next();
         if (!outputString.isEmpty())
-            outputString.append("*");
-        outputString.append(QString("%1^%2").arg(i.key()).arg(i.value()));
+            outputString.append('*');
+        outputString.append(QString("%1%2").arg(i.key()).arg(i.value()));
     }
+
+    // unicodify string
+    outputString.replace(QChar('*'), QChar(0x22C5)); //mathematic dot operator
+    outputString.replace(QChar('0'), QChar(0x2070));
+    outputString.replace(QChar('1'), QChar(0x00B9));
+    outputString.replace(QChar('2'), QChar(0x00B2));
+    outputString.replace(QChar('3'), QChar(0x00B3));
+    outputString.replace(QChar('4'), QChar(0x2074));
+    outputString.replace(QChar('5'), QChar(0x2075));
+    outputString.replace(QChar('6'), QChar(0x2076));
+    outputString.replace(QChar('7'), QChar(0x2077));
+    outputString.replace(QChar('8'), QChar(0x2078));
+    outputString.replace(QChar('9'), QChar(0x2079));
+    outputString.replace(QChar('-'), QChar(0x207B));
     return outputString;
 }
 
