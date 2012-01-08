@@ -21,8 +21,10 @@ SOURCES += main.cpp\
         phyxcalculator.cpp \
     qhidingtabwidget.cpp \
     phyxunit.cpp \
-    phyxunitmanager.cpp \
-    phyxvariable.cpp
+    phyxvariable.cpp \
+    phyxunitsystem.cpp \
+    phyxcompoundunit.cpp \
+    phyxtesting.cpp
 
 HEADERS  += mainwindow.h \
             lineparser.h \
@@ -35,8 +37,10 @@ HEADERS  += mainwindow.h \
             phyxcalculator.h \
     qhidingtabwidget.h \
     phyxunit.h \
-    phyxunitmanager.h \
-    phyxvariable.h
+    phyxvariable.h \
+    phyxunitsystem.h \
+    phyxcompoundunit.h \
+    phyxtesting.h
 
 FORMS    += mainwindow.ui \
     exportdialog.ui \

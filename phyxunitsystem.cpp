@@ -1,11 +1,11 @@
-#include "phyxunitmanager.h"
+#include "phyxunitsystem.h"
 
-PhyxUnitManager::PhyxUnitManager(QObject *parent) :
+PhyxUnitSystem::PhyxUnitSystem(QObject *parent) :
     QObject(parent)
 {
 }
 
-void PhyxUnitManager::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags)
+void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags)
 {
 
 
@@ -25,7 +25,7 @@ void PhyxUnitManager::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags)
     }
 }
 
-void PhyxUnitManager::addDerivedUnit(QString symbol, PhyxVariable *variable, double offset, PhyxUnit::UnitFlags flags)
+/*void PhyxUnitSystem::addDerivedUnit(QString symbol, PhyxVariable *variable, double offset, PhyxUnit::UnitFlags flags)
 {
     if (baseUnitsMap.contains(symbol))
         delete baseUnitsMap.take(symbol);
@@ -46,9 +46,9 @@ void PhyxUnitManager::addDerivedUnit(QString symbol, PhyxVariable *variable, dou
    derivedUnitsMap.insert(symbol, unit);
 
    recalculate();
-}
+}*/
 
-void PhyxUnitManager::addDerivedUnit(PhyxUnit *unit)
+void PhyxUnitSystem::addDerivedUnit(PhyxUnit *unit)
 {
     if (baseUnitsMap.contains(unit->symbol()))
         delete baseUnitsMap.take(unit->symbol());
@@ -60,21 +60,21 @@ void PhyxUnitManager::addDerivedUnit(PhyxUnit *unit)
    recalculate();
 }
 
-void PhyxUnitManager::recalculateUnits()
+void PhyxUnitSystem::recalculateUnits()
 {
 }
 
-void PhyxUnitManager::recalculateVariables()
+void PhyxUnitSystem::recalculateVariables()
 {
 }
 
-void PhyxUnitManager::recalculate()
+void PhyxUnitSystem::recalculate()
 {
     recalculateUnits();
     recalculateVariables();
 }
 
-PhyxUnit * PhyxUnitManager::copyUnit(QString symbol)
+PhyxUnit * PhyxUnitSystem::copyUnit(QString symbol)
 {
     if (baseUnitsMap.contains(symbol))
     {
@@ -92,7 +92,7 @@ PhyxUnit * PhyxUnitManager::copyUnit(QString symbol)
         return new PhyxUnit();
 }
 
-PhyxUnit *PhyxUnitManager::unit(QString symbol)
+PhyxUnit *PhyxUnitSystem::unit(QString symbol)
 {
     if (baseUnitsMap.contains(symbol))
         return baseUnitsMap.value(symbol);
@@ -102,7 +102,7 @@ PhyxUnit *PhyxUnitManager::unit(QString symbol)
         return new PhyxUnit();
 }
 
-bool PhyxUnitManager::verifyUnit(PhyxUnit *unit)
+bool PhyxUnitSystem::verifyUnit(PhyxUnit *unit)
 {
     if (unit->isBaseUnit())
     {

@@ -62,7 +62,7 @@ void PhyxUnit::powersMultiply(PhyxUnit::PowerMap powers)
      }
 }
 
-void PhyxUnit::powersDevide(PhyxUnit::PowerMap powers)
+void PhyxUnit::powersDivide(PhyxUnit::PowerMap powers)
 {
     QMapIterator<QString, double> i(powers);
      while (i.hasNext()) {

@@ -4,7 +4,7 @@ PhyxVariable::PhyxVariable(QObject *parent) :
     QObject(parent)
 {
     m_value = 1;
-    m_unit = new PhyxUnit();
+    m_unit = new PhyxCompoundUnit();
 }
 
 PhyxVariable::~PhyxVariable()
@@ -15,102 +15,10 @@ PhyxVariable::~PhyxVariable()
 void PhyxVariable::simplifyUnit()
 {
     //make the galilean transformation y = ax - b
-    m_value *= m_unit->scaleFactor();
-    m_value -= m_unit->offset();
+    scaleValue(m_unit->scaleFactor());
+    offsetValue(-m_unit->offset());
     m_unit->setOffset(0);
     m_unit->setScaleFactor(1);
-
-    updateUnitSymbol();
-}
-
-void PhyxVariable::updateUnitSymbol()
-{
-    if (m_unitManager != NULL)
-    {
-        if (m_unitManager->verifyUnit(m_unit))
-        {
-            m_compounds.clear();
-            appendCompound(m_unit->symbol(),1);
-        }
-        else     // if unit is not in unit manager
-        {
-            //build a nice unit symbol
-            int positiveCompoundsCount = 0;
-            int negativeCompoundsCount = 0;
-            QString positiveCompounds;
-            QString negativeCompounds;
-            QString compoundsString;
-
-            QMapIterator<QString, double> i(m_compounds);
-            while (i.hasNext())
-            {
-                i.next();
-                if (i.value() > 0)
-                {
-                    if (!positiveCompoundsCount == 0)
-                        positiveCompounds.append("*");
-
-                    positiveCompounds.append(i.key());
-
-                    if (i.value() != 1)
-                        positiveCompounds.append(QString("%1").arg(i.value()));
-
-                    positiveCompoundsCount++;
-                }
-                else
-                {
-                    if (!negativeCompoundsCount == 0)
-                        negativeCompounds.append("*");
-
-                    negativeCompounds.append(i.key());
-
-                    if (i.value() != -1)
-                        negativeCompounds.append(QString("%1").arg(-i.value()));
-
-                    negativeCompoundsCount++;
-                }
-            }
-
-            if (positiveCompoundsCount == 0)
-                positiveCompounds.append("1");
-
-            if ((positiveCompoundsCount > 1) && (negativeCompoundsCount > 0))
-            {
-                positiveCompounds.prepend("(");
-                positiveCompounds.append(")");
-            }
-
-            if (negativeCompoundsCount > 1)
-            {
-                negativeCompounds.prepend("(");
-                negativeCompounds.append(")");
-            }
-
-            compoundsString.append(positiveCompounds);
-
-            if (negativeCompoundsCount > 0)
-            {
-                compoundsString.append("/");
-                compoundsString.append(negativeCompounds);
-            }
-
-            // unicodify string
-            compoundsString.replace(QChar('*'), QChar(0x22C5)); //mathematic dot operator
-            compoundsString.replace(QChar('0'), QChar(0x2070));
-            compoundsString.replace(QChar('1'), QChar(0x00B9));
-            compoundsString.replace(QChar('2'), QChar(0x00B2));
-            compoundsString.replace(QChar('3'), QChar(0x00B3));
-            compoundsString.replace(QChar('4'), QChar(0x2074));
-            compoundsString.replace(QChar('5'), QChar(0x2075));
-            compoundsString.replace(QChar('6'), QChar(0x2076));
-            compoundsString.replace(QChar('7'), QChar(0x2077));
-            compoundsString.replace(QChar('8'), QChar(0x2078));
-            compoundsString.replace(QChar('9'), QChar(0x2079));
-            compoundsString.replace(QChar('-'), QChar(0x207B));
-
-            m_unit->setSymbol(compoundsString);
-        }
-    }
 }
 
 bool PhyxVariable::convertUnit(PhyxUnit *unit)
@@ -125,8 +33,8 @@ bool PhyxVariable::convertUnit(PhyxUnit *unit)
         this->simplifyUnit();
 
         // make the inverse galilean transformation x = (y+b)/a
-        m_value += unit->offset();
-        m_value /= unit->scaleFactor();
+        offsetValue(unit->offset());
+        scaleValue(1.0/unit->scaleFactor());
         m_unit->setPowers(unit->powers());
         m_unit->setScaleFactor(unit->scaleFactor());
         m_unit->setOffset(unit->offset());
@@ -138,17 +46,9 @@ bool PhyxVariable::convertUnit(PhyxUnit *unit)
 
 bool PhyxVariable::mathAdd(PhyxVariable *variable)
 {
-    if (this->unit()->isSame(variable->unit()))
+    if (m_unit->add(variable->unit()))
     {
-        this->m_value += variable->value();
-        return true;
-    }
-    else if (this->unit()->isConvertible(variable->unit()))
-    {
-        this->simplifyUnit();
-        variable->simplifyUnit();
-
-        this->m_value += variable->value();
+        m_value += variable->value();
         return true;
     }
     else
@@ -160,17 +60,9 @@ bool PhyxVariable::mathAdd(PhyxVariable *variable)
 
 bool PhyxVariable::mathSub(PhyxVariable *variable)
 {
-    if (this->unit()->isSame(variable->unit()))
+    if (m_unit->sub(variable->unit()))
     {
-        this->m_value -= variable->value();
-        return true;
-    }
-    else if (this->unit()->isConvertible(variable->unit()))
-    {
-        this->simplifyUnit();
-        variable->simplifyUnit();
-
-        this->m_value -= variable->value();
+        m_value -= variable->value();
         return true;
     }
     else
@@ -182,48 +74,16 @@ bool PhyxVariable::mathSub(PhyxVariable *variable)
 
 bool PhyxVariable::mathMul(PhyxVariable *variable)
 {
-    if ((!this->unit()->isDimensionlessUnit()) && (!variable->unit()->isDimensionlessUnit()))
-    {
-        this->simplifyUnit();
-        variable->simplifyUnit();
-    }
-    else
-    {
-        if (this->unit()->isDimensionlessUnit())
-            this->simplifyUnit();
-        if (variable->unit()->isDimensionlessUnit())
-            variable->simplifyUnit();
-    }
-
+    this->m_unit->multiply(variable->unit());
     this->m_value *= variable->value();
-    this->unit()->powersMultiply(variable->unit()->powers());
-    this->compoundsMultiply(variable->compounds());
-
-    this->updateUnitSymbol();
 
     return true;
 }
 
 bool PhyxVariable::mathDiv(PhyxVariable *variable)
 {
-    if ((!this->unit()->isDimensionlessUnit()) && (!variable->unit()->isDimensionlessUnit()))
-    {
-        this->simplifyUnit();
-        variable->simplifyUnit();
-    }
-    else
-    {
-        if (this->unit()->isDimensionlessUnit())
-            this->simplifyUnit();
-        if (variable->unit()->isDimensionlessUnit())
-            variable->simplifyUnit();
-    }
-
+    this->m_unit->divide(variable->unit());
     this->m_value /= variable->value();
-    this->unit()->powersDevide(variable->unit()->powers());
-    this->compoundsDivide(variable->compounds());
-
-    this->updateUnitSymbol();
 
     return true;
 }
@@ -240,14 +100,10 @@ bool PhyxVariable::mathRaise(PhyxVariable *variable)
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
-    variable->simplifyUnit();
+    //variable->simplifyUnit();
 
+    this->unit()->raise(variable->value());
     this->m_value = pow(this->m_value, variable->value());
-    this->unit()->powersRaise(variable->value());
-    this->compoundsRaise(variable->value());
-
-    this->updateUnitSymbol();
 
     return true;
 }
@@ -259,14 +115,10 @@ bool PhyxVariable::mathRoot(PhyxVariable *variable)
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
-    variable->simplifyUnit();
+    //variable->simplifyUnit();
 
+    this->unit()->root(variable->value());
     this->m_value = pow(this->m_value, 1.0/variable->value());
-    this->unit()->powersRoot(variable->value());
-    this->compoundsRoot(variable->value());
-
-    this->updateUnitSymbol();
 
     return true;
 }
@@ -276,7 +128,7 @@ void PhyxVariable::mathSqrt()
     this->simplifyUnit();
 
     this->m_value = sqrt(this->m_value);
-    this->unit()->powersRoot(2);
+    this->unit()->root(2);
 }
 
 bool PhyxVariable::mathSin()
@@ -676,83 +528,4 @@ bool PhyxVariable::mathFaculty()
     m_value = value;
 
     return true;
-}
-
-void PhyxVariable::appendCompound(QString base, double power)
-{
-    m_compounds.insert(base, power);
-}
-
-void PhyxVariable::compoundMultiply(QString base, double factor)
-{
-    double power;
-    if (m_compounds.contains(base))
-    {
-        power = m_compounds.value(base);
-        power += factor;
-    }
-    else
-    {
-        power = factor;
-    }
-
-    if (power == 0)
-        m_compounds.remove(base);
-    else
-        m_compounds.insert(base, power);
-}
-
-void PhyxVariable::compoundDevide(QString base, double factor)
-{
-    double power;
-    if (m_compounds.contains(base))
-    {
-        power = m_compounds.value(base);
-        power -= factor;
-    }
-    else
-    {
-        power = -factor;
-    }
-
-    if (power == 0)
-        m_compounds.remove(base);
-    else
-        m_compounds.insert(base, power);
-}
-
-void PhyxVariable::compoundsMultiply(PhyxUnit::PowerMap powers)
-{
-    QMapIterator<QString, double> i(powers);
-     while (i.hasNext()) {
-         i.next();
-         compoundMultiply(i.key(), i.value());
-     }
-}
-
-void PhyxVariable::compoundsDivide(PhyxUnit::PowerMap powers)
-{
-    QMapIterator<QString, double> i(powers);
-     while (i.hasNext()) {
-         i.next();
-         compoundDevide(i.key(), i.value());
-     }
-}
-
-void PhyxVariable::compoundsRaise(double power)
-{
-    QMapIterator<QString, double> i(m_compounds);
-     while (i.hasNext()) {
-         i.next();
-         m_compounds.insert(i.key(), i.value() * power);
-     }
-}
-
-void PhyxVariable::compoundsRoot(double root)
-{
-    QMapIterator<QString, double> i(m_compounds);
-     while (i.hasNext()) {
-         i.next();
-         m_compounds.insert(i.key(), i.value() / root);
-     }
 }

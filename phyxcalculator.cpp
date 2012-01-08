@@ -8,72 +8,7 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
     earleyParser.setStartSymbol("S");
 
     //testing
-    PhyxUnitManager unitManager;
-
-    unitManager.addBaseUnit("m", PhyxUnit::SiUnitFlag);
-    unitManager.addBaseUnit("kg", PhyxUnit::SiUnitFlag);
-    unitManager.addBaseUnit("A", PhyxUnit::SiUnitFlag);
-    unitManager.addBaseUnit("K", PhyxUnit::SiUnitFlag);
-    unitManager.addBaseUnit("s", PhyxUnit::SiUnitFlag);
-    unitManager.addBaseUnit("mol", PhyxUnit::SiUnitFlag);
-    unitManager.addBaseUnit("cd", PhyxUnit::SiUnitFlag);
-
-    PhyxUnit *newUnit = new PhyxUnit();
-    newUnit->setPowers(unitManager.unit("K")->powers());
-    newUnit->setOffset(-273.15);
-    newUnit->setSymbol("°C");
-    unitManager.addDerivedUnit(newUnit);
-    newUnit = new PhyxUnit();
-    newUnit->setPowers(unitManager.unit("K")->powers());
-    newUnit->setOffset(-459.67*(5.0/9.0));
-    newUnit->setScaleFactor(5.0/9.0);
-    newUnit->setSymbol("°F");
-    unitManager.addDerivedUnit(newUnit);
-    newUnit = new PhyxUnit();
-    newUnit->setPowers(unitManager.unit("m")->powers());
-    newUnit->setScaleFactor(0.0254);
-    newUnit->setOffset(0);
-    newUnit->setSymbol("in");
-    unitManager.addDerivedUnit(newUnit);
-    newUnit = new PhyxUnit();
-    newUnit->setPowers(PhyxUnit::PowerMap());
-    newUnit->setScaleFactor(0.01);
-    newUnit->setSymbol("%");
-    unitManager.addDerivedUnit(newUnit);
-
-    PhyxVariable *variable3 = new PhyxVariable();
-    variable3->setUnitManager(&unitManager);
-    variable3->setValue(60);
-    variable3->setUnit(unitManager.copyUnit("s"));
-    unitManager.addDerivedUnit("min", variable3, 0, 0);
-    variable3->setUnit(unitManager.copyUnit("min"));
-    unitManager.addDerivedUnit("h", variable3, 0, 0);
-
-    PhyxVariable *variable1 = new PhyxVariable();
-    variable1->setUnitManager(&unitManager);
-    variable1->setValue(5);
-    variable1->setUnit(unitManager.copyUnit("m"));
-    qDebug() << "variable1 powers size:" << variable1->unit()->powers().size();
-    qDebug() << "variable1 is ProductUnit:" << variable1->unit()->isProductUnit();
-    qDebug() << "variable1 is DimensionlessUnit:" << variable1->unit()->isDimensionlessUnit();
-
-    PhyxVariable *variable2 = new PhyxVariable();
-    variable2->setUnitManager(&unitManager);
-    variable2->setValue(2);
-    variable2->setUnit(unitManager.copyUnit("kg"));
-    qDebug() << "variable2 powers size:" << variable2->unit()->powers().size();
-    qDebug() << "variable2 is ProductUnit:" << variable2->unit()->isProductUnit();
-    qDebug() << "variable2 is DimensionlessUnit:" << variable2->unit()->isDimensionlessUnit();
-
-    variable1->mathDiv(variable2);
-    variable1->mathDiv(variable3);
-    //variable1->convertUnit(unitManager.unit("min"));
-
-    qDebug() << (double)variable1->value();
-    qDebug() << variable1->unit()->isOne();
-    qDebug() << variable1->unit()->isBaseUnit();
-    qDebug() << variable1->unit()->symbol();
-    qDebug() << variable1->unit()->dimensionString();
+    PhyxTesting::testUnits();
 }
 
 void PhyxCalculator::initialize()

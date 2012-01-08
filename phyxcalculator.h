@@ -8,9 +8,7 @@
 #include <QFile>
 #include "cmath"
 #include "qearleyparser.h"
-#include "phyxunitmanager.h"
-#include "phyxvariable.h"
-#include "phyxunit.h"
+#include "phyxtesting.h"
 
 typedef long double         PhyxValueDataType;      /// the base data type for values
 typedef int               PhyxUnitDataType;       /// the base data type for units

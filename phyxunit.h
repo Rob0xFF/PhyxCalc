@@ -44,7 +44,7 @@ public:
     void powerMultiply(QString base, double factor);    /// multiplies a power with factor
     void powerDivide(QString base, double factor);      /// devides a power with factor
     void powersMultiply(PowerMap powers);               /// multiplies powers of the unit with other powers
-    void powersDevide(PowerMap powers);                 /// devides powers of the unit with other powers
+    void powersDivide(PowerMap powers);                 /// devides powers of the unit with other powers
     void powersRaise(double power);                     /// raises all powers to power
     void powersRoot(double root);                       /// takes the root of all powers
     bool powersCompare(PowerMap powers);                /// compares powers of the unit with other powers and returns ==
