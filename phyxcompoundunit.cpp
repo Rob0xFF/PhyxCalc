@@ -8,26 +8,73 @@ PhyxCompoundUnit::PhyxCompoundUnit(QObject *parent) :
 PhyxCompoundUnit::PhyxCompoundUnit(PhyxUnit *unit)
 {
     m_compounds.clear();
-    appendCompound(unit->symbol(),1);
+    appendCompound(unit,1);
     powersMultiply(unit->powers());
 }
 
-void PhyxCompoundUnit::appendCompound(QString base, double power)
+void PhyxCompoundUnit::appendCompound(PhyxUnit *base, double power)
 {
     m_compounds.insert(base, power);
 }
 
-void PhyxCompoundUnit::compoundMultiply(QString base, double factor)
+void PhyxCompoundUnit::compoundSimplify(PhyxUnit *unit)
+{
+    QMapIterator<PhyxUnit*, double> i(m_compounds);
+    while (i.hasNext())
+    {
+        i.next();
+        if (i.key()->isSame(unit))
+        {
+            emit scaleValue(i.key()->scaleFactor());
+            emit offsetValue(-i.key()->offset());
+            i.key()->setOffset(0);
+            i.key()->setScaleFactor(1);
+            return;
+        }
+    }
+}
+
+bool PhyxCompoundUnit::isSame(PhyxCompoundUnit *unit)
+{
+    return (this->powersCompare(unit->powers()) && (m_compounds == unit->compounds()));
+}
+
+bool PhyxCompoundUnit::isConvertible(PhyxCompoundUnit *unit)
+{
+    return this->powersCompare(unit->powers());
+}
+
+bool PhyxCompoundUnit::isDimensionlessUnit()
+{
+    //work here
+}
+
+void PhyxCompoundUnit::compoundMultiply(PhyxUnit *unit, double factor)
 {
     double power;
+    power = factor;
+
+    //work here
+    if (m_compounds.contains(unit))
+    {
+        power += m_compounds.value(unit);
+    }
+
+    if (power == 0)
+        m_compounds.remove(unit);
+    else
+        m_compounds.insert(unit, power);
+}
+
+void PhyxCompoundUnit::compoundDevide(PhyxUnit *base, double factor)
+{
+    double power;
+    power = -factor;
+
+    //work here
     if (m_compounds.contains(base))
     {
-        power = m_compounds.value(base);
-        power += factor;
-    }
-    else
-    {
-        power = factor;
+        power += m_compounds.value(base);
     }
 
     if (power == 0)
@@ -36,46 +83,54 @@ void PhyxCompoundUnit::compoundMultiply(QString base, double factor)
         m_compounds.insert(base, power);
 }
 
-void PhyxCompoundUnit::compoundDevide(QString base, double factor)
+void PhyxCompoundUnit::compoundEqualize(PhyxUnit *unit, PhyxCompoundUnit *parentUnit)
 {
-    double power;
-    if (m_compounds.contains(base))
+    QMapIterator<PhyxUnit*, double> i(parentUnit->compounds());
+    while (i.hasNext())
     {
-        power = m_compounds.value(base);
-        power -= factor;
+        i.next();
+        if (i.key()->isConvertible(unit))
+        {
+            if (!i.key()->isSame(unit))
+            {
+                this->compoundSimplify(unit);
+                parentUnit->compoundSimplify(i.key());
+            }
+        }
     }
-    else
-    {
-        power = -factor;
-    }
-
-    if (power == 0)
-        m_compounds.remove(base);
-    else
-        m_compounds.insert(base, power);
 }
 
-void PhyxCompoundUnit::compoundsMultiply(PhyxUnit::PowerMap powers)
+void PhyxCompoundUnit::compoundsMultiply(PhyxUnitMap compounds)
 {
-    QMapIterator<QString, double> i(powers);
+    QMapIterator<PhyxUnit*, double> i(compounds);
      while (i.hasNext()) {
          i.next();
          compoundMultiply(i.key(), i.value());
      }
 }
 
-void PhyxCompoundUnit::compoundsDivide(PhyxUnit::PowerMap powers)
+void PhyxCompoundUnit::compoundsDivide(PhyxUnitMap compounds)
 {
-    QMapIterator<QString, double> i(powers);
+    QMapIterator<PhyxUnit*, double> i(compounds);
      while (i.hasNext()) {
          i.next();
          compoundDevide(i.key(), i.value());
      }
 }
 
+void PhyxCompoundUnit::compoundsEqualize(PhyxCompoundUnit *unit)
+{
+    QMapIterator<PhyxUnit*, double> i(m_compounds);
+    while (i.hasNext())
+    {
+        i.next();
+        compoundEqualize(i.key(), unit);
+    }
+}
+
 void PhyxCompoundUnit::compoundsRaise(double power)
 {
-    QMapIterator<QString, double> i(m_compounds);
+    QMapIterator<PhyxUnit*, double> i(m_compounds);
      while (i.hasNext()) {
          i.next();
          m_compounds.insert(i.key(), i.value() * power);
@@ -84,7 +139,7 @@ void PhyxCompoundUnit::compoundsRaise(double power)
 
 void PhyxCompoundUnit::compoundsRoot(double root)
 {
-    QMapIterator<QString, double> i(m_compounds);
+    QMapIterator<PhyxUnit*, double> i(m_compounds);
      while (i.hasNext()) {
          i.next();
          m_compounds.insert(i.key(), i.value() / root);
@@ -99,9 +154,8 @@ bool PhyxCompoundUnit::add(PhyxCompoundUnit *unit)
     }
     else if (this->isConvertible(unit))
     {
-        //this->simplifyUnit();
-        //variable->simplifyUnit();
         //make units the same
+        this->compoundsEqualize(unit);
 
         return true;
     }
@@ -163,6 +217,27 @@ void PhyxCompoundUnit::root(double root)
     this->compoundsRoot(root);
 }
 
+bool PhyxCompoundUnit::convertTo(PhyxCompoundUnit *unit)
+{
+    if (!this->isConvertible(unit))
+        return false;
+    else
+    {
+        //here goes the work
+        /*this->simplifyUnit();
+
+        // make the inverse galilean transformation x = (y+b)/a
+        offsetValue(unit->offset());
+        scaleValue(1.0/unit->scaleFactor());
+        m_unit->setPowers(unit->powers());
+        m_unit->setScaleFactor(unit->scaleFactor());
+        m_unit->setOffset(unit->offset());
+        m_unit->setFlags(unit->flags());*/
+
+        return true;
+    }
+}
+
 const QString PhyxCompoundUnit::symbol()
 {
     if (m_unitSystem != NULL)
@@ -181,7 +256,7 @@ const QString PhyxCompoundUnit::symbol()
             QString negativeCompounds;
             QString compoundsString;
 
-            QMapIterator<QString, double> i(m_compounds);
+            QMapIterator<PhyxUnit*, double> i(m_compounds);
             while (i.hasNext())
             {
                 i.next();
@@ -190,7 +265,7 @@ const QString PhyxCompoundUnit::symbol()
                     if (!positiveCompoundsCount == 0)
                         positiveCompounds.append("*");
 
-                    positiveCompounds.append(i.key());
+                    positiveCompounds.append(i.key()->symbol());
 
                     if (i.value() != 1)
                         positiveCompounds.append(QString("%1").arg(i.value()));
@@ -202,7 +277,7 @@ const QString PhyxCompoundUnit::symbol()
                     if (!negativeCompoundsCount == 0)
                         negativeCompounds.append("*");
 
-                    negativeCompounds.append(i.key());
+                    negativeCompounds.append(i.key()->symbol());
 
                     if (i.value() != -1)
                         negativeCompounds.append(QString("%1").arg(-i.value()));

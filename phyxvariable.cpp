@@ -21,27 +21,15 @@ void PhyxVariable::simplifyUnit()
     m_unit->setScaleFactor(1);
 }
 
-bool PhyxVariable::convertUnit(PhyxUnit *unit)
+bool PhyxVariable::convertUnit(PhyxCompoundUnit *unit)
 {
-    if (!this->unit()->isConvertible(unit))
+    if (!this->unit()->convertTo(unit))
     {
         m_error = PhyxVariable::UnitsNotConvertibleError;
         return false;
     }
     else
-    {
-        this->simplifyUnit();
-
-        // make the inverse galilean transformation x = (y+b)/a
-        offsetValue(unit->offset());
-        scaleValue(1.0/unit->scaleFactor());
-        m_unit->setPowers(unit->powers());
-        m_unit->setScaleFactor(unit->scaleFactor());
-        m_unit->setOffset(unit->offset());
-        m_unit->setFlags(unit->flags());
-
         return true;
-    }
 }
 
 bool PhyxVariable::mathAdd(PhyxVariable *variable)
@@ -367,26 +355,9 @@ bool PhyxVariable::mathMax(PhyxVariable *variable)
     }
     else if (this->unit()->isConvertible(variable->unit()))
     {
-        PhyxUnit *unit1 = new PhyxUnit();
-        PhyxUnit *unit2 = new PhyxUnit();
-        PhyxUnit::copyUnit(this->unit(), unit1);
-        PhyxUnit::copyUnit(variable->unit(), unit2);
+        this->unit()->compoundsEqualize(variable->unit());
 
-        this->simplifyUnit();
-        variable->simplifyUnit();
-
-        if (this->value() >= variable->value())
-        {
-            this->convertUnit(unit1);
-        }
-        else
-        {
-            m_value = variable->value();
-            this->convertUnit(unit2);
-        }
-
-        delete unit1;
-        delete unit2;
+        this->m_value = qMax(this->value(), variable->value());
         return true;
     }
     else
@@ -405,26 +376,9 @@ bool PhyxVariable::mathMin(PhyxVariable *variable)
     }
     else if (this->unit()->isConvertible(variable->unit()))
     {
-        PhyxUnit *unit1 = new PhyxUnit();
-        PhyxUnit *unit2 = new PhyxUnit();
-        PhyxUnit::copyUnit(this->unit(), unit1);
-        PhyxUnit::copyUnit(variable->unit(), unit2);
+        this->unit()->compoundsEqualize(variable->unit());
 
-        this->simplifyUnit();
-        variable->simplifyUnit();
-
-        if (this->value() <= variable->value())
-        {
-            this->convertUnit(unit1);
-        }
-        else
-        {
-            m_value = variable->value();
-            this->convertUnit(unit2);
-        }
-
-        delete unit1;
-        delete unit2;
+        this->m_value = qMin(this->value(), variable->value());
         return true;
     }
     else

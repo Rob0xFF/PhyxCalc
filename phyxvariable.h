@@ -27,7 +27,7 @@ public:
     };
 
     void simplifyUnit();                            ///< simplifies the unit of the variable (e.g.: GalileanUnit -> ProductUnit, DimensionlessUnit -> NoUnit)
-    bool convertUnit(PhyxUnit *unit);               ///< converts the variable to the given unit, returns successful
+    bool convertUnit(PhyxCompoundUnit *unit);
 
     /** mathematical functions of the variable */
     bool mathAdd(PhyxVariable *variable);
