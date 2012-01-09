@@ -10,7 +10,7 @@ PhyxUnit::PhyxUnit(QObject *parent) :
     m_flags = 0;
 }
 
-void PhyxUnit::appendPower(QString base, double power)
+void PhyxUnit::powerAppend(QString base, double power)
 {
     m_powers.insert(base, power);
 }
@@ -92,6 +92,11 @@ void PhyxUnit::powersRoot(double root)
 bool PhyxUnit::powersCompare(PhyxUnit::PowerMap powers)
 {
     return m_powers == powers;
+}
+
+void PhyxUnit::powersClear()
+{
+    m_powers.clear();
 }
 
 bool PhyxUnit::isOne()

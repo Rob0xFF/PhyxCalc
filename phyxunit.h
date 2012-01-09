@@ -40,7 +40,7 @@ public:
 
     typedef QMap<QString, double> PowerMap;
 
-    void appendPower(QString base, double power);       /// adds a power to the map
+    void powerAppend(QString base, double power);       /// adds a power to the map
     void powerMultiply(QString base, double factor);    /// multiplies a power with factor
     void powerDivide(QString base, double factor);      /// devides a power with factor
     void powersMultiply(PowerMap powers);               /// multiplies powers of the unit with other powers
@@ -48,6 +48,7 @@ public:
     void powersRaise(double power);                     /// raises all powers to power
     void powersRoot(double root);                       /// takes the root of all powers
     bool powersCompare(PowerMap powers);                /// compares powers of the unit with other powers and returns ==
+    void powersClear();                                 /// clears all powers
 
     /*void prefixMultiply(double factor);
     void prefixDevide(double factor);

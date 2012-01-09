@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <cmath>
+#include "phyxunit.h"
 #include "phyxcompoundunit.h"
 
 typedef long double         PhyxValueDataType;      /// the base data type for values
@@ -26,8 +27,9 @@ public:
         ValueNotIntegerError
     };
 
-    void simplifyUnit();                            ///< simplifies the unit of the variable (e.g.: GalileanUnit -> ProductUnit, DimensionlessUnit -> NoUnit)
     bool convertUnit(PhyxCompoundUnit *unit);
+
+    QString errorString();                              ///< returns the error string to current error
 
     /** mathematical functions of the variable */
     bool mathAdd(PhyxVariable *variable);
@@ -97,7 +99,12 @@ void setValue(PhyxValueDataType arg)
 void setUnit(PhyxCompoundUnit * arg)
 {
     m_unit = arg;
+    connect(m_unit, SIGNAL(offsetValue(double)),
+            this, SLOT(offsetValue(double)));
+    connect(m_unit, SIGNAL(scaleValue(double)),
+            this, SLOT(scaleValue(double)));
 }
+void setUnit(PhyxUnit *unit);
 void offsetValue(double offset)
 {
     m_value += offset;

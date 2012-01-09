@@ -4,21 +4,12 @@ PhyxVariable::PhyxVariable(QObject *parent) :
     QObject(parent)
 {
     m_value = 1;
-    m_unit = new PhyxCompoundUnit();
+    setUnit(new PhyxCompoundUnit());
 }
 
 PhyxVariable::~PhyxVariable()
 {
     delete m_unit;
-}
-
-void PhyxVariable::simplifyUnit()
-{
-    //make the galilean transformation y = ax - b
-    scaleValue(m_unit->scaleFactor());
-    offsetValue(-m_unit->offset());
-    m_unit->setOffset(0);
-    m_unit->setScaleFactor(1);
 }
 
 bool PhyxVariable::convertUnit(PhyxCompoundUnit *unit)
@@ -30,6 +21,18 @@ bool PhyxVariable::convertUnit(PhyxCompoundUnit *unit)
     }
     else
         return true;
+}
+
+QString PhyxVariable::errorString()
+{
+    switch (m_error)
+    {
+    case UnitsNotConvertibleError:      return tr("Units are not convertible");
+    case UnitNotDimensionlessError:     return tr("Unit is not dimensionless");
+    case ValueNotPositiveError:         return tr("value is not positive");
+    case ValueNotIntegerError:          return tr("Value is not an integer");
+    default:                            return tr("No error");
+    }
 }
 
 bool PhyxVariable::mathAdd(PhyxVariable *variable)
@@ -103,7 +106,6 @@ bool PhyxVariable::mathRoot(PhyxVariable *variable)
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    //variable->simplifyUnit();
 
     this->unit()->root(variable->value());
     this->m_value = pow(this->m_value, 1.0/variable->value());
@@ -113,10 +115,8 @@ bool PhyxVariable::mathRoot(PhyxVariable *variable)
 
 void PhyxVariable::mathSqrt()
 {
-    this->simplifyUnit();
-
-    this->m_value = sqrt(this->m_value);
     this->unit()->root(2);
+    this->m_value = sqrt(this->m_value);
 }
 
 bool PhyxVariable::mathSin()
@@ -126,7 +126,7 @@ bool PhyxVariable::mathSin()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = sin(m_value);
     return true;
@@ -139,7 +139,7 @@ bool PhyxVariable::mathArcsin()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = asin(m_value);
     return true;
@@ -152,7 +152,7 @@ bool PhyxVariable::mathCos()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = cos(m_value);
     return true;
@@ -165,7 +165,7 @@ bool PhyxVariable::mathArccos()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = acos(m_value);
     return true;
@@ -178,7 +178,7 @@ bool PhyxVariable::mathTan()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = tan(m_value);
     return true;
@@ -191,7 +191,7 @@ bool PhyxVariable::mathArctan()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = atan(m_value);
     return true;
@@ -204,7 +204,7 @@ bool PhyxVariable::mathSinh()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = sinh(m_value);
     return true;
@@ -217,7 +217,7 @@ bool PhyxVariable::mathArcsinh()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = asinh(m_value);
     return true;
@@ -230,7 +230,7 @@ bool PhyxVariable::mathCosh()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = cosh(m_value);
     return true;
@@ -243,7 +243,7 @@ bool PhyxVariable::mathArccosh()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = acosh(m_value);
     return true;
@@ -256,7 +256,7 @@ bool PhyxVariable::mathTanh()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = tanh(m_value);
     return true;
@@ -269,7 +269,7 @@ bool PhyxVariable::mathArctanh()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = atanh(m_value);
     return true;
@@ -282,7 +282,7 @@ bool PhyxVariable::mathExp()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = exp(m_value);
     return true;
@@ -295,7 +295,7 @@ bool PhyxVariable::mathLn()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = log(m_value);
     return true;
@@ -308,7 +308,7 @@ bool PhyxVariable::mathLog10()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = log10(m_value);
     return true;
@@ -321,7 +321,7 @@ bool PhyxVariable::mathLog2()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     m_value = log2(m_value);
     return true;
@@ -334,8 +334,8 @@ bool PhyxVariable::mathLogn(PhyxVariable *variable)
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
-    variable->simplifyUnit();
+    this->unit()->simplify();
+    variable->unit()->simplify();
 
     m_value = log(this->value()) / log(variable->value());
     return true;
@@ -425,7 +425,7 @@ bool PhyxVariable::mathHeaviside()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     if (m_value >= 0)
         m_value = 1;
@@ -442,8 +442,8 @@ bool PhyxVariable::mathRandg(PhyxVariable *variable)
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
-    variable->simplifyUnit();
+    this->unit()->simplify();
+    variable->unit()->simplify();
 
     int min = this->value();
     int max = variable->value();
@@ -459,7 +459,7 @@ bool PhyxVariable::mathFaculty()
         m_error = PhyxVariable::UnitNotDimensionlessError;
         return false;
     }
-    this->simplifyUnit();
+    this->unit()->simplify();
 
     PhyxValueDataType value = m_value;
 
@@ -482,4 +482,9 @@ bool PhyxVariable::mathFaculty()
     m_value = value;
 
     return true;
+}
+
+void PhyxVariable::setUnit(PhyxUnit *unit)
+{
+    m_unit->fromSimpleUnit(unit);
 }

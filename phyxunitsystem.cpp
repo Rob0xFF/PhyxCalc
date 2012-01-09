@@ -14,7 +14,7 @@ void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags)
 
    PhyxUnit *unit = new PhyxUnit();
    unit->setSymbol(symbol);
-   unit->appendPower(symbol,1);
+   unit->powerAppend(symbol,1);
    unit->setFlags(flags);
    baseUnitsMap.insert(symbol, unit);
 
