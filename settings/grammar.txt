@@ -28,18 +28,18 @@
 #
 # Definition needs following outline:
 #   Rule    |   functions               |   param function  |   parameter
-S=|E|
-E=|E|+|T|   ; valueAdd
-E=|E|-|T|   ; valueSub
+S=|E|       ; outputVariable
+E=|E|+|T|   ; mathAdd
+E=|E|-|T|   ; mathSub
 E=|T|
-T=|T|*|F|   ; valueMul
-T=|T|/|F|   ; valueDiv
-T=sin(|E|)  ; valueSin
+T=|T|*|F|   ; mathMul
+T=|T|/|F|   ; mathDiv
+T=sin(|E|)  ; mathSin
 T=|F|
 #F=-|F|
 #F=+|F|
 F=(|F|)
-F=|real|    ; setParam, numberPush
+F=|var|    ; pushVariable
 uint=|n|
 uint=|n||uint|
 int=|uint|
@@ -47,6 +47,9 @@ int=|-||uint|
 int=|+||uint|
 real=|int|
 real=|int||.||uint|
+var=|real||unit| ; bufferParameter, bufferUnit, bufferValue
+var=|real|  ; bufferParameter, bufferValue
+var=|unit|  ; bufferParameter, bufferUnit
 +=+
 -=-
 .=.

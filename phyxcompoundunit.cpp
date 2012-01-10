@@ -270,6 +270,11 @@ const QString PhyxCompoundUnit::symbol()
 {
     if (m_unitSystem != NULL)
     {
+        if (this->isOne())
+        {
+            return "";
+        }
+
         //build a nice unit symbol
         int positiveCompoundsCount = 0;
         int negativeCompoundsCount = 0;

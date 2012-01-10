@@ -30,6 +30,8 @@ private:
     void recalculateVariables();                    ///< recalculates all variables
     void recalculate();                             ///< recalculates units and variables
 signals:
+    void unitAdded(QString symbol);
+    void unitRemoved(QString symol);
 
 public slots:
 

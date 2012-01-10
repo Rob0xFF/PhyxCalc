@@ -7,8 +7,6 @@ PhyxUnitSystem::PhyxUnitSystem(QObject *parent) :
 
 void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags)
 {
-
-
     if (baseUnitsMap.contains(symbol))
         delete baseUnitsMap.take(symbol);
 
@@ -23,6 +21,8 @@ void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags)
         delete derivedUnitsMap.take(symbol);
         recalculate();
     }
+
+    emit unitAdded(symbol);
 }
 
 /*void PhyxUnitSystem::addDerivedUnit(QString symbol, PhyxVariable *variable, double offset, PhyxUnit::UnitFlags flags)
@@ -58,6 +58,21 @@ void PhyxUnitSystem::addDerivedUnit(PhyxUnit *unit)
 
    derivedUnitsMap.insert(unit->symbol(), unit);
    recalculate();
+
+   emit unitAdded(unit->symbol());
+}
+
+bool PhyxUnitSystem::removeUnit(QString symbol)
+{
+    if (baseUnitsMap.contains(symbol))
+        delete baseUnitsMap.take(symbol);
+
+    if (derivedUnitsMap.contains(symbol))
+        delete derivedUnitsMap.take(symbol);
+
+    recalculate();
+
+    emit unitRemoved(symbol);
 }
 
 void PhyxUnitSystem::recalculateUnits()

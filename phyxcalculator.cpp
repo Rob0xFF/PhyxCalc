@@ -9,6 +9,14 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
 
     //testing
     PhyxTesting::testUnits();
+
+    unitSystem->addBaseUnit("m", PhyxUnit::SiUnitFlag);
+    unitSystem->addBaseUnit("kg", PhyxUnit::SiUnitFlag);
+    unitSystem->addBaseUnit("A", PhyxUnit::SiUnitFlag);
+    unitSystem->addBaseUnit("K", PhyxUnit::SiUnitFlag);
+    unitSystem->addBaseUnit("s", PhyxUnit::SiUnitFlag);
+    unitSystem->addBaseUnit("mol", PhyxUnit::SiUnitFlag);
+    unitSystem->addBaseUnit("cd", PhyxUnit::SiUnitFlag);
 }
 
 void PhyxCalculator::initialize()
@@ -16,11 +24,20 @@ void PhyxCalculator::initialize()
     //initialize variables
     expression = "";
     expressionIsParsable = false;
+    valueBuffer = 1;
+    unitBuffer = "";
 
     //initialize random number generator
     qsrand(QDateTime::currentMSecsSinceEpoch());
 
     //map functions
+    functionMap.insert("mathAdd",      &PhyxCalculator::mathAdd);
+    functionMap.insert("mathSub",      &PhyxCalculator::mathSub);
+    functionMap.insert("mathMul",      &PhyxCalculator::mathMul);
+    functionMap.insert("mathDiv",      &PhyxCalculator::mathDiv);
+    functionMap.insert("mathNeg",      &PhyxCalculator::mathNeg);
+    functionMap.insert("mathSin",      &PhyxCalculator::mathSin);
+
     functionMap.insert("valueAdd",      &PhyxCalculator::valueAdd);
     functionMap.insert("valueSub",      &PhyxCalculator::valueSub);
     functionMap.insert("valueMul",      &PhyxCalculator::valueMul);
@@ -80,7 +97,19 @@ void PhyxCalculator::initialize()
     functionMap.insert("numberBuf",     &PhyxCalculator::numberBuf);
     functionMap.insert("variablePush",  &PhyxCalculator::variablePush);
 
+    functionMap.insert("bufferUnit",&PhyxCalculator::bufferUnit);
+    functionMap.insert("bufferValue",&PhyxCalculator::bufferValue);
+    functionMap.insert("pushVariable",&PhyxCalculator::pushVariable);
+    functionMap.insert("outputVariable",&PhyxCalculator::outputVariable);
+
     loadGrammar(":/settings/grammar");
+
+    //initialize unit system
+    unitSystem = new PhyxUnitSystem();
+    connect(unitSystem, SIGNAL(unitAdded(QString)),
+            this, SLOT(addUnitRule(QString)));
+    connect(unitSystem, SIGNAL(unitRemoved(QString)),
+            this, SLOT(removeUnitRule(QString)));
 }
 
 void PhyxCalculator::loadGrammar(QString fileName)
@@ -123,7 +152,8 @@ void PhyxCalculator::addRule(QString rule, QString functions)
     phyxRules.insert(rule, phyxRule);
 
     QStringList ruleFunctions;
-    foreach (QString function, phyxRule.functions) ruleFunctions.append(function.trimmed());
+    foreach (QString function, phyxRule.functions)
+        ruleFunctions.append(function.trimmed());
     earleyParser.loadRule(rule, ruleFunctions);
 }
 
@@ -166,7 +196,7 @@ bool PhyxCalculator::evaluate()
         QList<EarleyTreeItem> earleyTree;
         earleyTree = earleyParser.getTree();
 
-        for (int i = (earleyTree.size()-1); i > 0; i--)
+        for (int i = (earleyTree.size()-1); i >= 0; i--)
         {
             EarleyTreeItem *earleyTreeItem = &earleyTree[i];
             //PhyxRule phyxRule = phyxRules.value(earleyTreeItem->rule);
@@ -176,20 +206,15 @@ bool PhyxCalculator::evaluate()
             {
                 foreach (QString function, earleyTreeItem->rule->functions)
                 {
-                    if (function=="setParam")
-                    {
+                    if (function == "bufferParameter")
                         parameterBuffer = expression.mid(earleyTreeItem->startPos, earleyTreeItem->endPos - earleyTreeItem->startPos + 1);
-                    }
                     else
-                    {
                         (this->*functionMap.value(function))();
-                    }
                 }
             }
             //if (!phyxRule.paramFunction.isEmpty())
             //    (this->*paramFunctionMap.value(phyxRule.paramFunction))(phyxRule.parameter);
         }
-        qDebug() << (double)valueStack.pop();
         return true;
     }
     else
@@ -197,6 +222,75 @@ bool PhyxCalculator::evaluate()
         raiseException("Syntax Error!");
         return false;
     }
+}
+
+void PhyxCalculator::mathAdd()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    if (variable1->mathAdd(variable2))
+        variableStack.push(variable1);
+    else
+        raiseException(variable1->errorString());
+
+    delete variable2;
+}
+
+void PhyxCalculator::mathSub()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    if (variable1->mathSub(variable2))
+        variableStack.push(variable1);
+    else
+        raiseException(variable1->errorString());
+
+    delete variable2;
+}
+
+void PhyxCalculator::mathMul()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    if (variable1->mathMul(variable2))
+        variableStack.push(variable1);
+    else
+        raiseException(variable1->errorString());
+
+    delete variable2;
+}
+
+void PhyxCalculator::mathDiv()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    if (variable1->mathDiv(variable2))
+        variableStack.push(variable1);
+    else
+        raiseException(variable1->errorString());
+
+    delete variable2;
+}
+
+void PhyxCalculator::mathNeg()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(-variable1->value());
+}
+
+void PhyxCalculator::mathSin()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    if (variable1->mathSin())
+        variableStack.push(variable1);
+    else
+        raiseException(variable1->errorString());
 }
 
 void PhyxCalculator::valueFaculty()
@@ -236,4 +330,62 @@ void PhyxCalculator::variablePush()
    /* PhysicalVariable variable = variableMap.value(parameterBuffer);
     valueStack.push(variable.value);
     unitStack.push(variable.unit);*/
+}
+
+void PhyxCalculator::bufferUnit()
+{
+    //get the unit
+    int pos;
+    for (pos = (parameterBuffer.size()-1); pos >= 0; pos--)
+    {
+        if (parameterBuffer.at(pos).isNumber())
+        {
+            pos++;
+            break;
+        }
+    }
+
+    unitBuffer = parameterBuffer.mid(pos);
+    parameterBuffer.truncate(pos);      //cut off the unit
+}
+
+void PhyxCalculator::bufferValue()
+{
+    valueBuffer = parameterBuffer.toDouble();
+}
+
+void PhyxCalculator::pushVariable()
+{
+    //create new variable
+    PhyxVariable *variable = new PhyxVariable();
+    variable->unit()->setUnitSystem(unitSystem);
+    variable->setValue(valueBuffer);
+    if (!unitBuffer.isEmpty())
+        variable->setUnit(unitSystem->unit(unitBuffer));
+
+    //push it to the stack
+    variableStack.push(variable);
+
+    //cleanup
+    valueBuffer = 1;
+    unitBuffer = "";
+}
+
+void PhyxCalculator::outputVariable()
+{
+    if (!variableStack.isEmpty())
+    {
+        PhyxVariable *variable1 = variableStack.pop();
+        qDebug() << (double)variable1->value() << variable1->unit()->symbol();
+    }
+}
+
+void PhyxCalculator::addUnitRule(QString symbol)
+{
+    addRule(QString("unit=%1").arg(symbol), QString());
+}
+
+void PhyxCalculator::removeUnitRule(QString symbol)
+{
+    earleyParser.removeRule(QString("unit=%1").arg(symbol));
 }

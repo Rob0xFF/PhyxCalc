@@ -8,6 +8,8 @@
 #include <QFile>
 #include "cmath"
 #include "qearleyparser.h"
+#include "phyxunitsystem.h"
+#include "phyxvariable.h"
 #include "phyxtesting.h"
 
 typedef long double         PhyxValueDataType;      /// the base data type for values
@@ -29,9 +31,12 @@ public:
 private:
     QStack<PhyxValueDataType>   valueStack;                                     /// stack for value calculation
     QStack<PhyxUnitDataType>    unitStack;                                      /// stack for unit calculation
+    QStack<PhyxVariable*>       variableStack;
     QString                     numberBuffer;                                   /// string for buffering numbers
     QString                     parameterBuffer;                                /// string for buffering numbers
     QString                     stringBuffer;                                   /// string for buffering strings
+    PhyxValueDataType           valueBuffer;
+    QString                     unitBuffer;
 
     QHash<QString, PhyxRule>    phyxRules;                                      /// map of all rules, key is rule
 
@@ -40,8 +45,7 @@ private:
     QString                     expression;                                     /// currently set expression
     bool                        expressionIsParsable;                           /// holds wheter currently set expression is parsable or not
 
-    //QMap<QString, PhysicalVariable> variableMap;                                /// variables mapped with their name
-    //QMap<QString, PhysicalVariable> constantMap;                                /// constants mapped with their name
+    PhyxUnitSystem              *unitSystem;
 
     QHash<QString, void (PhyxCalculator::*)()> functionMap;                     /// functions mapped with their names
 
@@ -51,6 +55,16 @@ private:
     void raiseException(QString exception);                                                                     ///< raises an exception
     void addRule(QString rule, QString functions = "");     ///< adds a rule
 
+    /** math functions */
+    void mathAdd();
+    void mathSub();
+    void mathMul();
+    void mathDiv();
+    void mathNeg();
+    void mathPow();
+    void mathPow2();
+    void mathPow3();
+    void mathSin();
     /** functions for value calculation */
     void valueAdd()         {valueStack.push(valueStack.pop() + valueStack.pop());}
     void valueSub()         {valueStack.push(valueStack.pop() - valueStack.pop());}
@@ -123,9 +137,20 @@ private:
     void variableAdd();
     void variableRemove();
     void variablePush();
+
+    /** functions for buffering */
+    void bufferUnit();
+    void bufferValue();
+    void pushVariable();
+
+    void outputVariable();
 signals:
     
 public slots:
+
+private slots:
+    void addUnitRule(QString symbol);
+    void removeUnitRule(QString symbol);
     
 };
 
