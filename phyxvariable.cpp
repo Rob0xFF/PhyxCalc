@@ -343,7 +343,7 @@ bool PhyxVariable::mathLogn(PhyxVariable *variable)
 
 void PhyxVariable::mathAbs()
 {
-    m_value = abs(m_value);
+    m_value = qAbs(m_value);
 }
 
 bool PhyxVariable::mathMax(PhyxVariable *variable)
