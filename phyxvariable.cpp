@@ -488,3 +488,21 @@ void PhyxVariable::setUnit(PhyxUnit *unit)
 {
     m_unit->fromSimpleUnit(unit);
 }
+
+void PhyxVariable::setPreferedUnit(userUnitBuffer userInputUnits, outputMode mode)
+{
+    PhyxUnitSystem* UnitSystem = m_unit->unitSystem();
+    PhyxVariable newVar;
+
+    switch (mode)
+    {
+    case onlyBaseUnits:
+        break;
+
+    case minimizeUnit:
+        break;
+
+    case forceInputUnits:
+        break;
+    }
+}

@@ -2,10 +2,12 @@
 #define PHYXVARIABLE_H
 
 #include <QObject>
+#include <QSet>
 #include <cmath>
 #include "phyxunit.h"
 #include "phyxcompoundunit.h"
 
+typedef QSet<QString>       userUnitBuffer;         /// set of input units
 typedef long double         PhyxValueDataType;      /// the base data type for values
 
 class PhyxVariable : public QObject
@@ -19,6 +21,12 @@ class PhyxVariable : public QObject
 public:
     explicit PhyxVariable(QObject *parent = 0);
     ~PhyxVariable();
+
+    enum outputMode {
+        onlyBaseUnits = 0x01,           /// option to convert output units into base units
+        minimizeUnit = 0x02,            /// option to use shortest possible output unit, but use input units in case of ambiguity
+        forceInputUnits = 0x03          /// option to use only input units as output unit, as far as possible
+    };
 
     enum VariableError {
         UnitsNotConvertibleError,
@@ -82,6 +90,8 @@ public:
     {
         return m_error;
     }
+
+    void setPreferedUnit(userUnitBuffer userInputUnits, outputMode mode);
 
 private:
     PhyxValueDataType   m_value;
