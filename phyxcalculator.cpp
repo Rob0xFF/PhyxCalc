@@ -43,9 +43,9 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueMul",      &PhyxCalculator::valueMul);
     functionMap.insert("valueDiv",      &PhyxCalculator::valueDiv);
     functionMap.insert("valueNeg",      &PhyxCalculator::valueNeg);
-    functionMap.insert("valueExponent", &PhyxCalculator::valueExponent);
-    functionMap.insert("valueExp2",     &PhyxCalculator::valueExp2);
-    functionMap.insert("valueExp3",     &PhyxCalculator::valueExp3);
+    functionMap.insert("valueExponent", &PhyxCalculator::valuePow);
+    functionMap.insert("valueExp2",     &PhyxCalculator::valuePow2);
+    functionMap.insert("valueExp3",     &PhyxCalculator::valuePow3);
     functionMap.insert("valueSin",      &PhyxCalculator::valueSin);
     functionMap.insert("valueArcsin",   &PhyxCalculator::valueArcsin);
     functionMap.insert("valueCos",      &PhyxCalculator::valueCos);
@@ -293,21 +293,380 @@ void PhyxCalculator::mathSin()
         raiseException(variable1->errorString());
 }
 
+void PhyxCalculator::valueAdd()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue(variable1->value() + variable2->value());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::valueSub()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue(variable1->value() - variable2->value());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::valueMul()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue(variable1->value() * variable2->value());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::valueDiv()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue(variable1->value() / variable2->value());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::valueNeg()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(-variable1->value());
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valuePow()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue(pow(variable1->value(),variable2->value()));
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::valuePow2()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(pow(variable1->value(),2));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valuePow3()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(pow(variable1->value(),3));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueSin()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(sin(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueArcsin()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(asin(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueCos()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(cos(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueArccos()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(acos(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueTan()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(tan(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueArctan()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(atan(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueSinh()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(sinh(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueArcsinh()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(asinh(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueCosh()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(cosh(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueArccosh()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(acosh(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueTanh()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(tanh(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueArctanh()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(atanh(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueExp()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(exp(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueLn()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(log(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueLog10()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(log10(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueLog2()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(log2(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueLogn()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue(log(variable1->value()) / log(variable2->value()));
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::valueSqrt()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(sqrt(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueAbs()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(qAbs(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueMax()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue(qMax(variable1->value(),variable2->value()));
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::valueMin()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue(qMin(variable1->value(),variable2->value()));
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::valuePi()
+{
+    valueBuffer = M_PI;
+    unitBuffer = "";
+    pushVariable();
+}
+
+void PhyxCalculator::valueInt()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue((int)(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueTrunc()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(trunc(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueFloor()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(floor(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueRound()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(round(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueCeil()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(ceil(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueSign()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(copysign(1.0,variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueHeaviside()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    if (variable1->value() >= 0)
+        variable1->setValue(1);
+    else
+        variable1->setValue(0);
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueRand()
+{
+    valueBuffer = qrand();
+    unitBuffer = "";
+    pushVariable();
+}
+
+void PhyxCalculator::valueRandint()
+{
+    valueBuffer = (int)qrand();
+    unitBuffer = "";
+    pushVariable();
+}
+
+void PhyxCalculator::valueRandg()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    int min, max;
+    min = variable1->value();
+    max = variable2->value();
+    variable1->setValue(min + qrand()%(max-min+1));
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
 void PhyxCalculator::valueFaculty()
 {
-    PhyxValueDataType value = valueStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
+
+    PhyxValueDataType value = variable1->value();
 
     if (value < 0)
+    {
         raiseException("Only positive values");
-    if ((int)value != value)
+        return;
+    }
+    else if ((int)value != value)
+    {
         raiseException("Only integer values");
+        return;
+    }
 
     int n = (int)round(value);
     value = 1;
     for (int i = 2; i <=n; i++)
         value *= i;
 
-    valueStack.push(value);
+    variable1->setValue(value);
+    variableStack.push(variable1);
 }
 
 void PhyxCalculator::variableAdd()

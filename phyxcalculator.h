@@ -66,49 +66,46 @@ private:
     void mathPow3();
     void mathSin();
     /** functions for value calculation */
-    void valueAdd()         {valueStack.push(valueStack.pop() + valueStack.pop());}
-    void valueSub()         {valueStack.push(valueStack.pop() - valueStack.pop());}
-    void valueMul()         {valueStack.push(valueStack.pop() * valueStack.pop());}
-    void valueDiv()         {valueStack.push(valueStack.pop() / valueStack.pop());}
-    void valueNeg()         {valueStack.push(-valueStack.pop());}
-    void valueExponent()    {valueStack.push(pow(valueStack.pop(),valueStack.pop()));}
-    void valueExp2()        {valueStack.push(pow(valueStack.pop(),2));}
-    void valueExp3()        {valueStack.push(pow(valueStack.pop(),3));}
-    void valueSin()         {valueStack.push(sin(valueStack.pop()));}
-    void valueArcsin()      {valueStack.push(asin(valueStack.pop()));}
-    void valueCos()         {valueStack.push(cos(valueStack.pop()));}
-    void valueArccos()      {valueStack.push(acos(valueStack.pop()));}
-    void valueTan()         {valueStack.push(tan(valueStack.pop()));}
-    void valueArctan()      {valueStack.push(atan(valueStack.pop()));}
-    void valueSinh()        {valueStack.push(sinh(valueStack.pop()));}
-    void valueArcsinh()     {valueStack.push(asinh(valueStack.pop()));}
-    void valueCosh()        {valueStack.push(cosh(valueStack.pop()));}
-    void valueArccosh()     {valueStack.push(acosh(valueStack.pop()));}
-    void valueTanh()        {valueStack.push(tanh(valueStack.pop()));}
-    void valueArctanh()     {valueStack.push(atanh(valueStack.pop()));}
-    void valueExp()         {valueStack.push(exp(valueStack.pop()));}
-    void valueLn()          {valueStack.push(log(valueStack.pop()));}
-    void valueLog10()       {valueStack.push(log10(valueStack.pop()));}
-    void valueLog2()        {valueStack.push(log2(valueStack.pop()));}
-    void valueLogn()        {valueStack.push(log(valueStack.pop()) / log(valueStack.pop()));}
-    void valueSqrt()        {valueStack.push(sqrt(valueStack.pop()));}
-    void valueAbs()         {valueStack.push(abs(valueStack.pop()));}
-    void valueMax()         {valueStack.push(qMax(valueStack.pop(),valueStack.pop()));}
-    void valueMin()         {valueStack.push(qMin(valueStack.pop(),valueStack.pop()));}
-    void valuePi()          {valueStack.push(M_PI);}
-    void valueInt()         {valueStack.push((int)valueStack.pop());}
-    void valueTrunc()       {valueStack.push(trunc(valueStack.pop()));}
-    void valueFloor()       {valueStack.push(floor(valueStack.pop()));}
-    void valueRound()       {valueStack.push(round(valueStack.pop()));}
-    void valueCeil()        {valueStack.push(ceil(valueStack.pop()));}
-    void valueSign()        {valueStack.push(copysign(1.0,valueStack.pop()));}
-    void valueHeaviside()   {if (valueStack.pop() >= 0)  valueStack.push(1); else valueStack.push(0);}
-    void valueRand()        {valueStack.push(qrand());}
-    void valueRandint()     {valueStack.push((int)qrand());}
-    void valueRandg()       {int min, max;
-                             min = valueStack.pop();
-                             max = valueStack.pop();
-                             valueStack.push(min + qrand()%(max-min+1));}
+    void valueAdd();
+    void valueSub();
+    void valueMul();
+    void valueDiv();
+    void valueNeg();
+    void valuePow();
+    void valuePow2();
+    void valuePow3();
+    void valueSin();
+    void valueArcsin();
+    void valueCos();
+    void valueArccos();
+    void valueTan();
+    void valueArctan();
+    void valueSinh();
+    void valueArcsinh();
+    void valueCosh();
+    void valueArccosh();
+    void valueTanh();
+    void valueArctanh();
+    void valueExp();
+    void valueLn();
+    void valueLog10();
+    void valueLog2();
+    void valueLogn();
+    void valueSqrt();
+    void valueAbs();
+    void valueMax();
+    void valueMin();
+    void valuePi();
+    void valueInt();
+    void valueTrunc();
+    void valueFloor();
+    void valueRound();
+    void valueCeil();
+    void valueSign();
+    void valueHeaviside();
+    void valueRand();
+    void valueRandint();
+    void valueRandg();
     void valueFaculty();
 
     /** functions for unit calculation */
