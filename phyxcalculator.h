@@ -148,7 +148,7 @@ private:
     /** functions for variable handling */
     void variableAdd();
     void variableRemove();
-    void variablePush();
+    void variableLoad();
 
     /** functions for buffering */
     void bufferUnit();
@@ -165,6 +165,8 @@ public slots:
 private slots:
     void addUnitRule(QString symbol);
     void removeUnitRule(QString symbol);
+    void addVariableRule(QString name);
+    void removeVariableRule(QString name);
     
 };
 

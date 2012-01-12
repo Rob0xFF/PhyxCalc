@@ -9,6 +9,7 @@ class PhyxUnitSystem : public QObject
     Q_OBJECT
 public:
     explicit PhyxUnitSystem(QObject *parent = 0);
+    ~PhyxUnitSystem();
 
     void addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags);    ///< adds a base unit
    // void addDerivedUnit(QString symbol,

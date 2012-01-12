@@ -94,12 +94,11 @@ void PhyxCalculator::initialize()
 
     functionMap.insert("variableAdd",   &PhyxCalculator::variableAdd);
     functionMap.insert("variableRemove",&PhyxCalculator::variableRemove);
+    functionMap.insert("variableLoad",  &PhyxCalculator::variableLoad);
 
-    functionMap.insert("variablePush",  &PhyxCalculator::variablePush);
-
-    functionMap.insert("bufferUnit",&PhyxCalculator::bufferUnit);
-    functionMap.insert("bufferValue",&PhyxCalculator::bufferValue);
-    functionMap.insert("pushVariable",&PhyxCalculator::pushVariable);
+    functionMap.insert("bufferUnit",    &PhyxCalculator::bufferUnit);
+    functionMap.insert("bufferValue",   &PhyxCalculator::bufferValue);
+    functionMap.insert("pushVariable",  &PhyxCalculator::pushVariable);
     functionMap.insert("outputVariable",&PhyxCalculator::outputVariable);
 
     loadGrammar(":/settings/grammar");
@@ -170,6 +169,16 @@ void PhyxCalculator::addUnitRule(QString symbol)
 void PhyxCalculator::removeUnitRule(QString symbol)
 {
     earleyParser->removeRule(QString("unit=%1").arg(symbol));
+}
+
+void PhyxCalculator::addVariableRule(QString name)
+{
+    addRule(QString("variable=%1").arg(name), QString());
+}
+
+void PhyxCalculator::removeVariableRule(QString name)
+{
+     earleyParser->removeRule(QString("variable=%1").arg(name));
 }
 
 void PhyxCalculator::clearStack()
@@ -760,11 +769,9 @@ void PhyxCalculator::variableRemove()
     stringBuffer.clear();*/
 }
 
-void PhyxCalculator::variablePush()
+void PhyxCalculator::variableLoad()
 {
-   /* PhysicalVariable variable = variableMap.value(parameterBuffer);
-    valueStack.push(variable.value);
-    unitStack.push(variable.unit);*/
+    variableStack.push(variableManager->getVariable(parameterBuffer));
 }
 
 void PhyxCalculator::bufferUnit()

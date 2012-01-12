@@ -5,6 +5,23 @@ PhyxUnitSystem::PhyxUnitSystem(QObject *parent) :
 {
 }
 
+PhyxUnitSystem::~PhyxUnitSystem()
+{
+    // cleanup maps
+    QMapIterator<QString, PhyxUnit*> i(baseUnitsMap);
+    while (i.hasNext())
+    {
+        i.next();
+        delete i.value();
+    }
+    QMapIterator<QString, PhyxUnit*> i2(derivedUnitsMap);
+    while (i2.hasNext())
+    {
+        i2.next();
+        delete i2.value();
+    }
+}
+
 void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags)
 {
     if (baseUnitsMap.contains(symbol))
