@@ -40,9 +40,9 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueMul",      &PhyxCalculator::valueMul);
     functionMap.insert("valueDiv",      &PhyxCalculator::valueDiv);
     functionMap.insert("valueNeg",      &PhyxCalculator::valueNeg);
-    functionMap.insert("valueExponent", &PhyxCalculator::valuePow);
-    functionMap.insert("valueExp2",     &PhyxCalculator::valuePow2);
-    functionMap.insert("valueExp3",     &PhyxCalculator::valuePow3);
+    functionMap.insert("valuePow",      &PhyxCalculator::valuePow);
+    functionMap.insert("valuePow2",     &PhyxCalculator::valuePow2);
+    functionMap.insert("valuePow3",     &PhyxCalculator::valuePow3);
     functionMap.insert("valueSin",      &PhyxCalculator::valueSin);
     functionMap.insert("valueArcsin",   &PhyxCalculator::valueArcsin);
     functionMap.insert("valueCos",      &PhyxCalculator::valueCos);
@@ -60,6 +60,7 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueLog10",    &PhyxCalculator::valueLog10);
     functionMap.insert("valueLog2",     &PhyxCalculator::valueLog2);
     functionMap.insert("valueLogn",     &PhyxCalculator::valueLogn);
+    functionMap.insert("valueRoot",     &PhyxCalculator::valueRoot);
     functionMap.insert("valueSqrt",     &PhyxCalculator::valueSqrt);
     functionMap.insert("valueAbs",      &PhyxCalculator::valueAbs);
     functionMap.insert("valueMax",      &PhyxCalculator::valueMax);
@@ -160,7 +161,7 @@ bool PhyxCalculator::setExpression(QString expression)
         earleyParser.clearWord();
         expressionIsParsable = false;
     }
-    else if (!m_expression.isEmpty() && expression.indexOf(expression) == 0)      //new expression is old expression + string
+    else if (!m_expression.isEmpty() && expression.indexOf(m_expression) == 0)      //new expression is old expression + string
     {
         QString string = expression.mid(m_expression.size());
         foreach (QChar character, string)
@@ -441,7 +442,18 @@ void PhyxCalculator::valueLogn()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    variable1->setValue(log(variable1->value()) / log(variable2->value()));
+    variable1->setValue(log(variable2->value()) / log(variable1->value()));
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::valueRoot()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue(pow(variable1->value(), 1.0/variable2->value()));
     variableStack.push(variable1);
 
     delete variable2;

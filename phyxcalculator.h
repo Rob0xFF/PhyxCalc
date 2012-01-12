@@ -119,6 +119,7 @@ private:
     void valueLog10();
     void valueLog2();
     void valueLogn();
+    void valueRoot();
     void valueSqrt();
     void valueAbs();
     void valueMax();
