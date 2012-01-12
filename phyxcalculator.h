@@ -62,36 +62,34 @@ public:
     }
 
 private:
-    QStack<PhyxValueDataType>   valueStack;                                     /// stack for value calculation
-    QStack<PhyxUnitDataType>    unitStack;                                      /// stack for unit calculation
-    QStack<PhyxVariable*>       variableStack;
-    QString                     numberBuffer;                                   /// string for buffering numbers
+    QStack<PhyxVariable*>       variableStack;                                  /// stack for variable calculation
     QString                     parameterBuffer;                                /// string for buffering numbers
-    QString                     stringBuffer;                                   /// string for buffering strings
+//    QString                     stringBuffer;                                   /// string for buffering strings
     PhyxValueDataType           valueBuffer;
     QString                     unitBuffer;
 
     QHash<QString, PhyxRule>    phyxRules;                                      /// map of all rules, key is rule
 
-    QEarleyParser               earleyParser;                                   /// the earley parser
+    QEarleyParser               *earleyParser;                                  /// the earley parser
+    PhyxUnitSystem              *unitSystem;                                    /// the unit system
 
-    QString                     m_expression;                                     /// currently set expression
+    QString                     m_expression;                                   /// currently set expression
     bool                        expressionIsParsable;                           /// holds wheter currently set expression is parsable or not
+    PhyxValueDataType           m_resultValue;                                  /// value of the result
+    QString                     m_resultUnit;                                   /// unit symbol of the result
+    bool                        m_error;                                        /// holds wheter an error occured or not
+    int                         m_errorNumber;                                  /// current error number
 
-    PhyxUnitSystem              *unitSystem;
 
     QHash<QString, void (PhyxCalculator::*)()> functionMap;                     /// functions mapped with their names
-
-    bool m_error;
-    int m_errorNumber;
-    PhyxValueDataType m_resultValue;
-    QString m_resultUnit;
 
     void initialize();                                                                                          ///< initializes PhyxCalculator
     void loadGrammar(QString fileName);                                                                         ///< loads the grammar from a file
 
     void raiseException(QString exception);                                                                     ///< raises an exception
     void addRule(QString rule, QString functions = "");     ///< adds a rule
+
+    void clearStack();
 
     /** functions for value calculation */
     void valueAdd();
@@ -139,6 +137,7 @@ private:
 
     /** functions for unit calculation */
     void unitCheckDimensionless();
+    void unitCheckDimensionless2();
     void unitCheckConvertible();
     void unitMul();
     void unitDiv();
@@ -147,11 +146,6 @@ private:
     void unitPow3();
     void unitRoot();
     void unitSqrt();
-
-    /** functions for number generation */
-    void numberBuf()                        {numberBuffer.prepend(parameterBuffer);}
-    void numberPush()                       {valueStack.push(parameterBuffer.toDouble());
-                                             numberBuffer.clear();}
 
     /** functions for variable handling */
     void variableAdd();

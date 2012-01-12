@@ -5,7 +5,7 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
 {
     initialize();
 
-    earleyParser.setStartSymbol("S");
+    earleyParser->setStartSymbol("S");
 
     //testing
     PhyxTesting::testUnits();
@@ -33,6 +33,9 @@ void PhyxCalculator::initialize()
 
     //initialize random number generator
     qsrand(QDateTime::currentMSecsSinceEpoch());
+
+    // create earley parser
+    earleyParser = new QEarleyParser();
 
     //map functions
     functionMap.insert("valueAdd",      &PhyxCalculator::valueAdd);
@@ -76,8 +79,10 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueRand",     &PhyxCalculator::valueRand);
     functionMap.insert("valueRandint",  &PhyxCalculator::valueRandint);
     functionMap.insert("valueRandg",    &PhyxCalculator::valueRandg);
+    functionMap.insert("valueFaculty",  &PhyxCalculator::valueFaculty);
 
     functionMap.insert("unitCheckDimensionless",    &PhyxCalculator::unitCheckDimensionless);
+    functionMap.insert("unitCheckDimensionless2",    &PhyxCalculator::unitCheckDimensionless2);
     functionMap.insert("unitCheckConvertible",      &PhyxCalculator::unitCheckConvertible);
     functionMap.insert("unitMul",       &PhyxCalculator::unitMul);
     functionMap.insert("unitDiv",       &PhyxCalculator::unitDiv);
@@ -85,12 +90,11 @@ void PhyxCalculator::initialize()
     functionMap.insert("unitPow2",      &PhyxCalculator::unitPow2);
     functionMap.insert("unitPow3",      &PhyxCalculator::unitPow3);
     functionMap.insert("unitSqrt",      &PhyxCalculator::unitSqrt);
+    functionMap.insert("unitRoot",      &PhyxCalculator::unitRoot);
 
-    functionMap.insert("numberPush",    &PhyxCalculator::numberPush);
     functionMap.insert("variableAdd",   &PhyxCalculator::variableAdd);
     functionMap.insert("variableRemove",&PhyxCalculator::variableRemove);
 
-    functionMap.insert("numberBuf",     &PhyxCalculator::numberBuf);
     functionMap.insert("variablePush",  &PhyxCalculator::variablePush);
 
     functionMap.insert("bufferUnit",&PhyxCalculator::bufferUnit);
@@ -139,6 +143,7 @@ void PhyxCalculator::raiseException(QString exception)
 {
     qDebug() << exception;
     m_error = true;
+    clearStack();
 }
 
 void PhyxCalculator::addRule(QString rule, QString functions)
@@ -151,14 +156,31 @@ void PhyxCalculator::addRule(QString rule, QString functions)
     QStringList ruleFunctions;
     foreach (QString function, phyxRule.functions)
         ruleFunctions.append(function.trimmed());
-    earleyParser.loadRule(rule, ruleFunctions);
+    earleyParser->loadRule(rule, ruleFunctions);
+}
+
+void PhyxCalculator::addUnitRule(QString symbol)
+{
+    addRule(QString("unit=%1").arg(symbol), QString());
+}
+
+void PhyxCalculator::removeUnitRule(QString symbol)
+{
+    earleyParser->removeRule(QString("unit=%1").arg(symbol));
+}
+
+void PhyxCalculator::clearStack()
+{
+    foreach (PhyxVariable *variable, variableStack)
+        delete variable;
+    variableStack.clear();
 }
 
 bool PhyxCalculator::setExpression(QString expression)
 {
     if (expression.isEmpty())
     {
-        earleyParser.clearWord();
+        earleyParser->clearWord();
         expressionIsParsable = false;
     }
     else if (!m_expression.isEmpty() && expression.indexOf(m_expression) == 0)      //new expression is old expression + string
@@ -166,7 +188,7 @@ bool PhyxCalculator::setExpression(QString expression)
         QString string = expression.mid(m_expression.size());
         foreach (QChar character, string)
         {
-            expressionIsParsable = earleyParser.addSymbol(character);
+            expressionIsParsable = earleyParser->addSymbol(character);
         }
     }
     else if (m_expression.indexOf(expression) == 0) //new expression is old expression - string
@@ -174,12 +196,12 @@ bool PhyxCalculator::setExpression(QString expression)
         int  count = m_expression.size() - expression.size();
         for (int i = 0; i < count; i++)
         {
-            expressionIsParsable = earleyParser.removeSymbol();
+            expressionIsParsable = earleyParser->removeSymbol();
         }
     }
     else
     {
-        expressionIsParsable = earleyParser.parseWord(expression);
+        expressionIsParsable = earleyParser->parseWord(expression);
     }
 
     m_expression = expression;
@@ -193,7 +215,7 @@ bool PhyxCalculator::evaluate()
         m_error = false;
 
         QList<EarleyTreeItem> earleyTree;
-        earleyTree = earleyParser.getTree();
+        earleyTree = earleyParser->getTree();
 
         for (int i = (earleyTree.size()-1); i >= 0; i--)
         {
@@ -453,7 +475,7 @@ void PhyxCalculator::valueRoot()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    variable1->setValue(pow(variable1->value(), 1.0/variable2->value()));
+    variable1->setValue(pow(variable2->value(), 1.0/variable1->value()));
     variableStack.push(variable1);
 
     delete variable2;
@@ -627,6 +649,18 @@ void PhyxCalculator::unitCheckDimensionless()
     variableStack.push(variable1);
 }
 
+void PhyxCalculator::unitCheckDimensionless2()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    if (!variable1->unit()->isDimensionlessUnit() || !variable2->unit()->isDimensionlessUnit())
+        raiseException(tr("Unit is not dimensionless"));
+
+    variableStack.push(variable2);
+    variableStack.push(variable1);
+}
+
 void PhyxCalculator::unitCheckConvertible()
 {
     PhyxVariable *variable1 = variableStack.pop();
@@ -775,14 +809,4 @@ void PhyxCalculator::outputVariable()
 
         delete variable1;
     }
-}
-
-void PhyxCalculator::addUnitRule(QString symbol)
-{
-    addRule(QString("unit=%1").arg(symbol), QString());
-}
-
-void PhyxCalculator::removeUnitRule(QString symbol)
-{
-    earleyParser.removeRule(QString("unit=%1").arg(symbol));
 }

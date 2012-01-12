@@ -227,7 +227,7 @@ void LineParser::parseLine()
     phyxCalculator->setExpression(curLineText);
 
     if (phyxCalculator->evaluate())
-        insertResult(QString("%1 %2").arg((double)
+        insertResult(QString("%1%2").arg((double)
 
                                           phyxCalculator->resultValue()).arg(phyxCalculator->resultUnit()));
     else
