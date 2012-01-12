@@ -110,6 +110,9 @@ void PhyxCalculator::initialize()
             this, SLOT(addUnitRule(QString)));
     connect(unitSystem, SIGNAL(unitRemoved(QString)),
             this, SLOT(removeUnitRule(QString)));
+
+    //initialize variable manager
+    variableManager = new PhyxVariableManager();
 }
 
 void PhyxCalculator::loadGrammar(QString fileName)
@@ -245,6 +248,11 @@ bool PhyxCalculator::evaluate()
         raiseException("Syntax Error!");
         return false;
     }
+}
+
+PhyxVariableManager::PhyxVariableMap *PhyxCalculator::variables()
+{
+    return variableManager->variables();
 }
 
 QString PhyxCalculator::errorString() const

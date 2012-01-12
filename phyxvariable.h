@@ -39,45 +39,6 @@ public:
 
     QString errorString();                              ///< returns the error string to current error
 
-    /** mathematical functions of the variable */
-    bool mathAdd(PhyxVariable *variable);
-    bool mathSub(PhyxVariable *variable);
-    bool mathMul(PhyxVariable *variable);
-    bool mathDiv(PhyxVariable *variable);
-    void mathNeg();
-    bool mathRaise(PhyxVariable *variable);
-    bool mathRoot(PhyxVariable *variable);
-    void mathSqrt();
-    bool mathSin();
-    bool mathArcsin();
-    bool mathCos();
-    bool mathArccos();
-    bool mathTan();
-    bool mathArctan();
-    bool mathSinh();
-    bool mathArcsinh();
-    bool mathCosh();
-    bool mathArccosh();
-    bool mathTanh();
-    bool mathArctanh();
-    bool mathExp();
-    bool mathLn();
-    bool mathLog10();
-    bool mathLog2();
-    bool mathLogn(PhyxVariable *variable);
-    void mathAbs();
-    bool mathMax(PhyxVariable *variable);
-    bool mathMin(PhyxVariable *variable);
-    void mathInt();
-    void mathTrunc();
-    void mathFloor();
-    void mathRound();
-    void mathCeil();
-    void mathSign();
-    bool mathHeaviside();
-    bool mathRandg(PhyxVariable *variable);
-    bool mathFaculty();
-
     PhyxValueDataType value() const
     {
         return m_value;

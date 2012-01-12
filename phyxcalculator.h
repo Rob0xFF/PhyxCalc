@@ -10,6 +10,7 @@
 #include "qearleyparser.h"
 #include "phyxunitsystem.h"
 #include "phyxvariable.h"
+#include "phyxvariablemanager.h"
 #include "phyxtesting.h"
 
 typedef long double         PhyxValueDataType;      /// the base data type for values
@@ -34,28 +35,24 @@ public:
     bool setExpression (QString m_expression);                                  ///< sets the expression, checks what must be parsed and returns wheter the expression is parsable or not
     bool evaluate();                                                            ///< evaluates the expression
 
+    PhyxVariableManager::PhyxVariableMap * variables();
     QString expression() const
     {
         return m_expression;
     }
-
     bool hasError() const
     {
         return m_error;
     }
-
     int errorNumber() const
     {
         return m_errorNumber;
     }
-
     QString errorString() const;
-
     PhyxValueDataType resultValue() const
     {
         return m_resultValue;
     }
-
     QString resultUnit() const
     {
         return m_resultUnit;
@@ -72,6 +69,7 @@ private:
 
     QEarleyParser               *earleyParser;                                  /// the earley parser
     PhyxUnitSystem              *unitSystem;                                    /// the unit system
+    PhyxVariableManager         *variableManager;                               /// the variable manager
 
     QString                     m_expression;                                   /// currently set expression
     bool                        expressionIsParsable;                           /// holds wheter currently set expression is parsable or not
@@ -160,6 +158,7 @@ private:
     void outputVariable();
 
 signals:
+    void variablesChanged();
     
 public slots:
 

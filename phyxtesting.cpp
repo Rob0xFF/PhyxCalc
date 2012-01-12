@@ -71,7 +71,7 @@ void PhyxTesting::testUnits()
     variable3->setUnit(unitSystem.unit("K"));
 
     qDebug() << "variable2 + variable3 =";
-    variable2->mathAdd(variable3);
+    //variable2->mathAdd(variable3);
     qDebug() << (double)variable2->value() << variable2->unit()->symbol();
 
     qDebug() << "Defining variable4: 60s";
@@ -94,7 +94,7 @@ void PhyxTesting::testUnits()
 
 
     qDebug() << "variable4 * variable5 =";
-    variable4->mathMul(variable5);
+    //variable4->mathMul(variable5);
     qDebug() << (double)variable4->value() << variable4->unit()->symbol();
 
     qDebug() << "convert variable4 to min:";
@@ -108,10 +108,10 @@ void PhyxTesting::testUnits()
     variable1->setUnit(unitSystem.unit("m"));
     variable2->setValue(1);
     variable2->setUnit(unitSystem.unit("s"));
-    variable1->mathDiv(variable2);
+    //variable1->mathDiv(variable2);
     qDebug() << (double)variable1->value() << variable1->unit()->symbol();
 
     qDebug() << "variable1 * variable4 =";
-    variable1->mathMul(variable4);
+    //variable1->mathMul(variable4);
     qDebug() << (double)variable1->value() << variable1->unit()->symbol();
 }

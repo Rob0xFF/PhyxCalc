@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     phyxvariable.cpp \
     phyxunitsystem.cpp \
     phyxcompoundunit.cpp \
-    phyxtesting.cpp
+    phyxtesting.cpp \
+    phyxvariablemanager.cpp
 
 HEADERS  += mainwindow.h \
             lineparser.h \
@@ -40,7 +41,8 @@ HEADERS  += mainwindow.h \
     phyxvariable.h \
     phyxunitsystem.h \
     phyxcompoundunit.h \
-    phyxtesting.h
+    phyxtesting.h \
+    phyxvariablemanager.h
 
 FORMS    += mainwindow.ui \
     exportdialog.ui \
