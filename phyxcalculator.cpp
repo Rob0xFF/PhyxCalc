@@ -862,8 +862,9 @@ void PhyxCalculator::bufferValue()
 {
     if (parameterBuffer.indexOf(QRegExp("[ij]")) != -1)
     {
-        qDebug() << "tw";
         parameterBuffer.remove(QRegExp("[ij]"));
+        if (parameterBuffer.isEmpty())
+            parameterBuffer="1";
         valueBuffer = PhyxValueDataType(0,parameterBuffer.toDouble());
     }
     else

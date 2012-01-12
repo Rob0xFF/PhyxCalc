@@ -89,6 +89,7 @@ reale=|real||e||int|
 complex=|reale|
 complex=|i||reale|
 complex=|reale||i|
+complex=|i|
 var=|complex||unit|   ; bufferParameter, bufferUnit, bufferValue
 var=|complex|         ; bufferParameter, bufferValue
 var=|unit|          ; bufferParameter, bufferUnit
