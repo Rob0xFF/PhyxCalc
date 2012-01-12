@@ -29,12 +29,12 @@
 # Definition needs following outline:
 #   Rule    |   functions               |   param function  |   parameter
 S=|E|       ; outputVariable
-E=|E|+|T|   ; mathAdd
-E=|E|-|T|   ; mathSub
+E=|E|+|T|   ; unitCheckConvertible, valueAdd
+E=|E|-|T|   ; unitCheckConvertible, valueSub
 E=|T|
-T=|T|*|F|   ; mathMul
-T=|T|/|F|   ; mathDiv
-T=sin(|E|)  ; mathSin
+T=|T|*|F|   ; unitMul, valueMul
+T=|T|/|F|   ; unitDiv, valueDiv
+T=sin(|E|)  ; unitCheckDimensionless, valueSin
 T=|F|
 #F=-|F|
 #F=+|F|

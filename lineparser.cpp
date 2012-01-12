@@ -225,7 +225,13 @@ void LineParser::parseLine()
     QString curLineText = getCurrentLine();
 
     phyxCalculator->setExpression(curLineText);
-    phyxCalculator->evaluate();
+
+    if (phyxCalculator->evaluate())
+        insertResult(QString("%1 %2").arg((double)
+
+                                          phyxCalculator->resultValue()).arg(phyxCalculator->resultUnit()));
+    else
+        insertResult(phyxCalculator->errorString());
 
     /*LineType lineType = checkLineType(curLineText);
 

@@ -22,11 +22,44 @@ typedef struct {
 class PhyxCalculator : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString expression READ expression WRITE setExpression)
+    Q_PROPERTY(bool error READ hasError)
+    Q_PROPERTY(int errorNumber READ errorNumber)
+    Q_PROPERTY(PhyxValueDataType resultValue READ resultValue)
+    Q_PROPERTY(QString resultUnit READ resultUnit)
+
 public:
     explicit PhyxCalculator(QObject *parent = 0);
 
     bool setExpression (QString m_expression);                                  ///< sets the expression, checks what must be parsed and returns wheter the expression is parsable or not
     bool evaluate();                                                            ///< evaluates the expression
+
+    QString expression() const
+    {
+        return m_expression;
+    }
+
+    bool hasError() const
+    {
+        return m_error;
+    }
+
+    int errorNumber() const
+    {
+        return m_errorNumber;
+    }
+
+    QString errorString() const;
+
+    PhyxValueDataType resultValue() const
+    {
+        return m_resultValue;
+    }
+
+    QString resultUnit() const
+    {
+        return m_resultUnit;
+    }
 
 private:
     QStack<PhyxValueDataType>   valueStack;                                     /// stack for value calculation
@@ -42,12 +75,17 @@ private:
 
     QEarleyParser               earleyParser;                                   /// the earley parser
 
-    QString                     expression;                                     /// currently set expression
+    QString                     m_expression;                                     /// currently set expression
     bool                        expressionIsParsable;                           /// holds wheter currently set expression is parsable or not
 
     PhyxUnitSystem              *unitSystem;
 
     QHash<QString, void (PhyxCalculator::*)()> functionMap;                     /// functions mapped with their names
+
+    bool m_error;
+    int m_errorNumber;
+    PhyxValueDataType m_resultValue;
+    QString m_resultUnit;
 
     void initialize();                                                                                          ///< initializes PhyxCalculator
     void loadGrammar(QString fileName);                                                                         ///< loads the grammar from a file
@@ -55,16 +93,6 @@ private:
     void raiseException(QString exception);                                                                     ///< raises an exception
     void addRule(QString rule, QString functions = "");     ///< adds a rule
 
-    /** math functions */
-    void mathAdd();
-    void mathSub();
-    void mathMul();
-    void mathDiv();
-    void mathNeg();
-    void mathPow();
-    void mathPow2();
-    void mathPow3();
-    void mathSin();
     /** functions for value calculation */
     void valueAdd();
     void valueSub();
@@ -109,21 +137,15 @@ private:
     void valueFaculty();
 
     /** functions for unit calculation */
-    void unit0()            {/* ?? */}
-/*    void unitCheckEqual()   {PhyxUnitDataType unit = unitStack.pop();
-                            if (!unit.checkEqual(unitStack.pop()))
-                                raiseException("different units");
-                            else
-                                unitStack.push(unit);
-                            }
-    void unitCheck0()       {}
-    void unitCheck0k()      {}
-    void unitMul()          {unitStack.push(unitStack.pop() * unitStack.pop());}
-    void unitDiv()          {unitStack.push(unitStack.pop() / unitStack.pop());}
-    void unitExponent()     {unitStack.push(unitStack.pop().pow(valueStack.last()));}
-    void unitExp2()         {unitStack.push(unitStack.pop().pow(2));}
-    void unitExp3()         {unitStack.push(unitStack.pop().pow(3));}
-    void unitSqrt()         {unitStack.push(unitStack.pop().root(2));}*/
+    void unitCheckDimensionless();
+    void unitCheckConvertible();
+    void unitMul();
+    void unitDiv();
+    void unitPow();
+    void unitPow2();
+    void unitPow3();
+    void unitRoot();
+    void unitSqrt();
 
     /** functions for number generation */
     void numberBuf()                        {numberBuffer.prepend(parameterBuffer);}
@@ -141,6 +163,7 @@ private:
     void pushVariable();
 
     void outputVariable();
+
 signals:
     
 public slots:
