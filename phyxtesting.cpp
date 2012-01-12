@@ -55,7 +55,7 @@ void PhyxTesting::testUnits()
 
     qDebug() << "convert to in:";
     variable1->convertUnit(new PhyxCompoundUnit(unitSystem.unit("in")));
-    qDebug() << (double)variable1->value() << variable1->unit()->symbol();
+    qDebug() << (double)variable1->value().real() << variable1->unit()->symbol();
 
 
     qDebug() << "Defining variable2: 50°C";
@@ -72,7 +72,7 @@ void PhyxTesting::testUnits()
 
     qDebug() << "variable2 + variable3 =";
     //variable2->mathAdd(variable3);
-    qDebug() << (double)variable2->value() << variable2->unit()->symbol();
+    qDebug() << (double)variable2->value().real() << variable2->unit()->symbol();
 
     qDebug() << "Defining variable4: 60s";
     PhyxVariable *variable4 = new PhyxVariable();
@@ -83,7 +83,7 @@ void PhyxTesting::testUnits()
     qDebug() << "Define variable4 as unit min";
     newUnit = new PhyxUnit();
     newUnit->setPowers(variable4->unit()->powers());
-    newUnit->setScaleFactor(variable4->value());
+    newUnit->setScaleFactor(variable4->value().real());
     newUnit->setSymbol("min");
     unitSystem.addDerivedUnit(newUnit);
 
@@ -95,13 +95,13 @@ void PhyxTesting::testUnits()
 
     qDebug() << "variable4 * variable5 =";
     //variable4->mathMul(variable5);
-    qDebug() << (double)variable4->value() << variable4->unit()->symbol();
+    qDebug() << (double)variable4->value().real() << variable4->unit()->symbol();
 
     qDebug() << "convert variable4 to min:";
     if (!variable4->convertUnit(new PhyxCompoundUnit(unitSystem.unit("min"))))
         qDebug() << variable4->errorString();
     else
-        qDebug() << (double)variable4->value() << variable4->unit()->symbol();
+        qDebug() << (double)variable4->value().real() << variable4->unit()->symbol();
 
     qDebug() << "variable1 = 120m/s";
     variable1->setValue(120);
@@ -109,9 +109,9 @@ void PhyxTesting::testUnits()
     variable2->setValue(1);
     variable2->setUnit(unitSystem.unit("s"));
     //variable1->mathDiv(variable2);
-    qDebug() << (double)variable1->value() << variable1->unit()->symbol();
+    qDebug() << (double)variable1->value().real() << variable1->unit()->symbol();
 
     qDebug() << "variable1 * variable4 =";
     //variable1->mathMul(variable4);
-    qDebug() << (double)variable1->value() << variable1->unit()->symbol();
+    qDebug() << (double)variable1->value().real() << variable1->unit()->symbol();
 }

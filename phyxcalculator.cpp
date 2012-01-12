@@ -38,6 +38,10 @@ void PhyxCalculator::initialize()
     earleyParser = new QEarleyParser();
 
     //map functions
+    functionMap.insert("valueCheckComplex",     &PhyxCalculator::valueCheckComplex);
+    functionMap.insert("valueCheckComplex2",    &PhyxCalculator::valueCheckComplex2);
+    functionMap.insert("valuePositive",         &PhyxCalculator::valueCheckPositive);
+    functionMap.insert("valueInteger",          &PhyxCalculator::valueCheckInteger);
     functionMap.insert("valueAdd",      &PhyxCalculator::valueAdd);
     functionMap.insert("valueSub",      &PhyxCalculator::valueSub);
     functionMap.insert("valueMul",      &PhyxCalculator::valueMul);
@@ -269,6 +273,48 @@ QString PhyxCalculator::errorString() const
     return QString();
 }
 
+void PhyxCalculator::valueCheckComplex()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    if (variable1->value().imag() != 0)
+        raiseException(tr("Value is complex"));
+
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueCheckComplex2()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    if ((variable1->value().imag() != 0) || (variable2->value().imag() != 0))
+        raiseException(tr("Value is complex"));
+
+    variableStack.push(variable2);
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueCheckPositive()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    if (variable1->value().real() < 0)
+        raiseException(tr("Value is negative"));
+
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueCheckInteger()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    if ((int)variable1->value().real() != variable1->value().real())
+        raiseException(tr("Value is not an integer"));
+
+    variableStack.push(variable1);
+}
+
 void PhyxCalculator::valueAdd()
 {
     PhyxVariable *variable1 = variableStack.pop();
@@ -360,7 +406,7 @@ void PhyxCalculator::valueArcsin()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(asin(variable1->value()));
+    variable1->setValue(boost::math::asin(variable1->value()));
     variableStack.push(variable1);
 }
 
@@ -376,7 +422,7 @@ void PhyxCalculator::valueArccos()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(acos(variable1->value()));
+    variable1->setValue(boost::math::acos(variable1->value()));
     variableStack.push(variable1);
 }
 
@@ -392,7 +438,7 @@ void PhyxCalculator::valueArctan()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(atan(variable1->value()));
+    variable1->setValue(boost::math::atan(variable1->value()));
     variableStack.push(variable1);
 }
 
@@ -408,7 +454,7 @@ void PhyxCalculator::valueArcsinh()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(asinh(variable1->value()));
+    variable1->setValue(boost::math::asinh(variable1->value()));
     variableStack.push(variable1);
 }
 
@@ -424,7 +470,7 @@ void PhyxCalculator::valueArccosh()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(acosh(variable1->value()));
+    variable1->setValue(boost::math::acosh(variable1->value()));
     variableStack.push(variable1);
 }
 
@@ -440,7 +486,7 @@ void PhyxCalculator::valueArctanh()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(atanh(variable1->value()));
+    variable1->setValue(boost::math::atanh(variable1->value()));
     variableStack.push(variable1);
 }
 
@@ -472,7 +518,7 @@ void PhyxCalculator::valueLog2()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(log2(variable1->value()));
+    variable1->setValue(log(variable1->value()));
     variableStack.push(variable1);
 }
 
@@ -491,8 +537,9 @@ void PhyxCalculator::valueRoot()
 {
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
+    PhyxValueDataType one(1,0);
 
-    variable1->setValue(pow(variable2->value(), 1.0/variable1->value()));
+    variable1->setValue(pow(variable2->value(), one/variable1->value()));
     variableStack.push(variable1);
 
     delete variable2;
@@ -510,7 +557,7 @@ void PhyxCalculator::valueAbs()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(qAbs(variable1->value()));
+    variable1->setValue(abs(variable1->value()));
     variableStack.push(variable1);
 }
 
@@ -519,10 +566,16 @@ void PhyxCalculator::valueMax()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    variable1->setValue(qMax(variable1->value(),variable2->value()));
-    variableStack.push(variable1);
-
-    delete variable2;
+    if (variable1->value().real() >= variable2->value().real())
+    {
+        variableStack.push(variable1);
+        delete variable2;
+    }
+    else
+    {
+        variableStack.push(variable2);
+        delete variable1;
+    }
 }
 
 void PhyxCalculator::valueMin()
@@ -530,8 +583,16 @@ void PhyxCalculator::valueMin()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    variable1->setValue(qMin(variable1->value(),variable2->value()));
-    variableStack.push(variable1);
+    if (variable1->value().real()<= variable2->value().real())
+    {
+        variableStack.push(variable1);
+        delete variable2;
+    }
+    else
+    {
+        variableStack.push(variable2);
+        delete variable1;
+    }
 
     delete variable2;
 }
@@ -547,7 +608,8 @@ void PhyxCalculator::valueInt()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue((int)(variable1->value()));
+    PhyxValueDataType value((int)variable1->value().real(),0);
+    variable1->setValue(value);
     variableStack.push(variable1);
 }
 
@@ -555,7 +617,8 @@ void PhyxCalculator::valueTrunc()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(trunc(variable1->value()));
+    PhyxValueDataType value(trunc(variable1->value().real()),0);
+    variable1->setValue(value);
     variableStack.push(variable1);
 }
 
@@ -563,7 +626,8 @@ void PhyxCalculator::valueFloor()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(floor(variable1->value()));
+    PhyxValueDataType value(floor(variable1->value().real()),0);
+    variable1->setValue(value);
     variableStack.push(variable1);
 }
 
@@ -571,7 +635,8 @@ void PhyxCalculator::valueRound()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(round(variable1->value()));
+    PhyxValueDataType value(round(variable1->value().real()),0);
+    variable1->setValue(value);
     variableStack.push(variable1);
 }
 
@@ -579,7 +644,8 @@ void PhyxCalculator::valueCeil()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(ceil(variable1->value()));
+    PhyxValueDataType value(ceil(variable1->value().real()),0);
+    variable1->setValue(value);
     variableStack.push(variable1);
 }
 
@@ -587,7 +653,8 @@ void PhyxCalculator::valueSign()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(copysign(1.0,variable1->value()));
+    PhyxValueDataType value(copysign(1.0,variable1->value().real()),0);
+    variable1->setValue(value);
     variableStack.push(variable1);
 }
 
@@ -595,10 +662,10 @@ void PhyxCalculator::valueHeaviside()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    if (variable1->value() >= 0)
-        variable1->setValue(1);
+    if (variable1->value().real() >= 0)
+        variable1->setValue(PhyxValueDataType(1,0));
     else
-        variable1->setValue(0);
+        variable1->setValue(PhyxValueDataType(0,0));
     variableStack.push(variable1);
 }
 
@@ -622,9 +689,9 @@ void PhyxCalculator::valueRandg()
     PhyxVariable *variable2 = variableStack.pop();
 
     int min, max;
-    min = variable1->value();
-    max = variable2->value();
-    variable1->setValue(min + qrand()%(max-min+1));
+    min = variable1->value().real();
+    max = variable2->value().real();
+    variable1->setValue(PhyxValueDataType(min + qrand()%(max-min+1),0));
     variableStack.push(variable1);
 
     delete variable2;
@@ -634,7 +701,7 @@ void PhyxCalculator::valueFaculty()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxValueDataType value = variable1->value();
+    long double value = variable1->value().real();
 
     if (value < 0)
     {
@@ -652,7 +719,7 @@ void PhyxCalculator::valueFaculty()
     for (int i = 2; i <=n; i++)
         value *= i;
 
-    variable1->setValue(value);
+    variable1->setValue(PhyxValueDataType(value,0));
     variableStack.push(variable1);
 }
 
@@ -715,7 +782,7 @@ void PhyxCalculator::unitPow()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    variable1->unit()->raise(variable2->value());
+    variable1->unit()->raise(variable2->value().real());
     variableStack.push(variable2);
     variableStack.push(variable1);
 }
@@ -741,7 +808,7 @@ void PhyxCalculator::unitRoot()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    variable1->unit()->root(variable2->value());
+    variable1->unit()->root(variable2->value().real());
     variableStack.push(variable2);
     variableStack.push(variable1);
 }
@@ -793,7 +860,14 @@ void PhyxCalculator::bufferUnit()
 
 void PhyxCalculator::bufferValue()
 {
-    valueBuffer = parameterBuffer.toDouble();
+    if (parameterBuffer.indexOf(QRegExp("[ij]")) != -1)
+    {
+        qDebug() << "tw";
+        parameterBuffer.remove(QRegExp("[ij]"));
+        valueBuffer = PhyxValueDataType(0,parameterBuffer.toDouble());
+    }
+    else
+        valueBuffer = PhyxValueDataType(parameterBuffer.toDouble(),0);
 }
 
 void PhyxCalculator::pushVariable()
@@ -820,7 +894,7 @@ void PhyxCalculator::outputVariable()
         PhyxVariable *variable1 = variableStack.pop();
         m_resultValue = variable1->value();
         m_resultUnit = variable1->unit()->symbol();
-        qDebug() << (double)variable1->value() << variable1->unit()->symbol();
+        qDebug() << (double)variable1->value().real() << variable1->unit()->symbol();
 
         delete variable1;
     }

@@ -227,9 +227,22 @@ void LineParser::parseLine()
     phyxCalculator->setExpression(curLineText);
 
     if (phyxCalculator->evaluate())
-        insertResult(QString("%1%2").arg((double)
+    {
+        QString output;
+        if (phyxCalculator->resultValue().real() != 0)
+            output.append(QString::number((double)phyxCalculator->resultValue().real()));
+        if (phyxCalculator->resultValue().imag() != 0)
+        {
+            if (!output.isEmpty())
+                output.append("+");
+            output.append(QString::number((double)phyxCalculator->resultValue().imag()) + "i");
+        }
+        if (output.isEmpty())
+            output.append("0");
+        output.append(phyxCalculator->resultUnit());
 
-                                          phyxCalculator->resultValue()).arg(phyxCalculator->resultUnit()));
+        insertResult(output);
+    }
     else
         insertResult(phyxCalculator->errorString());
 

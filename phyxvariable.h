@@ -3,12 +3,12 @@
 
 #include <QObject>
 #include <QSet>
-#include <cmath>
+#include <complex>
 #include "phyxunit.h"
 #include "phyxcompoundunit.h"
 
-typedef QSet<QString>       userUnitBuffer;         /// set of input units
-typedef long double         PhyxValueDataType;      /// the base data type for values
+typedef QSet<QString>               userUnitBuffer;         /// set of input units
+typedef std::complex<long double>   PhyxValueDataType;      /// the base data type for values
 
 class PhyxVariable : public QObject
 {

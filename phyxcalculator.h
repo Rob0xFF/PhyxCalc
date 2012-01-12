@@ -6,15 +6,15 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>
-#include "cmath"
+#include "boost/math/complex.hpp"
 #include "qearleyparser.h"
 #include "phyxunitsystem.h"
 #include "phyxvariable.h"
 #include "phyxvariablemanager.h"
 #include "phyxtesting.h"
 
-typedef long double         PhyxValueDataType;      /// the base data type for values
-typedef int               PhyxUnitDataType;       /// the base data type for units
+typedef std::complex<long double>   PhyxValueDataType;      /// the base data type for values
+typedef int                         PhyxUnitDataType;       /// the base data type for units
 
 typedef struct {
     QStringList functions;                          /// a list of functions to call
@@ -90,6 +90,10 @@ private:
     void clearStack();
 
     /** functions for value calculation */
+    void valueCheckComplex();
+    void valueCheckComplex2();
+    void valueCheckPositive();
+    void valueCheckInteger();
     void valueAdd();
     void valueSub();
     void valueMul();
