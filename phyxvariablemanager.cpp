@@ -11,6 +11,7 @@ void PhyxVariableManager::addVariable(QString name, PhyxVariable *variable)
         delete variableMap.value(name);
 
     variableMap.insert(name, variable);
+    emit variableAdded(name);
 }
 
 PhyxVariable *PhyxVariableManager::getVariable(QString name) const
@@ -24,6 +25,7 @@ void PhyxVariableManager::removeVariable(QString name)
     {
         delete variableMap.value(name);
         variableMap.remove(name);
+        emit variableRemoved(name);
     }
 }
 

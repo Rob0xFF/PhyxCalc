@@ -92,6 +92,19 @@ bool PhyxUnitSystem::removeUnit(QString symbol)
     emit unitRemoved(symbol);
 }
 
+void PhyxUnitSystem::addPrefix(QString symbol, double value)
+{
+    prefixMap.insert(symbol, value);
+    emit prefixAdded(symbol);
+}
+
+bool PhyxUnitSystem::removePrefix(QString symbol)
+{
+    prefixMap.remove(symbol);
+    emit prefixRemoved(symbol);
+    return true;
+}
+
 void PhyxUnitSystem::recalculateUnits()
 {
 }
@@ -132,6 +145,11 @@ PhyxUnit *PhyxUnitSystem::unit(QString symbol)
         return derivedUnitsMap.value(symbol);
     else
         return new PhyxUnit();
+}
+
+double PhyxUnitSystem::prefix(QString symbol)
+{
+    return prefixMap.value(symbol, 0);
 }
 
 bool PhyxUnitSystem::verifyUnit(PhyxUnit *unit)

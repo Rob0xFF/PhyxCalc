@@ -63,6 +63,7 @@ private:
     QString                     parameterBuffer;                                /// string for buffering numbers
 //    QString                     stringBuffer;                                   /// string for buffering strings
     PhyxValueDataType           valueBuffer;
+    QString                     prefixBuffer;
     QString                     unitBuffer;
 
     QHash<QString, PhyxRule>    phyxRules;                                      /// map of all rules, key is rule
@@ -157,6 +158,7 @@ private:
     /** functions for buffering */
     void bufferUnit();
     void bufferValue();
+    void bufferPrefix();
     void pushVariable();
 
     void outputVariable();
@@ -171,6 +173,8 @@ private slots:
     void removeUnitRule(QString symbol);
     void addVariableRule(QString name);
     void removeVariableRule(QString name);
+    void addPrefixRule(QString symbol);
+    void removePrefixRule(QString symbol);
     
 };
 

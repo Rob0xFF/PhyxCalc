@@ -22,6 +22,8 @@ private:
     PhyxVariableMap variableMap;
     
 signals:
+    void variableAdded(QString name);
+    void variableRemoved(QString name);
     
 public slots:
     

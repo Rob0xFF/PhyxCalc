@@ -18,21 +18,28 @@ public:
    //                     PhyxUnit::UnitFlags flags);                 ///< adds a derived unit, based on a variable
     void addDerivedUnit(PhyxUnit *unit);                            ///< adds a derived unit
     bool removeUnit(QString symbol);                                ///< removes a unit, returns successful
+    void addPrefix(QString symbol, double value);                   ///< adds a prefix
+    bool removePrefix(QString symbol);                              ///< removes a prefi, returns successful
 
     PhyxUnit * copyUnit(QString symbol);                            ///< copys a unit
     PhyxUnit * unit(QString symbol);                                ///< gives back a reference to the unit
 
-    bool verifyUnit(PhyxUnit *unit);                                ///< finds unit in the system and sets all the missing information, return wheter unit was found or not
-private:
-    QMap<QString, PhyxUnit*>    baseUnitsMap;       ///< contains all base units mapped with their symbol
-    QMap<QString, PhyxUnit*>    derivedUnitsMap;     ///< contains all derived units mapped with their symbol
+    double  prefix(QString symbol);                                 ///< returns the value of a prefix
 
-    void recalculateUnits();                        ///< recalculates all units
-    void recalculateVariables();                    ///< recalculates all variables
-    void recalculate();                             ///< recalculates units and variables
+    bool    verifyUnit(PhyxUnit *unit);                             ///< finds unit in the system and sets all the missing information, return wheter unit was found or not
+private:
+    QMap<QString, PhyxUnit*>    baseUnitsMap;                       ///< contains all base units mapped with their symbol
+    QMap<QString, PhyxUnit*>    derivedUnitsMap;                    ///< contains all derived units mapped with their symbol
+    QMap<QString, double>       prefixMap;                          ///< contains all unit prefixes
+
+    void recalculateUnits();                                        ///< recalculates all units
+    void recalculateVariables();                                    ///< recalculates all variables
+    void recalculate();                                             ///< recalculates units and variables
 signals:
     void unitAdded(QString symbol);
     void unitRemoved(QString symol);
+    void prefixAdded(QString symbol);
+    void prefixRemoved(QString symbol);
 
 public slots:
 

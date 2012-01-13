@@ -17,6 +17,8 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
     unitSystem->addBaseUnit("s", PhyxUnit::SiUnitFlag);
     unitSystem->addBaseUnit("mol", PhyxUnit::SiUnitFlag);
     unitSystem->addBaseUnit("cd", PhyxUnit::SiUnitFlag);
+    unitSystem->addPrefix("k", 1e3);
+    unitSystem->addPrefix("m",1e-3);
 }
 
 void PhyxCalculator::initialize()
@@ -25,6 +27,7 @@ void PhyxCalculator::initialize()
     m_expression = "";
     expressionIsParsable = false;
     valueBuffer = 1;
+    prefixBuffer = "";
     unitBuffer = "";
     m_error = false;
     m_errorNumber = 0;
@@ -102,6 +105,7 @@ void PhyxCalculator::initialize()
 
     functionMap.insert("bufferUnit",    &PhyxCalculator::bufferUnit);
     functionMap.insert("bufferValue",   &PhyxCalculator::bufferValue);
+    functionMap.insert("bufferPrefix",   &PhyxCalculator::bufferPrefix);
     functionMap.insert("pushVariable",  &PhyxCalculator::pushVariable);
     functionMap.insert("outputVariable",&PhyxCalculator::outputVariable);
 
@@ -113,9 +117,17 @@ void PhyxCalculator::initialize()
             this, SLOT(addUnitRule(QString)));
     connect(unitSystem, SIGNAL(unitRemoved(QString)),
             this, SLOT(removeUnitRule(QString)));
+    connect(unitSystem, SIGNAL(prefixAdded(QString)),
+            this, SLOT(addPrefixRule(QString)));
+    connect(unitSystem, SIGNAL(prefixRemoved(QString)),
+            this, SLOT(removePrefixRule(QString)));
 
     //initialize variable manager
     variableManager = new PhyxVariableManager();
+    connect(variableManager, SIGNAL(variableAdded(QString)),
+            this, SLOT(addVariableRule(QString)));
+    connect(variableManager, SIGNAL(variableRemoved(QString)),
+            this, SLOT(removeVariableRule(QString)));
 }
 
 void PhyxCalculator::loadGrammar(QString fileName)
@@ -167,7 +179,7 @@ void PhyxCalculator::addRule(QString rule, QString functions)
 
 void PhyxCalculator::addUnitRule(QString symbol)
 {
-    addRule(QString("unit=%1").arg(symbol), QString());
+    addRule(QString("unit=%1").arg(symbol), QString("bufferParameter, bufferUnit"));
 }
 
 void PhyxCalculator::removeUnitRule(QString symbol)
@@ -182,7 +194,17 @@ void PhyxCalculator::addVariableRule(QString name)
 
 void PhyxCalculator::removeVariableRule(QString name)
 {
-     earleyParser->removeRule(QString("variable=%1").arg(name));
+    earleyParser->removeRule(QString("variable=%1").arg(name));
+}
+
+void PhyxCalculator::addPrefixRule(QString symbol)
+{
+    addRule(QString("prefix=%1").arg(symbol), QString("bufferParameter, bufferPrefix"));
+}
+
+void PhyxCalculator::removePrefixRule(QString symbol)
+{
+    earleyParser->removeRule(QString("prefix=%1").arg(symbol));
 }
 
 void PhyxCalculator::clearStack()
@@ -848,18 +870,7 @@ void PhyxCalculator::variableLoad()
 void PhyxCalculator::bufferUnit()
 {
     //get the unit
-    int pos;
-    for (pos = (parameterBuffer.size()-1); pos >= 0; pos--)
-    {
-        if (parameterBuffer.at(pos).isNumber())
-        {
-            pos++;
-            break;
-        }
-    }
-
-    unitBuffer = parameterBuffer.mid(pos);
-    parameterBuffer.truncate(pos);      //cut off the unit
+    unitBuffer = parameterBuffer;
 }
 
 void PhyxCalculator::bufferValue()
@@ -875,12 +886,20 @@ void PhyxCalculator::bufferValue()
         valueBuffer = PhyxValueDataType(parameterBuffer.toDouble(),0);
 }
 
+void PhyxCalculator::bufferPrefix()
+{
+    prefixBuffer = parameterBuffer;
+}
+
 void PhyxCalculator::pushVariable()
 {
     //create new variable
     PhyxVariable *variable = new PhyxVariable();
     variable->unit()->setUnitSystem(unitSystem);
-    variable->setValue(valueBuffer);
+    if (!prefixBuffer.isEmpty())
+        variable->setValue(valueBuffer * PhyxValueDataType(unitSystem->prefix(prefixBuffer),0));
+    else
+        variable->setValue(valueBuffer);
     if (!unitBuffer.isEmpty())
         variable->setUnit(unitSystem->unit(unitBuffer));
 
@@ -890,6 +909,7 @@ void PhyxCalculator::pushVariable()
     //cleanup
     valueBuffer = 1;
     unitBuffer = "";
+    prefixBuffer = "";
 }
 
 void PhyxCalculator::outputVariable()
