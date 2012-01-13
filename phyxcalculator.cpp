@@ -44,8 +44,8 @@ void PhyxCalculator::initialize()
     //map functions
     functionMap.insert("valueCheckComplex",     &PhyxCalculator::valueCheckComplex);
     functionMap.insert("valueCheckComplex2",    &PhyxCalculator::valueCheckComplex2);
-    functionMap.insert("valuePositive",         &PhyxCalculator::valueCheckPositive);
-    functionMap.insert("valueInteger",          &PhyxCalculator::valueCheckInteger);
+    functionMap.insert("valueCheckPositive",         &PhyxCalculator::valueCheckPositive);
+    functionMap.insert("valueCheckInteger",          &PhyxCalculator::valueCheckInteger);
     functionMap.insert("valueAdd",      &PhyxCalculator::valueAdd);
     functionMap.insert("valueSub",      &PhyxCalculator::valueSub);
     functionMap.insert("valueMul",      &PhyxCalculator::valueMul);
@@ -298,16 +298,18 @@ QString PhyxCalculator::errorString() const
     return QString();
 }
 
-QString PhyxCalculator::stringFromNumber(const PhyxValueDataType number)
+QString PhyxCalculator::complexToString(const PhyxValueDataType number)
 {
     QString string;
     boost::format format("%.10g");
+    int components = 0;
 
     if (number.real() != 0)
     {
         std::stringstream ss;
         ss << format % number.real();
         string.append(QString::fromStdString(ss.str()));
+        components++;
     }
 
     if (number.imag() != 0)
@@ -321,11 +323,12 @@ QString PhyxCalculator::stringFromNumber(const PhyxValueDataType number)
             string.append(QString::fromStdString(ss.str()));
         }
         string.append("i");
+        components++;
     }
 
     if (string.isEmpty())
         string.append("0");
-    else if (string.contains("+"))
+    else if (components == 2)
     {
         string.prepend("(");
         string.append(")");
@@ -334,7 +337,7 @@ QString PhyxCalculator::stringFromNumber(const PhyxValueDataType number)
     return string;
 }
 
-PhyxValueDataType PhyxCalculator::numberFromString(QString string)
+PhyxValueDataType PhyxCalculator::stringToComplex(QString string)
 {
     PhyxValueDataType value;
 
@@ -937,7 +940,7 @@ void PhyxCalculator::bufferUnit()
 
 void PhyxCalculator::bufferValue()
 {
-    valueBuffer = numberFromString(parameterBuffer);
+    valueBuffer = stringToComplex(parameterBuffer);
 }
 
 void PhyxCalculator::bufferPrefix()

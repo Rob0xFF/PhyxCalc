@@ -59,8 +59,8 @@ public:
         return m_resultUnit;
     }
 
-    static QString stringFromNumber(const PhyxValueDataType number);
-    static PhyxValueDataType numberFromString(QString string);
+    static QString complexToString(const PhyxValueDataType number);
+    static PhyxValueDataType stringToComplex(QString string);
 
 private:
     QStack<PhyxVariable*>       variableStack;                                  /// stack for variable calculation

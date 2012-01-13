@@ -229,7 +229,7 @@ void LineParser::parseLine()
     if (phyxCalculator->evaluate())
     {
         QString output;
-        output.append(PhyxCalculator::stringFromNumber(phyxCalculator->resultValue()));
+        output.append(PhyxCalculator::complexToString(phyxCalculator->resultValue()));
         output.append(phyxCalculator->resultUnit());
 
         insertResult(output);
