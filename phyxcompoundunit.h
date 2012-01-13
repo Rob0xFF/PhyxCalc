@@ -70,9 +70,11 @@ private:
     void compoundsDivide(PhyxCompoundList compounds);                /// devides powers of the unit with other powers
     void compoundsRaise(double power);                       /// raises all powers to power
     void compoundsRoot(double root);                         /// takes the root of all powers
-    void compoundsClear();
+    void compoundsClear();                                   /// clear all compounds
+    void compoundsSetNull();                                 /// sets the powers of all compounds to 0
+    int  compoundsNonNullCount();                            /// returns the number of compounds that are not 0
 
-    void verify();                                          /// verifies the unit
+    void verify();                                           /// verifies the unit
 
 signals:
     void offsetValue(double value);

@@ -22,12 +22,12 @@ bool PhyxCompoundUnit::isConvertible(PhyxCompoundUnit *unit)
 
 bool PhyxCompoundUnit::isOne()
 {
-    return (m_compounds.size() == 0);
+    return (compoundsNonNullCount() == 0);
 }
 
 bool PhyxCompoundUnit::isSimpleUnit()
 {
-    return (m_compounds.size() == 1);
+    return (compoundsNonNullCount() == 1);
 }
 
 void PhyxCompoundUnit::compoundAppend(PhyxUnit *unit, double power)
@@ -71,11 +71,11 @@ void PhyxCompoundUnit::compoundMultiply(PhyxUnit *unit, double factor)
         if (m_compounds.at(i).unit->isSame(unit))   //if compounds contain unit
         {
             m_compounds[i].power += factor;      // multiply the with the factor
-            if (m_compounds.at(i).power == 0)       // if new power = 0
+            /*if (m_compounds.at(i).power == 0)       // if new power = 0
             {
                 delete m_compounds.at(i).unit;      //remove the compound
                 m_compounds.removeAt(i);
-            }
+            }*/
             return;
         }
     }
@@ -144,6 +144,24 @@ void PhyxCompoundUnit::compoundsClear()
     }
 }
 
+void PhyxCompoundUnit::compoundsSetNull()
+{
+    for (int i = 0; i < m_compounds.size(); i++)
+        m_compounds[i].power = 0;
+}
+
+int PhyxCompoundUnit::compoundsNonNullCount()
+{
+    int count = 0;
+    for (int i = 0; i < m_compounds.size(); i++)
+    {
+        if (m_compounds.at(i).power != 0)
+            count++;
+    }
+
+    return count;
+}
+
 void PhyxCompoundUnit::verify()
 {
     if (m_unitSystem != NULL)
@@ -154,7 +172,7 @@ void PhyxCompoundUnit::verify()
             unit->setPowers(this->powers());
             if (m_unitSystem->verifyUnit(unit))
             {
-                compoundsClear();
+                compoundsSetNull();
                 compoundAppend(unit, 1);
             }
             else
@@ -299,7 +317,7 @@ const QString PhyxCompoundUnit::symbol()
 
                 positiveCompoundsCount++;
             }
-            else
+            else if (power < 0)
             {
                 if (!negativeCompoundsCount == 0)
                     negativeCompounds.append("*");
