@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>
+#include <sstream>
 #include "boost/math/complex.hpp"
 #include "qearleyparser.h"
 #include "phyxunitsystem.h"
@@ -35,7 +36,7 @@ public:
     bool setExpression (QString m_expression);                                  ///< sets the expression, checks what must be parsed and returns wheter the expression is parsable or not
     bool evaluate();                                                            ///< evaluates the expression
 
-    PhyxVariableManager::PhyxVariableMap * variables();
+    PhyxVariableManager::PhyxVariableMap * variables() const;
     QString expression() const
     {
         return m_expression;
@@ -57,6 +58,9 @@ public:
     {
         return m_resultUnit;
     }
+
+    static QString stringFromNumber(const PhyxValueDataType number);
+    static PhyxValueDataType numberFromString(QString string);
 
 private:
     QStack<PhyxVariable*>       variableStack;                                  /// stack for variable calculation

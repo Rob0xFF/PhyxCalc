@@ -229,16 +229,7 @@ void LineParser::parseLine()
     if (phyxCalculator->evaluate())
     {
         QString output;
-        if (phyxCalculator->resultValue().real() != 0)
-            output.append(QString::number((double)phyxCalculator->resultValue().real()));
-        if (phyxCalculator->resultValue().imag() != 0)
-        {
-            if (!output.isEmpty())
-                output.append("+");
-            output.append(QString::number((double)phyxCalculator->resultValue().imag()) + "i");
-        }
-        if (output.isEmpty())
-            output.append("0");
+        output.append(PhyxCalculator::stringFromNumber(phyxCalculator->resultValue()));
         output.append(phyxCalculator->resultUnit());
 
         insertResult(output);

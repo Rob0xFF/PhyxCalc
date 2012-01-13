@@ -18,6 +18,7 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
     unitSystem->addBaseUnit("mol", PhyxUnit::SiUnitFlag);
     unitSystem->addBaseUnit("cd", PhyxUnit::SiUnitFlag);
     unitSystem->addPrefix("k", 1e3);
+    unitSystem->addPrefix("M",1e6);
     unitSystem->addPrefix("m",1e-3);
 }
 
@@ -189,12 +190,14 @@ void PhyxCalculator::removeUnitRule(QString symbol)
 
 void PhyxCalculator::addVariableRule(QString name)
 {
-    addRule(QString("variable=%1").arg(name), QString());
+    addRule(QString("variable=%1").arg(name), QString("bufferParameter, variableLoad"));
+    variablesChanged();
 }
 
 void PhyxCalculator::removeVariableRule(QString name)
 {
     earleyParser->removeRule(QString("variable=%1").arg(name));
+    variablesChanged();
 }
 
 void PhyxCalculator::addPrefixRule(QString symbol)
@@ -285,7 +288,7 @@ bool PhyxCalculator::evaluate()
     }
 }
 
-PhyxVariableManager::PhyxVariableMap *PhyxCalculator::variables()
+PhyxVariableManager::PhyxVariableMap *PhyxCalculator::variables() const
 {
     return variableManager->variables();
 }
@@ -293,6 +296,68 @@ PhyxVariableManager::PhyxVariableMap *PhyxCalculator::variables()
 QString PhyxCalculator::errorString() const
 {
     return QString();
+}
+
+QString PhyxCalculator::stringFromNumber(const PhyxValueDataType number)
+{
+    QString string;
+    boost::format format("%.10g");
+
+    if (number.real() != 0)
+    {
+        std::stringstream ss;
+        ss << format % number.real();
+        string.append(QString::fromStdString(ss.str()));
+    }
+
+    if (number.imag() != 0)
+    {
+        if (!string.isEmpty())
+            string.append("+");
+        if (number.imag() != 1)
+        {
+            std::stringstream ss;
+            ss << format % number.imag();
+            string.append(QString::fromStdString(ss.str()));
+        }
+        string.append("i");
+    }
+
+    if (string.isEmpty())
+        string.append("0");
+    else if (string.contains("+"))
+    {
+        string.prepend("(");
+        string.append(")");
+    }
+
+    return string;
+}
+
+PhyxValueDataType PhyxCalculator::numberFromString(QString string)
+{
+    PhyxValueDataType value;
+
+    if (string.indexOf(QRegExp("[ij]")) != -1)
+    {
+        string.remove(QRegExp("[ij]"));
+        if (string.isEmpty())
+            string="1";
+
+        long double tmpValue;
+        std::istringstream inStream(string.toStdString());
+        inStream >> tmpValue;
+        value = PhyxValueDataType(0.0,tmpValue);
+    }
+    else
+    {
+        long double tmpValue;
+        std::istringstream inStream(string.toStdString());
+        inStream >> tmpValue;
+        value = PhyxValueDataType(tmpValue,0.0);
+    }
+
+    return value;
 }
 
 void PhyxCalculator::valueCheckComplex()
@@ -849,17 +914,14 @@ void PhyxCalculator::unitSqrt()
 
 void PhyxCalculator::variableAdd()
 {
-    /*PhysicalVariable variable;
-    variable.value = valueStack.pop();
-    variable.unit = unitStack.pop();
-    variableMap.insert(stringBuffer, variable);
-    stringBuffer.clear();*/
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variableManager->addVariable(parameterBuffer, variable1);
 }
 
 void PhyxCalculator::variableRemove()
 {
-   /* variableMap.remove(stringBuffer);
-    stringBuffer.clear();*/
+    variableManager->removeVariable(parameterBuffer);
 }
 
 void PhyxCalculator::variableLoad()
@@ -875,15 +937,7 @@ void PhyxCalculator::bufferUnit()
 
 void PhyxCalculator::bufferValue()
 {
-    if (parameterBuffer.indexOf(QRegExp("[ij]")) != -1)
-    {
-        parameterBuffer.remove(QRegExp("[ij]"));
-        if (parameterBuffer.isEmpty())
-            parameterBuffer="1";
-        valueBuffer = PhyxValueDataType(0,parameterBuffer.toDouble());
-    }
-    else
-        valueBuffer = PhyxValueDataType(parameterBuffer.toDouble(),0);
+    valueBuffer = numberFromString(parameterBuffer);
 }
 
 void PhyxCalculator::bufferPrefix()
