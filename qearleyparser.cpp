@@ -31,6 +31,9 @@ bool QEarleyParser::loadRule(QString rule, QStringList functions)
 
     newRule.premise = addNonTerminal(premise);         //convert premise
 
+    //replace the any char \* -> unicode 127 DEL
+    conclusio.replace("\\*",QChar(127));
+
     //convert conclusio
     if (!conclusio.isEmpty())   //check for epsilon rule
     {
@@ -235,7 +238,7 @@ bool QEarleyParser::parse(int startPosition)
                     else if (currentIndex < (itemListCount-1))
                     {
                         //Scanner
-                        if ((firstSymbol >= 0) && (word.conclusion.at(currentIndex) == firstSymbol))
+                        if ((word.conclusion.at(currentIndex) == firstSymbol) || (firstSymbol == 127))  //127 is the any char
                         {
                             appendEarleyItem(currentIndex+1, item->rule, item->dotPos+1, item->startPos);   //move point right
                         }

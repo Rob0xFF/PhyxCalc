@@ -107,6 +107,7 @@ void PhyxCalculator::initialize()
     functionMap.insert("bufferUnit",    &PhyxCalculator::bufferUnit);
     functionMap.insert("bufferValue",   &PhyxCalculator::bufferValue);
     functionMap.insert("bufferPrefix",   &PhyxCalculator::bufferPrefix);
+    functionMap.insert("bufferString",   &PhyxCalculator::bufferString);
     functionMap.insert("pushVariable",  &PhyxCalculator::pushVariable);
     functionMap.insert("outputVariable",&PhyxCalculator::outputVariable);
 
@@ -273,7 +274,12 @@ bool PhyxCalculator::evaluate()
                     else if (function == "bufferParameter")
                         parameterBuffer = m_expression.mid(earleyTreeItem->startPos, earleyTreeItem->endPos - earleyTreeItem->startPos + 1);
                     else
-                        (this->*functionMap.value(function))();
+                    {
+                        if (functionMap.value(function, NULL) != NULL)
+                            (this->*functionMap.value(function))();
+                        else
+                            qFatal(tr("Function %1 not found!").arg(function).toLocal8Bit());
+                    }
                 }
             }
             //if (!phyxRule.paramFunction.isEmpty())
@@ -919,7 +925,7 @@ void PhyxCalculator::variableAdd()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variableManager->addVariable(parameterBuffer, variable1);
+    variableManager->addVariable(stringBuffer, variable1);
 }
 
 void PhyxCalculator::variableRemove()
@@ -946,6 +952,12 @@ void PhyxCalculator::bufferValue()
 void PhyxCalculator::bufferPrefix()
 {
     prefixBuffer = parameterBuffer;
+}
+
+void PhyxCalculator::bufferString()
+{
+    stringBuffer = parameterBuffer;
+    stringBuffer.remove('"');
 }
 
 void PhyxCalculator::pushVariable()

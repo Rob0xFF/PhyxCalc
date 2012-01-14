@@ -65,7 +65,7 @@ public:
 private:
     QStack<PhyxVariable*>       variableStack;                                  /// stack for variable calculation
     QString                     parameterBuffer;                                /// string for buffering numbers
-//    QString                     stringBuffer;                                   /// string for buffering strings
+    QString                     stringBuffer;                                   /// string for buffering strings
     PhyxValueDataType           valueBuffer;
     QString                     prefixBuffer;
     QString                     unitBuffer;
@@ -163,6 +163,7 @@ private:
     void bufferUnit();
     void bufferValue();
     void bufferPrefix();
+    void bufferString();
     void pushVariable();
 
     void outputVariable();
