@@ -26,6 +26,7 @@ signals:
     void variableRemoved(QString name);
     
 public slots:
+    void clearVariables();
     
 };
 

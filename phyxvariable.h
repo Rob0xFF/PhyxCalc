@@ -36,8 +36,12 @@ public:
     };
 
     bool convertUnit(PhyxCompoundUnit *unit);
+    static void copyVariable(PhyxVariable *source, PhyxVariable *destination);
 
     QString errorString();                              ///< returns the error string to current error
+
+
+    void setPreferedUnit(userUnitBuffer userInputUnits, outputMode mode);
 
     PhyxValueDataType value() const
     {
@@ -51,8 +55,6 @@ public:
     {
         return m_error;
     }
-
-    void setPreferedUnit(userUnitBuffer userInputUnits, outputMode mode);
 
 private:
     PhyxValueDataType   m_value;

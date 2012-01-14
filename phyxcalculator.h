@@ -93,6 +93,7 @@ private:
     void addRule(QString rule, QString functions = "");     ///< adds a rule
 
     void clearStack();
+    void clearResult();
 
     /** functions for value calculation */
     void valueCheckComplex();
@@ -169,9 +170,12 @@ private:
     void outputVariable();
 
 signals:
-    void variablesChanged();
+    void variablesChanged();        ///< is emited when variables have changed
+    void outputResult();            ///< is emited when result should be output
+    void outputError();             ///< is emited when an error should be output
     
 public slots:
+    void clearVariables();
 
 private slots:
     void addUnitRule(QString symbol);
@@ -180,7 +184,6 @@ private slots:
     void removeVariableRule(QString name);
     void addPrefixRule(QString symbol);
     void removePrefixRule(QString symbol);
-    
 };
 
 #endif // PHYXCALCULATOR_H

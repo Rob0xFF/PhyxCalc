@@ -164,6 +164,7 @@ void PhyxCalculator::raiseException(QString exception)
     qDebug() << exception;
     m_error = true;
     clearStack();
+    emit outputError();
 }
 
 void PhyxCalculator::addRule(QString rule, QString functions)
@@ -218,6 +219,12 @@ void PhyxCalculator::clearStack()
     variableStack.clear();
 }
 
+void PhyxCalculator::clearResult()
+{
+    m_resultValue = PhyxValueDataType(0.0,0.0);
+    m_resultUnit = "";
+}
+
 bool PhyxCalculator::setExpression(QString expression)
 {
     if (expression.isEmpty())
@@ -254,6 +261,7 @@ bool PhyxCalculator::evaluate()
 {
     if (expressionIsParsable)
     {
+        clearResult();
         m_error = false;
 
         QList<EarleyTreeItem> earleyTree;
@@ -294,6 +302,11 @@ bool PhyxCalculator::evaluate()
     }
 }
 
+void PhyxCalculator::clearVariables()
+{
+    variableManager->clearVariables();
+}
+
 PhyxVariableManager::PhyxVariableMap *PhyxCalculator::variables() const
 {
     return variableManager->variables();
@@ -301,7 +314,7 @@ PhyxVariableManager::PhyxVariableMap *PhyxCalculator::variables() const
 
 QString PhyxCalculator::errorString() const
 {
-    return QString();
+    return QString("error");
 }
 
 QString PhyxCalculator::complexToString(const PhyxValueDataType number)
@@ -988,8 +1001,8 @@ void PhyxCalculator::outputVariable()
         PhyxVariable *variable1 = variableStack.pop();
         m_resultValue = variable1->value();
         m_resultUnit = variable1->unit()->symbol();
-        qDebug() << (double)variable1->value().real() << variable1->unit()->symbol();
-
         delete variable1;
+
+        emit outputResult();
     }
 }

@@ -284,6 +284,15 @@ void PhyxCompoundUnit::simplify()
         compoundSimplify(i);
 }
 
+void PhyxCompoundUnit::copyCompoundUnit(PhyxCompoundUnit *source, PhyxCompoundUnit *destination)
+{
+    destination->setPowers(source->powers());
+    destination->setUnitSystem(source->unitSystem());
+    destination->setScaleFactor(source->scaleFactor());
+    destination->setOffset(source->offset());
+    destination->setCompounds(source->compounds());
+}
+
 const QString PhyxCompoundUnit::symbol()
 {
     if (m_unitSystem != NULL)

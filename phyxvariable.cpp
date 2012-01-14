@@ -23,6 +23,14 @@ bool PhyxVariable::convertUnit(PhyxCompoundUnit *unit)
         return true;
 }
 
+void PhyxVariable::copyVariable(PhyxVariable *source, PhyxVariable *destination)
+{
+    PhyxCompoundUnit *unit = new PhyxCompoundUnit();
+    PhyxCompoundUnit::copyCompoundUnit(source->unit(), unit);
+    destination->setUnit(unit);
+    destination->setValue(source->value());
+}
+
 QString PhyxVariable::errorString()
 {
     switch (m_error)

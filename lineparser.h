@@ -31,7 +31,6 @@ public:
     void setUnitLoader(UnitLoader *loader) { unitLoader = loader;}
     void setAppSettings(AppSettings *settings) { appSettings = settings;}
 
-    void showVariables();
     void parseLine();
     void parseAll();
     void parseFromCurrentPosition();
@@ -62,7 +61,7 @@ private:
 
     /* Text functions */
     void replaceCurrentLine(QString text);
-    void insertResult(QString text);
+    void insertOutput(QString text);
     QString getCurrentLine();
 
     /* format a double with si prefixes */
@@ -77,7 +76,10 @@ private:
     QString replaceVariables(QString expression, bool insertValue = true, bool insertUnit = true);
 
 public slots:
+    void showVariables();
     void clearAllVariables();
+    void outputResult();
+    void outputError();
 };
 
 #endif // LINEPARSER_H

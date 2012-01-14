@@ -22,7 +22,7 @@ class PhyxCompoundUnit : public PhyxUnit
 
     Q_OBJECT
     Q_PROPERTY(PhyxUnitSystem *unitSystem READ unitSystem WRITE setUnitSystem)
-    Q_PROPERTY(PhyxCompoundList compounds READ compounds)
+    Q_PROPERTY(PhyxCompoundList compounds READ compounds WRITE setCompounds)
 
 public:
     explicit PhyxCompoundUnit(QObject *parent = 0);
@@ -47,6 +47,8 @@ public:
     void fromSimpleUnit(PhyxUnit *unit);
 
     void simplify();                                    ///< simplifies the unit (e.g.: GalileanUnit -> ProductUnit, DimensionlessUnit -> NoUnit)
+
+    static void copyCompoundUnit(PhyxCompoundUnit *source, PhyxCompoundUnit *destination);
 
     QString const symbol();
     PhyxUnitSystem * unitSystem() const
@@ -85,6 +87,10 @@ public slots:
 void setUnitSystem(PhyxUnitSystem * arg)
 {
     m_unitSystem = arg;
+}
+void setCompounds(PhyxCompoundList arg)
+{
+    m_compounds = arg;
 }
 };
 

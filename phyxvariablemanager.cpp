@@ -16,7 +16,14 @@ void PhyxVariableManager::addVariable(QString name, PhyxVariable *variable)
 
 PhyxVariable *PhyxVariableManager::getVariable(QString name) const
 {
-    return variableMap.value(name, NULL);
+    if (variableMap.contains(name))
+    {
+        PhyxVariable *variable = new PhyxVariable();
+        PhyxVariable::copyVariable(variableMap.value(name, NULL), variable);
+        return variable;
+    }
+    else
+        return NULL;
 }
 
 void PhyxVariableManager::removeVariable(QString name)
@@ -32,4 +39,15 @@ void PhyxVariableManager::removeVariable(QString name)
 PhyxVariableManager::PhyxVariableMap *PhyxVariableManager::variables()
 {
     return &variableMap;
+}
+
+void PhyxVariableManager::clearVariables()
+{
+    QMapIterator<QString, PhyxVariable*> i(variableMap);
+    while (i.hasNext())
+    {
+        i.next();
+        emit variableRemoved(i.key());
+        delete i.value();
+    }
 }

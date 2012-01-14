@@ -8,6 +8,12 @@ LineParser::LineParser(UnitLoader *loader, QTableWidget *tableWidget, QTextEdit 
     appSettings = settings;
 
     phyxCalculator = new PhyxCalculator();
+    connect(phyxCalculator, SIGNAL(outputResult()),
+            this, SLOT(outputResult()));
+    connect(phyxCalculator, SIGNAL(outputError()),
+            this, SLOT(outputError()));
+    connect(phyxCalculator, SIGNAL(variablesChanged()),
+            this, SLOT(showVariables()));
 }
 
 LineParser::~LineParser()
@@ -226,8 +232,9 @@ void LineParser::parseLine()
 
     phyxCalculator->setExpression(curLineText);
 
-    if (phyxCalculator->evaluate())
-    {
+    phyxCalculator->evaluate();
+    insertNewLine();
+    /*{
         QString output;
         output.append(PhyxCalculator::complexToString(phyxCalculator->resultValue()));
         output.append(phyxCalculator->resultUnit());
@@ -235,7 +242,7 @@ void LineParser::parseLine()
         insertResult(output);
     }
     else
-        insertResult(phyxCalculator->errorString());
+        insertResult(phyxCalculator->errorString());*/
 
     /*LineType lineType = checkLineType(curLineText);
 
@@ -254,7 +261,7 @@ void LineParser::parseLine()
         OutputVariable(curLineText, calculationEdit);
     }*/
 
-    insertNewLine();
+    //insertNewLine();
 }
 
 void LineParser::parseAll()
@@ -354,11 +361,11 @@ void LineParser::replaceCurrentLine(QString text)
     calculationEdit->setTextCursor(textCursor);
 }
 
-void LineParser::insertResult(QString text)
+void LineParser::insertOutput(QString text)
 {
     QTextCursor textCursor = calculationEdit->textCursor();
 
-    text.prepend("=");
+    //text.prepend("=");
 
     textCursor.clearSelection();
     textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
@@ -623,16 +630,16 @@ void LineParser::showVariables()
     variableTable->setRowCount(0);
 
 
-    QMapIterator<QString, physicalVariable> i(variableMap);
+    QMapIterator<QString, PhyxVariable*> i(*phyxCalculator->variables());
      while (i.hasNext()) {
          i.next();
 
          variableTable->setRowCount(row+1);
-         newItem = new QTableWidgetItem(i.key());
+         newItem = new QTableWidgetItem(i.key());   // name
          variableTable->setItem(row, 0, newItem);
-         newItem = new QTableWidgetItem(formatValue(i.value().value));//QString::number(i.value().value, numberFormat, numberPrecision));
+         newItem = new QTableWidgetItem(PhyxCalculator::complexToString(i.value()->value()));
          variableTable->setItem(row, 1, newItem);
-         newItem = new QTableWidgetItem(i.value().unit);
+         newItem = new QTableWidgetItem(i.value()->unit()->symbol());
          variableTable->setItem(row, 2, newItem);
 
          row++;
@@ -641,6 +648,23 @@ void LineParser::showVariables()
 
 void LineParser::clearAllVariables()
 {
-    variableMap.clear();
-    showVariables();
+    phyxCalculator->clearVariables();
+}
+
+void LineParser::outputResult()
+{
+    QString output;
+    output.append("=");
+    output.append(PhyxCalculator::complexToString(phyxCalculator->resultValue()));
+    output.append(phyxCalculator->resultUnit());
+    insertOutput(output);
+}
+
+void LineParser::outputError()
+{
+    QString output;
+    output.append("<font color=red>");
+    output.append(phyxCalculator->errorString());
+    output.append("</font> ");
+    insertOutput(output);
 }
