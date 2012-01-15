@@ -26,8 +26,8 @@ struct EarleyItem {
     EarleySymbol premise() {return rule->premise;}                          /// premise
     bool isInitial() {return dotPos==0;}                                    /// return true if dot is at the start
     bool isFinal() {return (dotPos==(rule->conclusion.size()));}          /// return true if dot is at the end
-    bool nextSymbol() {return rule->conclusion[dotPos];}                    /// return symbol left to dot
-    bool prevSymbol() {return rule->conclusion[dotPos-1];}                  /// return symbol right to dot
+    EarleySymbol nextSymbol() {return rule->conclusion[dotPos];}            /// return symbol left to dot
+    EarleySymbol prevSymbol() {return rule->conclusion[dotPos-1];}          /// return symbol right to dot
     bool nextIsTerminal() {return rule->conclusion[dotPos] >= 0;}           /// return true if symbol left to dot is terminal
     bool nextIsNonTerminal() {return rule->conclusion[dotPos] < 0;}         /// return true if symbol left to dot is nonterminal
     bool prevIsTerminal() {return rule->conclusion[dotPos-1] >= 0;}         /// return true if symbol right to dot is terminal

@@ -9,6 +9,7 @@ QT       += core gui
 TARGET = phyxcalc
 TEMPLATE = app
 
+win32:INCLUDEPATH += ../boost
 
 SOURCES += main.cpp\
         mainwindow.cpp \
