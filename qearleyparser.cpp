@@ -387,15 +387,18 @@ void QEarleyParser::treeRecursion(int listIndex, int itemIndex, EarleyItemList& 
                     }
                 }
             }
-            //backward scanner
-            if ((word.conclusion.at(listIndex-1) == tree[itemIndex].prevSymbol()) || (word.conclusion.at(listIndex-1) == 127))
-            {
-                tree[itemIndex].dotPos--;       //move dot left
-                treeRecursion(listIndex-1, itemIndex, tree);
-            }
             else
             {
-                tree.removeAt(itemIndex);
+                //backward scanner
+                if ((word.conclusion.at(listIndex-1) == tree[itemIndex].prevSymbol()) || (word.conclusion.at(listIndex-1) == 127))
+                {
+                    tree[itemIndex].dotPos--;       //move dot left
+                    treeRecursion(listIndex-1, itemIndex, tree);
+                }
+                else
+                {
+                    tree.removeAt(itemIndex);
+                }
             }
         }
         else
@@ -444,8 +447,8 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
         for (int i = earleyItemLists.at(listIndex).size()-1; i >= 0 ; i--)
         {
             earleyItemLists[listIndex][i].endPos = listIndex-1;  //store end position of item for later use in evaluation
-            if (!(earleyItemLists.at(listIndex).at(i).dotPos == earleyItemLists.at(listIndex).at(i).rule->conclusion.size()))  //not beta is empty
-                earleyItemLists[listIndex].removeAt(i);
+            /*if (!(earleyItemLists.at(listIndex).at(i).dotPos == earleyItemLists.at(listIndex).at(i).rule->conclusion.size()))  //not beta is empty
+                earleyItemLists[listIndex].removeAt(i);*/
         }
     }
     isRecursionDone = true;     //must be set, lists are destroyed and partial parsing is not possible any more
@@ -462,10 +465,10 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
         }
     }
 
-    //backtraceTree(&tree);
+    backtraceTree(&tree);
 
     //add the final item
-    for (int i = 0; i < earleyItemLists.last().size(); i++)
+    /*for (int i = 0; i < earleyItemLists.last().size(); i++)
     {
         EarleyItem *item = &earleyItemLists.last()[i];
         if ((item->premise() == startSymbol) && (item->dotPos == item->rule->conclusion.size()))
@@ -477,7 +480,7 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
     treeRecursion(itemListCount-1,0,tree);
 
     tree = earleyItemResultLists; //result has been stored in the deepest stack level of recursion
-
+    */
     //for testing purposes only
     qDebug() << "Earley items after tree recursion:";
     foreach (EarleyItem item, tree)
