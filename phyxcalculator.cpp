@@ -459,8 +459,8 @@ void PhyxCalculator::valueMul()
 
 void PhyxCalculator::valueDiv()
 {
-    PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(variable1->value() / variable2->value());
     variableStack.push(variable1);
@@ -478,13 +478,13 @@ void PhyxCalculator::valueNeg()
 
 void PhyxCalculator::valuePow()
 {
-    PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
 
     if (variable2->value().imag() == 0)     // precision fix
-        variable1->setValue(pow(variable2->value(),(double)variable1->value().real()));
+        variable1->setValue(pow(variable1->value(),(double)variable2->value().real()));
     else
-        variable1->setValue(pow(variable2->value(),variable1->value()));
+        variable1->setValue(pow(variable1->value(),variable2->value()));
     variableStack.push(variable1);
 
     delete variable2;
@@ -636,8 +636,8 @@ void PhyxCalculator::valueLog2()
 
 void PhyxCalculator::valueLogn()
 {
-    PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(log(variable2->value()) / log(variable1->value()));
     variableStack.push(variable1);
@@ -647,8 +647,8 @@ void PhyxCalculator::valueLogn()
 
 void PhyxCalculator::valueRoot()
 {
-    PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
 
     PhyxValueDataType one(1,0);
     variable1->setValue(pow(variable2->value(), one/variable1->value()));
@@ -882,22 +882,22 @@ void PhyxCalculator::unitMul()
 
 void PhyxCalculator::unitDiv()
 {
-    PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
 
     variable1->unit()->divide(variable2->unit());
-    variableStack.push(variable2);
     variableStack.push(variable1);
+    variableStack.push(variable2);
 }
 
 void PhyxCalculator::unitPow()
 {
-    PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
 
     variable1->unit()->raise(variable2->value().real());
-    variableStack.push(variable2);
     variableStack.push(variable1);
+    variableStack.push(variable2);
 }
 
 void PhyxCalculator::unitPow2()
@@ -918,12 +918,12 @@ void PhyxCalculator::unitPow3()
 
 void PhyxCalculator::unitRoot()
 {
-    PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
 
     variable1->unit()->root(variable2->value().real());
-    variableStack.push(variable2);
     variableStack.push(variable1);
+    variableStack.push(variable2);
 }
 
 void PhyxCalculator::unitSqrt()
