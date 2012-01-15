@@ -205,7 +205,7 @@ bool QEarleyParser::parse(int startPosition)
         //predictor special case
         for (int i = 0; i < rules.at(-startSymbol).size(); i++)
         {
-            appendEarleyItem(0, &rules[-startSymbol][i] ,0 , 0);
+            appendEarleyItem(0, &rules[-startSymbol][i] ,0 , 0, NULL);
         }
     }
 
@@ -227,12 +227,12 @@ bool QEarleyParser::parse(int startPosition)
                         //Predictor
                         for (int i = 0; i < rules.at(-firstSymbol).size(); i++)
                         {
-                            appendEarleyItem(currentIndex, &(rules[-firstSymbol][i]) ,0 , currentIndex);
+                            appendEarleyItem(currentIndex, &(rules[-firstSymbol][i]) ,0 , currentIndex, item);
                         }
                         //Aycock and Horspool Epsilon solution
                         if (isNullableVector.at(-firstSymbol))  //if B is nullable
                         {
-                            appendEarleyItem(currentIndex, item->rule, item->dotPos+1, item->startPos);   //move point right
+                            appendEarleyItem(currentIndex, item->rule, item->dotPos+1, item->startPos, item);   //move point right
                         }
                     }
                     else if (currentIndex < (itemListCount-1))
@@ -240,7 +240,7 @@ bool QEarleyParser::parse(int startPosition)
                         //Scanner
                         if ((word.conclusion.at(currentIndex) == firstSymbol) || (firstSymbol == 127))  //127 is the any char
                         {
-                            appendEarleyItem(currentIndex+1, item->rule, item->dotPos+1, item->startPos);   //move point right
+                            appendEarleyItem(currentIndex+1, item->rule, item->dotPos+1, item->startPos, item);   //move point right
                         }
                     }
                 }
@@ -252,7 +252,7 @@ bool QEarleyParser::parse(int startPosition)
                         EarleyItem *item2 = &earleyItemLists[item->startPos][i];
                         if (!(item2->dotPos == item2->rule->conclusion.size()) && (item2->rule->conclusion.at(item2->dotPos) == item->premise()))  //item2 is not empty and item2 B = item A
                         {
-                            appendEarleyItem(currentIndex, item2->rule, item2->dotPos+1, item2->startPos);   //move point right
+                            appendEarleyItem(currentIndex, item2->rule, item2->dotPos+1, item2->startPos, item);   //move point right
                         }
                     }
                 }
@@ -336,7 +336,7 @@ bool QEarleyParser::removeSymbol()
         return false;
 }
 
-void QEarleyParser::appendEarleyItem(int index, EarleyRule *rule, int dotPos, int K)
+void QEarleyParser::appendEarleyItem(int index, EarleyRule *rule, int dotPos, int K, EarleyItem *origin)
 {
     /*bool match = false;
     foreach (EarleyItem item, earleyItemLists.at(index))
@@ -350,6 +350,7 @@ void QEarleyParser::appendEarleyItem(int index, EarleyRule *rule, int dotPos, in
     earleyItem.rule = rule;
     earleyItem.dotPos = dotPos;
     earleyItem.startPos = K;
+    earleyItem.origin = origin;
 
     if (!earleyItemLists.at(index).contains(earleyItem))
         earleyItemLists[index].append(earleyItem);
@@ -434,7 +435,7 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
     EarleyItemList tree;
 
     //remove unneeded items
-    for (int listIndex = 0; listIndex < itemListCount; listIndex++)
+    /*for (int listIndex = 0; listIndex < itemListCount; listIndex++)
     {
         for (int i = earleyItemLists.at(listIndex).size()-1; i >= 0 ; i--)
         {
@@ -442,22 +443,25 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
             if (!(earleyItemLists.at(listIndex).at(i).dotPos == earleyItemLists.at(listIndex).at(i).rule->conclusion.size()))  //not beta is empty
                 earleyItemLists[listIndex].removeAt(i);
         }
-    }
+    }*/
     isRecursionDone = true;     //must be set, lists are destroyed and partial parsing is not possible any more
 
     //for testing purposes only
     qDebug() << "Earley items after Parsing:";
-    for (int i = 0; i < itemListCount; i++)
+    for (int x = 0; x < itemListCount; x++)
     {
-        foreach (EarleyItem item, earleyItemLists.at(i))
+        for (int y = 0; y < earleyItemLists.at(x).size(); y++)
+        //foreach (EarleyItem item, earleyItemLists.at(x))
         {
-            qDebug() << i << EarleyItemToString(item) << item.startPos;
+            EarleyItem *item = &earleyItemLists[x][y];
+            qDebug() << x << item << EarleyItemToString(*item) << item->startPos << item->origin;
         }
     }
-    qDebug();
+
+    backtraceTree(&tree);
 
     //add the final item
-    for (int i = 0; i < earleyItemLists.last().size(); i++)
+    /*for (int i = 0; i < earleyItemLists.last().size(); i++)
     {
         EarleyItem *item = &earleyItemLists.last()[i];
         if ((item->premise() == startSymbol) && (item->dotPos == item->rule->conclusion.size()))
@@ -469,14 +473,36 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
     treeRecursion(itemListCount-1,0,tree);
 
     tree = earleyItemResultLists; //result has been stored in the deepest stack level of recursion
-
+    */
     //for testing purposes only
     qDebug() << "Earley items after tree recursion:";
     foreach (EarleyItem item, tree)
     {
-        qDebug() << EarleyItemToString(item) << item.startPos << item.endPos;
+        qDebug() << EarleyItemToString(item) << item.startPos;
     }
     qDebug();
 
     return tree;
+}
+
+void QEarleyParser::backtraceTree(EarleyItemList *tree)
+{
+    EarleyItem *currentItem = NULL;
+
+    //get the startItem
+    for (int i = 0; i < earleyItemLists.last().size(); i++)
+    {
+        EarleyItem *item = &earleyItemLists.last()[i];
+        if ((item->premise() == startSymbol) && (item->isFinal()))
+        {
+            currentItem = item;
+        }
+    }
+
+    while (currentItem->origin != NULL)
+    {
+        if (currentItem->isFinal())
+            tree->append(*currentItem);
+        currentItem = currentItem->origin;
+    }
 }
