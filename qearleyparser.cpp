@@ -435,15 +435,15 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
     EarleyItemList tree;
 
     //remove unneeded items
-    /*for (int listIndex = 0; listIndex < itemListCount; listIndex++)
+    for (int listIndex = 0; listIndex < itemListCount; listIndex++)
     {
         for (int i = earleyItemLists.at(listIndex).size()-1; i >= 0 ; i--)
         {
             earleyItemLists[listIndex][i].endPos = listIndex-1;  //store end position of item for later use in evaluation
-            if (!(earleyItemLists.at(listIndex).at(i).dotPos == earleyItemLists.at(listIndex).at(i).rule->conclusion.size()))  //not beta is empty
-                earleyItemLists[listIndex].removeAt(i);
+            /*if (!(earleyItemLists.at(listIndex).at(i).dotPos == earleyItemLists.at(listIndex).at(i).rule->conclusion.size()))  //not beta is empty
+                earleyItemLists[listIndex].removeAt(i);*/
         }
-    }*/
+    }
     isRecursionDone = true;     //must be set, lists are destroyed and partial parsing is not possible any more
 
     //for testing purposes only

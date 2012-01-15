@@ -482,9 +482,9 @@ void PhyxCalculator::valuePow()
     PhyxVariable *variable2 = variableStack.pop();
 
     if (variable2->value().imag() == 0)     // precision fix
-        variable1->setValue(pow(variable1->value(),(double)variable2->value().real()));
+        variable1->setValue(pow(variable2->value(),(double)variable1->value().real()));
     else
-        variable1->setValue(pow(variable1->value(),variable2->value()));
+        variable1->setValue(pow(variable2->value(),variable1->value()));
     variableStack.push(variable1);
 
     delete variable2;
