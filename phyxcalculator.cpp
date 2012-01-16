@@ -985,14 +985,21 @@ void PhyxCalculator::unitAdd()
 {
     if (variableStack.isEmpty())        // <- base unit
     {
-        if (!unitGroupBuffer.isEmpty())
-            unitSystem->addBaseUnit(stringBuffer, 0, unitGroupBuffer);
-        else
-            unitSystem->addBaseUnit(stringBuffer, 0, unitGroupBuffer);
+        unitSystem->addBaseUnit(stringBuffer, 0, unitGroupBuffer, prefixBuffer);
     }
     else
     {
+        PhyxVariable *variable1 = variableStack.pop();
 
+        PhyxUnit *unit = new PhyxUnit();
+        unit->setPowers(variable1->unit()->powers());
+        unit->setUnitGroup(unitGroupBuffer);
+        unit->setPreferedPrefix(prefixBuffer);
+        unit->setSymbol(stringBuffer);
+        unit->setFlags(0);
+        unitSystem->addDerivedUnit(unit);
+
+        delete variable1;
     }
 
     stringBuffer.clear();

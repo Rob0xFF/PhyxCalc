@@ -463,7 +463,7 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
     isRecursionDone = true;     //must be set, lists are destroyed and partial parsing is not possible any more
 
     //for testing purposes only
-    qDebug() << "Earley items after Parsing:";
+    /*qDebug() << "Earley items after Parsing:";
     for (int x = 0; x < itemListCount; x++)
     {
         for (int y = 0; y < earleyItemLists.at(x).size(); y++)
@@ -472,7 +472,7 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
             EarleyItem *item = &earleyItemLists[x][y];
             qDebug() << x << item << EarleyItemToString(*item) << item->startPos << item->origin;
         }
-    }
+    }*/
 
     backtraceTree(&tree);
 
@@ -491,12 +491,12 @@ QList<EarleyTreeItem> QEarleyParser::getTree()
     tree = earleyItemResultLists; //result has been stored in the deepest stack level of recursion
     */
     //for testing purposes only
-    qDebug() << "Earley items after tree recursion:";
+    /*qDebug() << "Earley items after tree recursion:";
     foreach (EarleyItem item, tree)
     {
         qDebug() << EarleyItemToString(item) << item.startPos;
     }
-    qDebug();
+    qDebug();*/
 
     return tree;
 }

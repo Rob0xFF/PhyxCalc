@@ -17,7 +17,7 @@ public:
     explicit PhyxUnitSystem(QObject *parent = 0);
     ~PhyxUnitSystem();
 
-    void addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags, QString unitGroup);    ///< adds a base unit
+    void addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags, QString unitGroup, QString preferedPrefix);    ///< adds a base unit
    // void addDerivedUnit(QString symbol,
    //                     PhyxVariable *variable,
    //                     double offset,

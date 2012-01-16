@@ -22,7 +22,7 @@ PhyxUnitSystem::~PhyxUnitSystem()
     }
 }
 
-void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags, QString unitGroup)
+void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags, QString unitGroup, QString preferedPrefix)
 {
     if (baseUnitsMap.contains(symbol))
         delete baseUnitsMap.take(symbol);
@@ -32,6 +32,7 @@ void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags, QStr
    unit->powerAppend(symbol,1);
    unit->setFlags(flags);
    unit->setUnitGroup(unitGroup);
+   unit->setPreferedPrefix(preferedPrefix);
    baseUnitsMap.insert(symbol, unit);
 
     if (derivedUnitsMap.contains(symbol))
