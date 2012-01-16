@@ -22,7 +22,7 @@ PhyxUnitSystem::~PhyxUnitSystem()
     }
 }
 
-void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags)
+void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags, QString unitGroup)
 {
     if (baseUnitsMap.contains(symbol))
         delete baseUnitsMap.take(symbol);
@@ -31,6 +31,7 @@ void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags)
    unit->setSymbol(symbol);
    unit->powerAppend(symbol,1);
    unit->setFlags(flags);
+   unit->setUnitGroup(unitGroup);
    baseUnitsMap.insert(symbol, unit);
 
     if (derivedUnitsMap.contains(symbol))
@@ -92,9 +93,13 @@ bool PhyxUnitSystem::removeUnit(QString symbol)
     emit unitRemoved(symbol);
 }
 
-void PhyxUnitSystem::addPrefix(QString symbol, double value)
+void PhyxUnitSystem::addPrefix(QString symbol, double value, QString unitSystem)
 {
-    prefixMap.insert(symbol, value);
+    PhyxPrefix prefix;
+    prefix.value = value;
+    prefix.unitGroup = unitSystem;
+
+    prefixMap.insert(symbol, prefix);
     emit prefixAdded(symbol);
 }
 
@@ -102,6 +107,20 @@ bool PhyxUnitSystem::removePrefix(QString symbol)
 {
     prefixMap.remove(symbol);
     emit prefixRemoved(symbol);
+    return true;
+}
+
+void PhyxUnitSystem::addUnitGroup(QString name)
+{
+    if (!unitGroupsList.contains(name))
+        unitGroupsList.append(name);
+    emit unitGroupAdded(name);
+}
+
+bool PhyxUnitSystem::removeUnitGroup(QString name)
+{
+    unitGroupsList.removeOne(name);
+    emit unitGroupRemoved(name);
     return true;
 }
 
@@ -147,9 +166,13 @@ PhyxUnit *PhyxUnitSystem::unit(QString symbol)
         return new PhyxUnit();
 }
 
-double PhyxUnitSystem::prefix(QString symbol)
+PhyxUnitSystem::PhyxPrefix PhyxUnitSystem::prefix(QString symbol)
 {
-    return prefixMap.value(symbol, 0);
+    PhyxPrefix prefix;
+    prefix.value = 1;
+    prefix.unitGroup = "";
+
+    return prefixMap.value(symbol, prefix);
 }
 
 bool PhyxUnitSystem::verifyUnit(PhyxUnit *unit)

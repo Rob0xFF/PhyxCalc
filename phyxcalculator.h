@@ -69,6 +69,7 @@ private:
     PhyxValueDataType           valueBuffer;
     QString                     prefixBuffer;
     QString                     unitBuffer;
+    QString                     unitGroupBuffer;
 
     QHash<QString, PhyxRule>    phyxRules;                                      /// map of all rules, key is rule
 
@@ -154,6 +155,8 @@ private:
     void unitPow3();
     void unitRoot();
     void unitSqrt();
+    void unitAdd();
+    void unitRemove();
 
     /** functions for variable handling */
     void variableAdd();
@@ -165,9 +168,14 @@ private:
     void bufferValue();
     void bufferPrefix();
     void bufferString();
+    void bufferUnitGroup();
     void pushVariable();
 
     void outputVariable();
+    void unitGroupAdd();
+    void unitGroupRemove();
+    void prefixAdd();
+    void prefixRemove();
 
 signals:
     void variablesChanged();        ///< is emited when variables have changed
@@ -184,6 +192,8 @@ private slots:
     void removeVariableRule(QString name);
     void addPrefixRule(QString symbol);
     void removePrefixRule(QString symbol);
+    void addUnitGroupRule(QString name);
+    void removeUnitGroupRule(QString name);
 };
 
 #endif // PHYXCALCULATOR_H

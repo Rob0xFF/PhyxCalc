@@ -29,15 +29,25 @@
 #
 # Definition needs following outline:
 #   Rule        |   functions               |   param function  |   parameter
-S=|p1|          ; outputVariable
-S=|string|=|p1| ; variableAdd
-#p1=|p1|
-p1=|p1|+|p2|    ; unitCheckConvertible, valueAdd
-p1=|p1|-|p2|    ; unitCheckConvertible, valueSub
+S=|p1|              ; outputVariable
+S=|string|=|p1|     ; variableAdd
+S=|variable|=       ; variableRemove
+S=[|string|]        ; unitGroupAdd
+S=[|unitGroup|]:=   ; unitGroupRemove
+S=|string|:|unitGroup|=[|p1|]   ; unitCheckDimensionless, prefixAdd
+S=|prefix|:=                    ; prefixRemove
+S=|string|=[]                           ; unitAdd                                                   //define base unit without unit system
+S=|string|@|unitGroup|=[]               ; unitAdd                                                   //define base unit with unit system
+S=|string|@|unitGroup|@|prefix|=[]      ; unitAdd                                                   //define base unit with unit system and prefered prefix
+S=|string|=[|p1|]                       ; unitAdd                                                   //define derived unit without unit system
+S=|string|@|unitGroup|=[|p1|]           ; unitAdd                                                   //define derived unit with unit system
+S=|string|@|unitGroup|@|prefix|=[|p1|]  ; unitAdd                                                  //define derived unit with unit system and prefered prefix
+p1=|p1|+|p2|        ; unitCheckConvertible, valueAdd
+p1=|p1|-|p2|        ; unitCheckConvertible, valueSub
 p1=|p2|
-p2=|p2|*|p3|    ; unitMul, valueMul
-p2=|p2|/|p3|    ; unitDiv, valueDiv
-#p2=|p2||p3|     ; unitMul, valueMul
+p2=|p2|*|p3|        ; unitMul, valueMul
+p2=|p2|/|p3|        ; unitDiv, valueDiv
+#p2=|p2||p3|        ; unitMul, valueMul
 p2=|p3|
 p3=|p3|^|p4|        ; unitPow, valuePow
 p3=|p4|²            ; unitPow2, valuePow2

@@ -8,18 +8,18 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
     earleyParser->setStartSymbol("S");
 
     //testing
-    PhyxTesting::testUnits();
+    //PhyxTesting::testUnits();
 
-    unitSystem->addBaseUnit("m", PhyxUnit::SiUnitFlag);
+    /*unitSystem->addBaseUnit("m", PhyxUnit::SiUnitFlag);
     unitSystem->addBaseUnit("kg", PhyxUnit::SiUnitFlag);
     unitSystem->addBaseUnit("A", PhyxUnit::SiUnitFlag);
     unitSystem->addBaseUnit("K", PhyxUnit::SiUnitFlag);
     unitSystem->addBaseUnit("s", PhyxUnit::SiUnitFlag);
     unitSystem->addBaseUnit("mol", PhyxUnit::SiUnitFlag);
     unitSystem->addBaseUnit("cd", PhyxUnit::SiUnitFlag);
-    unitSystem->addPrefix("k", 1e3);
-    unitSystem->addPrefix("M",1e6);
-    unitSystem->addPrefix("m",1e-3);
+    unitSystem->addPrefix("k", 1e3, "si");
+    unitSystem->addPrefix("M",1e6, "si");
+    unitSystem->addPrefix("m",1e-3, "si");*/
 }
 
 void PhyxCalculator::initialize()
@@ -99,6 +99,8 @@ void PhyxCalculator::initialize()
     functionMap.insert("unitPow3",      &PhyxCalculator::unitPow3);
     functionMap.insert("unitSqrt",      &PhyxCalculator::unitSqrt);
     functionMap.insert("unitRoot",      &PhyxCalculator::unitRoot);
+    functionMap.insert("unitAdd",       &PhyxCalculator::unitAdd);
+    functionMap.insert("unitRemove",    &PhyxCalculator::unitRemove);
 
     functionMap.insert("variableAdd",   &PhyxCalculator::variableAdd);
     functionMap.insert("variableRemove",&PhyxCalculator::variableRemove);
@@ -108,8 +110,14 @@ void PhyxCalculator::initialize()
     functionMap.insert("bufferValue",   &PhyxCalculator::bufferValue);
     functionMap.insert("bufferPrefix",   &PhyxCalculator::bufferPrefix);
     functionMap.insert("bufferString",   &PhyxCalculator::bufferString);
+    functionMap.insert("bufferUnitGroup",&PhyxCalculator::bufferUnitGroup);
     functionMap.insert("pushVariable",  &PhyxCalculator::pushVariable);
+
     functionMap.insert("outputVariable",&PhyxCalculator::outputVariable);
+    functionMap.insert("unitGroupAdd",  &PhyxCalculator::unitGroupAdd);
+    functionMap.insert("unitGroupRemove",&PhyxCalculator::unitGroupRemove);
+    functionMap.insert("prefixAdd",     &PhyxCalculator::prefixAdd);
+    functionMap.insert("prefixRemove",  &PhyxCalculator::prefixRemove);
 
     loadGrammar(":/settings/grammar");
 
@@ -123,6 +131,10 @@ void PhyxCalculator::initialize()
             this, SLOT(addPrefixRule(QString)));
     connect(unitSystem, SIGNAL(prefixRemoved(QString)),
             this, SLOT(removePrefixRule(QString)));
+    connect(unitSystem, SIGNAL(unitGroupAdded(QString)),
+            this, SLOT(addUnitGroupRule(QString)));
+    connect(unitSystem, SIGNAL(unitGroupRemoved(QString)),
+            this, SLOT(removeUnitGroupRule(QString)));
 
     //initialize variable manager
     variableManager = new PhyxVariableManager();
@@ -143,6 +155,9 @@ void PhyxCalculator::loadGrammar(QString fileName)
         {
             if (line.trimmed().isEmpty() || (line.trimmed().at(0) == '#'))
                 continue;
+
+            if (line.contains("//"))
+                line.truncate(line.indexOf("//"));
 
             QStringList ruleData = line.split(';');
             QString rule;
@@ -210,6 +225,16 @@ void PhyxCalculator::addPrefixRule(QString symbol)
 void PhyxCalculator::removePrefixRule(QString symbol)
 {
     earleyParser->removeRule(QString("prefix=%1").arg(symbol));
+}
+
+void PhyxCalculator::addUnitGroupRule(QString name)
+{
+    addRule(QString("unitGroup=%1").arg(name), QString("bufferParameter, bufferUnitGroup"));
+}
+
+void PhyxCalculator::removeUnitGroupRule(QString name)
+{
+    earleyParser->removeRule(QString("unitGroup=%1").arg(name));
 }
 
 void PhyxCalculator::clearStack()
@@ -934,11 +959,37 @@ void PhyxCalculator::unitSqrt()
     variableStack.push(variable1);
 }
 
+void PhyxCalculator::unitAdd()
+{
+    if (variableStack.isEmpty())        // <- base unit
+    {
+        qDebug() << stringBuffer;
+        if (!unitGroupBuffer.isEmpty())
+            unitSystem->addBaseUnit(stringBuffer, 0, unitGroupBuffer);
+        else
+            unitSystem->addBaseUnit(stringBuffer, 0, unitGroupBuffer);
+    }
+    else
+    {
+
+    }
+
+    stringBuffer.clear();
+    unitGroupBuffer.clear();
+    prefixBuffer.clear();
+}
+
+void PhyxCalculator::unitRemove()
+{
+
+}
+
 void PhyxCalculator::variableAdd()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
     variableManager->addVariable(stringBuffer, variable1);
+    stringBuffer.clear();
 }
 
 void PhyxCalculator::variableRemove()
@@ -976,13 +1027,18 @@ void PhyxCalculator::bufferString()
         raiseException(tr("Not a valid string"));
 }
 
+void PhyxCalculator::bufferUnitGroup()
+{
+    unitGroupBuffer = parameterBuffer;
+}
+
 void PhyxCalculator::pushVariable()
 {
     //create new variable
     PhyxVariable *variable = new PhyxVariable();
     variable->unit()->setUnitSystem(unitSystem);
     if (!prefixBuffer.isEmpty())
-        variable->setValue(valueBuffer * PhyxValueDataType(unitSystem->prefix(prefixBuffer),0));
+        variable->setValue(valueBuffer * PhyxValueDataType(unitSystem->prefix(prefixBuffer).value,0));
     else
         variable->setValue(valueBuffer);
     if (!unitBuffer.isEmpty())
@@ -993,8 +1049,8 @@ void PhyxCalculator::pushVariable()
 
     //cleanup
     valueBuffer = 1;
-    unitBuffer = "";
-    prefixBuffer = "";
+    unitBuffer.clear();
+    prefixBuffer.clear();
 }
 
 void PhyxCalculator::outputVariable()
@@ -1008,4 +1064,32 @@ void PhyxCalculator::outputVariable()
 
         emit outputResult();
     }
+}
+
+void PhyxCalculator::unitGroupAdd()
+{
+    unitSystem->addUnitGroup(stringBuffer);
+    stringBuffer.clear();
+}
+
+void PhyxCalculator::unitGroupRemove()
+{
+    unitSystem->removeUnitGroup(unitGroupBuffer);
+    unitGroupBuffer.clear();
+}
+
+void PhyxCalculator::prefixAdd()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    unitSystem->addPrefix(stringBuffer, variable1->value().real(), unitGroupBuffer);
+
+    unitGroupBuffer.clear();
+    stringBuffer.clear();
+    delete variable1;
+}
+
+void PhyxCalculator::prefixRemove()
+{
+    unitSystem->removePrefix(prefixBuffer);
+    prefixBuffer.clear();
 }

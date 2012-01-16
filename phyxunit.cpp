@@ -5,6 +5,7 @@ PhyxUnit::PhyxUnit(QObject *parent) :
 {
     m_symbol = "";
     m_name   = "";
+    m_unitGroup = "";
     m_offset = 0;
     m_scaleFactor = 1;
     m_flags = 0;

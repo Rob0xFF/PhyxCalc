@@ -10,13 +10,13 @@ void PhyxTesting::testUnits()
     PhyxUnitSystem unitSystem;
 
     qDebug() << "Setting SI base units...";
-    unitSystem.addBaseUnit("m", PhyxUnit::SiUnitFlag);
+    /*unitSystem.addBaseUnit("m", PhyxUnit::SiUnitFlag);
     unitSystem.addBaseUnit("kg", PhyxUnit::SiUnitFlag);
     unitSystem.addBaseUnit("A", PhyxUnit::SiUnitFlag);
     unitSystem.addBaseUnit("K", PhyxUnit::SiUnitFlag);
     unitSystem.addBaseUnit("s", PhyxUnit::SiUnitFlag);
     unitSystem.addBaseUnit("mol", PhyxUnit::SiUnitFlag);
-    unitSystem.addBaseUnit("cd", PhyxUnit::SiUnitFlag);
+    unitSystem.addBaseUnit("cd", PhyxUnit::SiUnitFlag);*/
 
     qDebug() << "Adding °C to unit system";
     PhyxUnit *newUnit = new PhyxUnit();

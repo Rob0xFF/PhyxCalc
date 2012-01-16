@@ -15,6 +15,7 @@ class PhyxUnit : public QObject
     Q_PROPERTY(PowerMap powers READ powers WRITE setPowers)
     //Q_PROPERTY(double prefixPower READ prefixPower WRITE setPrefixPower)
     Q_PROPERTY(UnitFlags flags READ flags WRITE setFlags)
+    Q_PROPERTY(QString unitGroup READ unitGroup WRITE setUnitGroup)
     //Q_ENUMS(UnitType)
     Q_FLAGS(UnitFlag UnitFlags)
 
@@ -93,6 +94,11 @@ public:
         return m_powers;
     }
 
+    QString unitGroup() const
+    {
+        return m_unitGroup;
+    }
+
 private:
     QString     m_symbol;                  /// the symbol of the unit
     QString     m_name;                    /// the name of the unit
@@ -101,6 +107,8 @@ private:
     PowerMap    m_powers;                  /// this map holds the powers of the base units
     //double      m_prefixPower;             /// for Si units -> the power of the prefix (10^x)
     UnitFlags   m_flags;                   /// flags of the unit
+
+    QString m_unitGroup;
 
 signals:
     
@@ -129,6 +137,10 @@ void setFlags(UnitFlags arg)
 void setPowers(PowerMap arg)
 {
     m_powers = arg;
+}
+void setUnitGroup(QString arg)
+{
+    m_unitGroup = arg;
 }
 };
 
