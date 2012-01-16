@@ -1,6 +1,8 @@
 #ifndef QEARLEYPARSER_H
 #define QEARLEYPARSER_H
 
+#define EXCLUDED_CHARS "[:=@]"  /// RegExp with the excluded chars of the any character
+
 #include <QObject>
 #include <QStringList>
 #include <QMultiHash>

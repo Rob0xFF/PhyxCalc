@@ -47,7 +47,11 @@ void PhyxVariableManager::clearVariables()
     while (i.hasNext())
     {
         i.next();
-        emit variableRemoved(i.key());
-        delete i.value();
+        QString name = i.key();
+        PhyxVariable *variable = i.value();
+
+        variableMap.remove(name);
+        emit variableRemoved(name);
+        delete variable;
     }
 }

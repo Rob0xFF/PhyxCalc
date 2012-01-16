@@ -971,6 +971,9 @@ void PhyxCalculator::bufferString()
 {
     stringBuffer = parameterBuffer;
     stringBuffer.remove('"');
+
+    if (stringBuffer.at(0).isNumber())
+        raiseException(tr("Not a valid string"));
 }
 
 void PhyxCalculator::pushVariable()

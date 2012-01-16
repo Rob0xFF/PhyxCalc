@@ -24,7 +24,8 @@
 # |15| Einzelne Ziffer 0-9
 # |16| Offset-Einheit
 #
-# Z=
+# \~ = any character except =,:,@
+# \* = any character
 #
 # Definition needs following outline:
 #   Rule        |   functions               |   param function  |   parameter
@@ -36,7 +37,7 @@ p1=|p1|-|p2|    ; unitCheckConvertible, valueSub
 p1=|p2|
 p2=|p2|*|p3|    ; unitMul, valueMul
 p2=|p2|/|p3|    ; unitDiv, valueDiv
-#p2=|p2||p2|     ; unitMul, valueMul
+#p2=|p2||p3|     ; unitMul, valueMul
 p2=|p3|
 p3=|p3|^|p4|        ; unitPow, valuePow
 p3=|p4|²            ; unitPow2, valuePow2
@@ -114,7 +115,11 @@ n=6
 n=7
 n=8
 n=9
-char=|any|
-char=|any||char|
-string="|char|"     ; bufferParameter, bufferString
-any=\*
+chars+=|any+|
+chars+=|any+||chars|
+chars=|any|
+chars=|any||chars|
+string="|chars+|"     ; bufferParameter, bufferString
+string=|chars|       ; bufferParameter, bufferString
+any+=\*
+any=\~

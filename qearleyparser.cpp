@@ -31,8 +31,10 @@ bool QEarleyParser::loadRule(QString rule, QStringList functions)
 
     newRule.premise = addNonTerminal(premise);         //convert premise
 
-    //replace the any char \* -> unicode 127 DEL
+    //replace the any+ char \* -> unicode 127 DEL
     conclusio.replace("\\*",QChar(127));
+    //replace the any char \~ -> unicode 27 ESC
+    conclusio.replace("\\~",QChar(27));
 
     //convert conclusio
     if (!conclusio.isEmpty())   //check for epsilon rule
@@ -91,6 +93,11 @@ bool QEarleyParser::removeRule(QString rule)
         return false;
     }
 
+    //replace the any+ char \* -> unicode 127 DEL
+    conclusio.replace("\\*",QChar(127));
+    //replace the any char \~ -> unicode 27 ESC
+    conclusio.replace("\\~",QChar(27));
+
     //convert conclusio
     if (!conclusio.isEmpty())   //check for epsilon rule
     {
@@ -145,7 +152,7 @@ bool QEarleyParser::removeRule(QString rule)
 
         if (match)
         {
-            rules.remove(i);
+            rules[-newRule.premise].removeAt(i);;
             return true;
         }
     }
@@ -238,7 +245,9 @@ bool QEarleyParser::parse(int startPosition)
                     else if (currentIndex < (itemListCount-1))
                     {
                         //Scanner
-                        if ((word.conclusion.at(currentIndex) == firstSymbol) || (firstSymbol == 127))  //127 is the any char
+                        if ((word.conclusion.at(currentIndex) == firstSymbol)
+                                || (firstSymbol == 127)
+                                || ((firstSymbol == 27) && !QString(QChar(firstSymbol)).contains(QRegExp(EXCLUDED_CHARS))))  //127 is the any+ char, 27 the any char
                         {
                             appendEarleyItem(currentIndex+1, item->rule, item->dotPos+1, item->startPos, item);   //move point right
                         }

@@ -230,10 +230,12 @@ void LineParser::parseLine()
     //read current line
     QString curLineText = getCurrentLine();
 
-    phyxCalculator->setExpression(curLineText);
-
-    phyxCalculator->evaluate();
-    insertNewLine();
+    if (!curLineText.isEmpty())
+    {
+        phyxCalculator->setExpression(curLineText);
+        phyxCalculator->evaluate();
+        insertNewLine();
+    }
     /*{
         QString output;
         output.append(PhyxCalculator::complexToString(phyxCalculator->resultValue()));
