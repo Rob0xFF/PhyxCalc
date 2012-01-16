@@ -5,8 +5,6 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
 {
     initialize();
 
-    earleyParser->setStartSymbol("S");
-
     //testing
     //PhyxTesting::testUnits();
 
@@ -120,6 +118,7 @@ void PhyxCalculator::initialize()
     functionMap.insert("prefixRemove",  &PhyxCalculator::prefixRemove);
 
     loadGrammar(":/settings/grammar");
+    earleyParser->setStartSymbol("S");
 
     //initialize unit system
     unitSystem = new PhyxUnitSystem();
@@ -142,6 +141,8 @@ void PhyxCalculator::initialize()
             this, SLOT(addVariableRule(QString)));
     connect(variableManager, SIGNAL(variableRemoved(QString)),
             this, SLOT(removeVariableRule(QString)));
+
+    loadFile(":/settings/definitions");
 }
 
 void PhyxCalculator::loadGrammar(QString fileName)
@@ -324,6 +325,27 @@ bool PhyxCalculator::evaluate()
     {
         raiseException("Syntax Error!");
         return false;
+    }
+}
+
+void PhyxCalculator::loadFile(QString fileName)
+{
+    QFile file(fileName);
+
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QStringList lines = QString::fromUtf8(file.readAll()).split('\n');
+        foreach (QString line, lines)
+        {
+            if (line.contains("//"))
+                line.truncate(line.indexOf("//"));
+
+            if (line.trimmed().isEmpty() || (line.trimmed().at(0) == '#'))
+                continue;
+
+            this->setExpression(line.trimmed());
+            this->evaluate();
+        }
     }
 }
 
@@ -963,7 +985,6 @@ void PhyxCalculator::unitAdd()
 {
     if (variableStack.isEmpty())        // <- base unit
     {
-        qDebug() << stringBuffer;
         if (!unitGroupBuffer.isEmpty())
             unitSystem->addBaseUnit(stringBuffer, 0, unitGroupBuffer);
         else

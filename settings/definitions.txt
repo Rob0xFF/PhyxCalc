@@ -1,0 +1,36 @@
+//this file contains definitions of units and constants to be loaded a the start of phyxcalc
+
+//define unit systems
+[si]
+
+//define prefixes
+y:si=[1e-24]
+z:si=[1e-21]
+a:si=[1e-18]
+f:si=[1e-15]
+p:si=[1e-12]
+n:si=[1e-9]
+µ:si=[1e-6]
+m:si=[1e-3]
+c:si=[1e-2]
+d:si=[1e-1]
+da:si=[1e1]
+h:si=[1e2]
+k:si=[1e3]
+M:si=[1e6]
+G:si=[1e9]
+T:si=[1e12]
+P:si=[1e15]
+E:si=[1e18]
+Z:si=[1e21]
+Y:si=[1e24]
+
+//define si base units
+m@si=[]     // length, meter
+g@si@k=[]   // mass, kilogram
+s@si=[]     // time, second
+A@si=[]     // electric current, ampere
+K@si=[]     // thermodynamic temperature, kelvin
+cd@si=[]    // luminous intensity, candela
+mol@si=[]   // amount of substance, mole
+

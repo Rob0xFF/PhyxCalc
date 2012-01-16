@@ -33,8 +33,9 @@ class PhyxCalculator : public QObject
 public:
     explicit PhyxCalculator(QObject *parent = 0);
 
-    bool setExpression (QString m_expression);                                  ///< sets the expression, checks what must be parsed and returns wheter the expression is parsable or not
-    bool evaluate();                                                            ///< evaluates the expression
+    bool setExpression (QString m_expression);          ///< sets the expression, checks what must be parsed and returns wheter the expression is parsable or not
+    bool evaluate();                                    ///< evaluates the expression
+    void loadFile(QString fileName);                    ///< parses a complete txt file
 
     PhyxVariableManager::PhyxVariableMap * variables() const;
     QString expression() const

@@ -16,6 +16,7 @@ class PhyxUnit : public QObject
     //Q_PROPERTY(double prefixPower READ prefixPower WRITE setPrefixPower)
     Q_PROPERTY(UnitFlags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString unitGroup READ unitGroup WRITE setUnitGroup)
+    Q_PROPERTY(QString preferedPrefix READ preferedPrefix WRITE setPreferedPrefix)
     //Q_ENUMS(UnitType)
     Q_FLAGS(UnitFlag UnitFlags)
 
@@ -93,10 +94,13 @@ public:
     {
         return m_powers;
     }
-
     QString unitGroup() const
     {
         return m_unitGroup;
+    }
+    QString preferedPrefix() const
+    {
+        return m_preferedPrefix;
     }
 
 private:
@@ -109,6 +113,8 @@ private:
     UnitFlags   m_flags;                   /// flags of the unit
 
     QString m_unitGroup;
+
+    QString m_preferedPrefix;
 
 signals:
     
@@ -141,6 +147,10 @@ void setPowers(PowerMap arg)
 void setUnitGroup(QString arg)
 {
     m_unitGroup = arg;
+}
+void setPreferedPrefix(QString arg)
+{
+    m_preferedPrefix = arg;
 }
 };
 

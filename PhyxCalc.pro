@@ -54,4 +54,5 @@ RESOURCES += \
     settings.qrc
 
 OTHER_FILES += \
-    settings/grammar.txt
+    settings/grammar.txt \
+    settings/definitions.txt
