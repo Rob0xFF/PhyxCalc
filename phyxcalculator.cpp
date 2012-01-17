@@ -344,7 +344,8 @@ void PhyxCalculator::loadFile(QString fileName)
                 continue;
 
             this->setExpression(line.trimmed());
-            this->evaluate();
+            if (!this->evaluate())
+                qDebug() << line;
         }
     }
 }
@@ -989,7 +990,15 @@ void PhyxCalculator::unitAdd()
     }
     else
     {
-        PhyxVariable *variable1 = variableStack.pop();
+        PhyxVariable *variable1 = NULL;
+        PhyxVariable *variable2 = NULL;
+        if (!variableStack.size() == 2)
+        {
+            variable2 = variableStack.pop();
+            variable1 = variableStack.pop();
+        }
+        else
+            variable1 = variableStack.pop();
 
         PhyxUnit *unit = new PhyxUnit();
         unit->setPowers(variable1->unit()->powers());
@@ -997,6 +1006,10 @@ void PhyxCalculator::unitAdd()
         unit->setPreferedPrefix(prefixBuffer);
         unit->setSymbol(stringBuffer);
         unit->setFlags(0);
+        unit->setScaleFactor(variable1->value().real());
+        if (variable2 != NULL)
+            unit->setOffset(variable2->value().real());
+
         unitSystem->addDerivedUnit(unit);
 
         delete variable1;

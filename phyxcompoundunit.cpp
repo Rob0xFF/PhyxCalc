@@ -194,6 +194,7 @@ bool PhyxCompoundUnit::add(PhyxCompoundUnit *unit)
 
         return true;
     }
+    return false;
 }
 
 bool PhyxCompoundUnit::sub(PhyxCompoundUnit *unit)
@@ -274,8 +275,7 @@ void PhyxCompoundUnit::fromSimpleUnit(PhyxUnit *unit)
 {
     compoundsClear();
     compoundAppend(unit,1);
-    powersClear();
-    powersMultiply(unit->powers());
+    setPowers(unit->powers());
 }
 
 void PhyxCompoundUnit::simplify()
@@ -379,4 +379,5 @@ const QString PhyxCompoundUnit::symbol()
 
         return compoundsString;
     }
+    return QString();
 }
