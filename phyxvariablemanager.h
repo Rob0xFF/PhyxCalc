@@ -17,13 +17,20 @@ public:
     PhyxVariable * getVariable(QString name) const;
     void removeVariable(QString name);
     PhyxVariableMap * variables();
+    void addConstant(QString name, PhyxVariable *variable);
+    PhyxVariable * getConstant(QString name) const;
+    void removeConstant(QString name);
+    PhyxVariableMap * constants();
 
 private:
     PhyxVariableMap variableMap;
+    PhyxVariableMap constantMap;
     
 signals:
     void variableAdded(QString name);
     void variableRemoved(QString name);
+    void constantAdded(QString name);
+    void constantRemoved(QString name);
     
 public slots:
     void clearVariables();

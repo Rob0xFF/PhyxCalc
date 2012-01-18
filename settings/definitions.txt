@@ -96,55 +96,58 @@ SFr=[0.827064903€]      //Währung: Schweizer Franken (Stand: Jänner 2012)
 CHF=[1SFr]              //Währung: Schweizer Franken (Stand: Jänner 2012)
 
 //Informationseinheiten
-bit=[]              //Datenmenge: Bit
-kbit=[1E3bit]       //Datenmenge: Kilobyte
-Mbit=[1E6bit]       //Datenmenge: Megabyte
-Gbit=[1E9bit]       //Datenmenge: Gigabyte
-Tbit=[1E12bit]      //Datenmenge: Terabyte
-Pbit=[1E15bit]      //Datenmenge: Petabyte
-Ebit=[1E18bit]      //Datenmenge: Exabyte
-Kibit=[(2^10)*bit]  //Datenmenge: Kibibyte
-Mibit=[(2^20)*bit]  //Datenmenge: Mebibyte
-Gibit=[(2^30)*bit]  //Datenmenge: Gibibyte
-Tibit=[(2^40)*bit]  //Datenmenge: Tebibyte
-Pibit=[(2^50)*bit]  //Datenmenge: Pebibyte
-Eibit=[(2^60)*bit]  //Datenmenge: Exbibyte
-Byte=[8bit]         //Datenmenge: Byte
-kB=[1E3Byte]        //Datenmenge: Kilobyte
-MB=[1E6Byte]        //Datenmenge: Megabyte
-GB=[1E9Byte]        //Datenmenge: Gigabyte
-TB=[1E12Byte]       //Datenmenge: Terabyte
-PB=[1E15Byte]       //Datenmenge: Petabyte
-EB=[1E18Byte]       //Datenmenge: Exabyte
-KiB=[(2^10)*Byte]   //Datenmenge: Kibibyte
-MiB=[(2^20)*Byte]   //Datenmenge: Mebibyte
-GiB=[(2^30)*Byte]   //Datenmenge: Gibibyte
-TiB=[(2^40)*Byte]   //Datenmenge: Tebibyte
-PiB=[(2^50)*Byte]   //Datenmenge: Pebibyte
-EiB=[(2^60)*Byte]   //Datenmenge: Exbibyte
+[data]
+k:data=[1e3]
+M:data=[1e6]
+G:data=[1e9]
+T:data=[1e12]
+P:data=[1e15]
+E:data=[1e18]
+Z:data=[1e21]
+Y:data=[1e24]
+Ki:data=[2^10]
+Mi:data=[2^20]
+Gi:data=[2^30]
+Ti:data=[2^40]
+Pi:data=[2^50]
+Ei:data=[2^60]
+Zi:data=[2^70]
+Yi:data=[2^80]
+
+bit@data=[]         //Datenmenge: Bit
+b@data=[1bit]
+Byte@data=[8bit]    //Datenmenge: Byte
+B@data=[1Byte]
+
+//[data2]
+//k:data=[2^10]
+//M:data=[2^20]
+//G:data=[3^30]
+
 bps=[1bit/s]        //Datenrate: Bit pro Sekunde
 kbps=[2^10*1bit/s]  //Datenrate: Kilobit pro Sekunde
 Mbps=[2^20*1bit/s]  //Datenrate: Megabit pro Sekunde
 Gbps=[2^30*1bit/s]  //Datenrate: Gigabit pro Sekunde
 
 //Physikalische Konstanten
-e=1.60217733E-19C           //elektrische Elementarladung
-eV@si=[e*1V]                //Engergieeinheit: Elektronvolt
-eps0=8.854187817E-12F/m     //elektrische Feldkonstante
-µ0=1.2566370614E-6H/m       //magnetische Feldkonstante
-c=299792458m/s              //Lichtgeschwindigkeit
-c0=c                        //Lichtgeschwindigkeit
-Lj=[1yr*c0]                 //Länge: Lichtjahr
-h0=6.6260755E-34J*s         //Planck-Konstante
-hbar=h0/(2*pi)              //Drehimpulsquantum
-G0=2*e^2/h0                 //Leitwertquantum
-NA=6.0221367E23/mol         //Avogadro-Konstante
-G=6.67259e-11N*m^2/kg^2     //Gravitationskonstante
-gn=9.80665m/s^2             //Normalfallbeschleunigung
-kB=1.380658E-23J/K          //Boltzmann-Konstante
-R=8.314510J/mol*K           //molare Gaskonstante
-me=9.1093897E-31kg          //Ruhemasse des Elektrons
-mn=1.6749286E-27kg          //Ruhemasse des Neutrons
-mp=1.6726231E-27kg          //Ruhemasse des Protons
-Z0=376.7303135Ω           //Wellenwiderstand des Vakuums
-Rinf=1.0973731534E7/m       //Rydberg-Konstante
+e:=1.60217733E-19C           //elektrische Elementarladung
+eps0:=8.854187817E-12F/m     //elektrische Feldkonstante
+µ0:=1.2566370614E-6H/m       //magnetische Feldkonstante
+c:=299792458m/s              //Lichtgeschwindigkeit
+c0:=c_                       //Lichtgeschwindigkeit
+h0:=6.6260755E-34J*s         //Planck-Konstante
+hbar:=h0_/(2*pi)             //Drehimpulsquantum
+G0:=2*e_^2/h0_               //Leitwertquantum
+NA:=6.0221367E23/mol         //Avogadro-Konstante
+G:=6.67259e-11N*m^2/kg^2     //Gravitationskonstante
+gn:=9.80665m/s^2             //Normalfallbeschleunigung
+kB:=1.380658E-23J/K          //Boltzmann-Konstante
+R:=8.314510J/mol*K           //molare Gaskonstante
+me:=9.1093897E-31kg          //Ruhemasse des Elektrons
+mn:=1.6749286E-27kg          //Ruhemasse des Neutrons
+mp:=1.6726231E-27kg          //Ruhemasse des Protons
+Z0:=376.7303135Ω             //Wellenwiderstand des Vakuums
+Rinf:=1.0973731534E7/m       //Rydberg-Konstante
+
+Lj=[1yr*c0_]                //Länge: Lichtjahr
+eV@si=[e_*1V]                //Engergieeinheit: Elektronvolt

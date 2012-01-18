@@ -32,6 +32,8 @@
 S=|p1|              ; outputVariable
 S=|string|=|p1|     ; variableAdd
 S=|variable|=       ; variableRemove
+S=|string|:=|p1|    ; constantAdd
+S=|constant|:=      ; constantRemove
 S=[|string|]        ; unitGroupAdd
 S=[|unitGroup|]:=   ; unitGroupRemove
 S=|string|:|unitGroup|=[|p1|]   ; unitCheckDimensionless, prefixAdd
@@ -92,6 +94,7 @@ p5=(|p1|)
 p5=pi               ; valuePi
 p5=|var|            ; pushVariable
 p5=|variable|
+p5=|constant|_
 uint=|n|
 uint=|n||uint|
 uinte=|uint||e||uint|

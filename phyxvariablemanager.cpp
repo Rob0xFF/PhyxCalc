@@ -41,6 +41,42 @@ PhyxVariableManager::PhyxVariableMap *PhyxVariableManager::variables()
     return &variableMap;
 }
 
+void PhyxVariableManager::addConstant(QString name, PhyxVariable *variable)
+{
+    if (constantMap.contains(name))
+        delete constantMap.value(name);
+
+    constantMap.insert(name, variable);
+    emit constantAdded(name);
+}
+
+PhyxVariable *PhyxVariableManager::getConstant(QString name) const
+{
+    if (constantMap.contains(name))
+    {
+        PhyxVariable *variable = new PhyxVariable();
+        PhyxVariable::copyVariable(constantMap.value(name, NULL), variable);
+        return variable;
+    }
+    else
+        return NULL;
+}
+
+void PhyxVariableManager::removeConstant(QString name)
+{
+    if (constantMap.contains(name))
+    {
+        delete constantMap.value(name);
+        constantMap.remove(name);
+        emit constantRemoved(name);
+    }
+}
+
+PhyxVariableManager::PhyxVariableMap *PhyxVariableManager::constants()
+{
+    return &constantMap;
+}
+
 void PhyxVariableManager::clearVariables()
 {
     QMapIterator<QString, PhyxVariable*> i(variableMap);

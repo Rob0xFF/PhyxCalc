@@ -103,6 +103,9 @@ void PhyxCalculator::initialize()
     functionMap.insert("variableAdd",   &PhyxCalculator::variableAdd);
     functionMap.insert("variableRemove",&PhyxCalculator::variableRemove);
     functionMap.insert("variableLoad",  &PhyxCalculator::variableLoad);
+    functionMap.insert("constantAdd",   &PhyxCalculator::constantAdd);
+    functionMap.insert("constantRemove",&PhyxCalculator::constantRemove);
+    functionMap.insert("constantLoad",  &PhyxCalculator::constantLoad);
 
     functionMap.insert("bufferUnit",    &PhyxCalculator::bufferUnit);
     functionMap.insert("bufferValue",   &PhyxCalculator::bufferValue);
@@ -141,6 +144,10 @@ void PhyxCalculator::initialize()
             this, SLOT(addVariableRule(QString)));
     connect(variableManager, SIGNAL(variableRemoved(QString)),
             this, SLOT(removeVariableRule(QString)));
+    connect(variableManager, SIGNAL(constantAdded(QString)),
+            this, SLOT(addConstantRule(QString)));
+    connect(variableManager, SIGNAL(constantRemoved(QString)),
+            this, SLOT(removeConstantRule(QString)));
 
     loadFile(":/settings/definitions");
 }
@@ -209,13 +216,25 @@ void PhyxCalculator::removeUnitRule(QString symbol)
 void PhyxCalculator::addVariableRule(QString name)
 {
     addRule(QString("variable=%1").arg(name), QString("bufferParameter, variableLoad"));
-    variablesChanged();
+    emit variablesChanged();
 }
 
 void PhyxCalculator::removeVariableRule(QString name)
 {
     earleyParser->removeRule(QString("variable=%1").arg(name));
-    variablesChanged();
+    emit variablesChanged();
+}
+
+void PhyxCalculator::addConstantRule(QString name)
+{
+    addRule(QString("constant=%1").arg(name), QString("bufferParameter, constantLoad"));
+    emit constantsChanged();
+}
+
+void PhyxCalculator::removeConstantRule(QString name)
+{
+    earleyParser->removeRule(QString("constant=%1").arg(name));
+    emit constantsChanged();
 }
 
 void PhyxCalculator::addPrefixRule(QString symbol)
@@ -1000,6 +1019,8 @@ void PhyxCalculator::unitAdd()
         else
             variable1 = variableStack.pop();
 
+        variable1->unit()->simplify();
+
         PhyxUnit *unit = new PhyxUnit();
         unit->setPowers(variable1->unit()->powers());
         unit->setUnitGroup(unitGroupBuffer);
@@ -1041,6 +1062,24 @@ void PhyxCalculator::variableRemove()
 void PhyxCalculator::variableLoad()
 {
     variableStack.push(variableManager->getVariable(parameterBuffer));
+}
+
+void PhyxCalculator::constantAdd()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variableManager->addConstant(stringBuffer, variable1);
+    stringBuffer.clear();
+}
+
+void PhyxCalculator::constantRemove()
+{
+    variableManager->removeConstant(parameterBuffer);
+}
+
+void PhyxCalculator::constantLoad()
+{
+    variableStack.push(variableManager->getConstant(parameterBuffer));
 }
 
 void PhyxCalculator::bufferUnit()

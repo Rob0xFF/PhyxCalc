@@ -163,6 +163,9 @@ private:
     void variableAdd();
     void variableRemove();
     void variableLoad();
+    void constantAdd();
+    void constantRemove();
+    void constantLoad();
 
     /** functions for buffering */
     void bufferUnit();
@@ -180,6 +183,7 @@ private:
 
 signals:
     void variablesChanged();        ///< is emited when variables have changed
+    void constantsChanged();        ///< is emited wehen constants have changed
     void outputResult();            ///< is emited when result should be output
     void outputError();             ///< is emited when an error should be output
     
@@ -191,6 +195,8 @@ private slots:
     void removeUnitRule(QString symbol);
     void addVariableRule(QString name);
     void removeVariableRule(QString name);
+    void addConstantRule(QString name);
+    void removeConstantRule(QString name);
     void addPrefixRule(QString symbol);
     void removePrefixRule(QString symbol);
     void addUnitGroupRule(QString name);
