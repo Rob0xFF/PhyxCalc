@@ -1117,12 +1117,24 @@ void PhyxCalculator::pushVariable()
     //create new variable
     PhyxVariable *variable = new PhyxVariable();
     variable->unit()->setUnitSystem(unitSystem);
-    if (!prefixBuffer.isEmpty())
-        variable->setValue(valueBuffer * PhyxValueDataType(unitSystem->prefix(prefixBuffer).value,0));
-    else
-        variable->setValue(valueBuffer);
     if (!unitBuffer.isEmpty())
         variable->setUnit(unitSystem->unit(unitBuffer));
+    if (!prefixBuffer.isEmpty())
+    {
+        PhyxUnitSystem::PhyxPrefix prefix = unitSystem->prefix(prefixBuffer, variable->unit()->unitGroup());
+        if (!prefix.unitGroup.isEmpty())
+        {
+            valueBuffer *= PhyxValueDataType(prefix.value, 0.0);
+            variable->setValue(valueBuffer);
+        }
+        else
+        {
+            delete variable;
+            raiseException(tr("Prefix does not fit unit"));
+        }
+    }
+    else
+        variable->setValue(valueBuffer);
 
     //push it to the stack
     variableStack.push(variable);

@@ -32,13 +32,13 @@ public:
     PhyxUnit * copyUnit(QString symbol);                            ///< copys a unit
     PhyxUnit * unit(QString symbol);                                ///< gives back a reference to the unit
 
-    PhyxPrefix  prefix(QString symbol);                                 ///< returns the value of a prefix
+    PhyxPrefix  prefix(QString symbol, QString unitGroup);          ///< returns the value of a prefix
 
     bool    verifyUnit(PhyxUnit *unit);                             ///< finds unit in the system and sets all the missing information, return wheter unit was found or not
 private:
     QMap<QString, PhyxUnit*>    baseUnitsMap;                       /// contains all base units mapped with their symbol
     QMap<QString, PhyxUnit*>    derivedUnitsMap;                    /// contains all derived units mapped with their symbol
-    QMap<QString, PhyxPrefix>   prefixMap;                          /// contains all unit prefixes
+    QMultiMap<QString, PhyxPrefix>   prefixMap;                          /// contains all unit prefixes
     QStringList                 unitGroupsList;                     /// contains all unit groups
 
     void recalculateUnits();                                        ///< recalculates all units

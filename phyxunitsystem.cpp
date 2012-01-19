@@ -167,13 +167,19 @@ PhyxUnit *PhyxUnitSystem::unit(QString symbol)
         return new PhyxUnit();
 }
 
-PhyxUnitSystem::PhyxPrefix PhyxUnitSystem::prefix(QString symbol)
+PhyxUnitSystem::PhyxPrefix PhyxUnitSystem::prefix(QString symbol, QString unitGroup)
 {
     PhyxPrefix prefix;
     prefix.value = 1;
     prefix.unitGroup = "";
 
-    return prefixMap.value(symbol, prefix);
+    QList<PhyxPrefix> prefixList = prefixMap.values(symbol);
+    for (int i = 0; i < prefixList.size(); i++)
+    {
+        if (prefixList.at(i).unitGroup == unitGroup)
+            return prefixList.at(i);
+    }
+    return prefix;
 }
 
 bool PhyxUnitSystem::verifyUnit(PhyxUnit *unit)

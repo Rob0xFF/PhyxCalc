@@ -119,15 +119,12 @@ b@data=[1bit]
 Byte@data=[8bit]    //Datenmenge: Byte
 B@data=[1Byte]
 
-//[data2]
-//k:data=[2^10]
-//M:data=[2^20]
-//G:data=[3^30]
+[data2]
+k:data2=[2^10]
+M:data2=[2^20]
+G:data2=[2^30]
 
-bps=[1bit/s]        //Datenrate: Bit pro Sekunde
-kbps=[2^10*1bit/s]  //Datenrate: Kilobit pro Sekunde
-Mbps=[2^20*1bit/s]  //Datenrate: Megabit pro Sekunde
-Gbps=[2^30*1bit/s]  //Datenrate: Gigabit pro Sekunde
+bps@data2=[1bit/s]        //Datenrate: Bit pro Sekunde
 
 //Physikalische Konstanten
 e:=1.60217733E-19C           //elektrische Elementarladung

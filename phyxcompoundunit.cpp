@@ -276,6 +276,7 @@ void PhyxCompoundUnit::fromSimpleUnit(PhyxUnit *unit)
     compoundsClear();
     compoundAppend(unit,1);
     setPowers(unit->powers());
+    setUnitGroup(unit->unitGroup());
 }
 
 void PhyxCompoundUnit::simplify()
