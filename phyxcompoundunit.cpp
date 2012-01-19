@@ -251,24 +251,19 @@ void PhyxCompoundUnit::root(double root)
 
 bool PhyxCompoundUnit::convertTo(PhyxCompoundUnit *unit)
 {
-    if (!this->isConvertible(unit))
-        return false;
-    else
+    this->simplify();
+
+    for (int i = 0; i < unit->compounds().size(); i++)
     {
-        this->simplify();
-
-        for (int i = 0; i < unit->compounds().size(); i++)
-        {
-            // make the inverse galilean transformation x = (y+b)/a
-            offsetValue(unit->compounds().at(i).unit->offset());
-            scaleValue(pow(unit->compounds().at(i).unit->scaleFactor(), -unit->compounds().at(i).power));
-        }
-
-        this->compoundsClear();
-        this->compoundsMultiply(unit->compounds());
-
-        return true;
+        // make the inverse galilean transformation x = (y+b)/a
+        offsetValue(unit->compounds().at(i).unit->offset());
+        scaleValue(pow(unit->compounds().at(i).unit->scaleFactor(), -unit->compounds().at(i).power));
     }
+
+    this->compoundsClear();
+    this->compoundsMultiply(unit->compounds());
+
+    return true;
 }
 
 void PhyxCompoundUnit::fromSimpleUnit(PhyxUnit *unit)

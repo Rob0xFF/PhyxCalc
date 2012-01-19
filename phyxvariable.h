@@ -15,8 +15,6 @@ class PhyxVariable : public QObject
     Q_OBJECT
     Q_PROPERTY(PhyxValueDataType value READ value WRITE setValue)
     Q_PROPERTY(PhyxCompoundUnit *unit READ unit WRITE setUnit)
-    Q_PROPERTY(VariableError error READ error)
-    Q_ENUMS(VariableError)
 
 public:
     explicit PhyxVariable(QObject *parent = 0);
@@ -28,18 +26,8 @@ public:
         forceInputUnits = 0x03          /// option to use only input units as output unit, as far as possible
     };
 
-    enum VariableError {
-        UnitsNotConvertibleError,
-        UnitNotDimensionlessError,
-        ValueNotPositiveError,
-        ValueNotIntegerError
-    };
-
     bool convertUnit(PhyxCompoundUnit *unit);
     static void copyVariable(PhyxVariable *source, PhyxVariable *destination);
-
-    QString errorString();                              ///< returns the error string to current error
-
 
     void setPreferedUnit(userUnitBuffer userInputUnits, outputMode mode);
 
@@ -51,15 +39,10 @@ public:
     {
         return m_unit;
     }
-    VariableError error() const
-    {
-        return m_error;
-    }
 
 private:
     PhyxValueDataType   m_value;
     PhyxCompoundUnit    *m_unit;
-    VariableError       m_error;
 
 signals:
     

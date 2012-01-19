@@ -98,10 +98,10 @@ void PhyxTesting::testUnits()
     qDebug() << (double)variable4->value().real() << variable4->unit()->symbol();
 
     qDebug() << "convert variable4 to min:";
-    if (!variable4->convertUnit(new PhyxCompoundUnit(unitSystem.unit("min"))))
-        qDebug() << variable4->errorString();
-    else
-        qDebug() << (double)variable4->value().real() << variable4->unit()->symbol();
+    //if (!variable4->convertUnit(new PhyxCompoundUnit(unitSystem.unit("min"))))
+    //    qDebug() << variable4->errorString();
+    //else
+    //    qDebug() << (double)variable4->value().real() << variable4->unit()->symbol();
 
     qDebug() << "variable1 = 120m/s";
     variable1->setValue(120);

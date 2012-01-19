@@ -93,8 +93,9 @@ void PhyxCalculator::initialize()
     functionMap.insert("complexPolar",  &PhyxCalculator::complexPolar);
 
     functionMap.insert("unitCheckDimensionless",    &PhyxCalculator::unitCheckDimensionless);
-    functionMap.insert("unitCheckDimensionless2",    &PhyxCalculator::unitCheckDimensionless2);
+    functionMap.insert("unitCheckDimensionless2",   &PhyxCalculator::unitCheckDimensionless2);
     functionMap.insert("unitCheckConvertible",      &PhyxCalculator::unitCheckConvertible);
+    functionMap.insert("unitConvert",   &PhyxCalculator::unitConvert);
     functionMap.insert("unitMul",       &PhyxCalculator::unitMul);
     functionMap.insert("unitDiv",       &PhyxCalculator::unitDiv);
     functionMap.insert("unitPow",       &PhyxCalculator::unitPow);
@@ -996,9 +997,22 @@ void PhyxCalculator::unitCheckConvertible()
 
     if (!variable1->unit()->isConvertible(variable2->unit()))
         raiseException(UnitsNotConvertibleError);
+    else
+        variable1->unit()->compoundsEqualize(variable2->unit());
 
     variableStack.push(variable2);
     variableStack.push(variable1);
+}
+
+void PhyxCalculator::unitConvert()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->convertUnit(variable2->unit());
+    variableStack.push(variable1);
+
+    delete variable2;
 }
 
 void PhyxCalculator::unitMul()

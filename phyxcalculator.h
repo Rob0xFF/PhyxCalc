@@ -170,6 +170,7 @@ private:
     void unitCheckDimensionless();
     void unitCheckDimensionless2();
     void unitCheckConvertible();
+    void unitConvert();
     void unitMul();
     void unitDiv();
     void unitPow();

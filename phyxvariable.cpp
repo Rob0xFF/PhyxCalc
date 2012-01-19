@@ -14,13 +14,7 @@ PhyxVariable::~PhyxVariable()
 
 bool PhyxVariable::convertUnit(PhyxCompoundUnit *unit)
 {
-    if (!this->unit()->convertTo(unit))
-    {
-        m_error = PhyxVariable::UnitsNotConvertibleError;
-        return false;
-    }
-    else
-        return true;
+    m_unit->convertTo(unit);
 }
 
 void PhyxVariable::copyVariable(PhyxVariable *source, PhyxVariable *destination)
@@ -29,18 +23,6 @@ void PhyxVariable::copyVariable(PhyxVariable *source, PhyxVariable *destination)
     PhyxCompoundUnit::copyCompoundUnit(source->unit(), unit);
     destination->setUnit(unit);
     destination->setValue(source->value());
-}
-
-QString PhyxVariable::errorString()
-{
-    switch (m_error)
-    {
-    case UnitsNotConvertibleError:      return tr("Units are not convertible");
-    case UnitNotDimensionlessError:     return tr("Unit is not dimensionless");
-    case ValueNotPositiveError:         return tr("value is not positive");
-    case ValueNotIntegerError:          return tr("Value is not an integer");
-    default:                            return tr("No error");
-    }
 }
 
 void PhyxVariable::setUnit(PhyxUnit *unit)
