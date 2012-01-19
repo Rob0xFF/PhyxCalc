@@ -30,6 +30,7 @@ void PhyxCalculator::initialize()
     unitBuffer = "";
     m_error = false;
     m_errorNumber = 0;
+    m_errorPosition = 0;
     m_resultValue = 0;
     m_resultUnit = "";
 
@@ -182,10 +183,11 @@ void PhyxCalculator::loadGrammar(QString fileName)
         qFatal("Can't open file");
 }
 
-void PhyxCalculator::raiseException(QString exception)
+void PhyxCalculator::raiseException(int errorNumber)
 {
-    qDebug() << exception;
+    //qDebug() << exception;
     m_error = true;
+    m_errorNumber = errorNumber;
     clearStack();
     emit outputError();
 }
@@ -315,6 +317,8 @@ bool PhyxCalculator::evaluate()
         for (int i = (earleyTree.size()-1); i >= 0; i--)
         {
             EarleyTreeItem *earleyTreeItem = &earleyTree[i];
+
+            m_errorPosition = earleyTreeItem->startPos;     //just in case
             //PhyxRule phyxRule = phyxRules.value(earleyTreeItem->rule);
 
             //if (!phyxRule.functions.isEmpty())
@@ -322,9 +326,7 @@ bool PhyxCalculator::evaluate()
             {
                 foreach (QString function, earleyTreeItem->rule->functions)
                 {
-                    if (this->hasError())
-                        return false;
-                    else if (function == "bufferParameter")
+                    if (function == "bufferParameter")
                         parameterBuffer = m_expression.mid(earleyTreeItem->startPos, earleyTreeItem->endPos - earleyTreeItem->startPos + 1);
                     else
                     {
@@ -332,6 +334,9 @@ bool PhyxCalculator::evaluate()
                             (this->*functionMap.value(function))();
                         else
                             qFatal(tr("Function %1 not found!").arg(function).toLocal8Bit());
+
+                        if (this->hasError())
+                            return false;
                     }
                 }
             }
@@ -342,7 +347,7 @@ bool PhyxCalculator::evaluate()
     }
     else
     {
-        raiseException("Syntax Error!");
+        raiseException(SyntaxError);
         return false;
     }
 }
@@ -381,7 +386,27 @@ PhyxVariableManager::PhyxVariableMap *PhyxCalculator::variables() const
 
 QString PhyxCalculator::errorString() const
 {
-    return QString("error");
+    QString output;
+
+    switch (m_errorNumber)
+    {
+    case SyntaxError:       output.append(tr("Syntax Error!"));
+                            break;
+    case ValueComplexError: output.append(tr("Value is complex"));
+                            break;
+    case ValueNotPositiveError: output.append(tr("Value is negative"));
+                            break;
+    case ValueNotIntegerError: output.append(tr("Only integer values"));
+                            break;
+    case UnitNotDimensionlessError: output.append(tr("Unit is not dimensionless"));
+                            break;
+    case UnitsNotConvertibleError: output.append(tr("Units not convertible"));
+                            break;
+    case PrefixError: output.append(tr("Prefix does not fit unit"));
+                            break;
+    }
+
+    return tr("error at position %1: %2").arg(m_errorPosition).arg(output);
 }
 
 QString PhyxCalculator::complexToString(const PhyxValueDataType number)
@@ -454,7 +479,7 @@ void PhyxCalculator::valueCheckComplex()
     PhyxVariable *variable1 = variableStack.pop();
 
     if (variable1->value().imag() != 0)
-        raiseException(tr("Value is complex"));
+        raiseException(ValueComplexError);
 
     variableStack.push(variable1);
 }
@@ -465,7 +490,7 @@ void PhyxCalculator::valueCheckComplex2()
     PhyxVariable *variable2 = variableStack.pop();
 
     if ((variable1->value().imag() != 0) || (variable2->value().imag() != 0))
-        raiseException(tr("Value is complex"));
+        raiseException(ValueComplexError);
 
     variableStack.push(variable2);
     variableStack.push(variable1);
@@ -476,7 +501,7 @@ void PhyxCalculator::valueCheckPositive()
     PhyxVariable *variable1 = variableStack.pop();
 
     if (variable1->value().real() < 0)
-        raiseException(tr("Value is negative"));
+        raiseException(ValueNotPositiveError);
 
     variableStack.push(variable1);
 }
@@ -486,7 +511,7 @@ void PhyxCalculator::valueCheckInteger()
     PhyxVariable *variable1 = variableStack.pop();
 
     if ((int)variable1->value().real() != variable1->value().real())
-        raiseException(tr("Value is not an integer"));
+        raiseException(ValueNotIntegerError);
 
     variableStack.push(variable1);
 }
@@ -885,12 +910,12 @@ void PhyxCalculator::valueFaculty()
 
     if (value < 0)
     {
-        raiseException(tr("Only positive values"));
+        raiseException(ValueNotPositiveError);
         return;
     }
     else if ((int)value != value)
     {
-        raiseException(tr("Only integer values"));
+        raiseException(ValueNotIntegerError);
         return;
     }
 
@@ -908,7 +933,7 @@ void PhyxCalculator::unitCheckDimensionless()
     PhyxVariable *variable1 = variableStack.pop();
 
     if (!variable1->unit()->isDimensionlessUnit())
-        raiseException(tr("Unit is not dimensionless"));
+        raiseException(UnitNotDimensionlessError);
 
     variableStack.push(variable1);
 }
@@ -919,7 +944,7 @@ void PhyxCalculator::unitCheckDimensionless2()
     PhyxVariable *variable2 = variableStack.pop();
 
     if (!variable1->unit()->isDimensionlessUnit() || !variable2->unit()->isDimensionlessUnit())
-        raiseException(tr("Unit is not dimensionless"));
+        raiseException(UnitNotDimensionlessError);
 
     variableStack.push(variable2);
     variableStack.push(variable1);
@@ -931,7 +956,7 @@ void PhyxCalculator::unitCheckConvertible()
     PhyxVariable *variable2 = variableStack.pop();
 
     if (!variable1->unit()->isConvertible(variable2->unit()))
-        raiseException(tr("Units not convertible"));
+        raiseException(UnitsNotConvertibleError);
 
     variableStack.push(variable2);
     variableStack.push(variable1);
@@ -1104,7 +1129,7 @@ void PhyxCalculator::bufferString()
     stringBuffer.remove('"');
 
     if (stringBuffer.at(0).isNumber())
-        raiseException(tr("Not a valid string"));
+        raiseException(StringNotValidError);
 }
 
 void PhyxCalculator::bufferUnitGroup()
@@ -1129,8 +1154,7 @@ void PhyxCalculator::pushVariable()
         }
         else
         {
-            delete variable;
-            raiseException(tr("Prefix does not fit unit"));
+            raiseException(PrefixError);
         }
     }
     else

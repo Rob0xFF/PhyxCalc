@@ -27,11 +27,23 @@ class PhyxCalculator : public QObject
     Q_PROPERTY(QString expression READ expression WRITE setExpression)
     Q_PROPERTY(bool error READ hasError)
     Q_PROPERTY(int errorNumber READ errorNumber)
+    Q_PROPERTY(int errorPosition READ errorPosition)
     Q_PROPERTY(PhyxValueDataType resultValue READ resultValue)
     Q_PROPERTY(QString resultUnit READ resultUnit)
 
 public:
     explicit PhyxCalculator(QObject *parent = 0);
+
+    enum CalculationError {
+        SyntaxError,
+        UnitsNotConvertibleError,
+        UnitNotDimensionlessError,
+        ValueNotPositiveError,
+        ValueNotIntegerError,
+        ValueComplexError,
+        StringNotValidError,
+        PrefixError
+    };
 
     bool setExpression (QString m_expression);          ///< sets the expression, checks what must be parsed and returns wheter the expression is parsable or not
     bool evaluate();                                    ///< evaluates the expression
@@ -59,6 +71,10 @@ public:
     {
         return m_resultUnit;
     }
+    int errorPosition() const
+    {
+        return m_errorPosition;
+    }
 
     static QString complexToString(const PhyxValueDataType number);
     static PhyxValueDataType stringToComplex(QString string);
@@ -84,6 +100,7 @@ private:
     QString                     m_resultUnit;                                   /// unit symbol of the result
     bool                        m_error;                                        /// holds wheter an error occured or not
     int                         m_errorNumber;                                  /// current error number
+    int                         m_errorPosition;                                /// position where the error occured
 
 
     QHash<QString, void (PhyxCalculator::*)()> functionMap;                     /// functions mapped with their names
@@ -91,7 +108,7 @@ private:
     void initialize();                                                                                          ///< initializes PhyxCalculator
     void loadGrammar(QString fileName);                                                                         ///< loads the grammar from a file
 
-    void raiseException(QString exception);                                                                     ///< raises an exception
+    void raiseException(int errorNumber);                                                                     ///< raises an exception
     void addRule(QString rule, QString functions = "");     ///< adds a rule
 
     void clearStack();
