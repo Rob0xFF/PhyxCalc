@@ -161,6 +161,10 @@ private:
     void valueRandint();
     void valueRandg();
     void valueFaculty();
+    void complexArg();
+    void complexNorm();
+    void complexConj();
+    void complexPolar();
 
     /** functions for unit calculation */
     void unitCheckDimensionless();

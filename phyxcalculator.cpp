@@ -87,6 +87,10 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueRandint",  &PhyxCalculator::valueRandint);
     functionMap.insert("valueRandg",    &PhyxCalculator::valueRandg);
     functionMap.insert("valueFaculty",  &PhyxCalculator::valueFaculty);
+    functionMap.insert("complexArg",    &PhyxCalculator::complexArg);
+    functionMap.insert("complexNorm",   &PhyxCalculator::complexNorm);
+    functionMap.insert("complexConj",   &PhyxCalculator::complexConj);
+    functionMap.insert("complexPolar",  &PhyxCalculator::complexPolar);
 
     functionMap.insert("unitCheckDimensionless",    &PhyxCalculator::unitCheckDimensionless);
     functionMap.insert("unitCheckDimensionless2",    &PhyxCalculator::unitCheckDimensionless2);
@@ -340,8 +344,6 @@ bool PhyxCalculator::evaluate()
                     }
                 }
             }
-            //if (!phyxRule.paramFunction.isEmpty())
-            //    (this->*paramFunctionMap.value(phyxRule.paramFunction))(phyxRule.parameter);
         }
         return true;
     }
@@ -427,15 +429,21 @@ QString PhyxCalculator::complexToString(const PhyxValueDataType number)
     {
         if (!string.isEmpty())
             string.append("+");
-        if (number.imag() != 1)
+        if ((number.imag() != 1) && (number.imag() != -1))
         {
             std::stringstream ss;
             ss << format % number.imag();
             string.append(QString::fromStdString(ss.str()));
         }
+        else if (number.imag() == -1)
+        {
+            string.append("-");
+        }
         string.append("i");
         components++;
     }
+
+    string.replace("+-","-");
 
     if (string.isEmpty())
         string.append("0");
@@ -925,6 +933,37 @@ void PhyxCalculator::valueFaculty()
         value *= i;
 
     variable1->setValue(PhyxValueDataType(value,0));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::complexArg()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(arg(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::complexNorm()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(norm(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::complexConj()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(conj(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::complexPolar()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    variable1->setValue(std::polar(abs(variable1->value()), arg(variable1->value())));
     variableStack.push(variable1);
 }
 
