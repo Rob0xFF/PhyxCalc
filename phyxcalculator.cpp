@@ -4,20 +4,6 @@ PhyxCalculator::PhyxCalculator(QObject *parent) :
     QObject(parent)
 {
     initialize();
-
-    //testing
-    //PhyxTesting::testUnits();
-
-    /*unitSystem->addBaseUnit("m", PhyxUnit::SiUnitFlag);
-    unitSystem->addBaseUnit("kg", PhyxUnit::SiUnitFlag);
-    unitSystem->addBaseUnit("A", PhyxUnit::SiUnitFlag);
-    unitSystem->addBaseUnit("K", PhyxUnit::SiUnitFlag);
-    unitSystem->addBaseUnit("s", PhyxUnit::SiUnitFlag);
-    unitSystem->addBaseUnit("mol", PhyxUnit::SiUnitFlag);
-    unitSystem->addBaseUnit("cd", PhyxUnit::SiUnitFlag);
-    unitSystem->addPrefix("k", 1e3, "si");
-    unitSystem->addPrefix("M",1e6, "si");
-    unitSystem->addPrefix("m",1e-3, "si");*/
 }
 
 void PhyxCalculator::initialize()
@@ -538,8 +524,8 @@ void PhyxCalculator::valueAdd()
 
 void PhyxCalculator::valueSub()
 {
-    PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(variable1->value() - variable2->value());
     variableStack.push(variable1);
