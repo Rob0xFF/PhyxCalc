@@ -14,7 +14,7 @@ PhyxVariable::~PhyxVariable()
 
 bool PhyxVariable::convertUnit(PhyxCompoundUnit *unit)
 {
-    m_unit->convertTo(unit);
+    return m_unit->convertTo(unit);
 }
 
 void PhyxVariable::copyVariable(PhyxVariable *source, PhyxVariable *destination)
@@ -32,7 +32,7 @@ void PhyxVariable::setUnit(PhyxUnit *unit)
 
 void PhyxVariable::setPreferedUnit(userUnitBuffer userInputUnits, outputMode mode)
 {
-    PhyxUnitSystem* UnitSystem = m_unit->unitSystem();
+    PhyxUnitSystem* unitSystem = m_unit->unitSystem();
     PhyxVariable newVar;
 
     switch (mode)

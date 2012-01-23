@@ -92,6 +92,8 @@ bool PhyxUnitSystem::removeUnit(QString symbol)
     recalculate();
 
     emit unitRemoved(symbol);
+
+    return true;
 }
 
 void PhyxUnitSystem::addPrefix(QString symbol, double value, QString unitSystem)

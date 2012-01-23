@@ -40,7 +40,7 @@ bool QEarleyParser::loadRule(QString rule, QStringList functions)
     if (!conclusio.isEmpty())   //check for epsilon rule
     {
         bool isNonTerminal = false;
-        int nonTerminalPos;
+        int nonTerminalPos = 0;
         for (int i = 0; i < conclusio.size(); i++)
         {
             if (conclusio.at(i) == '|')
@@ -102,7 +102,7 @@ bool QEarleyParser::removeRule(QString rule)
     if (!conclusio.isEmpty())   //check for epsilon rule
     {
         bool isNonTerminal = false;
-        int nonTerminalPos;
+        int nonTerminalPos = 0;
         for (int i = 0; i < conclusio.size(); i++)
         {
             if (conclusio.at(i) == '|')
