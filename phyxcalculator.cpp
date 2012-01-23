@@ -817,7 +817,7 @@ void PhyxCalculator::valueTrunc()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxValueDataType value(trunc(variable1->value().real()),0);
+    PhyxValueDataType value(boost::math::trunc(variable1->value().real()),0);
     variable1->setValue(value);
     variableStack.push(variable1);
 }
@@ -835,7 +835,7 @@ void PhyxCalculator::valueRound()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxValueDataType value(round(variable1->value().real()),0);
+    PhyxValueDataType value(boost::math::round(variable1->value().real()),0);
     variable1->setValue(value);
     variableStack.push(variable1);
 }
@@ -853,7 +853,7 @@ void PhyxCalculator::valueSign()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxValueDataType value(copysign(1.0,variable1->value().real()),0);
+    PhyxValueDataType value(boost::math::copysign((long double)1.0,variable1->value().real()),0);
     variable1->setValue(value);
     variableStack.push(variable1);
 }
@@ -914,7 +914,7 @@ void PhyxCalculator::valueFaculty()
         return;
     }
 
-    int n = (int)round(value);
+    int n = (int)boost::math::round(value);
     value = 1;
     for (int i = 2; i <=n; i++)
         value *= i;

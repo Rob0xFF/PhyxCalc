@@ -1,12 +1,15 @@
 #ifndef PHYXCALCULATOR_H
 #define PHYXCALCULATOR_H
 
+#define _USE_MATH_DEFINES
+
 #include <QObject>
 #include <QStack>
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>
 #include <sstream>
+#include "boost/math/special_functions.hpp"
 #include "boost/math/complex.hpp"
 #include "qearleyparser.h"
 #include "phyxunitsystem.h"
