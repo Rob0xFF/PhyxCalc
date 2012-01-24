@@ -518,8 +518,8 @@ void PhyxCalculator::valueCheckInteger()
 
 void PhyxCalculator::valueAdd()
 {
-    PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(variable1->value() + variable2->value());
     variableStack.push(variable1);
@@ -540,8 +540,8 @@ void PhyxCalculator::valueSub()
 
 void PhyxCalculator::valueMul()
 {
-    PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(variable1->value() * variable2->value());
     variableStack.push(variable1);
@@ -983,22 +983,22 @@ void PhyxCalculator::unitCheckDimensionless2()
 
 void PhyxCalculator::unitCheckConvertible()
 {
-    PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
 
     if (!variable1->unit()->isConvertible(variable2->unit()))
         raiseException(UnitsNotConvertibleError);
     else
         variable1->unit()->compoundsEqualize(variable2->unit());
 
-    variableStack.push(variable2);
     variableStack.push(variable1);
+    variableStack.push(variable2);
 }
 
 void PhyxCalculator::unitConvert()
 {
-    PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
 
     variable1->convertUnit(variable2->unit());
     variableStack.push(variable1);
@@ -1008,12 +1008,12 @@ void PhyxCalculator::unitConvert()
 
 void PhyxCalculator::unitMul()
 {
-    PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
 
     variable1->unit()->multiply(variable2->unit());
-    variableStack.push(variable2);
     variableStack.push(variable1);
+    variableStack.push(variable2);
 }
 
 void PhyxCalculator::unitDiv()

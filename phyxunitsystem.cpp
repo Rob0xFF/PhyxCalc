@@ -27,6 +27,11 @@ void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags, QStr
     if (baseUnitsMap.contains(symbol))
         delete baseUnitsMap.take(symbol);
 
+    if (!preferedPrefix.isEmpty())      // here must the prefered prefix be handled (e.g. kg)
+    {
+        symbol.prepend(preferedPrefix); //only a bad handling
+    }
+
    PhyxUnit *unit = new PhyxUnit();
    unit->setSymbol(symbol);
    unit->powerAppend(symbol,1);
@@ -203,17 +208,38 @@ bool PhyxUnitSystem::verifyUnit(PhyxUnit *unit)
     }
     else
     {
+        QList<PhyxUnit*> matchList;
         QMapIterator<QString, PhyxUnit*> i(derivedUnitsMap);
         while (i.hasNext())
         {
             i.next();
             if (i.value()->isSame(unit))
+                matchList.append(i.value());
+        }
+
+        if (!matchList.isEmpty())
+        {
+            PhyxUnit* match = NULL;
+            if (matchList.size() > 1)   //handle multiple matches, currently the first match with unitGroup is used
             {
-                unit->setSymbol(i.value()->symbol());
-                unit->setName(i.value()->name());
-                unit->setFlags(i.value()->flags());
-                return true;
+                for (int pos = 0; pos < matchList.size(); pos++)
+                {
+                    if (!matchList.at(pos)->unitGroup().isEmpty())
+                    {
+                        match = matchList[pos];
+                        break;
+                    }
+                }
+                if (match == NULL)
+                    match = matchList.first();
             }
+            else
+                match = matchList.first();
+
+            unit->setSymbol(match->symbol());
+            unit->setName(match->name());
+            unit->setFlags(match->flags());
+            return true;
         }
     }
 

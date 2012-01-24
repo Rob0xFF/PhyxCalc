@@ -28,14 +28,15 @@ public:
     explicit PhyxCompoundUnit(QObject *parent = 0);
     explicit PhyxCompoundUnit(PhyxUnit *unit);
 
-    void compoundSimplify(int index);                   /// simplifies a unit
-    void compoundsEqualize(PhyxCompoundUnit *unit);     /// equalizes two units
+    void compoundSimplify(int index);                   ///< simplifies a unit
+    void compoundsEqualize(PhyxCompoundUnit *unit);     ///< equalizes two units
 
-    bool isSame(PhyxCompoundUnit *unit);
-    bool isConvertible(PhyxCompoundUnit *unit);
-    bool isOne();
-    bool isSimpleUnit();                                /// returns wheter this unit contains only one unit or not
+    bool isSame(PhyxCompoundUnit *unit);                ///< returns wheter this unit is the same as the given unit or not
+    bool isConvertible(PhyxCompoundUnit *unit);         ///< returns wheter this unit is convertible to the given unit or not
+    bool isOne();                                       ///< returns wheter the unit is one
+    bool isSimpleUnit();                                ///< returns wheter this unit contains only one unit or not
 
+    /// functions for unit manipulation
     bool add(PhyxCompoundUnit *unit);
     bool sub(PhyxCompoundUnit *unit);
     void multiply(PhyxCompoundUnit *unit);
@@ -43,8 +44,8 @@ public:
     void raise(double power);
     void root(double root);
 
-    bool convertTo(PhyxCompoundUnit *unit);               ///< converts the variable to the given unit, returns successful
-    void fromSimpleUnit(PhyxUnit *unit);
+    bool convertTo(PhyxCompoundUnit *unit);             ///< converts the variable to the given unit, returns successful
+    void fromSimpleUnit(PhyxUnit *unit);                ///< make a compound unit from a simple unit
 
     void simplify();                                    ///< simplifies the unit (e.g.: GalileanUnit -> ProductUnit, DimensionlessUnit -> NoUnit)
 
@@ -64,23 +65,23 @@ private:
     PhyxUnitSystem * m_unitSystem;
 
     PhyxCompoundList  m_compounds;    /// holds all compounds of a unit: e.g.: m/s -> compuound 1: m^1, compound 2: s^-1
-    void compoundAppend(PhyxUnit *unit, double power);       /// adds a power to the map
-    void compoundMultiply(PhyxUnit *unit, double factor);    /// multiplies a power with factor
-    void compoundDivide(PhyxUnit *unit, double factor);      /// devides a power with factor
-    void compoundEqualize(int unitIndex, PhyxCompoundUnit *parentUnit);
-    void compoundsMultiply(PhyxCompoundList compounds);              /// multiplies powers of the unit with other powers
-    void compoundsDivide(PhyxCompoundList compounds);                /// devides powers of the unit with other powers
-    void compoundsRaise(double power);                       /// raises all powers to power
-    void compoundsRoot(double root);                         /// takes the root of all powers
-    void compoundsClear();                                   /// clear all compounds
-    void compoundsSetNull();                                 /// sets the powers of all compounds to 0
-    int  compoundsNonNullCount();                            /// returns the number of compounds that are not 0
+    void compoundAppend(PhyxUnit *unit, double power);                  ///< adds a power to the map
+    void compoundMultiply(PhyxUnit *unit, double factor);               ///< multiplies a power with factor
+    void compoundDivide(PhyxUnit *unit, double factor);                 ///< devides a power with factor
+    void compoundEqualize(int unitIndex, PhyxCompoundUnit *parentUnit); ///< equalizes one compound with the matching compound in the given unit
+    void compoundsMultiply(PhyxCompoundList compounds);                 ///< multiplies powers of the unit with other powers
+    void compoundsDivide(PhyxCompoundList compounds);                   ///< devides powers of the unit with other powers
+    void compoundsRaise(double power);                                  ///< raises all powers to power
+    void compoundsRoot(double root);                                    ///< takes the root of all powers
+    void compoundsClear();                                              ///< clear all compounds
+    void compoundsSetNull();                                            ///< sets the powers of all compounds to 0
+    int  compoundsNonNullCount();                                       ///< returns the number of compounds that are not 0
 
-    void verify();                                           /// verifies the unit
+    void verify();                                           ///< searches for the unit in the unit system
 
 signals:
-    void offsetValue(double value);
-    void scaleValue(double scaleFactor);
+    void offsetValue(double value);                         ///< offsets the value of the variable
+    void scaleValue(double scaleFactor);                    ///< scales the value of the variable
     
 public slots:
 
