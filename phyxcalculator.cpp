@@ -373,6 +373,11 @@ PhyxVariableManager::PhyxVariableMap *PhyxCalculator::variables() const
     return variableManager->variables();
 }
 
+PhyxVariableManager::PhyxVariableMap *PhyxCalculator::constants() const
+{
+    return variableManager->constants();
+}
+
 QString PhyxCalculator::errorString() const
 {
     QString output;

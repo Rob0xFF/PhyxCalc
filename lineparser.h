@@ -21,15 +21,20 @@ enum LineType {DefinitionLine, ExpressionLine, CommentLine, OutputLine, EmptyLin
 class LineParser: public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QTextEdit *calculationEdit READ calculationEdit WRITE setCalculationEdit)
+    Q_PROPERTY(QTableWidget *variableTable READ variableTable WRITE setVariableTable)
+    Q_PROPERTY(QTableWidget *constantsTable READ constantsTable WRITE setConstantsTable)
+    Q_PROPERTY(AppSettings *appSettings READ appSettings WRITE setAppSettings)
+    Q_PROPERTY(UnitLoader *unitLoader READ unitLoader WRITE setUnitLoader)
 
 public:
-    explicit LineParser(UnitLoader *loader, QTableWidget *tableWidget, QTextEdit *textEdit, AppSettings *settings);
+    explicit LineParser(QObject *parent = 0);
     ~LineParser();
 
-    void setCalculationEdit(QTextEdit *textEdit) { calculationEdit = textEdit;}
-    void setVariableTable(QTableWidget *tableWidget) { variableTable = tableWidget;}
-    void setUnitLoader(UnitLoader *loader) { unitLoader = loader;}
-    void setAppSettings(AppSettings *settings) { appSettings = settings;}
+    //void setCalculationEdit(QTextEdit *textEdit) { calculationEdit = textEdit;}
+    //void setVariableTable(QTableWidget *tableWidget) { variableTable = tableWidget;}
+    //void setUnitLoader(UnitLoader *loader) { unitLoader = loader;}
+    //void setAppSettings(AppSettings *settings) { appSettings = settings;}
 
     void parseLine();
     void parseAll();
@@ -39,12 +44,38 @@ public:
 
     QString exportFormelEditor();
 
+    QTextEdit * calculationEdit() const
+    {
+        return m_calculationEdit;
+    }
+    QTableWidget * variableTable() const
+    {
+        return m_variableTable;
+    }
+    AppSettings * appSettings() const
+    {
+        return m_appSettings;
+    }
+    QTableWidget * constantsTable() const
+    {
+        return m_constantsTable;
+    }
+    UnitLoader * unitLoader() const
+    {
+        return m_unitLoader;
+    }
+
 private:
-    QTextEdit       *calculationEdit;
-    QTableWidget    *variableTable;
-    UnitLoader      *unitLoader;
-    AppSettings     *appSettings;
-    QMap<QString, physicalVariable> variableMap;
+    //QTextEdit       *calculationEdit;
+    //QTableWidget    *variableTable;
+    //UnitLoader      *unitLoader;
+    //AppSettings     *appSettings;
+    //QMap<QString, physicalVariable> variableMap;
+    QTextEdit       *m_calculationEdit;
+    QTableWidget    *m_variableTable;
+    QTableWidget    *m_constantsTable;
+    AppSettings     *m_appSettings;
+    UnitLoader      *m_unitLoader;
     PhyxCalculator  *phyxCalculator;
 
     /* Check the type of a line */
@@ -77,9 +108,31 @@ private:
 
 public slots:
     void showVariables();
+    void showConstants();
     void clearAllVariables();
     void outputResult();
     void outputError();
+
+    void setCalculationEdit(QTextEdit * arg)
+    {
+        m_calculationEdit = arg;
+    }
+    void setVariableTable(QTableWidget * arg)
+    {
+        m_variableTable = arg;
+    }
+    void setAppSettings(AppSettings * arg)
+    {
+        m_appSettings = arg;
+    }
+    void setConstantsTable(QTableWidget * arg)
+    {
+        m_constantsTable = arg;
+    }
+    void setUnitLoader(UnitLoader * arg)
+    {
+        m_unitLoader = arg;
+    }
 };
 
 #endif // LINEPARSER_H

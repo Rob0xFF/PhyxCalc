@@ -53,6 +53,7 @@ public:
     void loadFile(QString fileName);                    ///< parses a complete txt file
 
     PhyxVariableManager::PhyxVariableMap * variables() const;
+    PhyxVariableManager::PhyxVariableMap * constants() const;
     QString expression() const
     {
         return m_expression;

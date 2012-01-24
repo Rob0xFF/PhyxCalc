@@ -85,6 +85,12 @@ void MainWindow::loadSettings()
         ui->variableTable->setColumnWidth(2, settings.value("column3Width",80).toInt());
     settings.endGroup();
 
+    settings.beginGroup("constantDock");
+        ui->constantsTable->setColumnWidth(0, settings.value("column1Width",80).toInt());
+        ui->constantsTable->setColumnWidth(1, settings.value("column2Width",80).toInt());
+        ui->constantsTable->setColumnWidth(2, settings.value("column3Width",80).toInt());
+    settings.endGroup();
+
     settings.beginGroup("output");
         settings.beginGroup("numbers");
             appSettings.output.numbers.decimalPrecision = settings.value("decimalPrecision", 6).toInt();
@@ -116,6 +122,12 @@ void MainWindow::saveSettings()
         settings.setValue("column1Width",ui->variableTable->columnWidth(0));
         settings.setValue("column2Width",ui->variableTable->columnWidth(1));
         settings.setValue("column3Width",ui->variableTable->columnWidth(2));
+    settings.endGroup();
+
+    settings.beginGroup("constantDock");
+        settings.setValue("column1Width",ui->constantsTable->columnWidth(0));
+        settings.setValue("column2Width",ui->constantsTable->columnWidth(1));
+        settings.setValue("column3Width",ui->constantsTable->columnWidth(2));
     settings.endGroup();
 
     settings.beginGroup("output");
@@ -161,6 +173,26 @@ void MainWindow::initializeGUI()
     connect(ui->variablesDock, SIGNAL(visibilityChanged(bool)),
             ui->actionVariables, SLOT(setChecked(bool)));
 
+    //initialize constant Dock
+
+    ui->constantsTable->setColumnCount(3);
+    ui->constantsTable->setRowCount(0);
+    ui->constantsTable->setSortingEnabled(true);
+
+    newItem = new QTableWidgetItem(tr("Constant"));
+    newItem->setFont(font);
+    ui->constantsTable->setHorizontalHeaderItem(0, newItem);
+    newItem = new QTableWidgetItem(tr("Value"));
+    newItem->setFont(font);
+    ui->constantsTable->setHorizontalHeaderItem(1, newItem);
+    newItem = new QTableWidgetItem(tr("Unit"));
+    newItem->setFont(font);
+    ui->constantsTable->setHorizontalHeaderItem(2, newItem);
+
+    connect(ui->actionConstants, SIGNAL(toggled(bool)),
+            ui->constantsDock, SLOT(setVisible(bool)));
+    connect(ui->constantsDock, SIGNAL(visibilityChanged(bool)),
+            ui->actionConstants, SLOT(setChecked(bool)));
 
     //initialize special buttons
     QMenu *configureMenu = new QMenu();
@@ -224,7 +256,12 @@ void MainWindow::addNewTab()
 
     Document *newDocument = new Document;
     newDocument->expressionEdit = new QTextEdit(newTab);
-    newDocument->lineParser = new LineParser(unitLoader, ui->variableTable, newDocument->expressionEdit, &appSettings);
+    newDocument->lineParser = new LineParser(this);
+    newDocument->lineParser->setUnitLoader(unitLoader);
+    newDocument->lineParser->setVariableTable(ui->variableTable);
+    newDocument->lineParser->setConstantsTable(ui->constantsTable);
+    newDocument->lineParser->setCalculationEdit(newDocument->expressionEdit);
+    newDocument->lineParser->setAppSettings(&appSettings);
     newDocument->isUnchanged = true;
     newDocument->name = "";
     newDocument->path = "";
@@ -287,6 +324,7 @@ void MainWindow::tabChanged(int index)
 {
     activeTab = index;
     documentList.at(activeTab)->lineParser->showVariables();
+    documentList.at(activeTab)->lineParser->showConstants();
 }
 
 bool MainWindow::saveDocument(Document *document, bool force, bool exit)

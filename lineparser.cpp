@@ -1,11 +1,11 @@
 #include "lineparser.h"
 
-LineParser::LineParser(UnitLoader *loader, QTableWidget *tableWidget, QTextEdit *textEdit, AppSettings *settings)
+LineParser::LineParser(QObject *parent)
 {
-    unitLoader = loader;
-    variableTable = tableWidget;
-    calculationEdit = textEdit;
-    appSettings = settings;
+    //unitLoader = loader;
+    //variableTable = tableWidget;
+    //calculationEdit = textEdit;
+    //appSettings = settings;
 
     phyxCalculator = new PhyxCalculator();
     connect(phyxCalculator, SIGNAL(outputResult()),
@@ -14,6 +14,8 @@ LineParser::LineParser(UnitLoader *loader, QTableWidget *tableWidget, QTextEdit 
             this, SLOT(outputError()));
     connect(phyxCalculator, SIGNAL(variablesChanged()),
             this, SLOT(showVariables()));
+    connect(phyxCalculator, SIGNAL(constantsChanged()),
+            this, SLOT(showConstants()));
 }
 
 LineParser::~LineParser()
@@ -268,16 +270,16 @@ void LineParser::parseLine()
 
 void LineParser::parseAll()
 {
-    QTextCursor textCursor = calculationEdit->textCursor();
+    QTextCursor textCursor = m_calculationEdit->textCursor();
     textCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
-    calculationEdit->setTextCursor(textCursor);
+    m_calculationEdit->setTextCursor(textCursor);
 
     parseFromCurrentPosition();
 }
 
 void LineParser::parseFromCurrentPosition()
 {
-    while (!calculationEdit->textCursor().atEnd())
+    while (!m_calculationEdit->textCursor().atEnd())
         parseLine();
 }
 
@@ -289,9 +291,9 @@ void LineParser::replaceSymbols()
     curLineText = getCurrentLine();
     oldLine = curLineText;
 
-    for (int i = 0; i < unitLoader->symbols()->size(); i++)
+    for (int i = 0; i < m_unitLoader->symbols()->size(); i++)
     {
-        curLineText.replace(unitLoader->symbols()->at(i).name, unitLoader->symbols()->at(i).symbol, Qt::CaseSensitive);
+        curLineText.replace(m_unitLoader->symbols()->at(i).name, m_unitLoader->symbols()->at(i).symbol, Qt::CaseSensitive);
     }
 
     //if line not unchanged replace current line
@@ -303,7 +305,7 @@ void LineParser::replaceSymbols()
 
 QString LineParser::replaceVariables(QString expression, bool insertValue, bool insertUnit)
 {
-    QMapIterator<QString, physicalVariable> i(variableMap);
+    QMapIterator<QString, PhyxVariable*> i(*phyxCalculator->variables());
 
     //get the size of the biggest item
     int maxSize = 0;
@@ -326,9 +328,9 @@ QString LineParser::replaceVariables(QString expression, bool insertValue, bool 
                  {
                     QString variableValue;
                     if (insertValue)
-                        variableValue.append(formatValue(i.value().value));
+                        variableValue.append(PhyxCalculator::complexToString(i.value()->value()));
                     if (insertUnit)
-                        variableValue.append(i.value().unit);
+                        variableValue.append(i.value()->unit()->symbol());
                     expression.replace(variableName, variableValue);
                  }
              }
@@ -348,24 +350,24 @@ QString LineParser::removeWhitespace(QString string)
 
 QString LineParser::getCurrentLine()
 {
-    return calculationEdit->textCursor().block().text().trimmed();
+    return m_calculationEdit->textCursor().block().text().trimmed();
 }
 
 void LineParser::replaceCurrentLine(QString text)
 {
-    QTextCursor textCursor = calculationEdit->textCursor();
+    QTextCursor textCursor = m_calculationEdit->textCursor();
     textCursor.clearSelection();
     textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
     textCursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
     textCursor.removeSelectedText();
     textCursor.insertText(text);
     textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
-    calculationEdit->setTextCursor(textCursor);
+    m_calculationEdit->setTextCursor(textCursor);
 }
 
 void LineParser::insertOutput(QString text)
 {
-    QTextCursor textCursor = calculationEdit->textCursor();
+    QTextCursor textCursor = m_calculationEdit->textCursor();
 
     //text.prepend("=");
 
@@ -397,12 +399,12 @@ void LineParser::insertOutput(QString text)
 
     //textCursor.insertText(outputString);
     textCursor.insertHtml(text);
-    calculationEdit->setTextCursor(textCursor);
+    m_calculationEdit->setTextCursor(textCursor);
 }
 
 void LineParser::insertNewLine(bool force)
 {
-    QTextCursor textCursor = calculationEdit->textCursor();
+    QTextCursor textCursor = m_calculationEdit->textCursor();
 
     textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
 
@@ -412,7 +414,7 @@ void LineParser::insertNewLine(bool force)
         textCursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor);
 
 
-    calculationEdit->setTextCursor(textCursor);
+    m_calculationEdit->setTextCursor(textCursor);
 }
 
 QString LineParser::formatValue(double value, QString siPrefix)
@@ -453,7 +455,7 @@ QString LineParser::formatValue(double value, QString siPrefix)
     }*/
     outputValue = value;
 
-    return QString::number(outputValue, appSettings->output.numbers.format, appSettings->output.numbers.decimalPrecision) + siPrefix;
+    return QString::number(outputValue, m_appSettings->output.numbers.format, m_appSettings->output.numbers.decimalPrecision) + siPrefix;
 }
 
 QString LineParser::getUnitFromSymbol(QString variableName)
@@ -466,7 +468,7 @@ QString LineParser::getUnitFromSymbol(QString variableName)
     else
         pos = 0;
 
-    return unitLoader->units()->value(variableName.at(pos));
+    return m_unitLoader->units()->value(variableName.at(pos));
 }
 
 QString LineParser::exportFormelEditor()
@@ -477,7 +479,7 @@ QString LineParser::exportFormelEditor()
         depth;
     QRegExp regExp;
 
-    text = calculationEdit->toPlainText().trimmed();
+    text = m_calculationEdit->toPlainText().trimmed();
 
     //append results to the end of line
     textLines = text.split('\n');
@@ -522,7 +524,8 @@ QString LineParser::exportFormelEditor()
      }*/
 
 
-    QMapIterator<QString, physicalVariable> mapIterator(variableMap);
+    QMapIterator<QString, PhyxVariable*> mapIterator(*phyxCalculator->variables());
+
      //get the size of the biggest item
      int maxSize = 0;
      while (mapIterator.hasNext()) {
@@ -603,9 +606,9 @@ QString LineParser::exportFormelEditor()
     text.replace(QRegExp("[ ]*[/][ ]*"), " over ");
 
     //replace greek letters with the formel edit ones
-    for (int k = 0; k < unitLoader->symbols()->size(); k++)
+    for (int k = 0; k < m_unitLoader->symbols()->size(); k++)
     {
-        text.replace(unitLoader->symbols()->at(k).symbol, "%" + unitLoader->symbols()->at(k).name + " ", Qt::CaseSensitive);
+        text.replace(m_unitLoader->symbols()->at(k).symbol, "%" + m_unitLoader->symbols()->at(k).name + " ", Qt::CaseSensitive);
     }
 
     //Append the formel editor newline to every line
@@ -628,21 +631,46 @@ void LineParser::showVariables()
     int row = 0;
     QTableWidgetItem *newItem;
 
-    variableTable->clearContents();
-    variableTable->setRowCount(0);
+    m_variableTable->clearContents();
+    m_variableTable->setRowCount(0);
 
 
     QMapIterator<QString, PhyxVariable*> i(*phyxCalculator->variables());
      while (i.hasNext()) {
          i.next();
 
-         variableTable->setRowCount(row+1);
+         m_variableTable->setRowCount(row+1);
          newItem = new QTableWidgetItem(i.key());   // name
-         variableTable->setItem(row, 0, newItem);
+         m_variableTable->setItem(row, 0, newItem);
          newItem = new QTableWidgetItem(PhyxCalculator::complexToString(i.value()->value()));
-         variableTable->setItem(row, 1, newItem);
+         m_variableTable->setItem(row, 1, newItem);
          newItem = new QTableWidgetItem(i.value()->unit()->symbol());
-         variableTable->setItem(row, 2, newItem);
+         m_variableTable->setItem(row, 2, newItem);
+
+         row++;
+     }
+}
+
+void LineParser::showConstants()
+{
+    int row = 0;
+    QTableWidgetItem *newItem;
+
+    m_constantsTable->clearContents();
+    m_constantsTable->setRowCount(0);
+
+
+    QMapIterator<QString, PhyxVariable*> i(*phyxCalculator->constants());
+     while (i.hasNext()) {
+         i.next();
+
+         m_constantsTable->setRowCount(row+1);
+         newItem = new QTableWidgetItem(i.key());   // name
+         m_constantsTable->setItem(row, 0, newItem);
+         newItem = new QTableWidgetItem(PhyxCalculator::complexToString(i.value()->value()));
+         m_constantsTable->setItem(row, 1, newItem);
+         newItem = new QTableWidgetItem(i.value()->unit()->symbol());
+         m_constantsTable->setItem(row, 2, newItem);
 
          row++;
      }
