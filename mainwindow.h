@@ -84,8 +84,6 @@ private slots:
     void on_actionNew_Tab_triggered();
     void on_actionExport_triggered();
 
-    void on_clearVariablesButton_clicked();
-
     void on_actionSave_triggered();
 
     void on_actionSave_As_triggered();
@@ -116,6 +114,7 @@ private slots:
 
     void on_actionRecalculate_from_Line_triggered();
     void on_action_Slim_Mode_triggered();
+    void on_actionClear_Variables_triggered();
 };
 
 #endif // MAINWINDOW_H

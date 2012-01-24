@@ -221,6 +221,7 @@ void MainWindow::initializeGUI()
     ui->mainToolBar->addSeparator();
     ui->mainToolBar->addAction(ui->actionRecalculate_All);
     ui->mainToolBar->addAction(ui->actionRecalculate_from_Line);
+    ui->mainToolBar->addAction(ui->actionClear_Variables);
     ui->mainToolBar->addSeparator();
     ui->mainToolBar->addAction(ui->actionExport);
     ui->mainToolBar->addSeparator();
@@ -618,11 +619,6 @@ void MainWindow::openRecentDocument()
     openDocument(fileName, true);
 }
 
-void MainWindow::on_clearVariablesButton_clicked()
-{
-    documentList.at(activeTab)->lineParser->clearAllVariables();
-}
-
 void MainWindow::on_actionNew_Tab_triggered()
 {
     addNewTab();
@@ -750,4 +746,9 @@ void MainWindow::on_actionRecalculate_from_Line_triggered()
 void MainWindow::on_action_Slim_Mode_triggered()
 {
     switchLayout(ui->action_Slim_Mode->isChecked());
+}
+
+void MainWindow::on_actionClear_Variables_triggered()
+{
+    documentList.at(activeTab)->lineParser->clearAllVariables();
 }
