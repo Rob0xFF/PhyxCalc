@@ -2,11 +2,6 @@
 
 LineParser::LineParser(QObject *parent)
 {
-    //unitLoader = loader;
-    //variableTable = tableWidget;
-    //calculationEdit = textEdit;
-    //appSettings = settings;
-
     phyxCalculator = new PhyxCalculator();
     connect(phyxCalculator, SIGNAL(outputResult()),
             this, SLOT(outputResult()));
@@ -23,207 +18,6 @@ LineParser::~LineParser()
 
 }
 
-LineType LineParser::checkLineType(QString text)
-{
-    //int equalSignPos;
-    //bool isDefinition;
-
-    if (text.trimmed().isEmpty())
-        return EmptyLine;
-
-    if (text.trimmed().at(0) == '=')
-        return UnknownLine;
-
-    //equalSignPos = text.indexOf('=');
-
-    if (text.indexOf("//") == 0)
-        return CommentLine;
-
-    if (text.indexOf("=") != -1)
-        return DefinitionLine;
-
-    if (text.indexOf("=") == -1)
-        return ExpressionLine;
-
-    return UnknownLine;
-
-    /*if (equalSignPos == 0)
-        return UnknownLine;
-
-    //if = is at last position it is clearing a definition
-    if (equalSignPos == text.size()-1)
-        return DefinitionLine;
-
-    //check for boolean operators
-    if ((text.at(equalSignPos-1) == '!') || (text.at(equalSignPos+1) == '='))
-        return OutputLine;
-
-    //line is expression or definition
-    if (text.indexOf(QRegExp(MATH_OPERATORS), equalSignPos+2) != -1)
-        isDefinition = false;
-    else
-    {
-        //check wheter right side is only a variable or not
-        if (variableMap.contains(text.mid(equalSignPos+1).trimmed()))
-            isDefinition = false;
-        else
-            isDefinition = true;
-    }
-
-
-    if (isDefinition)
-        return DefinitionLine;
-    else
-        return ExpressionLine;*/
-}
-
-/*void LineParser::readExpression(QString line, QString varName)
-{
-    QString expression,
-            outputUnit,
-            outputString,
-            unit;
-    double value;
-    int pos;
-    bool error = false;
-
-    //check wheter converting is needed or not
-    pos = line.indexOf("->");
-    if (pos != -1)
-    {
-        if (line.size() > (pos+2))
-            outputUnit=line.mid(pos+2).trimmed();
-        expression = line.left(pos).trimmed();
-    }
-    else
-    {
-        expression = line.trimmed();
-    }
-
-    //check wheter expression is only a variable or not
-    if (variableMap.contains(expression))
-    {
-        value = variableMap.value(expression).value;
-        unit = variableMap.value(expression).unit;
-    }
-    else
-    {
-        //search for the next character that is not a whitespace, number, dot or minus
-        for ( int linePos = 0; linePos < expression.size(); linePos++)
-        {
-            if (!(expression.at(linePos).isNumber()
-                  || expression.at(linePos).isPunct()
-                  || (expression.at(linePos) == '-')
-                  || expression.at(linePos).isSpace()))
-            {
-                unit = expression.mid(linePos).trimmed();
-                break;
-            }
-        }
-        qDebug() << "Detected unit:" << unit;
-
-        if (unit.isEmpty())
-        {
-            value = expression.toDouble();
-            unit = "";
-        }
-        else
-        {
-            phexParser->setExpression(replaceVariables(expression));
-
-            if (phexParser->evaluate())
-            {
-                value = phexParser->resultValue();
-
-                if (unit != phexParser->resultUnit())
-                {
-                   if (!phexParser->convert(phexParser->resultUnit(), phexParser->resultValue(), unit, &value))
-                       unit = phexParser->resultUnit();
-                }
-                //unit = phexParser->resultUnit();
-            }
-            else
-            {
-                outputString.append(tr("Syntax error"));//tr("<span style='color:red'>Syntax error</span>"));
-                error = true;
-            }
-        }
-    }
-
-    if (!error && !outputUnit.isEmpty() && !unit.isEmpty())
-    {
-        if (!phexParser->convert(unit, value, outputUnit, &value))
-        {
-            outputString.append(tr("Conversion not possible"));
-            error = true;
-        }
-        else
-        {
-            unit = outputUnit;
-
-            if (variableMap.contains(expression))
-            {
-                variableMap[expression].unit = unit;
-                variableMap[expression].value = value;
-            }
-        }
-    }
-
-    if (!error)
-    {
-        if (appSettings->lineParser.expression.outputWithNumbers)
-        {
-            QString expressionWithNumbers = replaceVariables(expression);
-            if (expressionWithNumbers != expression)
-                insertResult(expressionWithNumbers);
-        }
-
-        if (varName.isEmpty() || appSettings->lineParser.expression.outputResult)
-        {
-            outputString.append(formatValue(value));
-            outputString.append(unit);
-
-            if (outputString != expression)
-                insertResult(outputString);
-        }
-
-        if (!varName.isEmpty())
-        {
-            variableMap[varName].value = value;
-            variableMap[varName].unit = unit;
-        }
-    }
-    else
-        insertResult(outputString);
-}
-
-void LineParser::readDefinition(QString line)
-{
-    int equalSignPos;
-    //double value;
-    QString variableName,
-            expression;
-
-    //get the position of =, left side is variable name
-    equalSignPos = line.indexOf("=");
-    variableName = line.left(equalSignPos).trimmed();
-
-    //if right side is empty clear variable
-    if (equalSignPos == line.size()-1)
-    {
-        variableMap.remove(variableName);
-        return;
-    }
-    else
-    {
-        expression = line.mid(equalSignPos+1).trimmed();
-    }
-
-    qDebug() << "Variable name:" << variableName << "Expression:" << expression;
-
-    readExpression(expression, variableName);
-}*/
-
 void LineParser::parseLine()
 {
     //replace greek units
@@ -232,40 +26,13 @@ void LineParser::parseLine()
     //read current line
     QString curLineText = getCurrentLine();
 
-    if (!curLineText.isEmpty())
+    if (!curLineText.isEmpty() && !(curLineText.at(0) == '='))
     {
         phyxCalculator->setExpression(curLineText);
         phyxCalculator->evaluate();
-        insertNewLine();
     }
-    /*{
-        QString output;
-        output.append(PhyxCalculator::complexToString(phyxCalculator->resultValue()));
-        output.append(phyxCalculator->resultUnit());
 
-        insertResult(output);
-    }
-    else
-        insertResult(phyxCalculator->errorString());*/
-
-    /*LineType lineType = checkLineType(curLineText);
-
-    if (lineType == DefinitionLine)
-    {
-        readDefinition(curLineText);
-        showVariables();
-    }
-    else if (lineType == ExpressionLine)
-    {
-        readExpression(curLineText);
-        showVariables();
-    }*/
-    /*else if (lineType == OutputLine)
-    {
-        OutputVariable(curLineText, calculationEdit);
-    }*/
-
-    //insertNewLine();
+    insertNewLine();
 }
 
 void LineParser::parseAll()
@@ -301,6 +68,92 @@ void LineParser::replaceSymbols()
     {
         replaceCurrentLine(curLineText);
     }
+}
+
+QString LineParser::getCurrentLine()
+{
+    return m_calculationEdit->textCursor().block().text().trimmed();
+}
+
+bool LineParser::resultLineSelected()
+{
+    QString curLineText = getCurrentLine();
+
+    if (!curLineText.isEmpty() && (curLineText.at(0) == '='))
+        return true;
+    else
+        return false;
+}
+
+void LineParser::replaceCurrentLine(QString text)
+{
+    QTextCursor textCursor = m_calculationEdit->textCursor();
+    textCursor.clearSelection();
+    textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
+    textCursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
+    textCursor.removeSelectedText();
+    textCursor.insertText(text);
+    textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
+    m_calculationEdit->setTextCursor(textCursor);
+}
+
+void LineParser::insertOutput(QString text)
+{
+    QTextCursor textCursor = m_calculationEdit->textCursor();
+
+    textCursor.clearSelection();
+    textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
+    if (textCursor.atEnd())
+        textCursor.insertText("\n");
+    else
+    {
+        textCursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor);       // move cursor to the next line
+        m_calculationEdit->setTextCursor(textCursor);
+        QString curLineText = getCurrentLine();
+
+        if (resultLineSelected())   //handle result line
+        {
+            deleteLine();
+            insertNewLine(true);
+        }
+        else if(!curLineText.isEmpty()) //handle any other line
+        {
+            textCursor.movePosition(QTextCursor::PreviousBlock, QTextCursor::MoveAnchor);
+            m_calculationEdit->setTextCursor(textCursor);
+            insertNewLine(true);
+        }
+        textCursor = m_calculationEdit->textCursor();
+    }
+
+    //textCursor.insertText(outputString);
+    textCursor.insertHtml(text);
+    m_calculationEdit->setTextCursor(textCursor);
+}
+
+void LineParser::insertNewLine(bool force)
+{
+    QTextCursor textCursor = m_calculationEdit->textCursor();
+
+    textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
+
+    if (textCursor.atEnd() || force)
+        textCursor.insertText("\n");
+    else
+        textCursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor);
+
+
+    m_calculationEdit->setTextCursor(textCursor);
+}
+
+void LineParser::deleteLine()
+{
+    QTextCursor textCursor = m_calculationEdit->textCursor();
+    textCursor.clearSelection();
+    textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
+    textCursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
+    textCursor.removeSelectedText();
+    textCursor.deletePreviousChar();    //delete newline character
+    m_calculationEdit->setTextCursor(textCursor);
 }
 
 QString LineParser::replaceVariables(QString expression, bool insertValue, bool insertUnit)
@@ -346,129 +199,6 @@ QString LineParser::removeWhitespace(QString string)
     string = string.simplified();
     string.replace(" ", "");
     return string;
-}
-
-QString LineParser::getCurrentLine()
-{
-    return m_calculationEdit->textCursor().block().text().trimmed();
-}
-
-void LineParser::replaceCurrentLine(QString text)
-{
-    QTextCursor textCursor = m_calculationEdit->textCursor();
-    textCursor.clearSelection();
-    textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
-    textCursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
-    textCursor.removeSelectedText();
-    textCursor.insertText(text);
-    textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
-    m_calculationEdit->setTextCursor(textCursor);
-}
-
-void LineParser::insertOutput(QString text)
-{
-    QTextCursor textCursor = m_calculationEdit->textCursor();
-
-    //text.prepend("=");
-
-    textCursor.clearSelection();
-    textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
-    if (textCursor.atEnd())
-        textCursor.insertText("\n");
-    else
-    {
-        textCursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor);
-        textCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
-        if (textCursor.selectedText() == "=")
-        {
-            textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-            textCursor.removeSelectedText();
-        }
-        else if (textCursor.atBlockStart())
-        {
-            textCursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
-            textCursor.removeSelectedText();
-        }
-        else
-        {
-            textCursor.movePosition(QTextCursor::PreviousBlock, QTextCursor::MoveAnchor);
-            textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
-            textCursor.insertText("\n");
-        }
-    }
-
-    //textCursor.insertText(outputString);
-    textCursor.insertHtml(text);
-    m_calculationEdit->setTextCursor(textCursor);
-}
-
-void LineParser::insertNewLine(bool force)
-{
-    QTextCursor textCursor = m_calculationEdit->textCursor();
-
-    textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
-
-    if (textCursor.atEnd() || force)
-        textCursor.insertText("\n");
-    else
-        textCursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor);
-
-
-    m_calculationEdit->setTextCursor(textCursor);
-}
-
-QString LineParser::formatValue(double value, QString siPrefix)
-{
-    //int     x;
-    double  outputValue;
-    //        scalingFactor;
-
-    /*if (siPrefix.isEmpty() || (!unitLoader->siPrefixes()->contains(siPrefix)))
-    {
-        for (x = 24; x > -25; x=x-3)
-        {
-            outputValue = value / pow(10,x);
-            if ((outputValue >= 1) || (outputValue*-1 >= 1))
-                break;
-        }
-
-        if (x == 0)
-            siPrefix = "";
-        else
-        {
-            QMapIterator<QString, double> i(*unitLoader->siPrefixes());
-            while (i.hasNext())
-            {
-                i.next();
-                if (pow(10,x) == i.value())
-                {
-                    siPrefix = i.key();
-                    break;
-                }
-            }
-        }
-    }
-    else
-    {
-        scalingFactor = unitLoader->siPrefixes()->value(siPrefix, 1);
-        outputValue = value / scalingFactor;
-    }*/
-    outputValue = value;
-
-    return QString::number(outputValue, m_appSettings->output.numbers.format, m_appSettings->output.numbers.decimalPrecision) + siPrefix;
-}
-
-QString LineParser::getUnitFromSymbol(QString variableName)
-{
-    int pos;
-
-    //check for DELTA
-    if (QString(variableName.at(0)) == QString::fromLocal8Bit("Δ"))
-        pos = 1;
-    else
-        pos = 0;
-
-    return m_unitLoader->units()->value(variableName.at(pos));
 }
 
 QString LineParser::exportFormelEditor()
@@ -693,6 +423,7 @@ void LineParser::outputResult()
 void LineParser::outputError()
 {
     QString output;
+    output.append("=");
     output.append("<font color=red>");
     output.append(phyxCalculator->errorString());
     output.append("</font> ");

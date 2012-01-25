@@ -16,7 +16,7 @@
 #include "phyxcalculator.h"
 //#include "phexparser.h"
 
-enum LineType {DefinitionLine, ExpressionLine, CommentLine, OutputLine, EmptyLine, UnknownLine};
+//enum LineType {DefinitionLine, ExpressionLine, CommentLine, OutputLine, EmptyLine, UnknownLine};
 
 class LineParser: public QObject
 {
@@ -41,6 +41,9 @@ public:
     void parseFromCurrentPosition();
 
     void insertNewLine(bool force = false);
+    void deleteLine();
+    bool resultLineSelected();
+
 
     QString exportFormelEditor();
 
@@ -79,7 +82,7 @@ private:
     PhyxCalculator  *phyxCalculator;
 
     /* Check the type of a line */
-    LineType checkLineType(QString text);
+    //LineType checkLineType(QString text);
     /* Reads a definition line */
     //void readDefinition(QString line);
     /* Reads an expression line */
@@ -96,9 +99,9 @@ private:
     QString getCurrentLine();
 
     /* format a double with si prefixes */
-    QString formatValue(double value, QString siPrefix = QString());
+    //QString formatValue(double value, QString siPrefix = QString());
     /* Gets the unit from the symbol in variable name */
-    QString getUnitFromSymbol(QString variableName);
+    //QString getUnitFromSymbol(QString variableName);
 
 
     /* si unit paser functions */

@@ -60,6 +60,14 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
                  return true;
              }
+             else if ((keyEvent->key() == Qt::Key_Delete) || (keyEvent->key() == Qt::Key_Backspace))
+             {
+                 if (documentList.at(activeTab)->lineParser->resultLineSelected())
+                 {
+                     documentList.at(activeTab)->lineParser->deleteLine();
+                     return true;
+                 }
+             }
         }
         return QMainWindow::eventFilter(obj, event);
      } else {
