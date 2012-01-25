@@ -157,9 +157,11 @@ void PhyxUnit::copyUnit(PhyxUnit *source, PhyxUnit *destination)
     destination->setOffset(source->offset());
     destination->setScaleFactor(source->scaleFactor());
     destination->setFlags(source->flags());
+    destination->setPreferedPrefix(source->preferedPrefix());
+    destination->setUnitGroup(source->unitGroup());
 }
 
-QString PhyxUnit::dimensionString() const
+QString PhyxUnit::dimensionString() const       //this can't handle units with prefered prefix
 {
     QString outputString;
     QMapIterator<QString, double> i(m_powers);

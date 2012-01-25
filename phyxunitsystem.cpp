@@ -27,11 +27,6 @@ void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags, QStr
     if (baseUnitsMap.contains(symbol))
         delete baseUnitsMap.take(symbol);
 
-    if (!preferedPrefix.isEmpty())      // here must the prefered prefix be handled (e.g. kg)
-    {
-        symbol.prepend(preferedPrefix); //only a bad handling
-    }
-
    PhyxUnit *unit = new PhyxUnit();
    unit->setSymbol(symbol);
    unit->powerAppend(symbol,1);

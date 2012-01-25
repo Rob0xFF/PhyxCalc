@@ -315,6 +315,7 @@ const QString PhyxCompoundUnit::symbol()
                 if (!positiveCompoundsCount == 0)
                     positiveCompounds.append("*");
 
+                positiveCompounds.append(unit->preferedPrefix());
                 positiveCompounds.append(unit->symbol());
 
                 if (power != 1)
@@ -327,6 +328,7 @@ const QString PhyxCompoundUnit::symbol()
                 if (!negativeCompoundsCount == 0)
                     negativeCompounds.append("*");
 
+                negativeCompounds.append(unit->preferedPrefix());
                 negativeCompounds.append(unit->symbol());
 
                 if (power != -1)

@@ -1188,12 +1188,29 @@ void PhyxCalculator::pushVariable()
     variable->unit()->setUnitSystem(unitSystem);
     if (!unitBuffer.isEmpty())
         variable->setUnit(unitSystem->unit(unitBuffer));
+
+    //handle units with prefered prefix (like kg)
+    QString preferedPrefix;
+    QString unitGroup;
+    double preferedPrefixValue = 1;
+    if (!variable->unit()->isDimensionlessUnit())
+    {
+        preferedPrefix  = variable->unit()->compounds().first().unit->preferedPrefix();
+        unitGroup       = variable->unit()->compounds().first().unit->unitGroup();
+        if (!preferedPrefix.isEmpty())
+            preferedPrefixValue = unitSystem->prefix(preferedPrefix, unitGroup).value;
+    }
+
     if (!prefixBuffer.isEmpty())
     {
         PhyxUnitSystem::PhyxPrefix prefix = unitSystem->prefix(prefixBuffer, variable->unit()->unitGroup());
         if (!prefix.unitGroup.isEmpty())
         {
-            valueBuffer *= PhyxValueDataType(prefix.value, 0.0);
+            PhyxValueDataType value = PhyxValueDataType(prefix.value, 0.0);
+
+            value /= preferedPrefixValue;
+            valueBuffer *= value;
+
             variable->setValue(valueBuffer);
         }
         else
@@ -1202,7 +1219,7 @@ void PhyxCalculator::pushVariable()
         }
     }
     else
-        variable->setValue(valueBuffer);
+        variable->setValue(valueBuffer / PhyxValueDataType(preferedPrefixValue,0.0));
 
     //push it to the stack
     variableStack.push(variable);
