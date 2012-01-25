@@ -16,7 +16,6 @@ SOURCES += main.cpp\
         lineparser.cpp \
         unitloader.cpp \
         exportdialog.cpp \
-        flowlayout.cpp \
         settingsdialog.cpp \
         qearleyparser.cpp \
         phyxcalculator.cpp \
@@ -32,7 +31,6 @@ HEADERS  += mainwindow.h \
             lineparser.h \
             unitloader.h \
             exportdialog.h \
-            flowlayout.h \
             settingsdialog.h \
             global.h \
             qearleyparser.h \

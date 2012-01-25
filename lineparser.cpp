@@ -1,6 +1,6 @@
 #include "lineparser.h"
 
-LineParser::LineParser(QObject *parent)
+LineParser::LineParser(QObject *)
 {
     phyxCalculator = new PhyxCalculator();
     connect(phyxCalculator, SIGNAL(outputResult()),

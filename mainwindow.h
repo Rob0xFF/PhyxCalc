@@ -7,6 +7,7 @@
 #include <QList>
 #include <QSettings>
 #include <QEvent>
+#include <QKeyEvent>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QListWidget>
@@ -14,7 +15,7 @@
 #include "lineparser.h"
 #include "unitloader.h"
 #include "exportdialog.h"
-#include "flowlayout.h"
+//#include "flowlayout.h"
 #include "settingsdialog.h"
 #include "global.h"
 
