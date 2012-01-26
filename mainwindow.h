@@ -54,7 +54,12 @@ private:
     AppSettings     appSettings;
     QStringList     recentDocuments;
 
+    QString settingsDir;                /// the directory in which the settigs are stored
+
     void addNewTab();
+
+    void copyResource(QString name);        ///< copies the resource in the settings folder
+    void firstStartConfig();                ///< copies all resources to the settings folder on first startup
     void loadSettings();
     void saveSettings();
     bool saveDocument(Document *document, bool force = false, bool exit = false);

@@ -1,6 +1,15 @@
 <RCC>
     <qresource prefix="/settings">
         <file alias="grammar">settings/grammar.txt</file>
-        <file alias="definitions">settings/definitions.txt</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>settings/electronicFunctions.txt</file>
+        <file>settings/functionsDock.txt</file>
+        <file>settings/numbersDock.txt</file>
+        <file>settings/operatorsDock.txt</file>
+        <file>settings/docks.txt</file>
+        <file>settings/settings.ini</file>
+        <file>settings/symbols.txt</file>
+        <file>settings/definitions.txt</file>
     </qresource>
 </RCC>

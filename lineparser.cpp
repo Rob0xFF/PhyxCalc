@@ -2,14 +2,14 @@
 
 LineParser::LineParser(QObject *)
 {
-    phyxCalculator = new PhyxCalculator();
-    connect(phyxCalculator, SIGNAL(outputResult()),
+    m_phyxCalculator = new PhyxCalculator();
+    connect(m_phyxCalculator, SIGNAL(outputResult()),
             this, SLOT(outputResult()));
-    connect(phyxCalculator, SIGNAL(outputError()),
+    connect(m_phyxCalculator, SIGNAL(outputError()),
             this, SLOT(outputError()));
-    connect(phyxCalculator, SIGNAL(variablesChanged()),
+    connect(m_phyxCalculator, SIGNAL(variablesChanged()),
             this, SLOT(showVariables()));
-    connect(phyxCalculator, SIGNAL(constantsChanged()),
+    connect(m_phyxCalculator, SIGNAL(constantsChanged()),
             this, SLOT(showConstants()));
 }
 
@@ -28,8 +28,8 @@ void LineParser::parseLine()
 
     if (!curLineText.isEmpty() && !(curLineText.at(0) == '='))
     {
-        phyxCalculator->setExpression(curLineText);
-        phyxCalculator->evaluate();
+        m_phyxCalculator->setExpression(curLineText);
+        m_phyxCalculator->evaluate();
     }
 
     insertNewLine();
@@ -158,7 +158,7 @@ void LineParser::deleteLine()
 
 QString LineParser::replaceVariables(QString expression, bool insertValue, bool insertUnit)
 {
-    QMapIterator<QString, PhyxVariable*> i(*phyxCalculator->variables());
+    QMapIterator<QString, PhyxVariable*> i(*m_phyxCalculator->variables());
 
     //get the size of the biggest item
     int maxSize = 0;
@@ -254,7 +254,7 @@ QString LineParser::exportFormelEditor()
      }*/
 
 
-    QMapIterator<QString, PhyxVariable*> mapIterator(*phyxCalculator->variables());
+    QMapIterator<QString, PhyxVariable*> mapIterator(*m_phyxCalculator->variables());
 
      //get the size of the biggest item
      int maxSize = 0;
@@ -365,7 +365,7 @@ void LineParser::showVariables()
     m_variableTable->setRowCount(0);
 
 
-    QMapIterator<QString, PhyxVariable*> i(*phyxCalculator->variables());
+    QMapIterator<QString, PhyxVariable*> i(*m_phyxCalculator->variables());
      while (i.hasNext()) {
          i.next();
 
@@ -390,7 +390,7 @@ void LineParser::showConstants()
     m_constantsTable->setRowCount(0);
 
 
-    QMapIterator<QString, PhyxVariable*> i(*phyxCalculator->constants());
+    QMapIterator<QString, PhyxVariable*> i(*m_phyxCalculator->constants());
      while (i.hasNext()) {
          i.next();
 
@@ -408,15 +408,15 @@ void LineParser::showConstants()
 
 void LineParser::clearAllVariables()
 {
-    phyxCalculator->clearVariables();
+    m_phyxCalculator->clearVariables();
 }
 
 void LineParser::outputResult()
 {
     QString output;
     output.append("=");
-    output.append(PhyxCalculator::complexToString(phyxCalculator->resultValue()));
-    output.append(phyxCalculator->resultUnit());
+    output.append(PhyxCalculator::complexToString(m_phyxCalculator->resultValue()));
+    output.append(m_phyxCalculator->resultUnit());
     insertOutput(output);
 }
 
@@ -425,7 +425,7 @@ void LineParser::outputError()
     QString output;
     output.append("=");
     output.append("<font color=red>");
-    output.append(phyxCalculator->errorString());
+    output.append(m_phyxCalculator->errorString());
     output.append("</font> ");
     insertOutput(output);
 }

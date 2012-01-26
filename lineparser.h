@@ -21,6 +21,7 @@ class LineParser: public QObject
     Q_PROPERTY(QTableWidget *constantsTable READ constantsTable WRITE setConstantsTable)
     Q_PROPERTY(AppSettings *appSettings READ appSettings WRITE setAppSettings)
     Q_PROPERTY(UnitLoader *unitLoader READ unitLoader WRITE setUnitLoader)
+    Q_PROPERTY(PhyxCalculator *phyxCalculator READ phyxCalculator)
 
 public:
     explicit LineParser(QObject * = 0);
@@ -56,6 +57,10 @@ public:
     {
         return m_unitLoader;
     }
+    PhyxCalculator * phyxCalculator() const
+    {
+        return m_phyxCalculator;
+    }
 
 private:
     QTextEdit       *m_calculationEdit;
@@ -63,7 +68,7 @@ private:
     QTableWidget    *m_constantsTable;
     AppSettings     *m_appSettings;
     UnitLoader      *m_unitLoader;
-    PhyxCalculator  *phyxCalculator;
+    PhyxCalculator  *m_phyxCalculator;
 
     /* Replace greek letters written out with the symbols */
     void replaceSymbols();

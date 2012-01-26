@@ -140,8 +140,6 @@ void PhyxCalculator::initialize()
             this, SLOT(addConstantRule(QString)));
     connect(variableManager, SIGNAL(constantRemoved(QString)),
             this, SLOT(removeConstantRule(QString)));
-
-    loadFile(":/settings/definitions");
 }
 
 void PhyxCalculator::loadGrammar(QString fileName)
@@ -965,6 +963,8 @@ void PhyxCalculator::unitCheckDimensionless()
 
     if (!variable1->unit()->isDimensionlessUnit())
         raiseException(UnitNotDimensionlessError);
+    else
+        variable1->unit()->simplify();
 
     variableStack.push(variable1);
 }
@@ -976,6 +976,11 @@ void PhyxCalculator::unitCheckDimensionless2()
 
     if (!variable1->unit()->isDimensionlessUnit() || !variable2->unit()->isDimensionlessUnit())
         raiseException(UnitNotDimensionlessError);
+    else
+    {
+        variable1->unit()->simplify();
+        variable2->unit()->simplify();
+    }
 
     variableStack.push(variable2);
     variableStack.push(variable1);

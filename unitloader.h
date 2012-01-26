@@ -38,7 +38,7 @@ class UnitLoader : public QObject
 public:
     explicit UnitLoader(QObject *parent = 0);
 
-    QMap<QString, QString> *units() {return &unitMap;}
+    //QMap<QString, QString> *units() {return &unitMap;}
     QList<symbolStruct>            *symbols() {return &symbolList;}
 
         //QMap<double, SIUnit>        *siUnits() {return &siUnitMap;}
@@ -47,11 +47,11 @@ public:
     bool load();
 
 private:
-    QMap<QString, QString>     unitMap;
+    //QMap<QString, QString>     unitMap;
     QList<symbolStruct>                symbolList;
 
     /* loads physcial units and symbols from local file*/
-    bool loadUnits();
+    //bool loadUnits();
     /* loads replacement table for symbols from local file*/
     bool loadSymbols();
 

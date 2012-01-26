@@ -7,11 +7,10 @@ UnitLoader::UnitLoader(QObject *parent) :
 
 bool UnitLoader::load()
 {
-    //loadSiPrefixes();
-    return (loadUnits() && loadSymbols());
+    return loadSymbols();
 }
 
-bool UnitLoader::loadUnits()
+/*bool UnitLoader::loadUnits()
 {
     QFile file("./settings/units.txt");
     if (file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -42,7 +41,7 @@ bool UnitLoader::loadUnits()
     }
     else
         return false;
-}
+}*/
 
 bool UnitLoader::loadSymbols()
 {

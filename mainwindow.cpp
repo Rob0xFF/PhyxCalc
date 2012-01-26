@@ -7,6 +7,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    settingsDir = "settings";
+    firstStartConfig();
+
     unitLoader = new UnitLoader();
     unitLoader->load();
 
@@ -26,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     initializeGUI();
     addNewTab();
     loadAllDocks();
+
     loadSettings();
 }
 
@@ -76,9 +80,29 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
      }
 }
 
+void MainWindow::copyResource(QString name)
+{
+    if (!QFile(settingsDir + "/" + name).exists())
+        QFile::copy(":/settings/" + name, settingsDir + "/" + name);
+}
+
+void MainWindow::firstStartConfig()
+{
+    QDir().mkdir(settingsDir);
+
+    copyResource("definitions.txt");
+    copyResource("settings.ini");
+    copyResource("symbols.txt");
+    copyResource("docks.txt");
+    copyResource("numbersDock.txt");
+    copyResource("functionsDock.txt");
+    copyResource("operatorsDock.txt");
+    copyResource("electronicFunctions.txt");
+}
+
 void MainWindow::loadSettings()
 {
-    QSettings settings("settings/settings.ini", QSettings::IniFormat);
+    QSettings settings(settingsDir + "/settings.ini", QSettings::IniFormat);
 
     settings.beginGroup("window");
         this->restoreState(settings.value("state", QByteArray()).toByteArray());
@@ -118,7 +142,7 @@ void MainWindow::loadSettings()
 
 void MainWindow::saveSettings()
 {
-    QSettings settings("settings/settings.ini", QSettings::IniFormat);
+    QSettings settings(settingsDir + "/settings.ini", QSettings::IniFormat);
 
     settings.beginGroup("window");
         settings.setValue("state",this->saveState());
@@ -271,6 +295,7 @@ void MainWindow::addNewTab()
     newDocument->lineParser->setConstantsTable(ui->constantsTable);
     newDocument->lineParser->setCalculationEdit(newDocument->expressionEdit);
     newDocument->lineParser->setAppSettings(&appSettings);
+    newDocument->lineParser->phyxCalculator()->loadFile(settingsDir + "/definitions.txt");
     newDocument->isUnchanged = true;
     newDocument->name = "";
     newDocument->path = "";
@@ -561,6 +586,9 @@ void MainWindow::loadAllDocks()
 
         for (int i = 0; i < dockNameList.size(); i++)
         {
+            if (dockNameList.at(i).isEmpty())
+                continue;
+
             QStringList list = dockNameList.at(i).split(";");
 
             QFile dockFile("./settings/" + list.at(1));

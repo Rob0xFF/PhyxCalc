@@ -53,4 +53,11 @@ RESOURCES += \
 
 OTHER_FILES += \
     settings/grammar.txt \
-    settings/definitions.txt
+    settings/definitions.txt \
+    settings/symbols.txt \
+    settings/settings.ini \
+    settings/docks.txt \
+    settings/electronicFunctions.txt \
+    settings/functionsDock.txt \
+    settings/numbersDock.txt \
+    settings/operatorsDock.txt
