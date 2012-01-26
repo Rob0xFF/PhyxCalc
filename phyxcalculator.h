@@ -33,6 +33,7 @@ class PhyxCalculator : public QObject
     Q_PROPERTY(int errorPosition READ errorPosition)
     Q_PROPERTY(PhyxValueDataType resultValue READ resultValue)
     Q_PROPERTY(QString resultUnit READ resultUnit)
+    Q_PROPERTY(PhyxVariable * result READ result)
 
 public:
     explicit PhyxCalculator(QObject *parent = 0);
@@ -47,6 +48,22 @@ public:
         StringNotValidError,
         PrefixError
     };
+
+    enum OutputMode {
+        OnlyBaseUnitsOutputMode   = 0x01,         /// option to convert output units into base units
+        MinimizeUnitOutputMode    = 0x02,         /// option to use shortest possible output unit, but use input units in case of ambiguity
+        ForceInputUnitsOutputMode = 0x03          /// option to use only input units as output unit, as far as possible
+    };
+
+    enum PrefixMode {
+        UsePrefix,
+        UseNoPrefix
+    };
+
+    typedef struct {
+        QString value;
+        QString unit;
+    } ResultVariable;   /// this struct is for outputting the formated variable
 
     bool setExpression (QString m_expression);          ///< sets the expression, checks what must be parsed and returns wheter the expression is parsable or not
     bool evaluate();                                    ///< evaluates the expression
@@ -79,9 +96,15 @@ public:
     {
         return m_errorPosition;
     }
+    PhyxVariable * result() const
+    {
+        return m_result;
+    }
 
     static QString complexToString(const PhyxValueDataType number);
     static PhyxValueDataType stringToComplex(QString string);
+
+    ResultVariable formatVariable(PhyxVariable *variable, OutputMode outputMode, PrefixMode prefixMode) const;
 
 private:
     QStack<PhyxVariable*>       variableStack;                                  /// stack for variable calculation
@@ -102,6 +125,7 @@ private:
     bool                        expressionIsParsable;                           /// holds wheter currently set expression is parsable or not
     PhyxValueDataType           m_resultValue;                                  /// value of the result
     QString                     m_resultUnit;                                   /// unit symbol of the result
+    PhyxVariable                *m_result;                                       /// result as variable
     bool                        m_error;                                        /// holds wheter an error occured or not
     int                         m_errorNumber;                                  /// current error number
     int                         m_errorPosition;                                /// position where the error occured
@@ -114,6 +138,8 @@ private:
 
     void raiseException(int errorNumber);                                                                     ///< raises an exception
     void addRule(QString rule, QString functions = "");     ///< adds a rule
+
+    PhyxUnitSystem::PhyxPrefix getBestPrefx(PhyxValueDataType value, QString unitGroup) const;     /// gets the best fitting prefix
 
     void clearStack();
     void clearResult();

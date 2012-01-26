@@ -19,6 +19,7 @@ void PhyxCalculator::initialize()
     m_errorPosition = 0;
     m_resultValue = 0;
     m_resultUnit = "";
+    m_result = NULL;
 
     //initialize random number generator
     qsrand(QDateTime::currentMSecsSinceEpoch());
@@ -470,6 +471,65 @@ PhyxValueDataType PhyxCalculator::stringToComplex(QString string)
     }
 
     return value;
+}
+
+PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefx(PhyxValueDataType value, QString unitGroup) const
+{
+    long double realValue = value.real();
+
+    QList<PhyxUnitSystem::PhyxPrefix> prefixes = unitSystem->prefixes(unitGroup);
+    for (int i = prefixes.size()-1; i >= 0; i--)
+    {
+        long double tmpValue = realValue / prefixes.at(i).value;
+        if (tmpValue >= 1)
+            return prefixes.at(i);
+    }
+}
+
+PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *variable, OutputMode outputMode, PrefixMode prefixMode) const
+{
+    ResultVariable result;
+    PhyxValueDataType value = variable->value();
+    PhyxCompoundUnit *unit = variable->unit();
+
+    switch (outputMode)
+    {
+    case OnlyBaseUnitsOutputMode:
+        result.unit = unit->dimensionString();
+        break;
+
+    case MinimizeUnitOutputMode:
+        result.unit = unit->symbol();
+        if (prefixMode == UsePrefix)
+        {
+            if (unit->isSimpleUnit())
+            {
+                PhyxUnitSystem::PhyxPrefix prefix = getBestPrefx(value, unit->unitGroup());     //get best prefix
+                value /= PhyxValueDataType(prefix.value, 0.0);
+                result.unit.prepend(prefix.symbol);
+            }
+        }
+        else if (prefixMode == UseNoPrefix)
+        {
+
+        }
+        break;
+
+    case ForceInputUnitsOutputMode:
+        if (prefixMode == UsePrefix)
+        {
+
+        }
+        else if (prefixMode == UseNoPrefix)
+        {
+
+        }
+        break;
+    }
+
+    result.value = complexToString(value);
+
+    return result;
 }
 
 void PhyxCalculator::valueCheckComplex()
@@ -1239,10 +1299,13 @@ void PhyxCalculator::outputVariable()
 {
     if (!variableStack.isEmpty())
     {
+        if (m_result != NULL)   // delete old result
+            delete m_result;
+
         PhyxVariable *variable1 = variableStack.pop();
         m_resultValue = variable1->value();
         m_resultUnit = variable1->unit()->symbol();
-        delete variable1;
+        m_result = variable1;
 
         emit outputResult();
     }

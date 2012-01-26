@@ -9,9 +9,15 @@ class PhyxUnitSystem : public QObject
 {
     Q_OBJECT
 public:
-    typedef struct {
+    typedef struct PhyxPrefixStruct{
         long double value;          /// the value of the prefix
-        QString     unitGroup;     /// the unit system of the prefix
+        QString     unitGroup;      /// the unit system of the prefix
+        QString     symbol;         /// the symbol of the prefix
+
+        bool operator < (PhyxPrefixStruct prefix) const
+        {
+            return value < prefix.value;
+        }
     } PhyxPrefix;
 
     explicit PhyxUnitSystem(QObject *parent = 0);
@@ -33,6 +39,7 @@ public:
     PhyxUnit * unit(QString symbol);                                ///< gives back a reference to the unit
 
     PhyxPrefix  prefix(QString symbol, QString unitGroup);          ///< returns the value of a prefix
+    QList<PhyxPrefix> prefixes(QString unitGroup) const;                  ///< returns all prefixes for one unitGroup sorted
 
     bool    verifyUnit(PhyxUnit *unit);                             ///< finds unit in the system and sets all the missing information, return wheter unit was found or not
 private:

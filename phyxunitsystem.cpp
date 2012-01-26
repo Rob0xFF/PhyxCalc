@@ -96,11 +96,12 @@ bool PhyxUnitSystem::removeUnit(QString symbol)
     return true;
 }
 
-void PhyxUnitSystem::addPrefix(QString symbol, double value, QString unitSystem)
+void PhyxUnitSystem::addPrefix(QString symbol, double value, QString unitGroup)
 {
     PhyxPrefix prefix;
     prefix.value = value;
-    prefix.unitGroup = unitSystem;
+    prefix.unitGroup = unitGroup;
+    prefix.symbol = symbol;
 
     prefixMap.insert(symbol, prefix);
     emit prefixAdded(symbol);
@@ -182,6 +183,33 @@ PhyxUnitSystem::PhyxPrefix PhyxUnitSystem::prefix(QString symbol, QString unitGr
             return prefixList.at(i);
     }
     return prefix;
+}
+
+QList<PhyxUnitSystem::PhyxPrefix> PhyxUnitSystem::prefixes(QString unitGroup) const
+{
+    QList<PhyxPrefix> prefixes;
+
+    QMapIterator<QString, PhyxPrefix> mapIterator(prefixMap);
+    while (mapIterator.hasNext())
+    {
+        mapIterator.next();
+        QList<PhyxPrefix> prefixList = prefixMap.values(mapIterator.key());
+        for (int i = 0; i < prefixList.size(); i++)
+        {
+            if (prefixList.at(i).unitGroup == unitGroup)
+                prefixes.append(prefixList.at(i));
+        }
+    }
+
+    //append the empty 1 prefix
+    PhyxPrefix onePrefix;
+    onePrefix.unitGroup = unitGroup;
+    onePrefix.value = 1;
+    onePrefix.symbol = "";
+    prefixes.append(onePrefix);
+
+    qSort(prefixes.begin(), prefixes.end());
+    return prefixes;
 }
 
 bool PhyxUnitSystem::verifyUnit(PhyxUnit *unit)

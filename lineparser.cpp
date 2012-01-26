@@ -413,10 +413,13 @@ void LineParser::clearAllVariables()
 
 void LineParser::outputResult()
 {
+    PhyxCalculator::ResultVariable result = m_phyxCalculator->formatVariable(m_phyxCalculator->result(),
+                                                                             PhyxCalculator::MinimizeUnitOutputMode,
+                                                                             PhyxCalculator::UsePrefix);
     QString output;
     output.append("=");
-    output.append(PhyxCalculator::complexToString(m_phyxCalculator->resultValue()));
-    output.append(m_phyxCalculator->resultUnit());
+    output.append(result.value);
+    output.append(result.unit);
     insertOutput(output);
 }
 
