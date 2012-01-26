@@ -242,7 +242,7 @@ void MainWindow::initializeGUI()
     configureButton->setMenu(configureMenu);
 
     //initialize Main Toolbar
-    ui->mainToolBar->addAction(ui->actionNew);
+    /*ui->mainToolBar->addAction(ui->actionNew);
     ui->mainToolBar->addAction(ui->actionOpen);
     ui->mainToolBar->addSeparator();
     ui->mainToolBar->addAction(ui->actionSave);
@@ -258,7 +258,7 @@ void MainWindow::initializeGUI()
     ui->mainToolBar->addAction(ui->actionExport);
     ui->mainToolBar->addSeparator();
     ui->mainToolBar->addAction(ui->actionClose);
-    ui->mainToolBar->addSeparator();
+    ui->mainToolBar->addSeparator();*/
     configureAction = ui->mainToolBar->addWidget(configureButton);
 }
 
