@@ -53,6 +53,8 @@ public:
 
     QString const symbol();
     QString const preferedPrefix();                     ///< this overloaded function returns the prefered prefix if unit is a simple unit
+    QString const unitGroup();                          ///< this overloaded function returns the unit group of the unit if the unit is a simple unit
+
     PhyxUnitSystem * unitSystem() const
 {
     return m_unitSystem;

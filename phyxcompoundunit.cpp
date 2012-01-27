@@ -10,6 +10,15 @@ PhyxCompoundUnit::PhyxCompoundUnit(PhyxUnit *unit)
     this->fromSimpleUnit(unit);
 }
 
+void PhyxCompoundUnit::copyCompoundUnit(PhyxCompoundUnit *source, PhyxCompoundUnit *destination)
+{
+    destination->setPowers(source->powers());
+    destination->setUnitSystem(source->unitSystem());
+    destination->setScaleFactor(source->scaleFactor());
+    destination->setOffset(source->offset());
+    destination->setCompounds(source->compounds());
+}
+
 bool PhyxCompoundUnit::isSame(PhyxCompoundUnit *unit)
 {
     return (this->powersCompare(unit->powers()) && (m_compounds == unit->compounds()));
@@ -271,22 +280,12 @@ void PhyxCompoundUnit::fromSimpleUnit(PhyxUnit *unit)
     compoundsClear();
     compoundAppend(unit,1);
     setPowers(unit->powers());
-    setUnitGroup(unit->unitGroup());
 }
 
 void PhyxCompoundUnit::simplify()
 {
     for (int i = (m_compounds.size() - 1); i >= 0; i--)
         compoundSimplify(i);
-}
-
-void PhyxCompoundUnit::copyCompoundUnit(PhyxCompoundUnit *source, PhyxCompoundUnit *destination)
-{
-    destination->setPowers(source->powers());
-    destination->setUnitSystem(source->unitSystem());
-    destination->setScaleFactor(source->scaleFactor());
-    destination->setOffset(source->offset());
-    destination->setCompounds(source->compounds());
 }
 
 const QString PhyxCompoundUnit::symbol()
@@ -388,6 +387,20 @@ const QString PhyxCompoundUnit::preferedPrefix()
         {
             if (m_compounds.at(i).power != 0)
                 return m_compounds.at(i).unit->preferedPrefix();
+        }
+    }
+    else
+        return QString();
+}
+
+const QString PhyxCompoundUnit::unitGroup()
+{
+    if (this->isSimpleUnit())
+    {
+        for (int i = 0; i < m_compounds.size(); i++)
+        {
+            if (m_compounds.at(i).power != 0)
+                return m_compounds.at(i).unit->unitGroup();
         }
     }
     else
