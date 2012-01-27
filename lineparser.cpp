@@ -364,17 +364,20 @@ void LineParser::showVariables()
     m_variableTable->clearContents();
     m_variableTable->setRowCount(0);
 
-
     QMapIterator<QString, PhyxVariable*> i(*m_phyxCalculator->variables());
      while (i.hasNext()) {
          i.next();
+         PhyxCalculator::ResultVariable variable;
+         variable = m_phyxCalculator->formatVariable(i.value(),
+                                                     (PhyxCalculator::OutputMode)m_appSettings->output.unitMode,
+                                                     (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode);
 
          m_variableTable->setRowCount(row+1);
          newItem = new QTableWidgetItem(i.key());   // name
          m_variableTable->setItem(row, 0, newItem);
-         newItem = new QTableWidgetItem(PhyxCalculator::complexToString(i.value()->value()));
+         newItem = new QTableWidgetItem(variable.value);
          m_variableTable->setItem(row, 1, newItem);
-         newItem = new QTableWidgetItem(i.value()->unit()->symbol());
+         newItem = new QTableWidgetItem(variable.unit);
          m_variableTable->setItem(row, 2, newItem);
 
          row++;
@@ -393,13 +396,17 @@ void LineParser::showConstants()
     QMapIterator<QString, PhyxVariable*> i(*m_phyxCalculator->constants());
      while (i.hasNext()) {
          i.next();
+         PhyxCalculator::ResultVariable variable;
+         variable = m_phyxCalculator->formatVariable(i.value(),
+                                                     (PhyxCalculator::OutputMode)m_appSettings->output.unitMode,
+                                                     (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode);
 
          m_constantsTable->setRowCount(row+1);
          newItem = new QTableWidgetItem(i.key());   // name
          m_constantsTable->setItem(row, 0, newItem);
-         newItem = new QTableWidgetItem(PhyxCalculator::complexToString(i.value()->value()));
+         newItem = new QTableWidgetItem(variable.value);
          m_constantsTable->setItem(row, 1, newItem);
-         newItem = new QTableWidgetItem(i.value()->unit()->symbol());
+         newItem = new QTableWidgetItem(variable.unit);
          m_constantsTable->setItem(row, 2, newItem);
 
          row++;
@@ -414,8 +421,8 @@ void LineParser::clearAllVariables()
 void LineParser::outputResult()
 {
     PhyxCalculator::ResultVariable result = m_phyxCalculator->formatVariable(m_phyxCalculator->result(),
-                                                                             PhyxCalculator::MinimizeUnitOutputMode,
-                                                                             PhyxCalculator::UsePrefix);
+                                                                             (PhyxCalculator::OutputMode)m_appSettings->output.unitMode,
+                                                                             (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode);
     QString output;
     output.append("=");
     output.append(result.value);

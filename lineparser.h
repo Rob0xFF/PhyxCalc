@@ -101,6 +101,8 @@ public slots:
     void setAppSettings(AppSettings * arg)
     {
         m_appSettings = arg;
+        showConstants();
+        showVariables();
     }
     void setConstantsTable(QTableWidget * arg)
     {

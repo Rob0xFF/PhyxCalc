@@ -128,6 +128,8 @@ void MainWindow::loadSettings()
             appSettings.output.numbers.decimalPrecision = settings.value("decimalPrecision", 6).toInt();
             appSettings.output.numbers.format = settings.value("format", 'g').toInt();
         settings.endGroup();
+        appSettings.output.unitMode = settings.value("unitMode",1).toInt();
+        appSettings.output.prefixMode = settings.value("prefixMode",1).toInt();
     settings.endGroup();
     settings.beginGroup("lineParser");
         settings.beginGroup("expression");
@@ -167,6 +169,8 @@ void MainWindow::saveSettings()
             settings.setValue("decimalPrecision", appSettings.output.numbers.decimalPrecision);
             settings.setValue("format", appSettings.output.numbers.format);
         settings.endGroup();
+        settings.setValue("unitMode", appSettings.output.unitMode);
+        settings.setValue("prefixMode", appSettings.output.prefixMode);
     settings.endGroup();
     settings.beginGroup("lineParser");
         settings.beginGroup("expression");

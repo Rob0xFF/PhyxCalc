@@ -14,6 +14,8 @@ typedef struct {
             int decimalPrecision;
             char format;
         } numbers;
+        int unitMode;
+        int prefixMode;
     } output;
     struct {
         struct {

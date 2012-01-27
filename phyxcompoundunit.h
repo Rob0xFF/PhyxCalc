@@ -52,6 +52,7 @@ public:
     static void copyCompoundUnit(PhyxCompoundUnit *source, PhyxCompoundUnit *destination);
 
     QString const symbol();
+    QString const preferedPrefix();                     ///< this overloaded function returns the prefered prefix if unit is a simple unit
     PhyxUnitSystem * unitSystem() const
 {
     return m_unitSystem;

@@ -379,3 +379,17 @@ const QString PhyxCompoundUnit::symbol()
     }
     return QString();
 }
+
+const QString PhyxCompoundUnit::preferedPrefix()
+{
+    if (this->isSimpleUnit())
+    {
+        for (int i = 0; i < m_compounds.size(); i++)
+        {
+            if (m_compounds.at(i).power != 0)
+                return m_compounds.at(i).unit->preferedPrefix();
+        }
+    }
+    else
+        return QString();
+}

@@ -31,6 +31,24 @@ void SettingsDialog::setAppSettings(AppSettings *settings)
     }
     ui->decimalPrecisionSpin->setValue(settings->output.numbers.decimalPrecision);
 
+    switch (settings->output.unitMode)
+    {
+        case 1: ui->unitRadio1->setChecked(true);
+                break;
+        case 2: ui->unitRadio2->setChecked(true);
+                break;
+        case 3: ui->unitRadio3->setChecked(true);
+                break;
+    }
+
+    switch (settings->output.prefixMode)
+    {
+        case 1: ui->prefixRadio1->setChecked(true);
+                break;
+        case 2: ui->prefixRadio2->setChecked(true);
+                break;
+    }
+
     //read line parser options
     ui->expressionOutputNumbersCheck->setChecked(settings->lineParser.expression.outputWithNumbers);
     ui->expressionOutputResultCheck->setChecked(settings->lineParser.expression.outputResult);
@@ -51,6 +69,18 @@ void SettingsDialog::getAppSettings(AppSettings *settings)
         settings->output.numbers.format = 'G';
 
     settings->output.numbers.decimalPrecision = ui->decimalPrecisionSpin->value();
+
+    if (ui->unitRadio1->isChecked())
+        settings->output.unitMode = 1;
+    else if (ui->unitRadio2->isChecked())
+        settings->output.unitMode = 2;
+    else if (ui->unitRadio3->isChecked())
+        settings->output.unitMode = 3;
+
+    if (ui->prefixRadio1->isChecked())
+        settings->output.prefixMode = 1;
+    else if (ui->prefixRadio2->isChecked())
+        settings->output.prefixMode = 2;
 
     //write line parser options
     settings->lineParser.expression.outputWithNumbers = ui->expressionOutputNumbersCheck->isChecked();

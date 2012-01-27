@@ -29,7 +29,7 @@ void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags, QStr
 
    PhyxUnit *unit = new PhyxUnit();
    unit->setSymbol(symbol);
-   unit->powerAppend(symbol,1);
+   unit->powerAppend(preferedPrefix + symbol,1);
    unit->setFlags(flags);
    unit->setUnitGroup(unitGroup);
    unit->setPreferedPrefix(preferedPrefix);
@@ -96,12 +96,13 @@ bool PhyxUnitSystem::removeUnit(QString symbol)
     return true;
 }
 
-void PhyxUnitSystem::addPrefix(QString symbol, double value, QString unitGroup)
+void PhyxUnitSystem::addPrefix(QString symbol, double value, QString unitGroup, bool inputOnly)
 {
     PhyxPrefix prefix;
     prefix.value = value;
     prefix.unitGroup = unitGroup;
     prefix.symbol = symbol;
+    prefix.inputOnly = inputOnly;
 
     prefixMap.insert(symbol, prefix);
     emit prefixAdded(symbol);
@@ -193,12 +194,8 @@ QList<PhyxUnitSystem::PhyxPrefix> PhyxUnitSystem::prefixes(QString unitGroup) co
     while (mapIterator.hasNext())
     {
         mapIterator.next();
-        QList<PhyxPrefix> prefixList = prefixMap.values(mapIterator.key());
-        for (int i = 0; i < prefixList.size(); i++)
-        {
-            if (prefixList.at(i).unitGroup == unitGroup)
-                prefixes.append(prefixList.at(i));
-        }
+        if (mapIterator.value().unitGroup == unitGroup)
+            prefixes.append(mapIterator.value());
     }
 
     //append the empty 1 prefix
@@ -206,9 +203,10 @@ QList<PhyxUnitSystem::PhyxPrefix> PhyxUnitSystem::prefixes(QString unitGroup) co
     onePrefix.unitGroup = unitGroup;
     onePrefix.value = 1;
     onePrefix.symbol = "";
+    onePrefix.inputOnly = false;
     prefixes.append(onePrefix);
 
-    qSort(prefixes.begin(), prefixes.end());
+    qSort(prefixes.begin(), prefixes.end());    // sort the prefixes
     return prefixes;
 }
 

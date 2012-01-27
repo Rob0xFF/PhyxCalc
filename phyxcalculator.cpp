@@ -14,6 +14,7 @@ void PhyxCalculator::initialize()
     valueBuffer = 1;
     prefixBuffer = "";
     unitBuffer = "";
+    flagBuffer = 0;
     m_error = false;
     m_errorNumber = 0;
     m_errorPosition = 0;
@@ -106,6 +107,8 @@ void PhyxCalculator::initialize()
     functionMap.insert("bufferString",   &PhyxCalculator::bufferString);
     functionMap.insert("bufferUnitGroup",&PhyxCalculator::bufferUnitGroup);
     functionMap.insert("pushVariable",  &PhyxCalculator::pushVariable);
+
+    functionMap.insert("setInputOnlyFlag",  &PhyxCalculator::setInputOnlyFlag);
 
     functionMap.insert("outputVariable",&PhyxCalculator::outputVariable);
     functionMap.insert("unitGroupAdd",  &PhyxCalculator::unitGroupAdd);
@@ -260,6 +263,11 @@ void PhyxCalculator::clearResult()
 {
     m_resultValue = PhyxValueDataType(0.0,0.0);
     m_resultUnit = "";
+}
+
+void PhyxCalculator::clearFlags()
+{
+    flagBuffer = 0;
 }
 
 bool PhyxCalculator::setExpression(QString expression)
@@ -473,17 +481,31 @@ PhyxValueDataType PhyxCalculator::stringToComplex(QString string)
     return value;
 }
 
-PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefx(PhyxValueDataType value, QString unitGroup) const
+PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefx(PhyxValueDataType value, QString unitGroup, QString preferedPrefix) const
 {
     long double realValue = value.real();
+    long double preferedPrefixValue = 1;
+    if (!preferedPrefix.isEmpty())
+        preferedPrefixValue = unitSystem->prefix(preferedPrefix, unitGroup).value;
+
 
     QList<PhyxUnitSystem::PhyxPrefix> prefixes = unitSystem->prefixes(unitGroup);
     for (int i = prefixes.size()-1; i >= 0; i--)
     {
+        if (prefixes.at(i).inputOnly)
+            continue;
+
+        prefixes[i].value /= preferedPrefixValue;
         long double tmpValue = realValue / prefixes.at(i).value;
+
         if (tmpValue >= 1)
             return prefixes.at(i);
     }
+
+    PhyxUnitSystem::PhyxPrefix prefix;
+    prefix.value = 1;
+    prefix.symbol = "";
+    return prefix;
 }
 
 PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *variable, OutputMode outputMode, PrefixMode prefixMode) const
@@ -504,8 +526,12 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
         {
             if (unit->isSimpleUnit())
             {
-                PhyxUnitSystem::PhyxPrefix prefix = getBestPrefx(value, unit->unitGroup());     //get best prefix
+                PhyxUnitSystem::PhyxPrefix prefix = getBestPrefx(value, unit->unitGroup(), unit->preferedPrefix());     //get best prefix
                 value /= PhyxValueDataType(prefix.value, 0.0);
+
+                if (!unit->preferedPrefix().isEmpty())      // for preferd prefix handling
+                    result.unit.remove(0, unit->preferedPrefix().size());
+
                 result.unit.prepend(prefix.symbol);
             }
         }
@@ -1173,6 +1199,7 @@ void PhyxCalculator::unitAdd()
     stringBuffer.clear();
     unitGroupBuffer.clear();
     prefixBuffer.clear();
+    clearFlags();
 }
 
 void PhyxCalculator::unitRemove()
@@ -1295,6 +1322,11 @@ void PhyxCalculator::pushVariable()
     prefixBuffer.clear();
 }
 
+void PhyxCalculator::setInputOnlyFlag()
+{
+    flagBuffer |= InputOnlyFlag;
+}
+
 void PhyxCalculator::outputVariable()
 {
     if (!variableStack.isEmpty())
@@ -1326,10 +1358,11 @@ void PhyxCalculator::unitGroupRemove()
 void PhyxCalculator::prefixAdd()
 {
     PhyxVariable *variable1 = variableStack.pop();
-    unitSystem->addPrefix(stringBuffer, variable1->value().real(), unitGroupBuffer);
+    unitSystem->addPrefix(stringBuffer, variable1->value().real(), unitGroupBuffer, (flagBuffer & InputOnlyFlag));
 
     unitGroupBuffer.clear();
     stringBuffer.clear();
+    clearFlags();
     delete variable1;
 }
 
