@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    settingsDir = QDir::currentPath() + "/settings";
+    settingsDir = QDir::currentPath() + "/settings/";
     firstStartConfig();
 
     unitLoader = new UnitLoader();
@@ -82,8 +82,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 void MainWindow::copyResource(QString name)
 {
-    if (!QFile::exists(settingsDir + "/" + name))
-        QFile::copy(":/settings/" + name, settingsDir + "/" + name);
+    if (!QFile::exists(settingsDir + name))
+    {
+        QFile::copy(":/settings/" + name, settingsDir + name);
+        QFile::setPermissions(settingsDir + name, QFile::ReadOwner | QFile::WriteOwner);
+    }
 }
 
 void MainWindow::firstStartConfig()
@@ -102,7 +105,7 @@ void MainWindow::firstStartConfig()
 
 void MainWindow::loadSettings()
 {
-    QSettings settings(settingsDir + "/settings.ini", QSettings::IniFormat);
+    QSettings settings(settingsDir + "settings.ini", QSettings::IniFormat);
 
     settings.beginGroup("window");
         this->restoreState(settings.value("state", QByteArray()).toByteArray());
@@ -144,7 +147,7 @@ void MainWindow::loadSettings()
 
 void MainWindow::saveSettings()
 {
-    QSettings settings(settingsDir + "/settings.ini", QSettings::IniFormat);
+    QSettings settings(settingsDir + "settings.ini", QSettings::IniFormat);
 
     settings.beginGroup("window");
         settings.setValue("state",this->saveState());
@@ -180,6 +183,8 @@ void MainWindow::saveSettings()
     settings.endGroup();
 
     settings.setValue("recentDocuments", recentDocuments);
+
+    settings.sync();
 }
 
 void MainWindow::initializeGUI()
