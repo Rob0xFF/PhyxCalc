@@ -410,10 +410,10 @@ QString PhyxCalculator::errorString() const
     return tr("error at position %1: %2").arg(m_errorPosition).arg(output);
 }
 
-QString PhyxCalculator::complexToString(const PhyxValueDataType number)
+QString PhyxCalculator::complexToString(const PhyxValueDataType number, int precision, char numberFormat)
 {
     QString string;
-    boost::format format("%.10g");
+    boost::format format(tr("%.%1%2").arg(precision).arg(numberFormat).toStdString());
     int components = 0;
 
     if (number.real() != 0)
@@ -508,7 +508,11 @@ PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefx(PhyxValueDataType value,
     return prefix;
 }
 
-PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *variable, OutputMode outputMode, PrefixMode prefixMode) const
+PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *variable,
+                                                              OutputMode outputMode,
+                                                              PrefixMode prefixMode,
+                                                              int precision,
+                                                              char numberFormat) const
 {
     ResultVariable result;
     PhyxValueDataType value = variable->value();
@@ -553,7 +557,7 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
         break;
     }
 
-    result.value = complexToString(value);
+    result.value = complexToString(value, precision, numberFormat);
 
     return result;
 }

@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    settingsDir = "settings";
+    settingsDir = QDir::currentPath() + "/settings";
     firstStartConfig();
 
     unitLoader = new UnitLoader();
@@ -27,10 +27,10 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(closeAllTabs()));
 
     initializeGUI();
-    addNewTab();
     loadAllDocks();
 
     loadSettings();
+    addNewTab();
 }
 
 MainWindow::~MainWindow()
@@ -82,7 +82,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 void MainWindow::copyResource(QString name)
 {
-    if (!QFile(settingsDir + "/" + name).exists())
+    if (!QFile::exists(settingsDir + "/" + name))
         QFile::copy(":/settings/" + name, settingsDir + "/" + name);
 }
 

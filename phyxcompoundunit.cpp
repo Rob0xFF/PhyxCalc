@@ -389,8 +389,8 @@ const QString PhyxCompoundUnit::preferedPrefix()
                 return m_compounds.at(i).unit->preferedPrefix();
         }
     }
-    else
-        return QString();
+
+    return QString();
 }
 
 const QString PhyxCompoundUnit::unitGroup()
@@ -403,6 +403,6 @@ const QString PhyxCompoundUnit::unitGroup()
                 return m_compounds.at(i).unit->unitGroup();
         }
     }
-    else
-        return QString();
+
+    return QString();
 }

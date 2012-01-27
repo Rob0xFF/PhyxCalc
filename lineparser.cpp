@@ -181,7 +181,9 @@ QString LineParser::replaceVariables(QString expression, bool insertValue, bool 
                  {
                     QString variableValue;
                     if (insertValue)
-                        variableValue.append(PhyxCalculator::complexToString(i.value()->value()));
+                        variableValue.append(PhyxCalculator::complexToString(i.value()->value(),
+                                                                             m_appSettings->output.numbers.decimalPrecision,
+                                                                             m_appSettings->output.numbers.format));
                     if (insertUnit)
                         variableValue.append(i.value()->unit()->symbol());
                     expression.replace(variableName, variableValue);
@@ -370,7 +372,9 @@ void LineParser::showVariables()
          PhyxCalculator::ResultVariable variable;
          variable = m_phyxCalculator->formatVariable(i.value(),
                                                      (PhyxCalculator::OutputMode)m_appSettings->output.unitMode,
-                                                     (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode);
+                                                     (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode,
+                                                     m_appSettings->output.numbers.decimalPrecision,
+                                                     m_appSettings->output.numbers.format);
 
          m_variableTable->setRowCount(row+1);
          newItem = new QTableWidgetItem(i.key());   // name
@@ -399,7 +403,9 @@ void LineParser::showConstants()
          PhyxCalculator::ResultVariable variable;
          variable = m_phyxCalculator->formatVariable(i.value(),
                                                      (PhyxCalculator::OutputMode)m_appSettings->output.unitMode,
-                                                     (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode);
+                                                     (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode,
+                                                     m_appSettings->output.numbers.decimalPrecision,
+                                                     m_appSettings->output.numbers.format);
 
          m_constantsTable->setRowCount(row+1);
          newItem = new QTableWidgetItem(i.key());   // name
@@ -422,7 +428,9 @@ void LineParser::outputResult()
 {
     PhyxCalculator::ResultVariable result = m_phyxCalculator->formatVariable(m_phyxCalculator->result(),
                                                                              (PhyxCalculator::OutputMode)m_appSettings->output.unitMode,
-                                                                             (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode);
+                                                                             (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode,
+                                                                             m_appSettings->output.numbers.decimalPrecision,
+                                                                             m_appSettings->output.numbers.format);
     QString output;
     output.append("=");
     output.append(result.value);

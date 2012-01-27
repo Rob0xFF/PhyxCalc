@@ -165,10 +165,10 @@
             <item>
              <widget class="QSpinBox" name="decimalPrecisionSpin">
               <property name="minimum">
-               <number>-1</number>
+               <number>0</number>
               </property>
               <property name="maximum">
-               <number>24</number>
+               <number>99</number>
               </property>
              </widget>
             </item>

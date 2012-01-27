@@ -105,10 +105,10 @@ public:
         return m_result;
     }
 
-    static QString complexToString(const PhyxValueDataType number);
+    static QString complexToString(const PhyxValueDataType number, int precision, char numberFormat);
     static PhyxValueDataType stringToComplex(QString string);
 
-    ResultVariable formatVariable(PhyxVariable *variable, OutputMode outputMode, PrefixMode prefixMode) const;
+    ResultVariable formatVariable(PhyxVariable *variable, OutputMode outputMode, PrefixMode prefixMode, int precision, char numberFormat) const;
 
 private:
     QStack<PhyxVariable*>       variableStack;                                  /// stack for variable calculation
