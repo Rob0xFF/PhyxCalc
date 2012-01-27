@@ -220,9 +220,7 @@ bool PhyxUnitSystem::verifyUnit(PhyxUnit *unit)
             i.next();
             if (i.value()->isSame(unit))
             {
-                unit->setSymbol(i.value()->symbol());
-                unit->setName(i.value()->name());
-                unit->setFlags(i.value()->flags());
+                PhyxUnit::copyUnit(i.value(), unit);
                 return true;
             }
         }

@@ -484,7 +484,7 @@ PhyxValueDataType PhyxCalculator::stringToComplex(QString string)
 PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefx(PhyxValueDataType value, QString unitGroup, QString preferedPrefix) const
 {
     long double realValue = value.real();
-    long double preferedPrefixValue = 1;
+    long double preferedPrefixValue = 1.0L;
     if (!preferedPrefix.isEmpty())
         preferedPrefixValue = unitSystem->prefix(preferedPrefix, unitGroup).value;
 
@@ -498,7 +498,7 @@ PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefx(PhyxValueDataType value,
         prefixes[i].value /= preferedPrefixValue;
         long double tmpValue = realValue / prefixes.at(i).value;
 
-        if (tmpValue >= 1)
+        if ((double)tmpValue >= 1.0)
             return prefixes.at(i);
     }
 
