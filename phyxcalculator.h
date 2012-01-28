@@ -186,6 +186,7 @@ private:
     void valueAbs();
     void valueMax();
     void valueMin();
+    void valueAvg();
     void valuePi();
     void valueInt();
     void valueTrunc();
@@ -198,10 +199,30 @@ private:
     void valueRandint();
     void valueRandg();
     void valueFaculty();
+
     void complexArg();
     void complexNorm();
     void complexConj();
     void complexPolar();
+
+    void logicAnd();
+    void logicOr();
+    void logicNand();
+    void logicNor();
+    void logicXand();
+    void logicXor();
+    void logicNot();
+    void logicEqual();
+    void logicNotEqual();
+    void logicGreater();
+    void logicGreaterOrEqual();
+    void logicSmaller();
+    void logicSmallerOrEqual();
+
+    void bitAnd();
+    void bitOr();
+    void bitXor();
+    void bitInv();
 
     /** functions for unit calculation */
     void unitCheckDimensionless();

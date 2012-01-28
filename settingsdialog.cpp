@@ -28,6 +28,10 @@ void SettingsDialog::setAppSettings(AppSettings *settings)
              break;
     case 'G':ui->formatRadioG->setChecked(true);
              break;
+    case 'x':ui->formatRadiox->setChecked(true);
+             break;
+    case 'X':ui->formatRadioX->setChecked(true);
+             break;
     }
     ui->decimalPrecisionSpin->setValue(settings->output.numbers.decimalPrecision);
 
@@ -67,6 +71,11 @@ void SettingsDialog::getAppSettings(AppSettings *settings)
         settings->output.numbers.format = 'g';
     else if (ui->formatRadioG->isChecked())
         settings->output.numbers.format = 'G';
+    else if (ui->formatRadiox->isChecked())
+        settings->output.numbers.format = 'x';
+    else if (ui->formatRadioX->isChecked())
+        settings->output.numbers.format = 'X';
+
 
     settings->output.numbers.decimalPrecision = ui->decimalPrecisionSpin->value();
 
@@ -90,4 +99,10 @@ void SettingsDialog::getAppSettings(AppSettings *settings)
 void SettingsDialog::on_listWidget_currentRowChanged(int currentRow)
 {
     ui->stackedWidget->setCurrentIndex(currentRow);
+}
+
+void SettingsDialog::on_formatRadioCustom_toggled(bool checked)
+{
+    ui->decimalPrecisionSpin->setEnabled(!checked);
+    ui->formatCustomEdit->setEnabled(checked);
 }

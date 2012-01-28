@@ -63,6 +63,7 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueAbs",      &PhyxCalculator::valueAbs);
     functionMap.insert("valueMax",      &PhyxCalculator::valueMax);
     functionMap.insert("valueMin",      &PhyxCalculator::valueMin);
+    functionMap.insert("valueAvg",      &PhyxCalculator::valueAvg);
     functionMap.insert("valuePi",       &PhyxCalculator::valuePi);
     functionMap.insert("valueInt",      &PhyxCalculator::valueInt);
     functionMap.insert("valueTrunc",    &PhyxCalculator::valueTrunc);
@@ -75,10 +76,30 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueRandint",  &PhyxCalculator::valueRandint);
     functionMap.insert("valueRandg",    &PhyxCalculator::valueRandg);
     functionMap.insert("valueFaculty",  &PhyxCalculator::valueFaculty);
+
     functionMap.insert("complexArg",    &PhyxCalculator::complexArg);
     functionMap.insert("complexNorm",   &PhyxCalculator::complexNorm);
     functionMap.insert("complexConj",   &PhyxCalculator::complexConj);
     functionMap.insert("complexPolar",  &PhyxCalculator::complexPolar);
+
+    functionMap.insert("logicAnd",      &PhyxCalculator::logicAnd);
+    functionMap.insert("logicOr",       &PhyxCalculator::logicOr);
+    functionMap.insert("logicNand",     &PhyxCalculator::logicNand);
+    functionMap.insert("logicNor",      &PhyxCalculator::logicNor);
+    functionMap.insert("logicXand",     &PhyxCalculator::logicXand);
+    functionMap.insert("logicXor",      &PhyxCalculator::logicXor);
+    functionMap.insert("logicNot",      &PhyxCalculator::logicNot);
+    functionMap.insert("logicEqual",    &PhyxCalculator::logicEqual);
+    functionMap.insert("logicNotEqual", &PhyxCalculator::logicNotEqual);
+    functionMap.insert("logicGreater",  &PhyxCalculator::logicGreater);
+    functionMap.insert("logicGreaterOrEqual",      &PhyxCalculator::logicGreaterOrEqual);
+    functionMap.insert("logicSmaller",  &PhyxCalculator::logicSmaller);
+    functionMap.insert("logicSmallerOrEqual",      &PhyxCalculator::logicSmallerOrEqual);
+
+    functionMap.insert("bitAnd",        &PhyxCalculator::bitAnd);
+    functionMap.insert("bitOr",         &PhyxCalculator::bitOr);
+    functionMap.insert("bitXor",        &PhyxCalculator::bitXor);
+    functionMap.insert("bitInv",        &PhyxCalculator::bitInv);
 
     functionMap.insert("unitCheckDimensionless",    &PhyxCalculator::unitCheckDimensionless);
     functionMap.insert("unitCheckDimensionless2",   &PhyxCalculator::unitCheckDimensionless2);
@@ -415,16 +436,27 @@ QString PhyxCalculator::complexToString(const PhyxValueDataType number, int prec
     QString string;
     boost::format format(tr("%.%1%2").arg(precision).arg(numberFormat).toStdString());
     int components = 0;
+    bool useInteger = false;
 
-    if (number.real() != 0)
+    //check wheter number is integer or not
+    if (number.imag() == 0.0L)
+    {
+        if ((long double)((long int)number.real()) == number.real())
+            useInteger = true;
+    }
+
+    if (number.real() != 0.0L)
     {
         std::stringstream ss;
-        ss << format % number.real();
+        if (!useInteger)
+            ss << format % number.real();
+        else
+            ss << format % (long int)number.real();
         string.append(QString::fromStdString(ss.str()));
         components++;
     }
 
-    if (number.imag() != 0)
+    if (number.imag() != 0.0L)
     {
         if (!string.isEmpty())
             string.append("+");
@@ -890,6 +922,18 @@ void PhyxCalculator::valueMin()
     delete variable2;
 }
 
+void PhyxCalculator::valueAvg()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue((variable1->value() + variable2->value())
+                        / PhyxValueDataType(2.0L,0.0L));
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
 void PhyxCalculator::valuePi()
 {
     valueBuffer = M_PI;
@@ -1044,6 +1088,190 @@ void PhyxCalculator::complexPolar()
 {
     PhyxVariable *variable1 = variableStack.pop();
     variable1->setValue(std::polar(abs(variable1->value()), arg(variable1->value())));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::logicAnd()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue(variable1->value().real() && variable2->value().real());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::logicOr()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue(variable1->value().real() || variable2->value().real());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::logicNand()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue(!(variable1->value().real() && variable2->value().real()));
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::logicNor()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue(!(variable1->value().real() || variable2->value().real()));
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::logicXand()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue((variable1->value().real() && variable2->value().real())
+                        || (!variable1->value().real() && !variable2->value().real()));
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::logicXor()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue((variable1->value().real() && !variable2->value().real())
+                        || (!variable1->value().real() && variable2->value().real()));
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::logicNot()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(!variable1->value().real());
+    variableStack.push(variable1);
+
+}
+
+void PhyxCalculator::logicEqual()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue(variable1->value() == variable2->value());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::logicNotEqual()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    variable1->setValue(variable1->value() != variable2->value());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::logicGreater()
+{
+    PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(variable1->value().real() > variable2->value().real());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::logicGreaterOrEqual()
+{
+    PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(variable1->value().real() >= variable2->value().real());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::logicSmaller()
+{
+    PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(variable1->value().real() < variable2->value().real());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::logicSmallerOrEqual()
+{
+    PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(variable1->value().real() <= variable2->value().real());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::bitAnd()
+{
+    PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue((long int)variable1->value().real() & (long int)variable2->value().real());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::bitOr()
+{
+    PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue((long int)variable1->value().real() | (long int)variable2->value().real());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::bitXor()
+{
+    PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue((long int)variable1->value().real() ^ (long int)variable2->value().real());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::bitInv()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(~(long int)variable1->value().real());
     variableStack.push(variable1);
 }
 

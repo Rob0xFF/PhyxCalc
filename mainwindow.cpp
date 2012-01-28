@@ -522,6 +522,9 @@ void MainWindow::loadDock(QString name, QStringList items)
         QString widgetName, toolTip, function;
         QStringList list;
 
+        if (items.at(i).isEmpty())
+            continue;
+
         //split the item and read name and tooltip
         list = items.at(i).split(";");
         if (list.size() == 2)       //for lists with size 2 just copy the second item
