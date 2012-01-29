@@ -223,6 +223,8 @@ private:
     void bitOr();
     void bitXor();
     void bitInv();
+    void bitShiftLeft();
+    void bitShiftRight();
 
     /** functions for unit calculation */
     void unitCheckDimensionless();

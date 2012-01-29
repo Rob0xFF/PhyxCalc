@@ -100,6 +100,8 @@ void PhyxCalculator::initialize()
     functionMap.insert("bitOr",         &PhyxCalculator::bitOr);
     functionMap.insert("bitXor",        &PhyxCalculator::bitXor);
     functionMap.insert("bitInv",        &PhyxCalculator::bitInv);
+    functionMap.insert("bitShiftLeft",      &PhyxCalculator::bitShiftLeft);
+    functionMap.insert("bitShiftRight",     &PhyxCalculator::bitShiftRight);
 
     functionMap.insert("unitCheckDimensionless",    &PhyxCalculator::unitCheckDimensionless);
     functionMap.insert("unitCheckDimensionless2",   &PhyxCalculator::unitCheckDimensionless2);
@@ -1173,7 +1175,8 @@ void PhyxCalculator::logicEqual()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    variable1->setValue(variable1->value() == variable2->value());
+    variable1->setValue((variable1->value() == variable2->value()) && variable1->unit()->isSame(variable2->unit()));
+    variable1->setUnit(new PhyxUnit());
     variableStack.push(variable1);
 
     delete variable2;
@@ -1184,7 +1187,8 @@ void PhyxCalculator::logicNotEqual()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    variable1->setValue(variable1->value() != variable2->value());
+    variable1->setValue((variable1->value() != variable2->value()) || !variable1->unit()->isSame(variable2->unit()));
+    variable1->setUnit(new PhyxUnit());
     variableStack.push(variable1);
 
     delete variable2;
@@ -1273,6 +1277,28 @@ void PhyxCalculator::bitInv()
 
     variable1->setValue(~(long int)variable1->value().real());
     variableStack.push(variable1);
+}
+
+void PhyxCalculator::bitShiftLeft()
+{
+    PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue((long int)variable1->value().real() << (long int)variable2->value().real());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::bitShiftRight()
+{
+    PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue((long int)variable1->value().real() >> (long int)variable2->value().real());
+    variableStack.push(variable1);
+
+    delete variable2;
 }
 
 void PhyxCalculator::unitCheckDimensionless()
