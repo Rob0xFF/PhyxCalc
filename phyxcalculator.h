@@ -154,8 +154,13 @@ private:
     /** functions for value calculation */
     void valueCheckComplex();
     void valueCheckComplex2();
+    void valueCheckComplex2th();
+    void valueCheckComplex3th();
     void valueCheckPositive();
-    void valueCheckInteger();
+    void valueCheckInteger();       ///< checks wheter the last argument is an integer or not
+    void valueCheckInteger2();      ///< checks wheter the last 2 arguments are integer or not
+    void valueCheckInteger2th();    ///< checks wheter the second argument is an integer or not
+    void valueCheckInteger3th();    ///< checks wheter the third argument is an integer or not
     void valueAdd();
     void valueSub();
     void valueMul();
@@ -226,9 +231,13 @@ private:
     void bitShiftLeft();
     void bitShiftRight();
 
+    void conditionIfElse();
+
     /** functions for unit calculation */
     void unitCheckDimensionless();
     void unitCheckDimensionless2();
+    void unitCheckDimensionless2th();
+    void unitCheckDimensionless3th();
     void unitCheckConvertible();
     void unitConvert();
     void unitMul();

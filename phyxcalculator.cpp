@@ -31,8 +31,13 @@ void PhyxCalculator::initialize()
     //map functions
     functionMap.insert("valueCheckComplex",     &PhyxCalculator::valueCheckComplex);
     functionMap.insert("valueCheckComplex2",    &PhyxCalculator::valueCheckComplex2);
-    functionMap.insert("valueCheckPositive",         &PhyxCalculator::valueCheckPositive);
-    functionMap.insert("valueCheckInteger",          &PhyxCalculator::valueCheckInteger);
+    functionMap.insert("valueCheckComplex2th",  &PhyxCalculator::valueCheckComplex2th);
+    functionMap.insert("valueCheckComplex3th",  &PhyxCalculator::valueCheckComplex3th);
+    functionMap.insert("valueCheckPositive",    &PhyxCalculator::valueCheckPositive);
+    functionMap.insert("valueCheckInteger",     &PhyxCalculator::valueCheckInteger);
+    functionMap.insert("valueCheckInteger2",    &PhyxCalculator::valueCheckInteger2);
+    functionMap.insert("valueCheckInteger2th",  &PhyxCalculator::valueCheckInteger2th);
+    functionMap.insert("valueCheckInteger3th",  &PhyxCalculator::valueCheckInteger3th);
     functionMap.insert("valueAdd",      &PhyxCalculator::valueAdd);
     functionMap.insert("valueSub",      &PhyxCalculator::valueSub);
     functionMap.insert("valueMul",      &PhyxCalculator::valueMul);
@@ -103,8 +108,12 @@ void PhyxCalculator::initialize()
     functionMap.insert("bitShiftLeft",      &PhyxCalculator::bitShiftLeft);
     functionMap.insert("bitShiftRight",     &PhyxCalculator::bitShiftRight);
 
+    functionMap.insert("conditionIfElse",   &PhyxCalculator::conditionIfElse);
+
     functionMap.insert("unitCheckDimensionless",    &PhyxCalculator::unitCheckDimensionless);
     functionMap.insert("unitCheckDimensionless2",   &PhyxCalculator::unitCheckDimensionless2);
+    functionMap.insert("unitCheckDimensionless2th", &PhyxCalculator::unitCheckDimensionless2th);
+    functionMap.insert("unitCheckDimensionless3th", &PhyxCalculator::unitCheckDimensionless3th);
     functionMap.insert("unitCheckConvertible",      &PhyxCalculator::unitCheckConvertible);
     functionMap.insert("unitConvert",   &PhyxCalculator::unitConvert);
     functionMap.insert("unitMul",       &PhyxCalculator::unitMul);
@@ -187,6 +196,20 @@ void PhyxCalculator::loadGrammar(QString fileName)
             QStringList ruleData = line.split(';');
             QString rule;
             QString functions;
+
+            for (int i = ruleData.size()-2; i >= 0; i--)    // handle termination of ;
+            {
+                if (ruleData.at(i).at(ruleData.at(i).size()-1) == '\\')
+                {
+                    if (ruleData.size() > (i+1))
+                    {
+                        ruleData[i].chop(1);
+                        ruleData[i].append(';');
+                        ruleData[i].append(ruleData.at(i+1));
+                        ruleData.removeAt(i+1);
+                    }
+                }
+            }
 
             rule = ruleData.at(0).trimmed();
             if (ruleData.size() > 1)
@@ -618,6 +641,32 @@ void PhyxCalculator::valueCheckComplex2()
     variableStack.push(variable1);
 }
 
+void PhyxCalculator::valueCheckComplex2th()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    if (variable2->value().imag() != 0)
+        raiseException(ValueComplexError);
+
+    variableStack.push(variable2);
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueCheckComplex3th()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable3 = variableStack.pop();
+
+    if (variable3->value().imag() != 0)
+        raiseException(ValueComplexError);
+
+    variableStack.push(variable3);
+    variableStack.push(variable2);
+    variableStack.push(variable1);
+}
+
 void PhyxCalculator::valueCheckPositive()
 {
     PhyxVariable *variable1 = variableStack.pop();
@@ -632,9 +681,49 @@ void PhyxCalculator::valueCheckInteger()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    if ((int)variable1->value().real() != variable1->value().real())
+    if ((long int)variable1->value().real() != variable1->value().real())
         raiseException(ValueNotIntegerError);
 
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueCheckInteger2()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    if ((long int)variable1->value().real() != variable1->value().real())
+        raiseException(ValueNotIntegerError);
+    else if ((long int)variable2->value().real() != variable2->value().real())
+        raiseException(ValueNotIntegerError);
+
+    variableStack.push(variable2);
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueCheckInteger2th()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    if ((long int)variable2->value().real() != variable2->value().real())
+        raiseException(ValueNotIntegerError);
+
+    variableStack.push(variable2);
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueCheckInteger3th()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable3 = variableStack.pop();
+
+    if ((long int)variable3->value().real() != variable3->value().real())
+        raiseException(ValueNotIntegerError);
+
+    variableStack.push(variable3);
+    variableStack.push(variable2);
     variableStack.push(variable1);
 }
 
@@ -1047,13 +1136,13 @@ void PhyxCalculator::valueFaculty()
         raiseException(ValueNotPositiveError);
         return;
     }
-    else if ((int)value != value)
+    else if ((long int)value != value)
     {
         raiseException(ValueNotIntegerError);
         return;
     }
 
-    int n = (int)boost::math::round(value);
+    long int n = (long int)boost::math::round(value);
     value = 1;
     for (int i = 2; i <=n; i++)
         value *= i;
@@ -1301,6 +1390,26 @@ void PhyxCalculator::bitShiftRight()
     delete variable2;
 }
 
+void PhyxCalculator::conditionIfElse()
+{
+    PhyxVariable *variable3 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
+
+    if ((long int)variable1->value().real())
+    {
+        variableStack.push(variable2);
+        delete variable3;
+    }
+    else
+    {
+        variableStack.push(variable3);
+        delete variable2;
+    }
+
+    delete variable1;
+}
+
 void PhyxCalculator::unitCheckDimensionless()
 {
     PhyxVariable *variable1 = variableStack.pop();
@@ -1326,6 +1435,36 @@ void PhyxCalculator::unitCheckDimensionless2()
         variable2->unit()->simplify();
     }
 
+    variableStack.push(variable2);
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::unitCheckDimensionless2th()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    if (!variable2->unit()->isDimensionlessUnit())
+        raiseException(UnitNotDimensionlessError);
+    else
+        variable2->unit()->simplify();
+
+    variableStack.push(variable2);
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::unitCheckDimensionless3th()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable3 = variableStack.pop();
+
+    if (!variable3->unit()->isDimensionlessUnit())
+        raiseException(UnitNotDimensionlessError);
+    else
+        variable3->unit()->simplify();
+
+    variableStack.push(variable3);
     variableStack.push(variable2);
     variableStack.push(variable1);
 }

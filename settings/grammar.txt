@@ -4,31 +4,13 @@
 # Nichtterminierte Symbole in Normklammern z.B. |A|
 # Terminierte Symbole außerhalb der Normklammern
 # Linksseitige Symbole ohne Klammern vor dem =
-# Spezialsymbole (positive Zahlen in Normklammern) sind:
-# (alle ab 3 dürfen nur als einziges Symbol in einer Regel vorkommen)
-# |0| Anfangs- und Endsymbol (automatisch!)
-# |1| Abschnitt aus terminierten Symbolen (automatisch!)
-# |2| N.N. (Groß-/Kleinschreibung)
-# |3| String in Anführungszeichen ""
-# |4| Folge von Leerzeichen
-# |5| Folge von Ziffern
-# |6| Variable
-# |7| Zeichenfolge für neue Variable
-# |8| terminiertes Symbol |
-# |9| si-Präfix
-# |10| 2-Stelliger si-Präfix (nämlich da = Deka)
-# |11| Einheit
-# |12| SI-Einheit
-# |13| Folge von mindestens einer Ziffer mit Basis bis 36, klein
-# |14| Folge von mindestens einer Ziffer mit Basis bis 36, groß
-# |15| Einzelne Ziffer 0-9
-# |16| Offset-Einheit
 #
-# \~ = any character except =,:,@
+#
+# \~ = any character except =,:,@,...
 # \* = any character
 #
 # Definition needs following outline:
-#   Rule        |   functions               |   param function  |   parameter
+#   Rule            |   functions
 S=|p1|              ; outputVariable
 S=|string|=|p1|     ; variableAdd
 S=|variable|=       ; variableRemove
@@ -49,47 +31,92 @@ S=|string|=[|p1|]|p1|                       ; unitAdd                           
 S=|string|@|unitGroup|=[|p1|]|p1|           ; unitAdd                                               //define offset unit with unit system
 S=|string|@|unitGroup|@|prefix|=[|p1|]|p1|  ; unitAdd                                               //define offset unit with unit system and prefered prefix
 S=|p1|->|p1|        ; unitCheckConvertible, unitConvert, outputVariable
+
+#Priority 1: assignement
 p1=|p2|
+
+#Priority 2: conditional
+p2=|p3|?|p3|:|p3|                     ; unitCheckDimensionless3th, valueCheckComplex3th, valueCheckInteger3th, conditionIfElse
+p2=if(|p3|)then(|p3|)else(|p3|)       ; unitCheckDimensionless3th, valueCheckComplex3th, valueCheckInteger3th, conditionIfElse
+p2=IF(|p3|\;|p3|\;|p3|)                 ; unitCheckDimensionless3th, valueCheckComplex3th, valueCheckInteger3th, conditionIfElse
 p2=|p3|
-p3=|p3|OR|p4|           ; unitCheckDimensionless2, valueCheckComplex2, logicOr
-p3=|p3|NOR|p4|          ; unitCheckDimensionless2, valueCheckComplex2, logicNor
+
+#Priority 3: logical OR and NOR
+p3=|p3||OR||p4|         ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, logicOr
+p3=|p3|NOR|p4|          ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, logicNor
 p3=|p4|
-p4=|p4|XOR|p5|          ; unitCheckDimensionless2, valueCheckComplex2, logicXor
+OR=OR
+OR=\|\|
+
+#Priortiy 4: logical XOR
+p4=|p4|XOR|p5|          ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, logicXor
 p4=|p5|
-p5=|p5|AND|p6|          ; unitCheckDimensionless2, valueCheckComplex2, logicAnd
-p5=|p5|NAND|p6|         ; unitCheckDimensionless2, valueCheckComplex2, logicNand
+
+#Priortiy 5:logical AND and NAND
+p5=|p5||AND||p6|        ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, logicAnd
+p5=|p5|NAND|p6|         ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, logicNand
 p5=|p6|
-p6=|p6|XAND|p7|         ; unitCheckDimensionless2, valueCheckComplex2, logicXand
+AND=AND
+AND=&&
+
+#Priortiy 6: logical XAND
+p6=|p6|XAND|p7|         ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, logicXand
 p6=|p7|
-p7=|p7|bOR|p8|          ; unitCheckDimensionless2, valueCheckComplex2, bitOr
+
+#Priortiy 7: bitwise OR
+p7=|p7||bOR||p8|        ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, bitOr
 p7=|p8|
-p8=|p8|^^|p9|           ; unitCheckDimensionless2, valueCheckComplex2, bitXor
+bOR=bOR
+bOR=\|
+
+#Priortiy 8: bitwise XOR
+p8=|p8||bXOR||p9|       ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, bitXor
 p8=|p9|
-p9=|p9|&|p10|           ; unitCheckDimensionless2, valueCheckComplex2, bitAnd
+bXOR=bXOR
+bXOR=^^
+
+#Priority 9: bitwise AND
+p9=|p9||bAND||p10|      ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, bitAnd
 p9=|p10|
+bAND=bAND
+bAND=&
+
+#Priority 10: equality
 p10=|p10|==|p11|        ; logicEqual
 p10=|p10|!=|p11|        ; logicNotEqual
 p10=|p11|
+
+#Priority 11: relational
 p11=|p11|<|p12|         ; valueCheckComplex2, unitCheckConvertible, logicSmaller
 p11=|p11|>|p12|         ; valueCheckComplex2, unitCheckConvertible, logicGreater
 p11=|p11|<=|p12|        ; valueCheckComplex2, unitCheckConvertible, logicSmallerOrEqual
 p11=|p11|>=|p12|        ; valueCheckComplex2, unitCheckConvertible, logicGreaterOrEqual
 p11=|p12|
-p12=|p12|<<|p13|        ; unitCheckDimensionless2, valueCheckComplex2, bitShiftLeft
-p12=|p12|>>|p13|        ; unitCheckDimensionless2, valueCheckComplex2, bitShiftRight
+
+#Priority 12: shift
+p12=|p12|<<|p13|        ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, bitShiftLeft
+p12=|p12|>>|p13|        ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, bitShiftRight
 p12=|p13|
+
+#Priority 13: additive
 p13=|p13|+|p14|        ; unitCheckConvertible, valueAdd
 p13=|p13|-|p14|        ; unitCheckConvertible, valueSub
 p13=|p14|
+
+#Priority 14: multiplicative
 p14=|p14|*|p15|        ; unitMul, valueMul
 p14=|p15||p17|         ; unitMul, valueMul
 p14=|p17||p15|         ; unitMul, valueMul
 p14=|p14|/|p15|        ; unitDiv, valueDiv
 p14=|p15|
+
+#Priority 15: powers
 p15=|p15|^|p16|        ; unitPow, valuePow
 p15=|p16|²            ; unitPow2, valuePow2
 p15=|p16|³            ; unitPow3, valuePow3
 p15=|p16|
+
+#Priority 16: unary (prefix) operations, functions, numbers and units
 p16=sin(|p1|)        ; unitCheckDimensionless, valueSin
 p16=arcsin(|p1|)     ; unitCheckDimensionless, valueArcsin
 p16=cos(|p1|)        ; unitCheckDimensionless, valueCos
@@ -130,10 +157,16 @@ p16=~|p1|            ; unitCheckDimensionless, valueCheckComplex, bitInv
 p16=!|p1|            ; unitCheckDimensionless, valueCheckComplex, logicNot
 p16=|var|            ; pushVariable
 p16=|p17|
+
+#Priority 17: postfix, variables, constants, pi
 p17=(|p1|)
 p17=|pi|             ; valuePi
 p17=|variable|
 p17=|constant|_
+pi=π
+pi=pi
+
+#Numbers
 uint=|n|
 uint=|n||uint|
 uinte=|uint||e||uint|
@@ -170,8 +203,8 @@ n=6
 n=7
 n=8
 n=9
-pi=π
-pi=pi
+
+#Strings
 chars+=|any+|
 chars+=|any+||chars|
 chars=|any|

@@ -45,14 +45,22 @@ bool QEarleyParser::loadRule(QString rule, QStringList functions)
         {
             if (conclusio.at(i) == '|')
             {
-                if (!isNonTerminal)
-                    nonTerminalPos = i+1;
+                if ((i > 0) && (conclusio.at(i-1) == '\\')) //terminated |
+                {
+                    newRule.conclusion.remove(newRule.conclusion.size()-1);
+                    newRule.conclusion.append(conclusio.at(i).unicode());
+                }
                 else
                 {
-                    QString tmpNonTerminal = conclusio.mid(nonTerminalPos, i-nonTerminalPos);
-                    newRule.conclusion.append(addNonTerminal(tmpNonTerminal));
+                    if (!isNonTerminal)
+                        nonTerminalPos = i+1;
+                    else
+                    {
+                        QString tmpNonTerminal = conclusio.mid(nonTerminalPos, i-nonTerminalPos);
+                        newRule.conclusion.append(addNonTerminal(tmpNonTerminal));
+                    }
+                    isNonTerminal = !isNonTerminal;
                 }
-                isNonTerminal = !isNonTerminal;
             }
             else if (!isNonTerminal)
             {
@@ -107,22 +115,30 @@ bool QEarleyParser::removeRule(QString rule)
         {
             if (conclusio.at(i) == '|')
             {
-                if (!isNonTerminal)
-                    nonTerminalPos = i+1;
+                if ((i > 0) && (conclusio.at(i-1) == '\\')) //terminated |
+                {
+                    newRule.conclusion.remove(newRule.conclusion.size()-1);
+                    newRule.conclusion.append(conclusio.at(i).unicode());
+                }
                 else
                 {
-                    QString         tmpNonTerminal = conclusio.mid(nonTerminalPos, i-nonTerminalPos);
-                    EarleySymbol    tmpNTConverted;
-                    tmpNTConverted = -nonTerminals.indexOf(tmpNonTerminal);      //find non terminal
-                    if (tmpNTConverted == 1)
-                    {
-                        qDebug() << "unknown rule";
-                        return false;
-                    }
+                    if (!isNonTerminal)
+                        nonTerminalPos = i+1;
                     else
-                        newRule.conclusion.append(tmpNTConverted);
+                    {
+                        QString         tmpNonTerminal = conclusio.mid(nonTerminalPos, i-nonTerminalPos);
+                        EarleySymbol    tmpNTConverted;
+                        tmpNTConverted = -nonTerminals.indexOf(tmpNonTerminal);      //find non terminal
+                        if (tmpNTConverted == 1)
+                        {
+                            qDebug() << "unknown rule";
+                            return false;
+                        }
+                        else
+                            newRule.conclusion.append(tmpNTConverted);
+                    }
+                    isNonTerminal = !isNonTerminal;
                 }
-                isNonTerminal = !isNonTerminal;
             }
             else if (!isNonTerminal)
             {
