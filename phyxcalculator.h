@@ -30,7 +30,8 @@ class PhyxCalculator : public QObject
     Q_PROPERTY(QString expression READ expression WRITE setExpression)
     Q_PROPERTY(bool error READ hasError)
     Q_PROPERTY(int errorNumber READ errorNumber)
-    Q_PROPERTY(int errorPosition READ errorPosition)
+    Q_PROPERTY(int errorStartPosition READ errorStartPosition)
+    Q_PROPERTY(int errorEndPosition READ errorEndPosition)
     Q_PROPERTY(PhyxValueDataType resultValue READ resultValue)
     Q_PROPERTY(QString resultUnit READ resultUnit)
     Q_PROPERTY(PhyxVariable * result READ result)
@@ -96,9 +97,13 @@ public:
     {
         return m_resultUnit;
     }
-    int errorPosition() const
+    int errorStartPosition() const
     {
-        return m_errorPosition;
+        return m_errorStartPosition;
+    }
+    int errorEndPosition() const
+    {
+        return m_errorEndPosition;
     }
     PhyxVariable * result() const
     {
@@ -126,6 +131,8 @@ private:
     PhyxUnitSystem              *unitSystem;                                    /// the unit system
     PhyxVariableManager         *variableManager;                               /// the variable manager
 
+    QList<int>                  expressionWhitespaceList;                       /// this list holds count of removed whitespace for each character of the expression
+
     QString                     m_expression;                                   /// currently set expression
     bool                        expressionIsParsable;                           /// holds wheter currently set expression is parsable or not
     PhyxValueDataType           m_resultValue;                                  /// value of the result
@@ -133,18 +140,21 @@ private:
     PhyxVariable                *m_result;                                      /// result as variable
     bool                        m_error;                                        /// holds wheter an error occured or not
     int                         m_errorNumber;                                  /// current error number
-    int                         m_errorPosition;                                /// position where the error occured
+    int                         m_errorStartPosition;                           /// position where the error occured
+    int                         m_errorEndPosition;                             /// end position of the error
 
 
     QHash<QString, void (PhyxCalculator::*)()> functionMap;                     /// functions mapped with their names
 
-    void initialize();                                                                                          ///< initializes PhyxCalculator
-    void loadGrammar(QString fileName);                                                                         ///< loads the grammar from a file
+    void initialize();                                                          ///< initializes PhyxCalculator
+    void loadGrammar(QString fileName);                                         ///< loads the grammar from a file
+    QString removeWhitespace(QString text);                                     ///< removes the whitespace of a string and saves the count
+    int restoreErrorPosition(int pos);                                          ///< restores the original position of an error in expression
 
-    void raiseException(int errorNumber);                                                                     ///< raises an exception
-    void addRule(QString rule, QString functions = "");     ///< adds a rule
+    void raiseException(int errorNumber);                                       ///< raises an exception
+    void addRule(QString rule, QString functions = "");                         ///< adds a rule
 
-    PhyxUnitSystem::PhyxPrefix getBestPrefx(PhyxValueDataType value, QString unitGroup, QString preferedPrefix) const;     /// gets the best fitting prefix
+    PhyxUnitSystem::PhyxPrefix getBestPrefx(PhyxValueDataType value, QString unitGroup, QString preferedPrefix) const;     ///< gets the best fitting prefix
 
     void clearStack();
     void clearResult();

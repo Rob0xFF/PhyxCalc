@@ -17,7 +17,7 @@ void PhyxCalculator::initialize()
     flagBuffer = 0;
     m_error = false;
     m_errorNumber = 0;
-    m_errorPosition = 0;
+    m_errorStartPosition = 0;
     m_resultValue = 0;
     m_resultUnit = "";
     m_result = NULL;
@@ -222,6 +222,34 @@ void PhyxCalculator::loadGrammar(QString fileName)
         qFatal("Can't open file");
 }
 
+QString PhyxCalculator::removeWhitespace(QString text)
+{
+    int whitespaceCount = 0;
+    QString output;
+
+    expressionWhitespaceList.clear();
+    for (int i = text.size() - 1; i >= 0; i--)
+    {
+        if (text.at(i).isSpace())
+            whitespaceCount++;
+        else
+        {
+            output.prepend(text.at(i));
+            expressionWhitespaceList.prepend(whitespaceCount);
+        }
+    }
+
+    for (int i = 0; i < expressionWhitespaceList.size(); i++)
+        expressionWhitespaceList[i] = whitespaceCount - expressionWhitespaceList.at(i);
+
+    return output;
+}
+
+int PhyxCalculator::restoreErrorPosition(int pos)
+{
+    return pos + expressionWhitespaceList.at(pos);
+}
+
 void PhyxCalculator::raiseException(int errorNumber)
 {
     //qDebug() << exception;
@@ -229,6 +257,31 @@ void PhyxCalculator::raiseException(int errorNumber)
     m_errorNumber = errorNumber;
     clearStack();
     emit outputError();
+}
+
+QString PhyxCalculator::errorString() const
+{
+    QString output;
+
+    switch (m_errorNumber)
+    {
+    case SyntaxError:       output.append(tr("Syntax Error!"));
+                            break;
+    case ValueComplexError: output.append(tr("Value is complex"));
+                            break;
+    case ValueNotPositiveError: output.append(tr("Value is negative"));
+                            break;
+    case ValueNotIntegerError: output.append(tr("Only integer values"));
+                            break;
+    case UnitNotDimensionlessError: output.append(tr("Unit is not dimensionless"));
+                            break;
+    case UnitsNotConvertibleError: output.append(tr("Units not convertible"));
+                            break;
+    case PrefixError: output.append(tr("Prefix does not fit unit"));
+                            break;
+    }
+
+    return tr("error at position %1-%2: %3").arg(m_errorStartPosition).arg(m_errorEndPosition).arg(output);
 }
 
 void PhyxCalculator::addRule(QString rule, QString functions)
@@ -318,6 +371,8 @@ void PhyxCalculator::clearFlags()
 
 bool PhyxCalculator::setExpression(QString expression)
 {
+    expression = removeWhitespace(expression);
+
     if (expression.isEmpty())
     {
         earleyParser->clearWord();
@@ -362,7 +417,8 @@ bool PhyxCalculator::evaluate()
         {
             EarleyTreeItem *earleyTreeItem = &earleyTree[i];
 
-            m_errorPosition = earleyTreeItem->startPos;     //just in case
+            m_errorStartPosition = restoreErrorPosition(earleyTreeItem->startPos);     //just in case
+            m_errorEndPosition   = restoreErrorPosition(earleyTreeItem->endPos)+1;
             //PhyxRule phyxRule = phyxRules.value(earleyTreeItem->rule);
 
             //if (!phyxRule.functions.isEmpty())
@@ -429,31 +485,6 @@ PhyxVariableManager::PhyxVariableMap *PhyxCalculator::variables() const
 PhyxVariableManager::PhyxVariableMap *PhyxCalculator::constants() const
 {
     return variableManager->constants();
-}
-
-QString PhyxCalculator::errorString() const
-{
-    QString output;
-
-    switch (m_errorNumber)
-    {
-    case SyntaxError:       output.append(tr("Syntax Error!"));
-                            break;
-    case ValueComplexError: output.append(tr("Value is complex"));
-                            break;
-    case ValueNotPositiveError: output.append(tr("Value is negative"));
-                            break;
-    case ValueNotIntegerError: output.append(tr("Only integer values"));
-                            break;
-    case UnitNotDimensionlessError: output.append(tr("Unit is not dimensionless"));
-                            break;
-    case UnitsNotConvertibleError: output.append(tr("Units not convertible"));
-                            break;
-    case PrefixError: output.append(tr("Prefix does not fit unit"));
-                            break;
-    }
-
-    return tr("error at position %1: %2").arg(m_errorPosition).arg(output);
 }
 
 QString PhyxCalculator::complexToString(const PhyxValueDataType number, int precision, char numberFormat)
