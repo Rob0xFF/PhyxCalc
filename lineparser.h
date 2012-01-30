@@ -12,6 +12,7 @@
 #include "unitloader.h"
 #include "global.h"
 #include "phyxcalculator.h"
+#include "phyxsyntaxhighlighter.h"
 
 class LineParser: public QObject
 {
@@ -22,6 +23,7 @@ class LineParser: public QObject
     Q_PROPERTY(AppSettings *appSettings READ appSettings WRITE setAppSettings)
     Q_PROPERTY(UnitLoader *unitLoader READ unitLoader WRITE setUnitLoader)
     Q_PROPERTY(PhyxCalculator *phyxCalculator READ phyxCalculator)
+    Q_PROPERTY(PhyxSyntaxHighlighter *syntaxHighlighter READ syntaxHighlighter)
 
 public:
     explicit LineParser(QObject * = 0);
@@ -61,6 +63,10 @@ public:
     {
         return m_phyxCalculator;
     }
+    PhyxSyntaxHighlighter * syntaxHighlighter() const
+    {
+        return m_syntaxHighlighter;
+    }
 
 private:
     QTextEdit       *m_calculationEdit;
@@ -69,6 +75,7 @@ private:
     AppSettings     *m_appSettings;
     UnitLoader      *m_unitLoader;
     PhyxCalculator  *m_phyxCalculator;
+    PhyxSyntaxHighlighter * m_syntaxHighlighter;
 
     /* Replace greek letters written out with the symbols */
     void replaceSymbols();
@@ -93,6 +100,7 @@ public slots:
     void setCalculationEdit(QTextEdit * arg)
     {
         m_calculationEdit = arg;
+        m_syntaxHighlighter = new PhyxSyntaxHighlighter(m_calculationEdit->document());
     }
     void setVariableTable(QTableWidget * arg)
     {

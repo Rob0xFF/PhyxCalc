@@ -362,6 +362,7 @@ void LineParser::showVariables()
 {
     int row = 0;
     QTableWidgetItem *newItem;
+    QStringList     variableNames;
 
     m_variableTable->clearContents();
     m_variableTable->setRowCount(0);
@@ -385,13 +386,19 @@ void LineParser::showVariables()
          m_variableTable->setItem(row, 2, newItem);
 
          row++;
+
+         variableNames.append(i.key());
      }
+
+     if (m_syntaxHighlighter != NULL)
+         m_syntaxHighlighter->setVariableHighlightingRules(variableNames);
 }
 
 void LineParser::showConstants()
 {
     int row = 0;
     QTableWidgetItem *newItem;
+    QStringList     constantNames;
 
     m_constantsTable->clearContents();
     m_constantsTable->setRowCount(0);
@@ -416,7 +423,12 @@ void LineParser::showConstants()
          m_constantsTable->setItem(row, 2, newItem);
 
          row++;
+
+         constantNames.append(i.key());
      }
+
+     if (m_syntaxHighlighter != NULL)
+         m_syntaxHighlighter->setConstantHighlightingRules(constantNames);
 }
 
 void LineParser::clearAllVariables()
