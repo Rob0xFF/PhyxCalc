@@ -69,6 +69,7 @@ void PhyxSyntaxHighlighter::setVariableHighlightingRules(QStringList variableLis
         rule.format = variablesFormat;
         variableHighlightingRules.append(rule);
     }
+    rehighlight();
 }
 
 void PhyxSyntaxHighlighter::setConstantHighlightingRules(QStringList variableList)
@@ -82,6 +83,7 @@ void PhyxSyntaxHighlighter::setConstantHighlightingRules(QStringList variableLis
         rule.format = constantsFormat;
         constantHighlightingRules.append(rule);
     }
+    rehighlight();
 }
 
 void PhyxSyntaxHighlighter::highlightBlock(const QString &text)

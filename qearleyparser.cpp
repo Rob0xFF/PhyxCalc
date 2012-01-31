@@ -95,6 +95,8 @@ bool QEarleyParser::loadRule(QString rule, QStringList functions)
     newRule.functions = functions;
     rules[-newRule.premise].append(newRule);
 
+    itemListCount = 0;   //when a rule is changed, whole parsing needs to be done again
+
     return true;
 }
 
@@ -187,7 +189,9 @@ bool QEarleyParser::removeRule(QString rule)
 
         if (match)
         {
-            rules[-newRule.premise].removeAt(i);;
+            rules[-newRule.premise].removeAt(i);
+
+            itemListCount = 0;   //when a rule is changed, whole parsing needs to be done again
             return true;
         }
     }
@@ -355,29 +359,43 @@ void QEarleyParser::clearWord()
 bool QEarleyParser::addSymbol(QChar earleySymbol)
 {
     word.conclusion.append(earleySymbol.unicode());
-    itemListCount++;
-    earleyItemLists.append(EarleyItemList());
 
-    if (isRecursionDone)    // if tree was already created whole parsing needs to be done
+    if (itemListCount != 0) //rules changed
     {
-        for (int i = 0; i < itemListCount; i++)
-            earleyItemLists[i].clear();
+        itemListCount++;
+        earleyItemLists.append(EarleyItemList());
+
+        if (isRecursionDone)    // if tree was already created whole parsing needs to be done
+        {
+            for (int i = 0; i < itemListCount; i++)
+                earleyItemLists[i].clear();
+            return parse();
+        }
+        else                    //else partial parsing is possible
+            return parse(itemListCount-2);
+    }
+    else
+    {
+        initialize();
         return parse();
     }
-    else                    //else partial parsing is possible
-        return parse(itemListCount-2);
 }
 
 bool QEarleyParser::removeSymbol()
 {
-    if (itemListCount > 1)
+    if (word.conclusion.size() > 0)
+        word.conclusion.remove(word.conclusion.size()-1);
+    if (itemListCount != 0) // rules changed
     {
         itemListCount--;
         earleyItemLists.removeLast();
         return checkSuccessful();
     }
     else
-        return false;
+    {
+        initialize();
+        return parse();
+    }
 }
 
 void QEarleyParser::appendEarleyItem(int index, EarleyRule *rule, int dotPos, int K, EarleyItem *origin)

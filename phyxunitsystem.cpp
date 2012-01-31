@@ -274,9 +274,7 @@ bool PhyxUnitSystem::verifyUnit(PhyxUnit *unit)
             else
                 match = matchList.first();
 
-            unit->setSymbol(match->symbol());
-            unit->setName(match->name());
-            unit->setFlags(match->flags());
+            PhyxUnit::copyUnit(match, unit);
             return true;
         }
     }
