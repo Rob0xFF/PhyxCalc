@@ -864,7 +864,7 @@ void PhyxCalculator::valuePow()
     PhyxVariable *variable1 = variableStack.pop();
 
     if (variable2->value().imag() == 0)     // precision fix
-        variable1->setValue(pow(variable1->value(),(double)variable2->value().real()));
+        variable1->setValue(pow(variable1->value(),variable2->value().real()));
     else
         variable1->setValue(pow(variable1->value(),variable2->value()));
     variableStack.push(variable1);
@@ -1115,7 +1115,7 @@ void PhyxCalculator::valueInt()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxValueDataType value((int)variable1->value().real(),0);
+    PhyxValueDataType value(variable1->toInt(),0);
     variable1->setValue(value);
     variableStack.push(variable1);
 }
@@ -1160,7 +1160,7 @@ void PhyxCalculator::valueSign()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxValueDataType value(boost::math::copysign((long double)1.0,variable1->value().real()),0);
+    PhyxValueDataType value(boost::math::copysign(1.0L,variable1->value().real()),0);
     variable1->setValue(value);
     variableStack.push(variable1);
 }
@@ -1185,7 +1185,7 @@ void PhyxCalculator::valueRand()
 
 void PhyxCalculator::valueRandint()
 {
-    valueBuffer = (int)qrand();
+    valueBuffer = (long int)qrand();
     unitBuffer = "";
     pushVariable();
 }
@@ -1208,21 +1208,9 @@ void PhyxCalculator::valueFaculty()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    long double value = variable1->value().real();
+    long int value = 1;
+    long int n = variable1->toInt();
 
-    if (value < 0)
-    {
-        raiseException(ValueNotPositiveError);
-        return;
-    }
-    else if ((long int)value != value)
-    {
-        raiseException(ValueNotIntegerError);
-        return;
-    }
-
-    long int n = (long int)boost::math::round(value);
-    value = 1;
     for (int i = 2; i <=n; i++)
         value *= i;
 
@@ -1411,7 +1399,7 @@ void PhyxCalculator::bitAnd()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue((long int)variable1->value().real() & (long int)variable2->value().real());
+    variable1->setValue(variable1->toInt() & variable2->toInt());
     variableStack.push(variable1);
 
     delete variable2;
@@ -1422,7 +1410,7 @@ void PhyxCalculator::bitOr()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue((long int)variable1->value().real() | (long int)variable2->value().real());
+    variable1->setValue(variable1->toInt() | variable2->toInt());
     variableStack.push(variable1);
 
     delete variable2;
@@ -1433,7 +1421,7 @@ void PhyxCalculator::bitXor()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue((long int)variable1->value().real() ^ (long int)variable2->value().real());
+    variable1->setValue(variable1->toInt() ^ variable2->toInt());
     variableStack.push(variable1);
 
     delete variable2;
@@ -1443,7 +1431,7 @@ void PhyxCalculator::bitInv()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(~(long int)variable1->value().real());
+    variable1->setValue(~variable1->toInt());
     variableStack.push(variable1);
 }
 
@@ -1452,7 +1440,7 @@ void PhyxCalculator::bitShiftLeft()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue((long int)variable1->value().real() << (long int)variable2->value().real());
+    variable1->setValue(variable1->toInt() << variable2->toInt());
     variableStack.push(variable1);
 
     delete variable2;
@@ -1463,7 +1451,7 @@ void PhyxCalculator::bitShiftRight()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue((long int)variable1->value().real() >> (long int)variable2->value().real());
+    variable1->setValue(variable1->toInt() >> variable2->toInt());
     variableStack.push(variable1);
 
     delete variable2;
@@ -1475,7 +1463,7 @@ void PhyxCalculator::conditionIfElse()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    if ((long int)variable1->value().real())
+    if (variable1->toInt())
     {
         variableStack.push(variable2);
         delete variable3;
