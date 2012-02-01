@@ -1356,6 +1356,7 @@ void PhyxCalculator::logicGreater()
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(variable1->value().real() > variable2->value().real());
+    variable1->setUnit(new PhyxUnit());
     variableStack.push(variable1);
 
     delete variable2;
@@ -1367,6 +1368,7 @@ void PhyxCalculator::logicGreaterOrEqual()
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(variable1->value().real() >= variable2->value().real());
+    variable1->setUnit(new PhyxUnit());
     variableStack.push(variable1);
 
     delete variable2;
@@ -1378,6 +1380,7 @@ void PhyxCalculator::logicSmaller()
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(variable1->value().real() < variable2->value().real());
+    variable1->setUnit(new PhyxUnit());
     variableStack.push(variable1);
 
     delete variable2;
@@ -1389,6 +1392,7 @@ void PhyxCalculator::logicSmallerOrEqual()
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(variable1->value().real() <= variable2->value().real());
+    variable1->setUnit(new PhyxUnit());
     variableStack.push(variable1);
 
     delete variable2;
