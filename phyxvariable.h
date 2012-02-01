@@ -42,6 +42,11 @@ public:
     bool convertUnit(PhyxCompoundUnit *unit);
     static void copyVariable(PhyxVariable *source, PhyxVariable *destination);
 
+    bool isComplex();
+    bool isPositive();
+    bool isInteger();
+    long int toInt();
+
     PhyxValueDataType value() const
     {
         return m_value;

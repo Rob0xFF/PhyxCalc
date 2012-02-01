@@ -781,7 +781,7 @@ void MainWindow::on_actionAbout_triggered()
 {
     QMessageBox::about(this, tr("About PhyxCalc"),
                        tr("<h2>PhyxCalc %1</h2>"
-                          "Based on Qt 4.7.4 <br><br>"
+                          "Based on Qt 4.8 <br><br>"
                           "Copyright 2011 by Christian Schirm and Alexander R&ouml;ssler"
                           "<br><br>"
                           "PhyxCalc is free software: you can redistribute it and/or modify<br>"

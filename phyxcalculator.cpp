@@ -61,6 +61,7 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueSub",      &PhyxCalculator::valueSub);
     functionMap.insert("valueMul",      &PhyxCalculator::valueMul);
     functionMap.insert("valueDiv",      &PhyxCalculator::valueDiv);
+    functionMap.insert("valueMod",      &PhyxCalculator::valueMod);
     functionMap.insert("valueNeg",      &PhyxCalculator::valueNeg);
     functionMap.insert("valuePow",      &PhyxCalculator::valuePow);
     functionMap.insert("valuePow2",     &PhyxCalculator::valuePow2);
@@ -166,6 +167,22 @@ void PhyxCalculator::initialize()
     functionMap.insert("unitGroupRemove",&PhyxCalculator::unitGroupRemove);
     functionMap.insert("prefixAdd",     &PhyxCalculator::prefixAdd);
     functionMap.insert("prefixRemove",  &PhyxCalculator::prefixRemove);
+
+    functionMap.insert("lowLevelAdd",                   &PhyxCalculator::lowLevelAdd);
+    functionMap.insert("lowLevelRun",                   &PhyxCalculator::lowLevelRun);
+    functionMap.insert("lowLevelAssignment",            &PhyxCalculator::lowLevelAssignment);
+    functionMap.insert("lowLevelAssignmentRemove",      &PhyxCalculator::lowLevelAssignmentRemove);
+    functionMap.insert("lowLevelCombinedAssignmentAdd", &PhyxCalculator::lowLevelCombinedAssignmentAdd);
+    functionMap.insert("lowLevelCombinedAssignmentSub", &PhyxCalculator::lowLevelCombinedAssignmentSub);
+    functionMap.insert("lowLevelCombinedAssignmentMul", &PhyxCalculator::lowLevelCombinedAssignmentMul);
+    functionMap.insert("lowLevelCombinedAssignmentDiv", &PhyxCalculator::lowLevelCombinedAssignmentDiv);
+    functionMap.insert("lowLevelCombinedAssignmentMod", &PhyxCalculator::lowLevelCombinedAssignmentMod);
+    functionMap.insert("lowLevelCombinedAssignmentAnd", &PhyxCalculator::lowLevelCombinedAssignmentAnd);
+    functionMap.insert("lowLevelCombinedAssignmentOr",  &PhyxCalculator::lowLevelCombinedAssignmentOr);
+    functionMap.insert("lowLevelCombinedAssignmentXor", &PhyxCalculator::lowLevelCombinedAssignmentXor);
+    functionMap.insert("lowLevelCombinedAssignmentShiftLeft",  &PhyxCalculator::lowLevelCombinedAssignmentShiftLeft);
+    functionMap.insert("lowLevelCombinedAssignmentShiftRight", &PhyxCalculator::lowLevelCombinedAssignmentShiftRight);
+    functionMap.insert("lowLevelOutput",                &PhyxCalculator::lowLevelOutput);
 
     loadGrammar(":/settings/grammar");
     earleyParser->setStartSymbol("S");
@@ -298,6 +315,7 @@ QString PhyxCalculator::errorString() const
                             break;
     case PrefixError: output.append(tr("Prefix does not fit unit"));
                             break;
+    case UnknownVariableError:  output.append(tr("Unknown variable"));
     }
 
     return tr("error at position %1-%2: %3").arg(m_errorStartPosition).arg(m_errorEndPosition).arg(output);
@@ -673,7 +691,7 @@ void PhyxCalculator::valueCheckComplex()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    if (variable1->value().imag() != 0)
+    if (variable1->isComplex())
         raiseException(ValueComplexError);
 
     variableStack.push(variable1);
@@ -684,7 +702,7 @@ void PhyxCalculator::valueCheckComplex2()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    if ((variable1->value().imag() != 0) || (variable2->value().imag() != 0))
+    if (variable1->isComplex() || variable2->isComplex())
         raiseException(ValueComplexError);
 
     variableStack.push(variable2);
@@ -696,7 +714,7 @@ void PhyxCalculator::valueCheckComplex2th()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    if (variable2->value().imag() != 0)
+    if (variable2->isComplex())
         raiseException(ValueComplexError);
 
     variableStack.push(variable2);
@@ -709,7 +727,7 @@ void PhyxCalculator::valueCheckComplex3th()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable3 = variableStack.pop();
 
-    if (variable3->value().imag() != 0)
+    if (variable3->isComplex())
         raiseException(ValueComplexError);
 
     variableStack.push(variable3);
@@ -721,7 +739,7 @@ void PhyxCalculator::valueCheckPositive()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    if (variable1->value().real() < 0)
+    if (!variable1->isPositive())
         raiseException(ValueNotPositiveError);
 
     variableStack.push(variable1);
@@ -731,7 +749,7 @@ void PhyxCalculator::valueCheckInteger()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    if ((long int)variable1->value().real() != variable1->value().real())
+    if (!variable1->isInteger())
         raiseException(ValueNotIntegerError);
 
     variableStack.push(variable1);
@@ -742,9 +760,9 @@ void PhyxCalculator::valueCheckInteger2()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    if ((long int)variable1->value().real() != variable1->value().real())
+    if (!variable1->isInteger())
         raiseException(ValueNotIntegerError);
-    else if ((long int)variable2->value().real() != variable2->value().real())
+    else if (!variable2->isInteger())
         raiseException(ValueNotIntegerError);
 
     variableStack.push(variable2);
@@ -756,7 +774,7 @@ void PhyxCalculator::valueCheckInteger2th()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    if ((long int)variable2->value().real() != variable2->value().real())
+    if (!variable2->isInteger())
         raiseException(ValueNotIntegerError);
 
     variableStack.push(variable2);
@@ -769,7 +787,7 @@ void PhyxCalculator::valueCheckInteger3th()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable3 = variableStack.pop();
 
-    if ((long int)variable3->value().real() != variable3->value().real())
+    if (!variable3->isInteger())
         raiseException(ValueNotIntegerError);
 
     variableStack.push(variable3);
@@ -816,6 +834,17 @@ void PhyxCalculator::valueDiv()
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(variable1->value() / variable2->value());
+    variableStack.push(variable1);
+
+    delete variable2;
+}
+
+void PhyxCalculator::valueMod()
+{
+    PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(PhyxValueDataType(variable1->toInt() % variable2->toInt(), 0));
     variableStack.push(variable1);
 
     delete variable2;
@@ -1670,6 +1699,7 @@ void PhyxCalculator::variableRemove()
 void PhyxCalculator::variableLoad()
 {
     variableStack.push(variableManager->getVariable(parameterBuffer));
+    nameBuffer = parameterBuffer;
 }
 
 void PhyxCalculator::constantAdd()
@@ -1688,6 +1718,7 @@ void PhyxCalculator::constantRemove()
 void PhyxCalculator::constantLoad()
 {
     variableStack.push(variableManager->getConstant(parameterBuffer));
+    nameBuffer = parameterBuffer;
 }
 
 void PhyxCalculator::bufferUnit()
@@ -1817,4 +1848,251 @@ void PhyxCalculator::prefixRemove()
 {
     unitSystem->removePrefix(prefixBuffer);
     prefixBuffer.clear();
+}
+
+void PhyxCalculator::appendLowLevelOperation(QString variableName, PhyxCalculator::LowLevelOperationType type, PhyxVariable *variable)
+{
+    LowLevelOperation   *operation = new LowLevelOperation;
+    LowLevelOperationList *operationList = new LowLevelOperationList;
+
+    operation->type = type;
+    operation->variableName = variableName;
+    operation->variable = variable;
+    operationList->append(operation);
+    lowLevelStack.push(operationList);
+}
+
+void PhyxCalculator::runLowLevelOperation(PhyxCalculator::LowLevelOperation *operation)
+{
+    if (operation->type == AssignmentOperation)
+    {
+        variableManager->addVariable(operation->variableName, operation->variable);
+    }
+    else if (operation->type == AssignmentRemoveOperation)
+    {
+        variableManager->removeVariable(operation->variableName);
+    }
+    else if (operation->type == OutputOperation)
+    {
+        if (m_result != NULL)   // delete old result
+            delete m_result;
+
+        PhyxVariable *variable1 = operation->variable;
+        m_resultValue = variable1->value();
+        m_resultUnit = variable1->unit()->symbol();
+        m_result = variable1;
+
+        emit outputResult();
+    }
+    else if (operation->type == CombinedAssignmentOperationAdd)
+    {
+        variableStack.push(variableManager->getVariable(operation->variableName));
+        variableStack.push(operation->variable);
+        unitCheckConvertible();
+        valueAdd();
+        variableManager->addVariable(operation->variableName, variableStack.pop());
+    }
+    else if (operation->type == CombinedAssignmentOperationSub)
+    {
+        variableStack.push(variableManager->getVariable(operation->variableName));
+        variableStack.push(operation->variable);
+        unitCheckConvertible();
+        valueSub();
+        variableManager->addVariable(operation->variableName, variableStack.pop());
+    }
+    else if (operation->type == CombinedAssignmentOperationMul)
+    {
+        variableStack.push(variableManager->getVariable(operation->variableName));
+        variableStack.push(operation->variable);
+        unitMul();
+        valueMul();
+        variableManager->addVariable(operation->variableName, variableStack.pop());
+    }
+    else if (operation->type == CombinedAssignmentOperationDiv)
+    {
+        variableStack.push(variableManager->getVariable(operation->variableName));
+        variableStack.push(operation->variable);
+        unitDiv();
+        valueDiv();
+        variableManager->addVariable(operation->variableName, variableStack.pop());
+    }
+    else if (operation->type == CombinedAssignmentOperationMod)
+    {
+        variableStack.push(variableManager->getVariable(operation->variableName));
+        variableStack.push(operation->variable);
+        unitCheckDimensionless2();
+        valueCheckInteger2();
+        valueMod();
+        variableManager->addVariable(operation->variableName, variableStack.pop());
+    }
+    else if (operation->type == CombinedAssignmentOperationAnd)
+    {
+        variableStack.push(variableManager->getVariable(operation->variableName));
+        variableStack.push(operation->variable);
+        unitCheckDimensionless2();
+        valueCheckInteger2();
+        bitAnd();
+        variableManager->addVariable(operation->variableName, variableStack.pop());
+    }
+    else if (operation->type == CombinedAssignmentOperationOr)
+    {
+        variableStack.push(variableManager->getVariable(operation->variableName));
+        variableStack.push(operation->variable);
+        unitCheckDimensionless2();
+        valueCheckInteger2();
+        bitOr();
+        variableManager->addVariable(operation->variableName, variableStack.pop());
+    }
+    else if (operation->type == CombinedAssignmentOperationXor)
+    {
+        variableStack.push(variableManager->getVariable(operation->variableName));
+        variableStack.push(operation->variable);
+        unitCheckDimensionless2();
+        valueCheckInteger2();
+        bitXor();
+        variableManager->addVariable(operation->variableName, variableStack.pop());
+    }
+    else if (operation->type == CombinedAssignmentOperationShiftLeft)
+    {
+        variableStack.push(variableManager->getVariable(operation->variableName));
+        variableStack.push(operation->variable);
+        unitCheckDimensionless2();
+        valueCheckInteger2();
+        bitShiftLeft();
+        variableManager->addVariable(operation->variableName, variableStack.pop());
+    }
+    else if (operation->type == CombinedAssignmentOperationShiftRight)
+    {
+        variableStack.push(variableManager->getVariable(operation->variableName));
+        variableStack.push(operation->variable);
+        unitCheckDimensionless2();
+        valueCheckInteger2();
+        bitShiftRight();
+        variableManager->addVariable(operation->variableName, variableStack.pop());
+    }
+}
+
+void PhyxCalculator::lowLevelAdd()
+{
+    LowLevelOperationList *operationList1 = lowLevelStack.pop();
+    LowLevelOperationList *operationList2 = lowLevelStack.pop();
+
+    operationList1->append(*operationList2);
+    lowLevelStack.push(operationList1);
+
+    delete operationList2;
+}
+
+void PhyxCalculator::lowLevelRun()
+{
+    LowLevelOperationList *operationList1 = lowLevelStack.pop();
+
+    for (int i = operationList1->size()-1; i  >= 0; i--)
+    {
+        runLowLevelOperation(operationList1->at(i));
+        delete operationList1->at(i);
+    }
+
+    delete operationList1;
+}
+
+void PhyxCalculator::lowLevelAssignment()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    appendLowLevelOperation(stringBuffer, AssignmentOperation, variable1);
+    stringBuffer.clear();
+}
+
+void PhyxCalculator::lowLevelAssignmentRemove()
+{
+    appendLowLevelOperation(nameBuffer, AssignmentRemoveOperation, NULL);
+    nameBuffer.clear();
+}
+
+void PhyxCalculator::lowLevelCombinedAssignmentAdd()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationAdd, variable1);
+    nameBuffer.clear();
+}
+
+void PhyxCalculator::lowLevelCombinedAssignmentSub()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationSub, variable1);
+    nameBuffer.clear();
+}
+
+void PhyxCalculator::lowLevelCombinedAssignmentMul()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationMul, variable1);
+    nameBuffer.clear();
+}
+
+void PhyxCalculator::lowLevelCombinedAssignmentDiv()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationDiv, variable1);
+    nameBuffer.clear();
+}
+
+void PhyxCalculator::lowLevelCombinedAssignmentMod()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationMod, variable1);
+    nameBuffer.clear();
+}
+
+void PhyxCalculator::lowLevelCombinedAssignmentAnd()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationAnd, variable1);
+    nameBuffer.clear();
+}
+
+void PhyxCalculator::lowLevelCombinedAssignmentOr()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationOr, variable1);
+    nameBuffer.clear();
+}
+
+void PhyxCalculator::lowLevelCombinedAssignmentXor()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationXor, variable1);
+    nameBuffer.clear();
+}
+
+void PhyxCalculator::lowLevelCombinedAssignmentShiftLeft()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationShiftLeft, variable1);
+    nameBuffer.clear();
+}
+
+void PhyxCalculator::lowLevelCombinedAssignmentShiftRight()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationShiftRight, variable1);
+    nameBuffer.clear();
+}
+
+void PhyxCalculator::lowLevelOutput()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    appendLowLevelOperation(QString(), OutputOperation, variable1);
 }

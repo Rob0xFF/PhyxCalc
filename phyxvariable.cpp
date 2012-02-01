@@ -48,3 +48,23 @@ void PhyxVariable::setUnit(PhyxUnit *unit)
 {
     m_unit->fromSimpleUnit(unit);
 }
+
+bool PhyxVariable::isComplex()
+{
+    return (m_value.imag() != 0);
+}
+
+bool PhyxVariable::isPositive()
+{
+    return (m_value.real() >= 0);
+}
+
+bool PhyxVariable::isInteger()
+{
+    return (!isComplex() && ((long int)m_value.real() == m_value.real()));
+}
+
+long int PhyxVariable::toInt()
+{
+    return (long int)m_value.real();
+}

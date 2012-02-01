@@ -66,7 +66,8 @@ public:
         ValueNotIntegerError,
         ValueComplexError,
         StringNotValidError,
-        PrefixError
+        PrefixError,
+        UnknownVariableError
     };
 
     enum OutputMode {
@@ -84,10 +85,34 @@ public:
         InputOnlyFlag   = 0x01                  /// option used for units and prefix which should be used for input only (like da or PS)
     };
 
+    enum LowLevelOperationType {
+        AssignmentOperation            = 0x01,
+        AssignmentRemoveOperation      = 0x02,
+        CombinedAssignmentOperationAdd = 0x03,
+        CombinedAssignmentOperationSub = 0x04,
+        CombinedAssignmentOperationMul = 0x05,
+        CombinedAssignmentOperationDiv = 0x06,
+        CombinedAssignmentOperationMod = 0x07,
+        CombinedAssignmentOperationAnd = 0x08,
+        CombinedAssignmentOperationOr  = 0x09,
+        CombinedAssignmentOperationXor = 0x10,
+        CombinedAssignmentOperationShiftLeft  = 0x11,
+        CombinedAssignmentOperationShiftRight = 0x12,
+        OutputOperation                = 0x13
+    };
+
     typedef struct {
         QString value;
         QString unit;
     } ResultVariable;   /// this struct is for outputting the formated variable
+
+    typedef struct {
+        QString                 variableName;
+        LowLevelOperationType   type;
+        PhyxVariable            *variable;
+    } LowLevelOperation;
+
+    typedef QList<LowLevelOperation*>    LowLevelOperationList;
 
     bool setExpression (QString m_expression);          ///< sets the expression, checks what must be parsed and returns wheter the expression is parsable or not
     bool evaluate();                                    ///< evaluates the expression
@@ -136,12 +161,14 @@ public:
 
 private:
     QStack<PhyxVariable*>       variableStack;                                  /// stack for variable calculation
+    QStack<LowLevelOperationList*> lowLevelStack;                                /// stack for low level operations
     QString                     parameterBuffer;                                /// string for buffering numbers
     QString                     stringBuffer;                                   /// string for buffering strings
     PhyxValueDataType           valueBuffer;
     QString                     prefixBuffer;
     QString                     unitBuffer;
     QString                     unitGroupBuffer;
+    QString                     nameBuffer;
     int                         flagBuffer;                                     /// this buffer holds current set flags (e.g. the inputOnly flag
 
     QHash<QString, PhyxRule>    phyxRules;                                      /// map of all rules, key is rule
@@ -194,6 +221,7 @@ private:
     void valueSub();
     void valueMul();
     void valueDiv();
+    void valueMod();
     void valueNeg();
     void valuePow();
     void valuePow2();
@@ -295,13 +323,35 @@ private:
     void bufferUnitGroup();
     void pushVariable();
 
+    /** flag functions */
     void setInputOnlyFlag();
 
     void outputVariable();
+
+    /** special functions */
     void unitGroupAdd();
     void unitGroupRemove();
     void prefixAdd();
     void prefixRemove();
+
+    /** low level functions */
+    void appendLowLevelOperation(QString variableName, LowLevelOperationType type, PhyxVariable *variable);
+    void runLowLevelOperation(LowLevelOperation *operation);
+    void lowLevelAdd();
+    void lowLevelRun();
+    void lowLevelAssignment();
+    void lowLevelAssignmentRemove();
+    void lowLevelCombinedAssignmentAdd();
+    void lowLevelCombinedAssignmentSub();
+    void lowLevelCombinedAssignmentMul();
+    void lowLevelCombinedAssignmentDiv();
+    void lowLevelCombinedAssignmentMod();
+    void lowLevelCombinedAssignmentAnd();
+    void lowLevelCombinedAssignmentOr();
+    void lowLevelCombinedAssignmentXor();
+    void lowLevelCombinedAssignmentShiftLeft();
+    void lowLevelCombinedAssignmentShiftRight();
+    void lowLevelOutput();
 
 signals:
     void variablesChanged();        ///< is emited when variables have changed

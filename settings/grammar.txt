@@ -11,158 +11,177 @@
 #
 # Definition needs following outline:
 #   Rule            |   functions
-S=|p1|              ; outputVariable
-S=|string|=|p1|     ; variableAdd
+#S=|p3|              ; outputVariable
+#S=|string|=|p3|     ; variableAdd
 S=|variable|=       ; variableRemove
-S=|string|:=|p1|    ; constantAdd
+S=|string|:=|p3|    ; constantAdd
 S=|constant|:=      ; constantRemove
 S=[|string|]        ; unitGroupAdd
 S=[|unitGroup|]:=   ; unitGroupRemove
-S=|string|:|unitGroup|=[|p1|]   ; unitCheckDimensionless, prefixAdd
-S=|string|:|unitGroup|:i=[|p1|] ; unitCheckDimensionless, setInputOnlyFlag, prefixAdd
+S=|string|:|unitGroup|=[|p3|]   ; unitCheckDimensionless, prefixAdd
+S=|string|:|unitGroup|:i=[|p3|] ; unitCheckDimensionless, setInputOnlyFlag, prefixAdd
 S=|prefix|:=                    ; prefixRemove
 S=|string|=[]                           ; unitAdd                                                   //define base unit without unit system
 S=|string|@|unitGroup|=[]               ; unitAdd                                                   //define base unit with unit system
 S=|string|@|unitGroup|@|prefix|=[]      ; unitAdd                                                   //define base unit with unit system and prefered prefix
-S=|string|=[|p1|]                       ; unitAdd                                                   //define derived unit without unit system
-S=|string|@|unitGroup|=[|p1|]           ; unitAdd                                                   //define derived unit with unit system
-S=|string|@|unitGroup|@|prefix|=[|p1|]  ; unitAdd                                                   //define derived unit with unit system and prefered prefix
-S=|string|=[|p1|]|p1|                       ; unitAdd                                               //define offset unit without unit system
-S=|string|@|unitGroup|=[|p1|]|p1|           ; unitAdd                                               //define offset unit with unit system
-S=|string|@|unitGroup|@|prefix|=[|p1|]|p1|  ; unitAdd                                               //define offset unit with unit system and prefered prefix
-S=|p1|->|p1|        ; unitCheckConvertible, unitConvert, outputVariable
+S=|string|=[|p3|]                       ; unitAdd                                                   //define derived unit without unit system
+S=|string|@|unitGroup|=[|p3|]           ; unitAdd                                                   //define derived unit with unit system
+S=|string|@|unitGroup|@|prefix|=[|p3|]  ; unitAdd                                                   //define derived unit with unit system and prefered prefix
+S=|string|=[|p3|]|p3|                       ; unitAdd                                               //define offset unit without unit system
+S=|string|@|unitGroup|=[|p3|]|p3|           ; unitAdd                                               //define offset unit with unit system
+S=|string|@|unitGroup|@|prefix|=[|p3|]|p3|  ; unitAdd                                               //define offset unit with unit system and prefered prefix
+S=|p3|->|p3|        ; unitCheckConvertible, unitConvert, outputVariable
+S=|p1|              ; lowLevelRun
 
-#Priority 1: assignement
+#Priority 1: sequential operator
+p1=|p1|,|p2|       ; lowLevelAdd
 p1=|p2|
 
-#Priority 2: conditional
-p2=|p3|?|p3|:|p3|                     ; unitCheckDimensionless3th, valueCheckComplex3th, valueCheckInteger3th, conditionIfElse
-p2=if|p3|then|p3|else|p3|             ; unitCheckDimensionless3th, valueCheckComplex3th, valueCheckInteger3th, conditionIfElse
-p2=IF(|p3|\;|p3|\;|p3|)               ; unitCheckDimensionless3th, valueCheckComplex3th, valueCheckInteger3th, conditionIfElse
-p2=|p3|
+#Priority 2: assignement
+p2=|string|=|p3|    ; lowLevelAssignment
+p2=|variable|=      ; lowLevelAssignmentRemove
+p2=|variable|+=|p3| ; lowLevelCombinedAssignmentAdd
+p2=|variable|-=|p3| ; lowLevelCombinedAssignmentSub
+p2=|variable|*=|p3| ; lowLevelCombinedAssignmentMul
+p2=|variable|/=|p3| ; lowLevelCombinedAssignmentDiv
+p2=|variable|%=|p3| ; lowLevelCombinedAssignmentMod
+p2=|variable|&=|p3| ; lowLevelCombinedAssignmentAnd
+p2=|variable||=|p3| ; lowLevelCombinedAssignmentOr
+p2=|variable|^=|p3| ; lowLevelCombinedAssignmentXor
+p2=|variable|<<=|p3|; lowLevelCombinedAssignmentShiftLeft
+p2=|variable|>>=|p3|; lowLevelCombinedAssignmentShiftRight
+p2=|p3|             ; lowLevelOutput
 
-#Priority 3: logical OR and NOR
-p3=|p3||OR||p4|         ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, logicOr
-p3=|p3|NOR|p4|          ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, logicNor
+#Priority 3: conditional
+p3=|p4|?|p4|:|p4|                     ; unitCheckDimensionless3th, valueCheckInteger3th, conditionIfElse
+p3=if|p4|then|p4|else|p4|             ; unitCheckDimensionless3th, valueCheckInteger3th, conditionIfElse
+p3=IF(|p4|\;|p4|\;|p4|)               ; unitCheckDimensionless3th, valueCheckInteger3th, conditionIfElse
 p3=|p4|
+
+#Priority 4: logical OR and NOR
+p4=|p4||OR||p5|         ; unitCheckDimensionless2, valueCheckInteger2, logicOr
+p4=|p4|NOR|p5|          ; unitCheckDimensionless2, valueCheckInteger2, logicNor
+p4=|p5|
 OR=OR
 OR=\|\|
 
-#Priortiy 4: logical XOR
-p4=|p4|XOR|p5|          ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, logicXor
-p4=|p5|
-
-#Priortiy 5:logical AND and NAND
-p5=|p5||AND||p6|        ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, logicAnd
-p5=|p5|NAND|p6|         ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, logicNand
+#Priortiy 5: logical XOR
+p5=|p5|XOR|p6|          ; unitCheckDimensionless2, valueCheckInteger2, logicXor
 p5=|p6|
+
+#Priortiy 6:logical AND and NAND
+p6=|p6||AND||p7|        ; unitCheckDimensionless2, valueCheckInteger2, logicAnd
+p6=|p6|NAND|p7|         ; unitCheckDimensionless2, valueCheckInteger2, logicNand
+p6=|p7|
 AND=AND
 AND=&&
 
-#Priortiy 6: logical XAND
-p6=|p6|XAND|p7|         ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, logicXand
-p6=|p7|
-
-#Priortiy 7: bitwise OR
-p7=|p7||bOR||p8|        ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, bitOr
+#Priortiy 7: logical XAND
+p7=|p7|XAND|p8|         ; unitCheckDimensionless2, valueCheckInteger2, logicXand
 p7=|p8|
+
+#Priortiy 8: bitwise OR
+p8=|p8||bOR||p9|        ; unitCheckDimensionless2, valueCheckInteger2, bitOr
+p8=|p9|
 bOR=bOR
 bOR=\|
 
-#Priortiy 8: bitwise XOR
-p8=|p8||bXOR||p9|       ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, bitXor
-p8=|p9|
+#Priortiy 9: bitwise XOR
+p9=|p9||bXOR||p10|       ; unitCheckDimensionless2, valueCheckInteger2, bitXor
+p9=|p10|
 bXOR=bXOR
 bXOR=^^
 
-#Priority 9: bitwise AND
-p9=|p9||bAND||p10|      ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, bitAnd
-p9=|p10|
+#Priority 10: bitwise AND
+p10=|p10||bAND||p11|      ; unitCheckDimensionless2, valueCheckInteger2, bitAnd
+p10=|p11|
 bAND=bAND
 bAND=&
 
-#Priority 10: equality
-p10=|p10|==|p11|        ; logicEqual
-p10=|p10|!=|p11|        ; logicNotEqual
-p10=|p11|
-
-#Priority 11: relational
-p11=|p11|<|p12|         ; valueCheckComplex2, unitCheckConvertible, logicSmaller
-p11=|p11|>|p12|         ; valueCheckComplex2, unitCheckConvertible, logicGreater
-p11=|p11|<=|p12|        ; valueCheckComplex2, unitCheckConvertible, logicSmallerOrEqual
-p11=|p11|>=|p12|        ; valueCheckComplex2, unitCheckConvertible, logicGreaterOrEqual
+#Priority 11: equality
+p11=|p11|==|p12|        ; logicEqual
+p11=|p11|!=|p12|        ; logicNotEqual
 p11=|p12|
 
-#Priority 12: shift
-p12=|p12|<<|p13|        ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, bitShiftLeft
-p12=|p12|>>|p13|        ; unitCheckDimensionless2, valueCheckComplex2, valueCheckInteger2, bitShiftRight
+#Priority 12: relational
+p12=|p12|<|p13|         ; valueCheckComplex2, unitCheckConvertible, logicSmaller
+p12=|p12|>|p13|         ; valueCheckComplex2, unitCheckConvertible, logicGreater
+p12=|p12|<=|p13|        ; valueCheckComplex2, unitCheckConvertible, logicSmallerOrEqual
+p12=|p12|>=|p13|        ; valueCheckComplex2, unitCheckConvertible, logicGreaterOrEqual
 p12=|p13|
 
-#Priority 13: additive
-p13=|p13|+|p14|        ; unitCheckConvertible, valueAdd
-p13=|p13|-|p14|        ; unitCheckConvertible, valueSub
+#Priority 13: shift
+p13=|p13|<<|p14|        ; unitCheckDimensionless2, valueCheckInteger2, bitShiftLeft
+p13=|p13|>>|p14|        ; unitCheckDimensionless2, valueCheckInteger2, bitShiftRight
 p13=|p14|
 
-#Priority 14: multiplicative
-p14=|p14|*|p15|        ; unitMul, valueMul
-p14=|p15||p17|         ; unitMul, valueMul
-p14=|p17||p15|         ; unitMul, valueMul
-p14=|p14|/|p15|        ; unitDiv, valueDiv
+#Priority 14: additive
+p14=|p14|+|p15|        ; unitCheckConvertible, valueAdd
+p14=|p14|-|p15|        ; unitCheckConvertible, valueSub
 p14=|p15|
 
-#Priority 15: powers
-p15=|p15|^|p16|        ; unitPow, valuePow
-p15=|p16|²            ; unitPow2, valuePow2
-p15=|p16|³            ; unitPow3, valuePow3
+#Priority 15: multiplicative
+p15=|p15|*|p16|        ; unitMul, valueMul
+p15=|p16||p18|         ; unitMul, valueMul
+p15=|p18||p16|         ; unitMul, valueMul
+p15=|p15|/|p16|        ; unitDiv, valueDiv
+p15=|p15||mod||p16|    ; unitCheckDimensionless2, valueCheckInteger2, valueMod
 p15=|p16|
+mod=mod
 
-#Priority 16: unary (prefix) operations, functions, numbers and units
-p16=sin(|p1|)        ; unitCheckDimensionless, valueSin
-p16=arcsin(|p1|)     ; unitCheckDimensionless, valueArcsin
-p16=cos(|p1|)        ; unitCheckDimensionless, valueCos
-p16=arccos(|p1|)     ; unitCheckDimensionless, valueArccos
-p16=tan(|p1|)        ; unitCheckDimensionless, valueTan
-p16=arctan(|p1|)     ; unitCheckDimensionless, valueArctan
-p16=sinh(|p1|)       ; unitCheckDimensionless, valueSinh
-p16=arcsinh(|p1|)    ; unitCheckDimensionless, valueArcsinh
-p16=cosh(|p1|)       ; unitCheckDimensionless, valueCosh
-p16=arccosh(|p1|)    ; unitCheckDimensionless, valueArccosh
-p16=tanh(|p1|)       ; unitCheckDimensionless, valueTanh
-p16=arctanh(|p1|)    ; unitCheckDimensionless, valueArctanh
-p16=exp(|p1|)        ; unitCheckDimensionless, valueExp
-p16=ln(|p1|)         ; unitCheckDimensionless, valueLn
-p16=log|p16|(|p1|)   ; unitCheckDimensionless2, valueLogn
-p16=root|p16|(|p1|)  ; unitRoot, valueRoot
-p16=sqrt(|p1|)       ; unitSqrt, valueSqrt
-p16=abs(|p1|)        ; valueAbs
-p16=max(|p1|,|p1|)   ; valueCheckComplex2, unitCheckConvertible, valueMax
-p16=min(|p1|,|p1|)   ; valueCheckComplex2, unitCheckConvertible, valueMin
-p16=avg(|p1|,|p1|)   ; valueCheckComplex2, unitCheckConvertible, valueAvg
-p16=int(|p1|)        ; valueCheckComplex, valueInt
-p16=trunc(|p1|)      ; valueCheckComplex, valueTrunc
-p16=floor(|p1|)      ; valueCheckComplex, valueFloor
-p16=round(|p1|)      ; valueCheckComplex, valueRound
-p16=ceil(|p1|)       ; valueCheckComplex, valueCeil
-p16=sign(|p1|)       ; valueCheckComplex, valueSign
-p16=heaviside(|p1|)  ; valueCheckComplex, valueHeaviside
-p16=rand()           ; valueRand
-p16=randint()        ; valueRandint
-p16=randg(|p1|,|p1|) ; valueCheckComplex2, unitCheckDimensionless2, valueRandg
-p16=arg(|p1|)        ; complexArg
-p16=norm(|p1|)       ; complexNorm
-p16=conj(|p1|)       ; complexConj
-p16=polar(|p1|)      ; complexPolar
-p16=|p1|!            ; valueCheckComplex, valueCheckPositive, valueCheckInteger, unitCheckDimensionless, valueFaculty
-p16=~|p1|            ; unitCheckDimensionless, valueCheckComplex, bitInv
-p16=!|p1|            ; unitCheckDimensionless, valueCheckComplex, logicNot
-p16=|var|            ; pushVariable
+#Priority 16: powers
+p16=|p16|^|p17|        ; unitPow, valuePow
+p16=|p17|²            ; unitPow2, valuePow2
+p16=|p17|³            ; unitPow3, valuePow3
 p16=|p17|
 
-#Priority 17: postfix, variables, constants, pi
-p17=(|p1|)
-p17=|pi|             ; valuePi
-p17=|variable|
-p17=|constant|_
+#Priority 17: unary (prefix) operations, functions, numbers and units
+p17=sin(|p3|)        ; unitCheckDimensionless, valueSin
+p17=arcsin(|p3|)     ; unitCheckDimensionless, valueArcsin
+p17=cos(|p3|)        ; unitCheckDimensionless, valueCos
+p17=arccos(|p3|)     ; unitCheckDimensionless, valueArccos
+p17=tan(|p3|)        ; unitCheckDimensionless, valueTan
+p17=arctan(|p3|)     ; unitCheckDimensionless, valueArctan
+p17=sinh(|p3|)       ; unitCheckDimensionless, valueSinh
+p17=arcsinh(|p3|)    ; unitCheckDimensionless, valueArcsinh
+p17=cosh(|p3|)       ; unitCheckDimensionless, valueCosh
+p17=arccosh(|p3|)    ; unitCheckDimensionless, valueArccosh
+p17=tanh(|p3|)       ; unitCheckDimensionless, valueTanh
+p17=arctanh(|p3|)    ; unitCheckDimensionless, valueArctanh
+p17=exp(|p3|)        ; unitCheckDimensionless, valueExp
+p17=ln(|p3|)         ; unitCheckDimensionless, valueLn
+p17=log|p17|(|p3|)   ; unitCheckDimensionless2, valueLogn
+p17=root|p17|(|p3|)  ; unitRoot, valueRoot
+p17=sqrt(|p3|)       ; unitSqrt, valueSqrt
+p17=abs(|p3|)        ; valueAbs
+p17=max(|p3|,|p3|)   ; valueCheckComplex2, unitCheckConvertible, valueMax
+p17=min(|p3|,|p3|)   ; valueCheckComplex2, unitCheckConvertible, valueMin
+p17=avg(|p3|,|p3|)   ; valueCheckComplex2, unitCheckConvertible, valueAvg
+p17=int(|p3|)        ; valueCheckComplex, valueInt
+p17=trunc(|p3|)      ; valueCheckComplex, valueTrunc
+p17=floor(|p3|)      ; valueCheckComplex, valueFloor
+p17=round(|p3|)      ; valueCheckComplex, valueRound
+p17=ceil(|p3|)       ; valueCheckComplex, valueCeil
+p17=sign(|p3|)       ; valueCheckComplex, valueSign
+p17=heaviside(|p3|)  ; valueCheckComplex, valueHeaviside
+p17=rand()           ; valueRand
+p17=randint()        ; valueRandint
+p17=randg(|p3|,|p3|) ; valueCheckComplex2, unitCheckDimensionless2, valueRandg
+p17=arg(|p3|)        ; complexArg
+p17=norm(|p3|)       ; complexNorm
+p17=conj(|p3|)       ; complexConj
+p17=polar(|p3|)      ; complexPolar
+p17=|p3|!            ; valueCheckInteger, valueCheckPositive, unitCheckDimensionless, valueFaculty
+p17=~|p3|            ; unitCheckDimensionless, valueCheckComplex, bitInv
+p17=!|p3|            ; unitCheckDimensionless, valueCheckComplex, logicNot
+p17=|var|            ; pushVariable
+p17=|p18|
+
+#Priority 18: postfix, variables, constants, pi
+p18=(|p3|)
+p18=|pi|             ; valuePi
+p18=|variable|
+p18=|constant|_
 pi=π
 pi=pi
 
