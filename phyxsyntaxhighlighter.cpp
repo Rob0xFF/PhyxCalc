@@ -34,7 +34,9 @@ PhyxSyntaxHighlighter::PhyxSyntaxHighlighter(QTextDocument *parent) :
     }
 
     variablesFormat.setForeground(Qt::darkBlue);
+    variablesFormat.setToolTip("variable");
     constantsFormat.setForeground(Qt::darkRed);
+    constantsFormat.setToolTip("constant");
 
     singleLineCommentFormat.setForeground(Qt::darkGreen);
     rule.pattern = QRegExp("//[^\n]*");
@@ -49,6 +51,7 @@ PhyxSyntaxHighlighter::PhyxSyntaxHighlighter(QTextDocument *parent) :
     highlightingRules.append(rule);
 
     functionFormat.setFontItalic(true);
+    functionFormat.setToolTip("function");
     //functionFormat.setForeground(Qt::darkBlue);
     rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
     rule.format = functionFormat;
@@ -59,8 +62,6 @@ PhyxSyntaxHighlighter::PhyxSyntaxHighlighter(QTextDocument *parent) :
 
     commentStartExpression = QRegExp("/\\*");
     commentEndExpression = QRegExp("\\*/");
-
-    addError(0,0,3);
 }
 
 void PhyxSyntaxHighlighter::setVariableHighlightingRules(QStringList variableList)

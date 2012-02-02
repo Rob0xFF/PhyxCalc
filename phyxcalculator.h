@@ -118,6 +118,8 @@ public:
     bool evaluate();                                    ///< evaluates the expression
     void loadFile(QString fileName);                    ///< parses a complete txt file
 
+    PhyxVariable * variable(QString name) const;
+    PhyxVariable * constant(QString name) const;
     PhyxVariableManager::PhyxVariableMap * variables() const;
     PhyxVariableManager::PhyxVariableMap * constants() const;
     QString expression() const

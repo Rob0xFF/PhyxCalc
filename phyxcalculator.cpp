@@ -509,6 +509,16 @@ void PhyxCalculator::loadFile(QString fileName)
     }
 }
 
+PhyxVariable *PhyxCalculator::variable(QString name) const
+{
+    return variableManager->getVariable(name);
+}
+
+PhyxVariable *PhyxCalculator::constant(QString name) const
+{
+    return variableManager->getConstant(name);
+}
+
 void PhyxCalculator::clearVariables()
 {
     variableManager->clearVariables();

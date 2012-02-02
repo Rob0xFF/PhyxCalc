@@ -104,6 +104,48 @@ bool LineParser::resultLineSelected()
         return false;
 }
 
+QString LineParser::variableToolTip(QString name)
+{
+    QString output;
+    PhyxVariable *variable = m_phyxCalculator->variable(name);
+    PhyxCalculator::ResultVariable outputVariable;
+
+    outputVariable = m_phyxCalculator->formatVariable(variable,
+                                                (PhyxCalculator::OutputMode)m_appSettings->output.unitMode,
+                                                (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode,
+                                                m_appSettings->output.numbers.decimalPrecision,
+                                                m_appSettings->output.numbers.format);
+
+    output.append(tr("<b>Variable %1</b><br>").arg(name));
+    output.append(tr("Value: %1%2").arg(outputVariable.value).arg(outputVariable.unit));
+    if (!variable->unit()->isDimensionlessUnit())
+        output.append(tr("<br>Dimension: %1").arg(variable->unit()->dimensionString()));
+
+    return output;
+}
+
+QString LineParser::constantToolTip(QString name)
+{
+    QString output;
+    name.chop(1);
+    PhyxVariable *variable = m_phyxCalculator->constant(name);
+    PhyxCalculator::ResultVariable outputVariable;
+
+    outputVariable = m_phyxCalculator->formatVariable(variable,
+                                                (PhyxCalculator::OutputMode)m_appSettings->output.unitMode,
+                                                (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode,
+                                                m_appSettings->output.numbers.decimalPrecision,
+                                                m_appSettings->output.numbers.format);
+
+    output.append(tr("<b>Constant %1</b><br>").arg(name));
+    output.append(tr("Value: %1%2").arg(outputVariable.value).arg(outputVariable.unit));
+    if (!variable->unit()->isDimensionlessUnit())
+        output.append(tr("<br>Dimension: %1").arg(variable->unit()->dimensionString()));
+
+
+    return output;
+}
+
 void LineParser::replaceCurrentLine(QString text)
 {
     QTextCursor textCursor = m_calculationEdit->textCursor();

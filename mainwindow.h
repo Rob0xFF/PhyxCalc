@@ -31,6 +31,8 @@
 #include <QFileDialog>
 #include <QListWidget>
 #include <QToolButton>
+#include <QToolTip>
+#include <QTextLayout>
 #include "lineparser.h"
 #include "unitloader.h"
 #include "exportdialog.h"

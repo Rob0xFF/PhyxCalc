@@ -92,6 +92,34 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                  }
              }
         }
+        else if (event->type() == QEvent::ToolTip)  //mouseover tooltips
+        {
+                QHelpEvent* helpEvent = static_cast <QHelpEvent*>(event);
+                QTextCursor cursor = documentList.at(activeTab)->expressionEdit->cursorForPosition(helpEvent->pos());
+                int pos = cursor.positionInBlock();
+                foreach (QTextLayout::FormatRange range, cursor.block().layout()->additionalFormats()) //syntaxhighlighter formats are additional formats
+                {
+                    if (pos >= range.start && pos <= range.start + range.length)    //get current format
+                    {
+                        cursor.setPosition(cursor.block().position() + range.start);
+                        cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, range.length);
+                        if (range.format.toolTip() == "variable")   //tooltip is used in syntaxhighlighter
+                        {
+                            QToolTip::showText(helpEvent->globalPos(),
+                                               documentList.at(activeTab)->lineParser->variableToolTip(cursor.selectedText()));
+                        }
+                        else if (range.format.toolTip() == "constant")
+                        {
+                            QToolTip::showText(helpEvent->globalPos(),
+                                               documentList.at(activeTab)->lineParser->constantToolTip(cursor.selectedText()));
+                        }
+                        else
+                            QToolTip::hideText();
+                        break;
+                    }
+                }
+                return true;
+        }
         return QMainWindow::eventFilter(obj, event);
      } else {
          // standard event processing

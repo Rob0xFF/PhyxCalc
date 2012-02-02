@@ -56,6 +56,9 @@ public:
     void deleteLine();
     bool resultLineSelected();
 
+    QString variableToolTip(QString name);
+    QString constantToolTip(QString name);
+
     QString exportFormelEditor();
 
     QTextEdit * calculationEdit() const
