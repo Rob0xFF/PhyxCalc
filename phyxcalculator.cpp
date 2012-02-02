@@ -623,7 +623,7 @@ PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefx(PhyxValueDataType value,
         prefixes[i].value /= preferedPrefixValue;
         long double tmpValue = realValue / prefixes.at(i).value;
 
-        if ((double)tmpValue >= 1.0)
+        if (abs(tmpValue) >= 1.0L)
             return prefixes.at(i);
     }
 

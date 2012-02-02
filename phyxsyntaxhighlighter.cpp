@@ -54,8 +54,13 @@ PhyxSyntaxHighlighter::PhyxSyntaxHighlighter(QTextDocument *parent) :
     rule.format = functionFormat;
     highlightingRules.append(rule);
 
+    errorFormat.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
+    errorFormat.setUnderlineColor(Qt::red);
+
     commentStartExpression = QRegExp("/\\*");
     commentEndExpression = QRegExp("\\*/");
+
+    addError(0,0,3);
 }
 
 void PhyxSyntaxHighlighter::setVariableHighlightingRules(QStringList variableList)
@@ -84,6 +89,25 @@ void PhyxSyntaxHighlighter::setConstantHighlightingRules(QStringList variableLis
         constantHighlightingRules.append(rule);
     }
     rehighlight();
+}
+
+void PhyxSyntaxHighlighter::addError(int line, int pos, int length)
+{
+    Error error;
+    error.line = line;
+    error.pos = pos;
+    error.length = length;
+
+    errorList.append(error);
+}
+
+void PhyxSyntaxHighlighter::removeError(int line, int pos)
+{
+    for (int i = 0; i < errorList.size(); i++)
+    {
+        if ((errorList.at(i).line == line) && (errorList.at(i).pos == pos))
+            errorList.removeAt(i);
+    }
 }
 
 void PhyxSyntaxHighlighter::highlightBlock(const QString &text)
@@ -134,5 +158,12 @@ void PhyxSyntaxHighlighter::highlightBlock(const QString &text)
         }
         setFormat(startIndex, commentLength, multiLineCommentFormat);
         startIndex = commentStartExpression.indexIn(text, startIndex + commentLength);
+    }
+
+    //underline error
+    foreach (Error error, errorList)
+    {
+        if (currentBlock().firstLineNumber() == error.line)
+            setFormat(error.pos, error.length, errorFormat);
     }
 }

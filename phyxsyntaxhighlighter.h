@@ -27,11 +27,19 @@ class PhyxSyntaxHighlighter : public QSyntaxHighlighter
 {
     Q_OBJECT
 
+    typedef struct {
+        int line;
+        int pos;
+        int length;
+    } Error;
+
 public:
     PhyxSyntaxHighlighter(QTextDocument *parent = 0);
 
     void setVariableHighlightingRules(QStringList variableList);
     void setConstantHighlightingRules(QStringList variableList);
+    void addError(int line, int pos, int length);
+    void removeError(int line, int pos);
     
 protected:
     void highlightBlock(const QString &text);
@@ -45,6 +53,7 @@ private:
     QVector<HighlightingRule> highlightingRules;
     QVector<HighlightingRule> variableHighlightingRules;
     QVector<HighlightingRule> constantHighlightingRules;
+    QList<Error>              errorList;
 
     QRegExp commentStartExpression;
     QRegExp commentEndExpression;
@@ -56,6 +65,7 @@ private:
     QTextCharFormat functionFormat;
     QTextCharFormat variablesFormat;
     QTextCharFormat constantsFormat;
+    QTextCharFormat errorFormat;
     
 };
 
