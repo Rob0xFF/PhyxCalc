@@ -1572,9 +1572,11 @@ void PhyxCalculator::unitCheckConvertible()
 
 void PhyxCalculator::unitConvert()
 {
+    // conversion works -> bug with output, bug with unit symbol (not correct)
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
+    variable1->setValue(variable1->value() / variable2->value());
     variable1->convertUnit(variable2->unit());
     variableStack.push(variable1);
 
