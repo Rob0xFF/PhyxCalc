@@ -1341,10 +1341,11 @@ void PhyxCalculator::logicEqual()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    variable1->setValue((variable1->value() == variable2->value()) && variable1->unit()->isSame(variable2->unit()));
-    variable1->setUnit(new PhyxUnit());
-    variableStack.push(variable1);
+    PhyxVariable *variable3 = new PhyxVariable();
+    variable3->setValue((variable1->value() == variable2->value()) && variable1->unit()->isSame(variable2->unit()));
+    variableStack.push(variable3);
 
+    delete variable1;
     delete variable2;
 }
 
@@ -1353,10 +1354,11 @@ void PhyxCalculator::logicNotEqual()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    variable1->setValue((variable1->value() != variable2->value()) || !variable1->unit()->isSame(variable2->unit()));
-    variable1->setUnit(new PhyxUnit());
-    variableStack.push(variable1);
+    PhyxVariable *variable3 = new PhyxVariable();
+    variable3->setValue((variable1->value() != variable2->value()) || !variable1->unit()->isSame(variable2->unit()));
+    variableStack.push(variable3);
 
+    delete variable1;
     delete variable2;
 }
 
@@ -1365,10 +1367,11 @@ void PhyxCalculator::logicGreater()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(variable1->value().real() > variable2->value().real());
-    variable1->setUnit(new PhyxUnit());
-    variableStack.push(variable1);
+    PhyxVariable *variable3 = new PhyxVariable();
+    variable3->setValue(variable1->value().real() > variable2->value().real());
+    variableStack.push(variable3);
 
+    delete variable1;
     delete variable2;
 }
 
@@ -1377,10 +1380,11 @@ void PhyxCalculator::logicGreaterOrEqual()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(variable1->value().real() >= variable2->value().real());
-    variable1->setUnit(new PhyxUnit());
-    variableStack.push(variable1);
+    PhyxVariable *variable3 = new PhyxVariable();
+    variable3->setValue(variable1->value().real() >= variable2->value().real());
+    variableStack.push(variable3);
 
+    delete variable1;
     delete variable2;
 }
 
@@ -1389,10 +1393,11 @@ void PhyxCalculator::logicSmaller()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(variable1->value().real() < variable2->value().real());
-    variable1->setUnit(new PhyxUnit());
-    variableStack.push(variable1);
+    PhyxVariable *variable3 = new PhyxVariable();
+    variable3->setValue(variable1->value().real() < variable2->value().real());
+    variableStack.push(variable3);
 
+    delete variable1;
     delete variable2;
 }
 
@@ -1401,10 +1406,11 @@ void PhyxCalculator::logicSmallerOrEqual()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(variable1->value().real() <= variable2->value().real());
-    variable1->setUnit(new PhyxUnit());
-    variableStack.push(variable1);
+    PhyxVariable *variable3 = new PhyxVariable();
+    variable3->setValue(variable1->value().real() <= variable2->value().real());
+    variableStack.push(variable3);
 
+    delete variable1;
     delete variable2;
 }
 
