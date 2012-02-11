@@ -57,15 +57,16 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueCheckInteger2",    &PhyxCalculator::valueCheckInteger2);
     functionMap.insert("valueCheckInteger2th",  &PhyxCalculator::valueCheckInteger2th);
     functionMap.insert("valueCheckInteger3th",  &PhyxCalculator::valueCheckInteger3th);
+    functionMap.insert("valuePush2",      &PhyxCalculator::valuePush2);
+    functionMap.insert("valuePush3",      &PhyxCalculator::valuePush3);
     functionMap.insert("valueAdd",      &PhyxCalculator::valueAdd);
     functionMap.insert("valueSub",      &PhyxCalculator::valueSub);
     functionMap.insert("valueMul",      &PhyxCalculator::valueMul);
     functionMap.insert("valueDiv",      &PhyxCalculator::valueDiv);
     functionMap.insert("valueMod",      &PhyxCalculator::valueMod);
     functionMap.insert("valueNeg",      &PhyxCalculator::valueNeg);
+    functionMap.insert("valueNoPow",    &PhyxCalculator::valueNoPow);
     functionMap.insert("valuePow",      &PhyxCalculator::valuePow);
-    functionMap.insert("valuePow2",     &PhyxCalculator::valuePow2);
-    functionMap.insert("valuePow3",     &PhyxCalculator::valuePow3);
     functionMap.insert("valueSin",      &PhyxCalculator::valueSin);
     functionMap.insert("valueArcsin",   &PhyxCalculator::valueArcsin);
     functionMap.insert("valueCos",      &PhyxCalculator::valueCos);
@@ -139,8 +140,6 @@ void PhyxCalculator::initialize()
     functionMap.insert("unitMul",       &PhyxCalculator::unitMul);
     functionMap.insert("unitDiv",       &PhyxCalculator::unitDiv);
     functionMap.insert("unitPow",       &PhyxCalculator::unitPow);
-    functionMap.insert("unitPow2",      &PhyxCalculator::unitPow2);
-    functionMap.insert("unitPow3",      &PhyxCalculator::unitPow3);
     functionMap.insert("unitSqrt",      &PhyxCalculator::unitSqrt);
     functionMap.insert("unitRoot",      &PhyxCalculator::unitRoot);
     functionMap.insert("unitAdd",       &PhyxCalculator::unitAdd);
@@ -805,6 +804,18 @@ void PhyxCalculator::valueCheckInteger3th()
     variableStack.push(variable1);
 }
 
+void PhyxCalculator::valuePush2()
+{
+    valueBuffer = 2;
+    pushVariable();
+}
+
+void PhyxCalculator::valuePush3()
+{
+    valueBuffer = 3;
+    pushVariable();
+}
+
 void PhyxCalculator::valueAdd()
 {
     PhyxVariable *variable2 = variableStack.pop();
@@ -868,6 +879,24 @@ void PhyxCalculator::valueNeg()
     variableStack.push(variable1);
 }
 
+void PhyxCalculator::valueNoPow()
+{
+    PhyxVariable *variable2 = variableStack.pop();
+    PhyxVariable *variable1 = variableStack.pop();
+
+    if (variable1->unit()->isOne())
+    {
+        variableStack.push(variable1);
+        variableStack.push(variable2);
+        valuePow();
+    }
+    else
+    {
+        variableStack.push(variable1);
+        delete variable2;
+    }
+}
+
 void PhyxCalculator::valuePow()
 {
     PhyxVariable *variable2 = variableStack.pop();
@@ -880,22 +909,6 @@ void PhyxCalculator::valuePow()
     variableStack.push(variable1);
 
     delete variable2;
-}
-
-void PhyxCalculator::valuePow2()
-{
-    PhyxVariable *variable1 = variableStack.pop();
-
-    variable1->setValue(pow(variable1->value(),2));
-    variableStack.push(variable1);
-}
-
-void PhyxCalculator::valuePow3()
-{
-    PhyxVariable *variable1 = variableStack.pop();
-
-    variable1->setValue(pow(variable1->value(),3));
-    variableStack.push(variable1);
 }
 
 void PhyxCalculator::valueSin()
@@ -1611,22 +1624,6 @@ void PhyxCalculator::unitPow()
     variable1->unit()->raise(variable2->value().real());
     variableStack.push(variable1);
     variableStack.push(variable2);
-}
-
-void PhyxCalculator::unitPow2()
-{
-    PhyxVariable *variable1 = variableStack.pop();
-
-    variable1->unit()->raise(2);
-    variableStack.push(variable1);
-}
-
-void PhyxCalculator::unitPow3()
-{
-    PhyxVariable *variable1 = variableStack.pop();
-
-    variable1->unit()->raise(3);
-    variableStack.push(variable1);
 }
 
 void PhyxCalculator::unitRoot()

@@ -219,15 +219,16 @@ private:
     void valueCheckInteger2();      ///< checks wheter the last 2 arguments are integer or not
     void valueCheckInteger2th();    ///< checks wheter the second argument is an integer or not
     void valueCheckInteger3th();    ///< checks wheter the third argument is an integer or not
+    void valuePush2();
+    void valuePush3();
     void valueAdd();
     void valueSub();
     void valueMul();
     void valueDiv();
     void valueMod();
     void valueNeg();
+    void valueNoPow();
     void valuePow();
-    void valuePow2();
-    void valuePow3();
     void valueSin();
     void valueArcsin();
     void valueCos();
@@ -302,8 +303,6 @@ private:
     void unitMul();
     void unitDiv();
     void unitPow();
-    void unitPow2();
-    void unitPow3();
     void unitRoot();
     void unitSqrt();
     void unitAdd();
