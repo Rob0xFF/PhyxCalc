@@ -46,7 +46,7 @@ p2=|variable|*=|p3| ; lowLevelCombinedAssignmentMul
 p2=|variable|/=|p3| ; lowLevelCombinedAssignmentDiv
 p2=|variable|%=|p3| ; lowLevelCombinedAssignmentMod
 p2=|variable|&=|p3| ; lowLevelCombinedAssignmentAnd
-p2=|variable||=|p3| ; lowLevelCombinedAssignmentOr
+p2=|variable|\|=|p3| ; lowLevelCombinedAssignmentOr
 p2=|variable|^=|p3| ; lowLevelCombinedAssignmentXor
 p2=|variable|<<=|p3|; lowLevelCombinedAssignmentShiftLeft
 p2=|variable|>>=|p3|; lowLevelCombinedAssignmentShiftRight
