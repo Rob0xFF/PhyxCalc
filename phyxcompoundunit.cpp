@@ -55,7 +55,17 @@ bool PhyxCompoundUnit::isOne()
 
 bool PhyxCompoundUnit::isSimpleUnit()
 {
-    return (compoundsNonNullCount() == 1);
+    if (compoundsNonNullCount() == 1)   //unit has only 1 compound
+    {
+        for (int i = 0; i < m_compounds.size(); i++)
+        {
+            if (m_compounds.at(i).power < 0)
+                return false;
+        }
+        return true;    //if function has not returned yet, unit has no negative compound and is simple
+
+    }
+    return false;
 }
 
 void PhyxCompoundUnit::compoundAppend(PhyxUnit *unit, double power)
@@ -189,6 +199,7 @@ int PhyxCompoundUnit::compoundsNonNullCount()
 
     return count;
 }
+
 
 void PhyxCompoundUnit::verify()
 {
