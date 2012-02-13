@@ -62,7 +62,7 @@ bool PhyxCompoundUnit::isSimpleUnit()
             if (m_compounds.at(i).power < 0)
                 return false;
         }
-        return true;    //if function has not returned yet, unit has no negative compound and is simple
+        return true;    //if function has not returned yet, unit has no negative compound and is simplebas
 
     }
     return false;

@@ -103,6 +103,8 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueRandg",    &PhyxCalculator::valueRandg);
     functionMap.insert("valueFaculty",  &PhyxCalculator::valueFaculty);
 
+    functionMap.insert("complexReal",   &PhyxCalculator::complexReal);
+    functionMap.insert("complexImag",   &PhyxCalculator::complexImag);
     functionMap.insert("complexArg",    &PhyxCalculator::complexArg);
     functionMap.insert("complexNorm",   &PhyxCalculator::complexNorm);
     functionMap.insert("complexConj",   &PhyxCalculator::complexConj);
@@ -1241,6 +1243,22 @@ void PhyxCalculator::valueFaculty()
     variableStack.push(variable1);
 }
 
+void PhyxCalculator::complexReal()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue((PhyxValueDataType)real(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::complexImag()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue((PhyxValueDataType)imag(variable1->value()));
+    variableStack.push(variable1);
+}
+
 void PhyxCalculator::complexArg()
 {
     PhyxVariable *variable1 = variableStack.pop();
@@ -1267,9 +1285,13 @@ void PhyxCalculator::complexConj()
 
 void PhyxCalculator::complexPolar()
 {
+    PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
-    variable1->setValue(std::polar(abs(variable1->value()), arg(variable1->value())));
+
+    variable1->setValue(std::polar(variable1->value().real(), variable2->value().real()));
     variableStack.push(variable1);
+
+    delete variable2;
 }
 
 void PhyxCalculator::logicAnd()

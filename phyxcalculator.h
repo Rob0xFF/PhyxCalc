@@ -265,6 +265,8 @@ private:
     void valueRandg();
     void valueFaculty();
 
+    void complexReal();
+    void complexImag();
     void complexArg();
     void complexNorm();
     void complexConj();
