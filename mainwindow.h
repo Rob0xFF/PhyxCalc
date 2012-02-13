@@ -45,8 +45,6 @@ typedef struct {
     QString     path;
     LineParser  *lineParser;
     QTextEdit   *expressionEdit;
-    bool        isUnchanged;
-
 } Document;
 
 namespace Ui {
@@ -101,7 +99,7 @@ private slots:
     bool closeTab(int index);
     bool closeAllTabs();
 
-    void documentModified();
+    void documentModified(bool modified);
 
     void dockButtonPressed(QAbstractButton *button);
     void dockWidgetPressed(QListWidgetItem *item);

@@ -352,14 +352,13 @@ void MainWindow::addNewTab()
     newDocument->lineParser->setCalculationEdit(newDocument->expressionEdit);
     newDocument->lineParser->setAppSettings(&appSettings);
     newDocument->lineParser->phyxCalculator()->loadFile(settingsDir + "/definitions.txt");
-    newDocument->isUnchanged = true;
     newDocument->name = "";
     newDocument->path = "";
     documentList.append(newDocument);
 
     newDocument->expressionEdit->installEventFilter(this);
-    connect(newDocument->expressionEdit, SIGNAL(textChanged()),
-            this, SLOT(documentModified()));
+    connect(newDocument->expressionEdit->document(), SIGNAL(modificationChanged(bool)),
+            this, SLOT(documentModified(bool)));
 
     layout->addWidget(newDocument->expressionEdit);
     layout->setMargin(0);
@@ -392,7 +391,7 @@ bool MainWindow::closeTab(int index)
         document->path = "";
         document->expressionEdit->clear();
         document->lineParser->clearAllVariables();
-        document->isUnchanged = true;
+        document->expressionEdit->document()->setModified(false);
         ui->tabWidget->setTabText(0, tr("Untitled"));
     }
 
@@ -420,7 +419,7 @@ void MainWindow::tabChanged(int index)
 bool MainWindow::saveDocument(Document *document, bool force, bool exit)
 {
     //check wheter the document is unchanged or not
-    if (document->isUnchanged && !force)
+    if (!document->expressionEdit->document()->isModified() && !force)
         return true;
 
     //exit = if tab is closed
@@ -457,7 +456,7 @@ bool MainWindow::saveDocument(Document *document, bool force, bool exit)
             int pos = fileName.lastIndexOf("/");
             document->path = fileName.left(pos+1);
             document->name = fileName.mid(pos+1);
-            document->isUnchanged = false;
+            document->expressionEdit->document()->setModified(true);
         }
     }
 
@@ -469,7 +468,7 @@ bool MainWindow::saveDocument(Document *document, bool force, bool exit)
         file.write(text.toLocal8Bit());
         file.close();
 
-        document->isUnchanged = true;
+        document->expressionEdit->document()->setModified(false);
         ui->tabWidget->setTabText(documentList.indexOf(document), document->name);
 
         addRecentDocument(file.fileName());
@@ -501,7 +500,7 @@ void MainWindow::openDocument(QString fileName, bool newTab)
         int pos = fileName.lastIndexOf("/");
         document->path = fileName.left(pos+1);
         document->name = fileName.mid(pos+1);
-        document->isUnchanged = true;
+        document->expressionEdit->document()->setModified(false);
 
         ui->tabWidget->setTabText(activeTab, document->name);
 
@@ -513,13 +512,13 @@ void MainWindow::openDocument(QString fileName, bool newTab)
     }
 }
 
-void MainWindow::documentModified()
+void MainWindow::documentModified(bool modified)
 {
     Document *document = documentList.at(activeTab);
-    if (document->isUnchanged)
+    if (modified)
     {
-        document->isUnchanged = false;
-        ui->tabWidget->setTabText(activeTab, ui->tabWidget->tabText(activeTab) + "*");
+        if (ui->tabWidget->tabText(activeTab).at(ui->tabWidget->tabText(activeTab).size()-1) != '*')
+            ui->tabWidget->setTabText(activeTab, ui->tabWidget->tabText(activeTab) + "*");
     }
 }
 
