@@ -33,7 +33,7 @@ PhyxSyntaxHighlighter::PhyxSyntaxHighlighter(QTextDocument *parent) :
         highlightingRules.append(rule);
     }
 
-    variablesFormat.setForeground(Qt::darkBlue);
+    variablesFormat.setForeground(Qt::darkMagenta);
     variablesFormat.setToolTip("variable");
     constantsFormat.setForeground(Qt::darkRed);
     constantsFormat.setToolTip("constant");
@@ -59,6 +59,15 @@ PhyxSyntaxHighlighter::PhyxSyntaxHighlighter(QTextDocument *parent) :
 
     errorFormat.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
     errorFormat.setUnderlineColor(Qt::red);
+
+    numberFormat.setForeground(Qt::darkBlue);
+    rule.pattern = QRegExp("\\b[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?");
+    rule.format = numberFormat;
+    highlightingRules.append(rule);
+    rule.pattern = QRegExp("\\b[0][x][0-9A-Fa-f]+\\b");
+    highlightingRules.append(rule);
+    rule.pattern = QRegExp("\\b[0][b][0-1]+\\b");
+    highlightingRules.append(rule);
 
     commentStartExpression = QRegExp("/\\*");
     commentEndExpression = QRegExp("\\*/");

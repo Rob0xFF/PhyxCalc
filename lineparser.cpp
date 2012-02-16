@@ -26,6 +26,8 @@ LineParser::LineParser(QObject *)
             this, SLOT(outputResult()));
     connect(m_phyxCalculator, SIGNAL(outputError()),
             this, SLOT(outputError()));
+    connect(m_phyxCalculator, SIGNAL(outputText(QString)),
+            this, SLOT(outputText(QString)));
     connect(m_phyxCalculator, SIGNAL(variablesChanged()),
             this, SLOT(showVariables()));
     connect(m_phyxCalculator, SIGNAL(constantsChanged()),
@@ -519,4 +521,10 @@ void LineParser::outputError()
     output.append(m_phyxCalculator->errorString());
     output.append("</font> ");
     insertOutput(output);
+}
+
+void LineParser::outputText(QString text)
+{
+    text.prepend("=");
+    insertOutput(text);
 }

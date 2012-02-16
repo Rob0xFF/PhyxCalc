@@ -144,6 +144,7 @@ void PhyxCalculator::initialize()
     functionMap.insert("unitPow",       &PhyxCalculator::unitPow);
     functionMap.insert("unitSqrt",      &PhyxCalculator::unitSqrt);
     functionMap.insert("unitRoot",      &PhyxCalculator::unitRoot);
+    functionMap.insert("unitClear",     &PhyxCalculator::unitClear);
     functionMap.insert("unitAdd",       &PhyxCalculator::unitAdd);
     functionMap.insert("unitRemove",    &PhyxCalculator::unitRemove);
 
@@ -156,6 +157,10 @@ void PhyxCalculator::initialize()
 
     functionMap.insert("bufferUnit",    &PhyxCalculator::bufferUnit);
     functionMap.insert("bufferValue",   &PhyxCalculator::bufferValue);
+    functionMap.insert("bufferHex",     &PhyxCalculator::bufferHex);
+    functionMap.insert("bufferBin",     &PhyxCalculator::bufferBin);
+    functionMap.insert("bufferHexString",&PhyxCalculator::bufferHexString);
+    functionMap.insert("bufferBinString",&PhyxCalculator::bufferBinString);
     functionMap.insert("bufferPrefix",   &PhyxCalculator::bufferPrefix);
     functionMap.insert("bufferString",   &PhyxCalculator::bufferString);
     functionMap.insert("bufferUnitGroup",&PhyxCalculator::bufferUnitGroup);
@@ -164,6 +169,7 @@ void PhyxCalculator::initialize()
     functionMap.insert("setInputOnlyFlag",  &PhyxCalculator::setInputOnlyFlag);
 
     functionMap.insert("outputVariable",&PhyxCalculator::outputVariable);
+    functionMap.insert("outputString",  &PhyxCalculator::outputString);
     functionMap.insert("unitGroupAdd",  &PhyxCalculator::unitGroupAdd);
     functionMap.insert("unitGroupRemove",&PhyxCalculator::unitGroupRemove);
     functionMap.insert("prefixAdd",     &PhyxCalculator::prefixAdd);
@@ -615,6 +621,72 @@ PhyxValueDataType PhyxCalculator::stringToComplex(QString string)
     }
 
     return value;
+}
+
+long int PhyxCalculator::hexToLongInt(QString string)
+{
+    long int value = 0;
+    long int n = 1;
+
+    string.remove("0x");
+    for (int i = string.size()-1; i >= 0; i--)
+    {
+        if (string.at(i).isNumber())
+            value += (string.at(i).toAscii()-48)*n;
+        else
+            value += (string.at(i).toAscii()-55)*n;
+        n *= 16;
+    }
+
+    return value;
+}
+
+long PhyxCalculator::binToLongInt(QString string)
+{
+    long int value = 0;
+    long int n = 1;
+
+    string.remove("0b");
+    for (int i = string.size()-1; i >= 0; i--)
+    {
+        value += (string.at(i).toAscii()-48)*n;
+        n *= 2;
+    }
+
+    return value;
+}
+
+QString PhyxCalculator::longIntToHex(long int number)
+{
+    QString output;
+
+    while (number != 0)
+    {
+        int rest = number % 16;
+        if (rest < 10)
+            output.prepend(QChar::fromAscii(rest+48));
+        else
+            output.prepend(QChar::fromAscii(rest+55));
+        number /= 16;
+    }
+
+    output.prepend("0x");
+    return output;
+}
+
+QString PhyxCalculator::longIntToBin(long int number)
+{
+    QString output;
+
+    while (number != 0)
+    {
+        int rest = number % 2;
+        output.prepend(QChar::fromAscii(rest+48));
+        number /= 2;
+    }
+
+    output.prepend("0b");
+    return output;
 }
 
 PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefx(PhyxValueDataType value, QString unitGroup, QString preferedPrefix) const
@@ -1210,9 +1282,14 @@ void PhyxCalculator::valueRand()
 
 void PhyxCalculator::valueRandint()
 {
-    valueBuffer = (long int)qrand();
+    PhyxVariable *variable1 = variableStack.pop();
+
+    long int max = (long int)variable1->value().real();
+    valueBuffer = (long int)((max) * qrand()/(float)RAND_MAX);
     unitBuffer = "";
     pushVariable();
+
+    delete variable1;
 }
 
 void PhyxCalculator::valueRandg()
@@ -1220,10 +1297,15 @@ void PhyxCalculator::valueRandg()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    int min, max;
-    min = variable1->value().real();
-    max = variable2->value().real();
-    variable1->setValue(PhyxValueDataType(min + qrand()%(max-min+1),0));
+    long double mean, standard;
+    mean = variable1->value().real();
+    standard = variable2->value().real();
+
+    boost::variate_generator<boost::mt19937, boost::normal_distribution<> >
+        generator(boost::mt19937(QDateTime::currentMSecsSinceEpoch()),
+                  boost::normal_distribution<>(variable1->value().real(),variable2->value().real()));
+    variable1->setValue((PhyxValueDataType)generator());
+
     variableStack.push(variable1);
 
     delete variable2;
@@ -1666,6 +1748,14 @@ void PhyxCalculator::unitSqrt()
     variableStack.push(variable1);
 }
 
+void PhyxCalculator::unitClear()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setUnit(new PhyxUnit());
+    variableStack.push(variable1);
+}
+
 void PhyxCalculator::unitAdd()
 {
     if (variableStack.isEmpty())        // <- base unit
@@ -1761,6 +1851,32 @@ void PhyxCalculator::bufferValue()
     valueBuffer = stringToComplex(parameterBuffer);
 }
 
+void PhyxCalculator::bufferHex()
+{
+    valueBuffer = (PhyxValueDataType)(long double)hexToLongInt(parameterBuffer);
+}
+
+void PhyxCalculator::bufferBin()
+{
+    valueBuffer = (PhyxValueDataType)(long double)binToLongInt(parameterBuffer);
+}
+
+void PhyxCalculator::bufferHexString()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    stringBuffer = longIntToHex((long int)variable1->value().real());
+    delete variable1;
+}
+
+void PhyxCalculator::bufferBinString()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    stringBuffer = longIntToBin((long int)variable1->value().real());
+    delete variable1;
+}
+
 void PhyxCalculator::bufferPrefix()
 {
     prefixBuffer = parameterBuffer;
@@ -1848,6 +1964,11 @@ void PhyxCalculator::outputVariable()
 
         emit outputResult();
     }
+}
+
+void PhyxCalculator::outputString()
+{
+    emit outputText(stringBuffer);
 }
 
 void PhyxCalculator::unitGroupAdd()

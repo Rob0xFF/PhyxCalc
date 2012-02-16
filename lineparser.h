@@ -118,6 +118,7 @@ public slots:
     void clearAllVariables();
     void outputResult();
     void outputError();
+    void outputText(QString text);
 
     void setCalculationEdit(QTextEdit * arg)
     {

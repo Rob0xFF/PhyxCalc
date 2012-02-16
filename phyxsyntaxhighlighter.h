@@ -66,6 +66,7 @@ private:
     QTextCharFormat variablesFormat;
     QTextCharFormat constantsFormat;
     QTextCharFormat errorFormat;
+    QTextCharFormat numberFormat;
     
 };
 

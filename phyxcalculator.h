@@ -30,6 +30,9 @@
 #include <sstream>
 #include "boost/math/special_functions.hpp"
 #include "boost/math/complex.hpp"
+#include <boost/random/normal_distribution.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/variate_generator.hpp>
 #include "qearleyparser.h"
 #include "phyxunitsystem.h"
 #include "phyxvariable.h"
@@ -158,6 +161,10 @@ public:
 
     static QString complexToString(const PhyxValueDataType number, int precision, char numberFormat);
     static PhyxValueDataType stringToComplex(QString string);
+    static long int hexToLongInt(QString string);
+    static long int binToLongInt(QString string);
+    static QString longIntToHex(long int number);
+    static QString longIntToBin(long int number);
 
     ResultVariable formatVariable(PhyxVariable *variable, OutputMode outputMode, PrefixMode prefixMode, int precision, char numberFormat) const;
 
@@ -307,9 +314,9 @@ private:
     void unitPow();
     void unitRoot();
     void unitSqrt();
+    void unitClear();
     void unitAdd();
     void unitRemove();
-
     /** functions for variable handling */
     void variableAdd();
     void variableRemove();
@@ -321,6 +328,10 @@ private:
     /** functions for buffering */
     void bufferUnit();
     void bufferValue();
+    void bufferHex();
+    void bufferBin();
+    void bufferHexString();
+    void bufferBinString();
     void bufferPrefix();
     void bufferString();
     void bufferUnitGroup();
@@ -330,6 +341,7 @@ private:
     void setInputOnlyFlag();
 
     void outputVariable();
+    void outputString();
 
     /** special functions */
     void unitGroupAdd();
@@ -361,6 +373,7 @@ signals:
     void constantsChanged();        ///< is emited wehen constants have changed
     void outputResult();            ///< is emited when result should be output
     void outputError();             ///< is emited when an error should be output
+    void outputText(QString text);  ///< is emited when text should be output
     
 public slots:
     void clearVariables();

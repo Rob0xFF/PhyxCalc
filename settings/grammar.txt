@@ -31,6 +31,8 @@ S=|string|=[|p3|]|p3|                       ; unitAdd                           
 S=|string|@|unitGroup|=[|p3|]|p3|           ; unitAdd                                               //define offset unit with unit system
 S=|string|@|unitGroup|@|prefix|=[|p3|]|p3|  ; unitAdd                                               //define offset unit with unit system and prefered prefix
 S=|p3|->|p3|        ; unitCheckConvertible, unitConvert, outputVariable
+S=|p3|->hex         ; unitCheckDimensionless, valueCheckInteger, valueCheckPositive, bufferHexString, outputString
+S=|p3|->bin         ; unitCheckDimensionless, valueCheckInteger, valueCheckPositive, bufferBinString, outputString
 S=|p1|              ; lowLevelRun
 
 #Priority 1: sequential operator
@@ -140,7 +142,7 @@ p16=|p17|³            ; valuePush3, unitPow, valueNoPow
 p16=|p17|
 
 #Priority 17: unary (prefix) operations, numbers and units
-p17=|p3|!            ; valueCheckInteger, valueCheckPositive, unitCheckDimensionless, valueFaculty
+p17=|p3|!            ;  unitCheckDimensionless, valueCheckInteger, valueCheckPositive, valueFaculty
 p17=~|p3|            ; unitCheckDimensionless, valueCheckComplex, bitInv
 p17=!|p3|            ; unitCheckDimensionless, valueCheckComplex, logicNot
 p17=|var|            ; pushVariable
@@ -176,15 +178,16 @@ p18=ceil(|p3|)       ; valueCheckComplex, valueCeil
 p18=sign(|p3|)       ; valueCheckComplex, valueSign
 p18=heaviside(|p3|)  ; valueCheckComplex, valueHeaviside
 p18=rand()           ; valueRand
-p18=randint()        ; valueRandint
+p18=randi(|p3|)      ; unitCheckDimensionless, valueCheckInteger, valueCheckPositive, valueRandint
 p18=randg(|p3|,|p3|) ; valueCheckComplex2, unitCheckDimensionless2, valueRandg
-p18=real(|p3|)       ; complexReal
-p18=imag(|p3|)       ; complexImag
+p18=Re(|p3|)         ; complexReal
+p18=Im(|p3|)         ; complexImag
 p18=arg(|p3|)        ; complexArg
 p18=norm(|p3|)       ; complexNorm
 p18=conj(|p3|)       ; complexConj
 p18=polar(|p3|,|p3|) ; valueCheckComplex2, unitCheckDimensionless2, complexPolar
 p18=(|p3|)
+p18={|p3|}           ; unitClear
 p18=|pi|             ; valuePi
 p18=|variable|
 p18=|constant|_
@@ -202,6 +205,12 @@ real=|int|
 real=|int|.|uint|
 reale=|real|
 reale=|real||e||int|
+hexpart=|nh|
+hexpart=|nh||hexpart|
+hex=0x|hexpart|
+binpart=|nb|
+binpart=|nb||binpart|
+bin=0b|binpart|
 complex=|reale|     ; bufferParameter, bufferValue
 complex=|i||reale|  ; bufferParameter, bufferValue
 complex=|reale||i|  ; bufferParameter, bufferValue
@@ -210,6 +219,8 @@ complex=|i|         ; bufferParameter, bufferValue
 var=|complex|
 var=|complex||prefix||unit|
 var=|prefix||unit|
+var=|hex|       ; bufferParameter, bufferHex
+var=|bin|       ; bufferParameter, bufferBin
 prefix=
 #unit=|prefix||unit|
 +-=+
@@ -228,6 +239,30 @@ n=6
 n=7
 n=8
 n=9
+nh=0
+nh=1
+nh=2
+nh=3
+nh=4
+nh=5
+nh=6
+nh=7
+nh=8
+nh=9
+nh=A
+nh=B
+nh=C
+nh=D
+nh=E
+nh=F
+nh=a
+nh=b
+nh=c
+nh=d
+nh=e
+nh=f
+nb=0
+nb=1
 
 #Strings
 chars+=|any+|
