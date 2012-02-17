@@ -139,6 +139,14 @@ void SettingsDialog::getAppSettings(AppSettings *settings)
     settings->textEditor.font = font;
 
     settings->textEditor.useSyntaxHighlighter = ui->colorSchemeUseCheck->isChecked();
+    for (int i = 0; i < settings->textEditor.colorScheme.size(); i++)
+    {
+        ui->colorSchemeList->setCurrentRow(i);
+        settings->textEditor.colorScheme[i].foregroundColor = ui->colorSchemeList->currentItem()->foreground().color();
+        settings->textEditor.colorScheme[i].backgroundColor = ui->colorSchemeList->currentItem()->background().color();
+        settings->textEditor.colorScheme[i].bold            = ui->colorSchemeList->currentItem()->font().bold();
+        settings->textEditor.colorScheme[i].italic          = ui->colorSchemeList->currentItem()->font().italic();
+    }
 }
 
 void SettingsDialog::on_listWidget_currentRowChanged(int currentRow)
@@ -150,16 +158,6 @@ void SettingsDialog::on_formatRadioCustom_toggled(bool checked)
 {
     ui->decimalPrecisionSpin->setEnabled(!checked);
     ui->formatCustomEdit->setEnabled(checked);
-}
-
-void SettingsDialog::on_colorSchemeForegroundButton_clicked()
-{
-    setColorSchemeForeground(QColorDialog::getColor());
-}
-
-void SettingsDialog::on_colorSchemeBackgroundButton_clicked()
-{
-    setColorSchemeBackground(QColorDialog::getColor());
 }
 
 void SettingsDialog::setColorSchemeForeground(QColor color)
@@ -196,6 +194,26 @@ void SettingsDialog::setColorSchemeItalic(bool italic)
     font.setItalic(italic);
     ui->colorSchemeList->currentItem()->setFont(font);
     ui->colorSchemeItalicCheck->setChecked(italic);
+}
+
+void SettingsDialog::on_colorSchemeForegroundButton_clicked()
+{
+    QColor color = QColorDialog::getColor(ui->colorSchemeList->currentItem()->foreground().color(),
+                                          this,
+                                          tr("Select Foreground Color"),
+                                          QColorDialog::ShowAlphaChannel);
+    if (color.isValid())
+        setColorSchemeForeground(color);
+}
+
+void SettingsDialog::on_colorSchemeBackgroundButton_clicked()
+{
+    QColor color = QColorDialog::getColor(ui->colorSchemeList->currentItem()->background().color(),
+                                          this,
+                                          tr("Select Background Color"),
+                                          QColorDialog::ShowAlphaChannel);
+    if (color.isValid())
+        setColorSchemeBackground(color);
 }
 
 void SettingsDialog::on_colorSchemeDeleteForegroundButton_clicked()

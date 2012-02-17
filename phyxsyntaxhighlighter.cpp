@@ -22,53 +22,6 @@
 PhyxSyntaxHighlighter::PhyxSyntaxHighlighter(QTextDocument *parent) :
     QSyntaxHighlighter(parent)
 {
-    HighlightingRule rule;
-
-    keywordFormat.setForeground(Qt::darkYellow);
-    QStringList keywordPatterns;
-    keywordPatterns << "\\bif\\b" << "\\bthen\\b" << "\\belse\\b";
-    foreach (const QString &pattern, keywordPatterns) {
-        rule.pattern = QRegExp(pattern);
-        rule.format = keywordFormat;
-        highlightingRules.append(rule);
-    }
-
-    variablesFormat.setForeground(Qt::darkMagenta);
-    variablesFormat.setToolTip("variable");
-    constantsFormat.setForeground(Qt::darkRed);
-    constantsFormat.setToolTip("constant");
-
-    singleLineCommentFormat.setForeground(Qt::darkGreen);
-    rule.pattern = QRegExp("//[^\n]*");
-    rule.format = singleLineCommentFormat;
-    highlightingRules.append(rule);
-
-    multiLineCommentFormat.setForeground(Qt::darkGreen);
-
-    quotationFormat.setForeground(Qt::darkGreen);
-    rule.pattern = QRegExp("\".*\"");
-    rule.format = quotationFormat;
-    highlightingRules.append(rule);
-
-    functionFormat.setFontItalic(true);
-    functionFormat.setToolTip("function");
-    //functionFormat.setForeground(Qt::darkBlue);
-    rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
-    rule.format = functionFormat;
-    highlightingRules.append(rule);
-
-    errorFormat.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
-    errorFormat.setUnderlineColor(Qt::red);
-
-    numberFormat.setForeground(Qt::darkBlue);
-    rule.pattern = QRegExp("\\b[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?");
-    rule.format = numberFormat;
-    highlightingRules.append(rule);
-    rule.pattern = QRegExp("\\b[0][x][0-9A-Fa-f]+\\b");
-    highlightingRules.append(rule);
-    rule.pattern = QRegExp("\\b[0][b][0-1]+\\b");
-    highlightingRules.append(rule);
-
     commentStartExpression = QRegExp("/\\*");
     commentEndExpression = QRegExp("\\*/");
 }
@@ -166,7 +119,7 @@ void PhyxSyntaxHighlighter::highlightBlock(const QString &text)
             commentLength = endIndex - startIndex
                             + commentEndExpression.matchedLength();
         }
-        setFormat(startIndex, commentLength, multiLineCommentFormat);
+        setFormat(startIndex, commentLength, commentFormat);
         startIndex = commentStartExpression.indexIn(text, startIndex + commentLength);
     }
 
@@ -176,4 +129,96 @@ void PhyxSyntaxHighlighter::highlightBlock(const QString &text)
         if (currentBlock().firstLineNumber() == error.line)
             setFormat(error.pos, error.length, errorFormat);
     }
+}
+
+void PhyxSyntaxHighlighter::updateFormats()
+{
+    HighlightingRule rule;
+    highlightingRules.clear();
+
+    textFormat.setForeground(m_appSettings->textEditor.colorScheme.at(0).foregroundColor);
+    textFormat.setBackground(m_appSettings->textEditor.colorScheme.at(0).backgroundColor);
+    textFormat.setFontItalic(m_appSettings->textEditor.colorScheme.at(0).italic);
+    textFormat.setFontWeight(m_appSettings->textEditor.colorScheme.at(0).bold ? QFont::Bold : QFont::Normal);
+    selectionFormat.setForeground(m_appSettings->textEditor.colorScheme.at(1).foregroundColor);
+    selectionFormat.setBackground(m_appSettings->textEditor.colorScheme.at(1).backgroundColor);
+    selectionFormat.setFontItalic(m_appSettings->textEditor.colorScheme.at(1).italic);
+    selectionFormat.setFontWeight(m_appSettings->textEditor.colorScheme.at(1).bold ? QFont::Bold : QFont::Normal);
+    numberFormat.setForeground(m_appSettings->textEditor.colorScheme.at(2).foregroundColor);
+    numberFormat.setBackground(m_appSettings->textEditor.colorScheme.at(2).backgroundColor);
+    numberFormat.setFontItalic(m_appSettings->textEditor.colorScheme.at(2).italic);
+    numberFormat.setFontWeight(m_appSettings->textEditor.colorScheme.at(2).bold ? QFont::Bold : QFont::Normal);
+    stringFormat.setForeground(m_appSettings->textEditor.colorScheme.at(3).foregroundColor);
+    stringFormat.setBackground(m_appSettings->textEditor.colorScheme.at(3).backgroundColor);
+    stringFormat.setFontItalic(m_appSettings->textEditor.colorScheme.at(3).italic);
+    stringFormat.setFontWeight(m_appSettings->textEditor.colorScheme.at(3).bold ? QFont::Bold : QFont::Normal);
+    commentFormat.setForeground(m_appSettings->textEditor.colorScheme.at(4).foregroundColor);
+    commentFormat.setBackground(m_appSettings->textEditor.colorScheme.at(4).backgroundColor);
+    commentFormat.setFontItalic(m_appSettings->textEditor.colorScheme.at(4).italic);
+    commentFormat.setFontWeight(m_appSettings->textEditor.colorScheme.at(4).bold ? QFont::Bold : QFont::Normal);
+    keywordFormat.setForeground(m_appSettings->textEditor.colorScheme.at(5).foregroundColor);
+    keywordFormat.setBackground(m_appSettings->textEditor.colorScheme.at(5).backgroundColor);
+    keywordFormat.setFontItalic(m_appSettings->textEditor.colorScheme.at(5).italic);
+    keywordFormat.setFontWeight(m_appSettings->textEditor.colorScheme.at(5).bold ? QFont::Bold : QFont::Normal);
+    functionFormat.setForeground(m_appSettings->textEditor.colorScheme.at(6).foregroundColor);
+    functionFormat.setBackground(m_appSettings->textEditor.colorScheme.at(6).backgroundColor);
+    functionFormat.setFontItalic(m_appSettings->textEditor.colorScheme.at(6).italic);
+    functionFormat.setFontWeight(m_appSettings->textEditor.colorScheme.at(6).bold ? QFont::Bold : QFont::Normal);
+    variablesFormat.setForeground(m_appSettings->textEditor.colorScheme.at(7).foregroundColor);
+    variablesFormat.setBackground(m_appSettings->textEditor.colorScheme.at(7).backgroundColor);
+    variablesFormat.setFontItalic(m_appSettings->textEditor.colorScheme.at(7).italic);
+    variablesFormat.setFontWeight(m_appSettings->textEditor.colorScheme.at(7).bold ? QFont::Bold : QFont::Normal);
+    constantsFormat.setForeground(m_appSettings->textEditor.colorScheme.at(8).foregroundColor);
+    constantsFormat.setBackground(m_appSettings->textEditor.colorScheme.at(8).backgroundColor);
+    constantsFormat.setFontItalic(m_appSettings->textEditor.colorScheme.at(8).italic);
+    constantsFormat.setFontWeight(m_appSettings->textEditor.colorScheme.at(8).bold ? QFont::Bold : QFont::Normal);
+    errorFormat.setForeground(m_appSettings->textEditor.colorScheme.at(9).foregroundColor);
+    errorFormat.setBackground(m_appSettings->textEditor.colorScheme.at(9).backgroundColor);
+    errorFormat.setFontItalic(m_appSettings->textEditor.colorScheme.at(9).italic);
+    errorFormat.setFontWeight(m_appSettings->textEditor.colorScheme.at(9).bold ? QFont::Bold : QFont::Normal);
+
+    //tooltips for help
+    variablesFormat.setToolTip("variable");
+    constantsFormat.setToolTip("constant");
+    functionFormat.setToolTip("function");
+
+    //text
+    rule.pattern = QRegExp("\\b[^ ]+\\b");
+    rule.format = textFormat;
+    highlightingRules.append(rule);
+
+    //keywords
+    QStringList keywordPatterns;
+    keywordPatterns << "\\bif\\b" << "\\bthen\\b" << "\\belse\\b";
+    foreach (const QString &pattern, keywordPatterns) {
+        rule.pattern = QRegExp(pattern);
+        rule.format = keywordFormat;
+        highlightingRules.append(rule);
+    }
+
+    //single line comments
+    rule.pattern = QRegExp("//[^\n]*");
+    rule.format = commentFormat;
+    highlightingRules.append(rule);
+
+    //strings
+    rule.pattern = QRegExp("\".*\"");
+    rule.format = stringFormat;
+    highlightingRules.append(rule);
+
+    //functions
+    rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
+    rule.format = functionFormat;
+    highlightingRules.append(rule);
+
+    //errorFormat.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
+
+    //numbers
+    rule.format = numberFormat;
+    rule.pattern = QRegExp("\\b[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?[ij]?");
+    highlightingRules.append(rule);
+    rule.pattern = QRegExp("\\b[0][x][0-9A-Fa-f]+\\b");
+    highlightingRules.append(rule);
+    rule.pattern = QRegExp("\\b[0][b][0-1]+\\b");
+    highlightingRules.append(rule);
 }

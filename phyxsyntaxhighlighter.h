@@ -22,10 +22,12 @@
 
 #include <QSyntaxHighlighter>
 #include <QTextCharFormat>
+#include "global.h"
 
 class PhyxSyntaxHighlighter : public QSyntaxHighlighter
 {
     Q_OBJECT
+    Q_PROPERTY(AppSettings *appSettings READ appSettings WRITE setAppSettings)
 
     typedef struct {
         int line;
@@ -40,7 +42,19 @@ public:
     void setConstantHighlightingRules(QStringList variableList);
     void addError(int line, int pos, int length);
     void removeError(int line, int pos);
+    void updateFormats();
     
+    AppSettings * appSettings() const
+    {
+        return m_appSettings;
+    }
+
+public slots:
+    void setAppSettings(AppSettings * arg)
+    {
+        m_appSettings = arg;
+    }
+
 protected:
     void highlightBlock(const QString &text);
 
@@ -58,16 +72,18 @@ private:
     QRegExp commentStartExpression;
     QRegExp commentEndExpression;
 
-    QTextCharFormat singleLineCommentFormat;
-    QTextCharFormat multiLineCommentFormat;
+    QTextCharFormat textFormat;
+    QTextCharFormat commentFormat;
     QTextCharFormat keywordFormat;
-    QTextCharFormat quotationFormat;
+    QTextCharFormat stringFormat;
     QTextCharFormat functionFormat;
     QTextCharFormat variablesFormat;
     QTextCharFormat constantsFormat;
     QTextCharFormat errorFormat;
     QTextCharFormat numberFormat;
+    QTextCharFormat selectionFormat;
     
+    AppSettings * m_appSettings;
 };
 
 #endif // PHYXSYNTAXHIGHLIGHTER_H

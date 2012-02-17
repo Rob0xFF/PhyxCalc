@@ -266,6 +266,7 @@ void LineParser::updateSettings()
         m_syntaxHighlighter->setDocument(m_calculationEdit->document());
     else
         m_syntaxHighlighter->setDocument(NULL);
+    m_syntaxHighlighter->updateFormats();
 }
 
 QString LineParser::removeWhitespace(QString string)

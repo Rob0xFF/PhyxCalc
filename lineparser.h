@@ -134,6 +134,7 @@ public slots:
     void setAppSettings(AppSettings * arg)
     {
         m_appSettings = arg;
+        m_syntaxHighlighter->setAppSettings(m_appSettings);
         updateSettings();
         showConstants();
         showVariables();

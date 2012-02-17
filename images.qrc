@@ -21,6 +21,7 @@
         <file>images/dialog-close.png</file>
         <file>images/run-build-cursor.png</file>
         <file>images/run-build.png</file>
+        <file>images/text-x-katefilelist.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="splash">images/splash.png</file>
