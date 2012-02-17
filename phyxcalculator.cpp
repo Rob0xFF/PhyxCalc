@@ -1303,7 +1303,7 @@ void PhyxCalculator::valueRandg()
 
     boost::variate_generator<boost::mt19937, boost::normal_distribution<> >
         generator(boost::mt19937(QDateTime::currentMSecsSinceEpoch()),
-                  boost::normal_distribution<>(variable1->value().real(),variable2->value().real()));
+                  boost::normal_distribution<>(mean,standard));
     variable1->setValue((PhyxValueDataType)generator());
 
     variableStack.push(variable1);

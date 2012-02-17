@@ -187,6 +187,31 @@ void MainWindow::loadSettings()
             appSettings.lineParser.expression.outputResult = settings.value("outputResult", false).toBool();
         settings.endGroup();
     settings.endGroup();
+    settings.beginGroup("textEditor");
+        appSettings.textEditor.font.fromString(settings.value("font", "Monospace").toString());
+        if (settings.value("fontAntialiasing", true).toBool())
+            appSettings.textEditor.font.setStyleStrategy(QFont::PreferDefault);
+        else
+            appSettings.textEditor.font.setStyleStrategy(QFont::NoAntialias);
+        appSettings.textEditor.useSyntaxHighlighter = settings.value("useSyntaxHighlighter", true).toBool();
+        settings.beginGroup("colorScheme");
+            colorSchemeItem item;
+            settings.beginGroup("text");
+                item.foregroundColor = settings.value("foregroundColor", QColor(0,0,0)).value<QColor>();
+                item.backgroundColor = settings.value("backgroundColor", QColor(0,0,0,0)).value<QColor>();
+                item.bold            = settings.value("bold", false).toBool();
+                item.italic          = settings.value("bold", false).toBool();
+                appSettings.textEditor.colorScheme.append(item);
+            settings.endGroup();
+            settings.beginGroup("selection");
+                item.foregroundColor = settings.value("foregroundColor", QColor(255,255,255)).value<QColor>();
+                item.backgroundColor = settings.value("backgroundColor", QColor(144,168,192)).value<QColor>();
+                item.bold            = settings.value("bold", false).toBool();
+                item.italic          = settings.value("bold", false).toBool();
+                appSettings.textEditor.colorScheme.append(item);
+            settings.endGroup();
+        settings.endGroup();
+    settings.endGroup();
 
     recentDocuments = settings.value("recentDocuments", QStringList()).toStringList();
     updateRecentDocuments();
@@ -227,6 +252,11 @@ void MainWindow::saveSettings()
             settings.setValue("outputWithNumbers", appSettings.lineParser.expression.outputWithNumbers);
             settings.setValue("outputResult", appSettings.lineParser.expression.outputResult);
         settings.endGroup();
+    settings.endGroup();
+    settings.beginGroup("textEditor");
+        settings.setValue("font", appSettings.textEditor.font.toString());
+        settings.setValue("fontAntialiasing", !(appSettings.textEditor.font.styleStrategy() & QFont::NoAntialias));
+        settings.setValue("useSyntaxHighlighter", appSettings.textEditor.useSyntaxHighlighter);
     settings.endGroup();
 
     settings.setValue("recentDocuments", recentDocuments);
@@ -514,7 +544,7 @@ void MainWindow::openDocument(QString fileName, bool newTab)
 
 void MainWindow::documentModified(bool modified)
 {
-    Document *document = documentList.at(activeTab);
+    //Document *document = documentList.at(activeTab);
     if (modified)
     {
         if (ui->tabWidget->tabText(activeTab).at(ui->tabWidget->tabText(activeTab).size()-1) != '*')

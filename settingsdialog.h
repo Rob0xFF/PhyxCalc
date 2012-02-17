@@ -21,6 +21,8 @@
 #define SETTINGSDIALOG_H
 
 #include <QDialog>
+#include <QColorDialog>
+#include <QListWidgetItem>
 #include "global.h"
 
 namespace Ui {
@@ -43,8 +45,29 @@ private slots:
 
     void on_formatRadioCustom_toggled(bool checked);
 
+    void on_colorSchemeForegroundButton_clicked();
+
+    void on_colorSchemeBackgroundButton_clicked();
+
+    void on_colorSchemeDeleteForegroundButton_clicked();
+
+    void on_colorSchemeDeleteBackgroundButton_clicked();
+
+    void on_colorSchemeBoldCheck_clicked(bool checked);
+
+    void on_colorSchemeItalicCheck_clicked(bool checked);
+
+    void on_colorSchemeList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *);
+
+    void on_fontCombo_currentFontChanged(const QFont &f);
+
 private:
     Ui::SettingsDialog *ui;
+
+    void setColorSchemeForeground(QColor color);
+    void setColorSchemeBackground(QColor color);
+    void setColorSchemeBold(bool bold);
+    void setColorSchemeItalic(bool italic);
 };
 
 #endif // SETTINGSDIALOG_H

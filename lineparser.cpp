@@ -259,6 +259,15 @@ QString LineParser::replaceVariables(QString expression, bool insertValue, bool 
     return expression;
 }
 
+void LineParser::updateSettings()
+{
+    m_calculationEdit->setFont(m_appSettings->textEditor.font);
+    if (m_appSettings->textEditor.useSyntaxHighlighter)
+        m_syntaxHighlighter->setDocument(m_calculationEdit->document());
+    else
+        m_syntaxHighlighter->setDocument(NULL);
+}
+
 QString LineParser::removeWhitespace(QString string)
 {
     string = string.simplified();

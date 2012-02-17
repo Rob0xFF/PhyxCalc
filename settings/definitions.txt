@@ -51,7 +51,7 @@ N@si=[kg*m/s²]      //Kraft: Newton
 Pa@si=[N/m^2]       //Druck: Pascal
 J@si=[N*m]          //Energie: Joule
 W@si=[J/s]          //Leistung: Watt
-kWh=[1kW*h]         //Energie: Kilowattstunden
+Wh@si@k=[1kW*h]         //Energie: Kilowattstunden
 C@si=[A*s]          //Ladung: Coulomb
 V@si=[J/C]          //elektrische Spannung: Volt
 Ω@si=[V/A]          //elektrischer Widerstand: Ohm
@@ -84,7 +84,7 @@ cd@si=[]            //Lichststärke: Candela
 lm=[cd*sr]          //Lichtstrom: Lumen
 lx=[cd*sr/m^2]      //Beleuchtungsstärke: Lux
 dB=[]               //deziBel
-Ah@si=[1A*h]        //Ladung: Amperestunden
+Ah=[1A*h]           //Ladung: Amperestunden
 
 //Währungseinheiten
 €=[]                    //Währung: Euro

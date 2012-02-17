@@ -112,6 +112,8 @@ private:
     /* Writes the expression with numbers and units instead of variables */
     QString replaceVariables(QString expression, bool insertValue = true, bool insertUnit = true);
 
+    void updateSettings();      ///< updates settings
+
 public slots:
     void showVariables();
     void showConstants();
@@ -132,6 +134,7 @@ public slots:
     void setAppSettings(AppSettings * arg)
     {
         m_appSettings = arg;
+        updateSettings();
         showConstants();
         showVariables();
     }

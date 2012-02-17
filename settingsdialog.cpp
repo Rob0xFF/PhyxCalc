@@ -75,6 +75,21 @@ void SettingsDialog::setAppSettings(AppSettings *settings)
     //read line parser options
     ui->expressionOutputNumbersCheck->setChecked(settings->lineParser.expression.outputWithNumbers);
     ui->expressionOutputResultCheck->setChecked(settings->lineParser.expression.outputResult);
+
+    //read text editor options
+    ui->fontCombo->setCurrentFont(settings->textEditor.font);
+    ui->fontSizeSpin->setValue(settings->textEditor.font.pointSize());
+    ui->fontAntialiasCheck->setChecked(!(settings->textEditor.font.styleStrategy() & QFont::NoAntialias));
+
+    ui->colorSchemeUseCheck->setChecked(settings->textEditor.useSyntaxHighlighter);
+    for (int i = 0; i < settings->textEditor.colorScheme.size(); i++)
+    {
+        ui->colorSchemeList->setCurrentRow(i);
+        setColorSchemeForeground(settings->textEditor.colorScheme.at(i).foregroundColor);
+        setColorSchemeBackground(settings->textEditor.colorScheme.at(i).backgroundColor);
+        setColorSchemeBold(settings->textEditor.colorScheme.at(i).bold);
+        setColorSchemeItalic(settings->textEditor.colorScheme.at(i).italic);
+    }
 }
 
 void SettingsDialog::getAppSettings(AppSettings *settings)
@@ -113,6 +128,17 @@ void SettingsDialog::getAppSettings(AppSettings *settings)
     //write line parser options
     settings->lineParser.expression.outputWithNumbers = ui->expressionOutputNumbersCheck->isChecked();
     settings->lineParser.expression.outputResult = ui->expressionOutputResultCheck->isChecked();
+
+    //write text editor options
+    QFont font = ui->fontCombo->currentFont();
+    font.setPointSize(ui->fontSizeSpin->value());
+    if (ui->fontAntialiasCheck->isChecked())
+        font.setStyleStrategy(QFont::PreferDefault);
+    else
+        font.setStyleStrategy(QFont::NoAntialias);
+    settings->textEditor.font = font;
+
+    settings->textEditor.useSyntaxHighlighter = ui->colorSchemeUseCheck->isChecked();
 }
 
 void SettingsDialog::on_listWidget_currentRowChanged(int currentRow)
@@ -124,4 +150,86 @@ void SettingsDialog::on_formatRadioCustom_toggled(bool checked)
 {
     ui->decimalPrecisionSpin->setEnabled(!checked);
     ui->formatCustomEdit->setEnabled(checked);
+}
+
+void SettingsDialog::on_colorSchemeForegroundButton_clicked()
+{
+    setColorSchemeForeground(QColorDialog::getColor());
+}
+
+void SettingsDialog::on_colorSchemeBackgroundButton_clicked()
+{
+    setColorSchemeBackground(QColorDialog::getColor());
+}
+
+void SettingsDialog::setColorSchemeForeground(QColor color)
+{
+    ui->colorSchemeList->currentItem()->setForeground(QBrush(color));
+    ui->colorSchemeForegroundButton->setStyleSheet(QString("border-color: rgb(0, 0, 0);\nborder: 2px solid;\nbackground-color: rgba(%1,%2,%3,%4)")
+                                                   .arg(color.red())
+                                                   .arg(color.green())
+                                                   .arg(color.blue())
+                                                   .arg(color.alpha()));
+}
+
+void SettingsDialog::setColorSchemeBackground(QColor color)
+{
+    ui->colorSchemeList->currentItem()->setBackground(QBrush(color));
+    ui->colorSchemeBackgroundButton->setStyleSheet(QString("border-color: rgb(0, 0, 0);\nborder: 2px solid;\nbackground-color: rgba(%1,%2,%3,%4)")
+                                                   .arg(color.red())
+                                                   .arg(color.green())
+                                                   .arg(color.blue())
+                                                   .arg(color.alpha()));
+}
+
+void SettingsDialog::setColorSchemeBold(bool bold)
+{
+    QFont font = ui->colorSchemeList->currentItem()->font();
+    font.setBold(bold);
+    ui->colorSchemeList->currentItem()->setFont(font);
+    ui->colorSchemeBoldCheck->setChecked(bold);
+}
+
+void SettingsDialog::setColorSchemeItalic(bool italic)
+{
+    QFont font = ui->colorSchemeList->currentItem()->font();
+    font.setItalic(italic);
+    ui->colorSchemeList->currentItem()->setFont(font);
+    ui->colorSchemeItalicCheck->setChecked(italic);
+}
+
+void SettingsDialog::on_colorSchemeDeleteForegroundButton_clicked()
+{
+    setColorSchemeForeground(QColor());
+}
+
+void SettingsDialog::on_colorSchemeDeleteBackgroundButton_clicked()
+{
+    setColorSchemeBackground(QColor(0,0,0,0));
+}
+
+void SettingsDialog::on_colorSchemeBoldCheck_clicked(bool checked)
+{
+    setColorSchemeBold(checked);
+}
+
+void SettingsDialog::on_colorSchemeItalicCheck_clicked(bool checked)
+{
+    setColorSchemeItalic(checked);
+}
+
+void SettingsDialog::on_colorSchemeList_currentItemChanged(QListWidgetItem *current, QListWidgetItem *)
+{
+    setColorSchemeForeground(current->foreground().color());
+    if (current->background().style() != Qt::NoBrush)
+        setColorSchemeBackground(current->background().color());
+    else
+        setColorSchemeBackground(QColor(0,0,0,0));
+    setColorSchemeBold(current->font().bold());
+    setColorSchemeItalic(current->font().italic());
+}
+
+void SettingsDialog::on_fontCombo_currentFontChanged(const QFont &f)
+{
+    ui->colorSchemeList->setFont(f);
 }

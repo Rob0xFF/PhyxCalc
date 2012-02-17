@@ -22,10 +22,23 @@
 
 #define MATH_OPERATORS "[+\\-*/()<>!^=]"
 
-struct physicalVariable {
+#include <QFont>
+#include <QColor>
+#include <QList>
+
+/*struct physicalVariable {
     double  value;
     QString unit;
-};
+};*/
+
+
+//structure for colorScheme Items
+typedef struct {
+    QColor  foregroundColor;
+    QColor  backgroundColor;
+    bool    bold;
+    bool    italic;
+} colorSchemeItem;
 
 typedef struct {
     struct {
@@ -42,6 +55,11 @@ typedef struct {
             bool outputResult;
         } expression;
     } lineParser;
+    struct {
+        QFont font;
+        bool useSyntaxHighlighter;
+        QList<colorSchemeItem> colorScheme;
+    } textEditor;
 } AppSettings;
 
 #endif // GLOBAL_H
