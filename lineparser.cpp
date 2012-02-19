@@ -519,7 +519,7 @@ void LineParser::showConstants()
 
 void LineParser::updateUnits()
 {
-    if (isLoading())
+    if (isLoading() || m_syntaxHighlighter == NULL)
         return;
 
     QStringList unitList;
