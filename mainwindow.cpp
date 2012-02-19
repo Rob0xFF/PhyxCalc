@@ -922,9 +922,7 @@ void MainWindow::on_actionSettings_triggered()
     settingsDialog.getAppSettings(&appSettings);
 
     for (int i = 0; i < documentList.size(); i++)
-    {
-        documentList.at(i)->lineParser->setAppSettings(&appSettings);
-    }
+        documentList.at(i)->lineParser->updateSettings();
 }
 
 void MainWindow::on_actionAbout_triggered()

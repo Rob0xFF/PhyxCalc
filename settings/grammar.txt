@@ -203,6 +203,7 @@ int=|+-||uint|
 inte=|int||e||int|
 real=|int|
 real=|int|.|uint|
+real=.|uint|
 reale=|real|
 reale=|real||e||int|
 hexpart=|nh|

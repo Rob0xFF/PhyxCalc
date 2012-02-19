@@ -57,6 +57,8 @@ public:
     void deleteLine();
     bool resultLineSelected();
 
+    void updateSettings();      ///< updates settings
+
     QString variableToolTip(QString name);
     QString constantToolTip(QString name);
 
@@ -116,8 +118,6 @@ private:
     QString removeWhitespace(QString string);
     /* Writes the expression with numbers and units instead of variables */
     QString replaceVariables(QString expression, bool insertValue = true, bool insertUnit = true);
-
-    void updateSettings();      ///< updates settings
 
     bool m_loading;
 

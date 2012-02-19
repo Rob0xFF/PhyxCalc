@@ -22,7 +22,6 @@
 
 #include <QSyntaxHighlighter>
 #include <QTextCharFormat>
-#include <QDebug>
 #include "global.h"
 
 class PhyxSyntaxHighlighter : public QSyntaxHighlighter

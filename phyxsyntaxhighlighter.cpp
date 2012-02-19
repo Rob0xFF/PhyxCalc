@@ -186,6 +186,8 @@ void PhyxSyntaxHighlighter::updateFormats()
     errorFormat.setFontWeight(m_appSettings->textEditor.colorScheme.at(10).bold ? QFont::Bold : QFont::Normal);
 
     HighlightingRule rule;
+    highlightingRulesPriority1.clear();
+    highlightingRulesPriority2.clear();
 
     //tooltips for help
     variablesFormat.setToolTip("variable");
@@ -194,7 +196,7 @@ void PhyxSyntaxHighlighter::updateFormats()
     unitFormat.setToolTip("unit");
 
     //text
-    rule.pattern = QRegExp("\\b\\S+\\b");
+    rule.pattern = QRegExp("[\\S]+");
     rule.format = textFormat;
     highlightingRulesPriority1.append(rule);
 
@@ -216,11 +218,11 @@ void PhyxSyntaxHighlighter::updateFormats()
 
     //numbers
     rule.format = numberFormat;
-    rule.pattern = QRegExp("\\b[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?[ij]?");
-    highlightingRulesPriority1.append(rule);
-    rule.pattern = QRegExp("\\b[0][x][0-9A-Fa-f]+\\b");
-    highlightingRulesPriority1.append(rule);
-    rule.pattern = QRegExp("\\b[0][b][0-1]+\\b");
+    rule.pattern = QRegExp("(\\b(([0-9]+(\\.[0-9]+)?)|(\\.[0-9]+))([eE][+-]?[0-9]+)?[ij]?)|(\\b[0][x][0-9A-Fa-f]+\\b)|(\\b[0][b][0-1]+\\b)");
+    //highlightingRulesPriority1.append(rule);
+    //rule.pattern = QRegExp("\\b[0][x][0-9A-Fa-f]+\\b");
+    //highlightingRulesPriority1.append(rule);
+    //rule.pattern = QRegExp("\\b[0][b][0-1]+\\b");
     highlightingRulesPriority1.append(rule);
 
     //single line comments
