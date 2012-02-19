@@ -21,6 +21,7 @@
 
 LineParser::LineParser(QObject *)
 {
+    m_loading = true;
     m_phyxCalculator = new PhyxCalculator();
     connect(m_phyxCalculator, SIGNAL(outputResult()),
             this, SLOT(outputResult()));
@@ -32,6 +33,8 @@ LineParser::LineParser(QObject *)
             this, SLOT(showVariables()));
     connect(m_phyxCalculator, SIGNAL(constantsChanged()),
             this, SLOT(showConstants()));
+    connect(m_phyxCalculator, SIGNAL(unitsChanged()),
+            this, SLOT(updateUnits()));
 }
 
 LineParser::~LineParser()
@@ -266,7 +269,11 @@ void LineParser::updateSettings()
         m_syntaxHighlighter->setDocument(m_calculationEdit->document());
     else
         m_syntaxHighlighter->setDocument(NULL);
+    m_syntaxHighlighter->setAppSettings(m_appSettings);
     m_syntaxHighlighter->updateFormats();
+    showConstants();
+    showVariables();
+    updateUnits();
 }
 
 QString LineParser::removeWhitespace(QString string)
@@ -433,6 +440,9 @@ QString LineParser::exportFormelEditor()
 
 void LineParser::showVariables()
 {
+    if (isLoading())
+        return;
+
     int row = 0;
     QTableWidgetItem *newItem;
     QStringList     variableNames;
@@ -469,6 +479,9 @@ void LineParser::showVariables()
 
 void LineParser::showConstants()
 {
+    if (isLoading())
+        return;
+
     int row = 0;
     QTableWidgetItem *newItem;
     QStringList     constantNames;
@@ -502,6 +515,22 @@ void LineParser::showConstants()
 
      if (m_syntaxHighlighter != NULL)
          m_syntaxHighlighter->setConstantHighlightingRules(constantNames);
+}
+
+void LineParser::updateUnits()
+{
+    if (isLoading())
+        return;
+
+    QStringList unitList;
+    PhyxUnitSystem::PhyxUnitMap unitMap = m_phyxCalculator->units();
+    QMapIterator<QString, PhyxUnit*> mapIterator(unitMap);
+    while (mapIterator.hasNext())
+    {
+        mapIterator.next();
+        unitList.append(mapIterator.key());
+    }
+    m_syntaxHighlighter->setUnitHighlightingRules(unitList);
 }
 
 void LineParser::clearAllVariables()

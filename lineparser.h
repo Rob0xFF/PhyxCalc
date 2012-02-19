@@ -43,6 +43,7 @@ class LineParser: public QObject
     Q_PROPERTY(UnitLoader *unitLoader READ unitLoader WRITE setUnitLoader)
     Q_PROPERTY(PhyxCalculator *phyxCalculator READ phyxCalculator)
     Q_PROPERTY(PhyxSyntaxHighlighter *syntaxHighlighter READ syntaxHighlighter)
+    Q_PROPERTY(bool loading READ isLoading WRITE setLoading)
 
 public:
     explicit LineParser(QObject * = 0);
@@ -89,6 +90,10 @@ public:
     {
         return m_syntaxHighlighter;
     }
+    bool isLoading() const
+    {
+        return m_loading;
+    }
 
 private:
     QTextEdit       *m_calculationEdit;
@@ -114,9 +119,12 @@ private:
 
     void updateSettings();      ///< updates settings
 
+    bool m_loading;
+
 public slots:
     void showVariables();
     void showConstants();
+    void updateUnits();
     void clearAllVariables();
     void outputResult();
     void outputError();
@@ -134,10 +142,6 @@ public slots:
     void setAppSettings(AppSettings * arg)
     {
         m_appSettings = arg;
-        m_syntaxHighlighter->setAppSettings(m_appSettings);
-        updateSettings();
-        showConstants();
-        showVariables();
     }
     void setConstantsTable(QTableWidget * arg)
     {
@@ -146,6 +150,12 @@ public slots:
     void setUnitLoader(UnitLoader * arg)
     {
         m_unitLoader = arg;
+    }
+    void setLoading(bool arg)
+    {
+        m_loading = arg;
+        if (!arg)
+            updateSettings();
     }
 };
 

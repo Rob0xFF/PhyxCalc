@@ -259,6 +259,13 @@ void MainWindow::loadSettings()
                 item.italic          = settings.value("italic", false).toBool();
                 appSettings.textEditor.colorScheme.append(item);
             settings.endGroup();
+            settings.beginGroup("unit");
+                item.foregroundColor = settings.value("foregroundColor", Qt::black).value<QColor>();
+                item.backgroundColor = settings.value("backgroundColor", Qt::transparent).value<QColor>();
+                item.bold            = settings.value("bold", false).toBool();
+                item.italic          = settings.value("italic", false).toBool();
+                appSettings.textEditor.colorScheme.append(item);
+            settings.endGroup();
             settings.beginGroup("error");
                 item.foregroundColor = settings.value("foregroundColor", Qt::red).value<QColor>();
                 item.backgroundColor = settings.value("backgroundColor", Qt::transparent).value<QColor>();
@@ -315,76 +322,32 @@ void MainWindow::saveSettings()
         settings.setValue("useSyntaxHighlighter", appSettings.textEditor.useSyntaxHighlighter);
         settings.beginGroup("colorScheme");
             colorSchemeItem item;
-            settings.beginGroup("text");
-                item = appSettings.textEditor.colorScheme.at(0);
+            int n = 0;
+            for (int i = 0; i < appSettings.textEditor.colorScheme.size(); i++)
+            {
+                QString group;
+                switch (i) {
+                    case 0: group = "text"; break;
+                    case 1: group = "selection"; break;
+                    case 2: group = "number"; break;
+                    case 3: group = "string"; break;
+                    case 4: group = "comment"; break;
+                    case 5: group = "keyword"; break;
+                    case 6: group = "function"; break;
+                    case 7: group = "variable"; break;
+                    case 8: group = "constant"; break;
+                    case 9: group = "unit"; break;
+                    case 10: group = "error"; break;
+                }
+                settings.beginGroup(group);
+                item = appSettings.textEditor.colorScheme.at(i);
                 settings.setValue("foregroundColor", item.foregroundColor);
                 settings.setValue("backgroundColor", item.backgroundColor);
                 settings.setValue("bold",            item.bold);
                 settings.setValue("italic",          item.italic);
-            settings.endGroup();
-            settings.beginGroup("selection");
-                item = appSettings.textEditor.colorScheme.at(1);
-                settings.setValue("foregroundColor", item.foregroundColor);
-                settings.setValue("backgroundColor", item.backgroundColor);
-                settings.setValue("bold",            item.bold);
-                settings.setValue("italic",          item.italic);
-            settings.endGroup();
-            settings.beginGroup("number");
-                item = appSettings.textEditor.colorScheme.at(2);
-                settings.setValue("foregroundColor", item.foregroundColor);
-                settings.setValue("backgroundColor", item.backgroundColor);
-                settings.setValue("bold",            item.bold);
-                settings.setValue("italic",          item.italic);
-            settings.endGroup();
-            settings.beginGroup("string");
-                item = appSettings.textEditor.colorScheme.at(3);
-                settings.setValue("foregroundColor", item.foregroundColor);
-                settings.setValue("backgroundColor", item.backgroundColor);
-                settings.setValue("bold",            item.bold);
-                settings.setValue("italic",          item.italic);
-            settings.endGroup();
-            settings.beginGroup("comment");
-                item = appSettings.textEditor.colorScheme.at(4);
-                settings.setValue("foregroundColor", item.foregroundColor);
-                settings.setValue("backgroundColor", item.backgroundColor);
-                settings.setValue("bold",            item.bold);
-                settings.setValue("italic",          item.italic);
-            settings.endGroup();
-            settings.beginGroup("keyword");
-                item = appSettings.textEditor.colorScheme.at(5);
-                settings.setValue("foregroundColor", item.foregroundColor);
-                settings.setValue("backgroundColor", item.backgroundColor);
-                settings.setValue("bold",            item.bold);
-                settings.setValue("italic",          item.italic);
-            settings.endGroup();
-            settings.beginGroup("function");
-                item = appSettings.textEditor.colorScheme.at(6);
-                settings.setValue("foregroundColor", item.foregroundColor);
-                settings.setValue("backgroundColor", item.backgroundColor);
-                settings.setValue("bold",            item.bold);
-                settings.setValue("italic",          item.italic);
-            settings.endGroup();
-            settings.beginGroup("variable");
-                item = appSettings.textEditor.colorScheme.at(7);
-                settings.setValue("foregroundColor", item.foregroundColor);
-                settings.setValue("backgroundColor", item.backgroundColor);
-                settings.setValue("bold",            item.bold);
-                settings.setValue("italic",          item.italic);
-            settings.endGroup();
-            settings.beginGroup("constant");
-                item = appSettings.textEditor.colorScheme.at(8);
-                settings.setValue("foregroundColor", item.foregroundColor);
-                settings.setValue("backgroundColor", item.backgroundColor);
-                settings.setValue("bold",            item.bold);
-                settings.setValue("italic",          item.italic);
-            settings.endGroup();
-            settings.beginGroup("error");
-                item = appSettings.textEditor.colorScheme.at(9);
-                settings.setValue("foregroundColor", item.foregroundColor);
-                settings.setValue("backgroundColor", item.backgroundColor);
-                settings.setValue("bold",            item.bold);
-                settings.setValue("italic",          item.italic);
-            settings.endGroup();
+                n++;
+                settings.endGroup();
+            }
         settings.endGroup();
     settings.endGroup();
 
@@ -525,6 +488,7 @@ void MainWindow::addNewTab()
 
     ui->tabWidget->addTab(newTab,QIcon(),tr("Untitled"));
     ui->tabWidget->setCurrentIndex(activeTab);
+    newDocument->lineParser->setLoading(false);
 }
 
 bool MainWindow::closeTab(int index)

@@ -162,7 +162,7 @@ void PhyxUnitSystem::recalculate()
     recalculateVariables();
 }
 
-PhyxUnit * PhyxUnitSystem::copyUnit(QString symbol)
+PhyxUnit * PhyxUnitSystem::copyUnit(QString symbol) const
 {
     if (baseUnitsMap.contains(symbol))
     {
@@ -180,7 +180,7 @@ PhyxUnit * PhyxUnitSystem::copyUnit(QString symbol)
         return new PhyxUnit();
 }
 
-PhyxUnit *PhyxUnitSystem::unit(QString symbol)
+PhyxUnit *PhyxUnitSystem::unit(QString symbol) const
 {
     if (baseUnitsMap.contains(symbol))
         return baseUnitsMap.value(symbol);
@@ -190,7 +190,27 @@ PhyxUnit *PhyxUnitSystem::unit(QString symbol)
         return new PhyxUnit();
 }
 
-PhyxUnitSystem::PhyxPrefix PhyxUnitSystem::prefix(QString symbol, QString unitGroup)
+PhyxUnitSystem::PhyxUnitMap PhyxUnitSystem::units() const
+{
+    PhyxUnitMap map;
+
+    QMapIterator<QString, PhyxUnit*> mapIterator1(baseUnitsMap);
+    while (mapIterator1.hasNext())
+    {
+        mapIterator1.next();
+        map.insert(mapIterator1.key(), mapIterator1.value());
+    }
+    QMapIterator<QString, PhyxUnit*> mapIterator2(derivedUnitsMap);
+    while (mapIterator2.hasNext())
+    {
+        mapIterator2.next();
+        map.insert(mapIterator2.key(), mapIterator2.value());
+    }
+
+    return map;
+}
+
+PhyxUnitSystem::PhyxPrefix PhyxUnitSystem::prefix(QString symbol, QString unitGroup) const
 {
     PhyxPrefix prefix;
     prefix.value = 1;

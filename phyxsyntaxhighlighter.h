@@ -22,6 +22,7 @@
 
 #include <QSyntaxHighlighter>
 #include <QTextCharFormat>
+#include <QDebug>
 #include "global.h"
 
 class PhyxSyntaxHighlighter : public QSyntaxHighlighter
@@ -40,6 +41,7 @@ public:
 
     void setVariableHighlightingRules(QStringList variableList);
     void setConstantHighlightingRules(QStringList variableList);
+    void setUnitHighlightingRules(QStringList unitList);
     void addError(int line, int pos, int length);
     void removeError(int line, int pos);
     void updateFormats();
@@ -64,9 +66,11 @@ private:
         QRegExp pattern;
         QTextCharFormat format;
     };
-    QVector<HighlightingRule> highlightingRules;
+    QVector<HighlightingRule> highlightingRulesPriority1;
+    QVector<HighlightingRule> highlightingRulesPriority2;
     QVector<HighlightingRule> variableHighlightingRules;
     QVector<HighlightingRule> constantHighlightingRules;
+    QVector<HighlightingRule> unitHighlightingRules;
     QList<Error>              errorList;
 
     QRegExp commentStartExpression;
@@ -82,8 +86,11 @@ private:
     QTextCharFormat errorFormat;
     QTextCharFormat numberFormat;
     QTextCharFormat selectionFormat;
+    QTextCharFormat unitFormat;
     
     AppSettings * m_appSettings;
+
+    void highlightRules( const QString &text, const QVector<HighlightingRule> &highlightingRules);
 };
 
 #endif // PHYXSYNTAXHIGHLIGHTER_H

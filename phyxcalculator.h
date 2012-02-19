@@ -123,8 +123,10 @@ public:
 
     PhyxVariable * variable(QString name) const;
     PhyxVariable * constant(QString name) const;
+    PhyxUnit     * unit(QString symbol) const;
     PhyxVariableManager::PhyxVariableMap * variables() const;
     PhyxVariableManager::PhyxVariableMap * constants() const;
+    PhyxUnitSystem::PhyxUnitMap units() const;
     QString expression() const
     {
         return m_expression;
@@ -370,7 +372,8 @@ private:
 
 signals:
     void variablesChanged();        ///< is emited when variables have changed
-    void constantsChanged();        ///< is emited wehen constants have changed
+    void constantsChanged();        ///< is emited when constants have changed
+    void unitsChanged();            ///< is emited when units have changed
     void outputResult();            ///< is emited when result should be output
     void outputError();             ///< is emited when an error should be output
     void outputText(QString text);  ///< is emited when text should be output

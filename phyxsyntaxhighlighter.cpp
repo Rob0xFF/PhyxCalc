@@ -31,7 +31,7 @@ void PhyxSyntaxHighlighter::setVariableHighlightingRules(QStringList variableLis
     variableHighlightingRules.clear();
     foreach (QString variableName, variableList)
     {
-        QString pattern = QString("\\b%1\\b").arg(variableName);
+        QString pattern = QString("%1\\b").arg(variableName);
         HighlightingRule rule;
         rule.pattern = QRegExp(pattern);
         rule.format = variablesFormat;
@@ -45,11 +45,26 @@ void PhyxSyntaxHighlighter::setConstantHighlightingRules(QStringList variableLis
     constantHighlightingRules.clear();
     foreach (QString variableName, variableList)
     {
-        QString pattern = QString("\\b%1_\\b").arg(variableName);
+        QString pattern = QString("%1_\\b").arg(variableName);
         HighlightingRule rule;
         rule.pattern = QRegExp(pattern);
         rule.format = constantsFormat;
         constantHighlightingRules.append(rule);
+    }
+    rehighlight();
+}
+
+void PhyxSyntaxHighlighter::setUnitHighlightingRules(QStringList unitList)
+{
+    unitHighlightingRules.clear();
+    foreach (QString variableName, unitList)
+    {
+        variableName.replace("$","\\$");
+        QString pattern = QString("%1\\b").arg(variableName);
+        HighlightingRule rule;
+        rule.pattern = QRegExp(pattern);
+        rule.format = unitFormat;
+        unitHighlightingRules.append(rule);
     }
     rehighlight();
 }
@@ -73,7 +88,7 @@ void PhyxSyntaxHighlighter::removeError(int line, int pos)
     }
 }
 
-void PhyxSyntaxHighlighter::highlightBlock(const QString &text)
+void PhyxSyntaxHighlighter::highlightRules(const QString &text, const QVector<HighlightingRule> &highlightingRules)
 {
     foreach (const HighlightingRule &rule, highlightingRules) {
         QRegExp expression(rule.pattern);
@@ -84,24 +99,16 @@ void PhyxSyntaxHighlighter::highlightBlock(const QString &text)
             index = expression.indexIn(text, index + length);
         }
     }
-    foreach (const HighlightingRule &rule, variableHighlightingRules) {
-        QRegExp expression(rule.pattern);
-        int index = expression.indexIn(text);
-        while (index >= 0) {
-            int length = expression.matchedLength();
-            setFormat(index, length, rule.format);
-            index = expression.indexIn(text, index + length);
-        }
-    }
-    foreach (const HighlightingRule &rule, constantHighlightingRules) {
-        QRegExp expression(rule.pattern);
-        int index = expression.indexIn(text);
-        while (index >= 0) {
-            int length = expression.matchedLength();
-            setFormat(index, length, rule.format);
-            index = expression.indexIn(text, index + length);
-        }
-    }
+}
+
+void PhyxSyntaxHighlighter::highlightBlock(const QString &text)
+{
+    //sort with priority
+    highlightRules(text, highlightingRulesPriority1);
+    highlightRules(text, unitHighlightingRules);
+    highlightRules(text, constantHighlightingRules);
+    highlightRules(text, variableHighlightingRules);
+    highlightRules(text, highlightingRulesPriority2);
 
     setCurrentBlockState(0);
 
@@ -133,9 +140,6 @@ void PhyxSyntaxHighlighter::highlightBlock(const QString &text)
 
 void PhyxSyntaxHighlighter::updateFormats()
 {
-    HighlightingRule rule;
-    highlightingRules.clear();
-
     textFormat.setForeground(m_appSettings->textEditor.colorScheme.at(0).foregroundColor);
     textFormat.setBackground(m_appSettings->textEditor.colorScheme.at(0).backgroundColor);
     textFormat.setFontItalic(m_appSettings->textEditor.colorScheme.at(0).italic);
@@ -172,20 +176,27 @@ void PhyxSyntaxHighlighter::updateFormats()
     constantsFormat.setBackground(m_appSettings->textEditor.colorScheme.at(8).backgroundColor);
     constantsFormat.setFontItalic(m_appSettings->textEditor.colorScheme.at(8).italic);
     constantsFormat.setFontWeight(m_appSettings->textEditor.colorScheme.at(8).bold ? QFont::Bold : QFont::Normal);
-    errorFormat.setForeground(m_appSettings->textEditor.colorScheme.at(9).foregroundColor);
-    errorFormat.setBackground(m_appSettings->textEditor.colorScheme.at(9).backgroundColor);
-    errorFormat.setFontItalic(m_appSettings->textEditor.colorScheme.at(9).italic);
-    errorFormat.setFontWeight(m_appSettings->textEditor.colorScheme.at(9).bold ? QFont::Bold : QFont::Normal);
+    unitFormat.setForeground(m_appSettings->textEditor.colorScheme.at(9).foregroundColor);
+    unitFormat.setBackground(m_appSettings->textEditor.colorScheme.at(9).backgroundColor);
+    unitFormat.setFontItalic(m_appSettings->textEditor.colorScheme.at(9).italic);
+    unitFormat.setFontWeight(m_appSettings->textEditor.colorScheme.at(9).bold ? QFont::Bold : QFont::Normal);
+    errorFormat.setForeground(m_appSettings->textEditor.colorScheme.at(10).foregroundColor);
+    errorFormat.setBackground(m_appSettings->textEditor.colorScheme.at(10).backgroundColor);
+    errorFormat.setFontItalic(m_appSettings->textEditor.colorScheme.at(10).italic);
+    errorFormat.setFontWeight(m_appSettings->textEditor.colorScheme.at(10).bold ? QFont::Bold : QFont::Normal);
+
+    HighlightingRule rule;
 
     //tooltips for help
     variablesFormat.setToolTip("variable");
     constantsFormat.setToolTip("constant");
     functionFormat.setToolTip("function");
+    unitFormat.setToolTip("unit");
 
     //text
-    rule.pattern = QRegExp("\\b[^ ]+\\b");
+    rule.pattern = QRegExp("\\b\\S+\\b");
     rule.format = textFormat;
-    highlightingRules.append(rule);
+    highlightingRulesPriority1.append(rule);
 
     //keywords
     QStringList keywordPatterns;
@@ -193,32 +204,32 @@ void PhyxSyntaxHighlighter::updateFormats()
     foreach (const QString &pattern, keywordPatterns) {
         rule.pattern = QRegExp(pattern);
         rule.format = keywordFormat;
-        highlightingRules.append(rule);
+        highlightingRulesPriority2.append(rule);
     }
-
-    //single line comments
-    rule.pattern = QRegExp("//[^\n]*");
-    rule.format = commentFormat;
-    highlightingRules.append(rule);
-
-    //strings
-    rule.pattern = QRegExp("\".*\"");
-    rule.format = stringFormat;
-    highlightingRules.append(rule);
 
     //functions
     rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
     rule.format = functionFormat;
-    highlightingRules.append(rule);
+    highlightingRulesPriority2.append(rule);
 
     //errorFormat.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
 
     //numbers
     rule.format = numberFormat;
     rule.pattern = QRegExp("\\b[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?[ij]?");
-    highlightingRules.append(rule);
+    highlightingRulesPriority1.append(rule);
     rule.pattern = QRegExp("\\b[0][x][0-9A-Fa-f]+\\b");
-    highlightingRules.append(rule);
+    highlightingRulesPriority1.append(rule);
     rule.pattern = QRegExp("\\b[0][b][0-1]+\\b");
-    highlightingRules.append(rule);
+    highlightingRulesPriority1.append(rule);
+
+    //single line comments
+    rule.pattern = QRegExp("//[^\n]*");
+    rule.format = commentFormat;
+    highlightingRulesPriority2.append(rule);
+
+    //strings
+    rule.pattern = QRegExp("\".*\"");
+    rule.format = stringFormat;
+    highlightingRulesPriority2.append(rule);
 }

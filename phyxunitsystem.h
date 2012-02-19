@@ -40,6 +40,8 @@ public:
         }
     } PhyxPrefix;
 
+    typedef QMap<QString, PhyxUnit*> PhyxUnitMap;
+
     explicit PhyxUnitSystem(QObject *parent = 0);
     ~PhyxUnitSystem();
 
@@ -55,17 +57,18 @@ public:
     void addUnitGroup(QString name);                                ///< adds a unit group
     bool removeUnitGroup(QString name);                             ///< removes a unit group, returns succesful
 
-    PhyxUnit * copyUnit(QString symbol);                            ///< copys a unit
-    PhyxUnit * unit(QString symbol);                                ///< gives back a reference to the unit
+    PhyxUnit * copyUnit(QString symbol) const;                      ///< copys a unit
+    PhyxUnit * unit(QString symbol) const;                          ///< gives back a reference to the unit
+    PhyxUnitMap units() const;                                      ///< gives back a map holding all defined units
 
-    PhyxPrefix  prefix(QString symbol, QString unitGroup);          ///< returns the value of a prefix
-    QList<PhyxPrefix> prefixes(QString unitGroup) const;                  ///< returns all prefixes for one unitGroup sorted
+    PhyxPrefix  prefix(QString symbol, QString unitGroup) const;    ///< returns the value of a prefix
+    QList<PhyxPrefix> prefixes(QString unitGroup) const;            ///< returns all prefixes for one unitGroup sorted
 
     bool    verifyUnit(PhyxUnit *unit);                             ///< finds unit in the system and sets all the missing information, return wheter unit was found or not
 private:
-    QMap<QString, PhyxUnit*>    baseUnitsMap;                       /// contains all base units mapped with their symbol
-    QMap<QString, PhyxUnit*>    derivedUnitsMap;                    /// contains all derived units mapped with their symbol
-    QMultiMap<QString, PhyxPrefix>   prefixMap;                          /// contains all unit prefixes
+    PhyxUnitMap    baseUnitsMap;                                    /// contains all base units mapped with their symbol
+    PhyxUnitMap    derivedUnitsMap;                                 /// contains all derived units mapped with their symbol
+    QMultiMap<QString, PhyxPrefix>   prefixMap;                     /// contains all unit prefixes
     QStringList                 unitGroupsList;                     /// contains all unit groups
 
     void recalculateUnits();                                        ///< recalculates all units

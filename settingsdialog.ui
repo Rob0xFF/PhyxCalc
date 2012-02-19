@@ -613,7 +613,7 @@ border: 2px solid</string>
           <item row="1" column="0" rowspan="4">
            <widget class="QListWidget" name="colorSchemeList">
             <property name="currentRow">
-             <number>0</number>
+             <number>-1</number>
             </property>
             <item>
              <property name="text">
@@ -658,6 +658,11 @@ border: 2px solid</string>
             <item>
              <property name="text">
               <string>Constant</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Unit</string>
              </property>
             </item>
             <item>

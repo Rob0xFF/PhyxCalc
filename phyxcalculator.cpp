@@ -344,11 +344,13 @@ void PhyxCalculator::addRule(QString rule, QString functions)
 void PhyxCalculator::addUnitRule(QString symbol)
 {
     addRule(QString("unit=%1").arg(symbol), QString("bufferParameter, bufferUnit"));
+    emit unitsChanged();
 }
 
 void PhyxCalculator::removeUnitRule(QString symbol)
 {
     earleyParser->removeRule(QString("unit=%1").arg(symbol));
+    emit unitsChanged();
 }
 
 void PhyxCalculator::addVariableRule(QString name)
@@ -526,6 +528,11 @@ PhyxVariable *PhyxCalculator::constant(QString name) const
     return variableManager->getConstant(name);
 }
 
+PhyxUnit *PhyxCalculator::unit(QString symbol) const
+{
+    return unitSystem->unit(symbol);
+}
+
 void PhyxCalculator::clearVariables()
 {
     variableManager->clearVariables();
@@ -539,6 +546,11 @@ PhyxVariableManager::PhyxVariableMap *PhyxCalculator::variables() const
 PhyxVariableManager::PhyxVariableMap *PhyxCalculator::constants() const
 {
     return variableManager->constants();
+}
+
+PhyxUnitSystem::PhyxUnitMap PhyxCalculator::units() const
+{
+    return unitSystem->units();
 }
 
 QString PhyxCalculator::complexToString(const PhyxValueDataType number, int precision, char numberFormat)
