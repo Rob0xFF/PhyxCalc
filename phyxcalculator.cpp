@@ -275,12 +275,12 @@ void PhyxCalculator::loadGrammar(QString fileName)
         qFatal("Can't open file");
 }
 
-QString PhyxCalculator::removeWhitespace(QString text)
+QString PhyxCalculator::removeWhitespace(QString text, QList<int> *whiteSpaceList)
 {
     int whitespaceCount = 0;
     QString output;
 
-    expressionWhitespaceList.clear();
+    whiteSpaceList->clear();
     for (int i = text.size() - 1; i >= 0; i--)
     {
         if (text.at(i).isSpace())
@@ -288,19 +288,19 @@ QString PhyxCalculator::removeWhitespace(QString text)
         else
         {
             output.prepend(text.at(i));
-            expressionWhitespaceList.prepend(whitespaceCount);
+            whiteSpaceList->prepend(whitespaceCount);
         }
     }
 
-    for (int i = 0; i < expressionWhitespaceList.size(); i++)
-        expressionWhitespaceList[i] = whitespaceCount - expressionWhitespaceList.at(i);
+    for (int i = 0; i < whiteSpaceList->size(); i++)
+        (*whiteSpaceList)[i] = whitespaceCount - whiteSpaceList->at(i);
 
     return output;
 }
 
-int PhyxCalculator::restoreErrorPosition(int pos)
+int PhyxCalculator::restoreErrorPosition(int pos, QList<int> whiteSpaceList)
 {
-    return pos + expressionWhitespaceList.at(pos);
+    return pos + whiteSpaceList.at(pos);
 }
 
 void PhyxCalculator::raiseException(int errorNumber)
@@ -420,7 +420,6 @@ void PhyxCalculator::addFunctionRule(QString name, int parameterCount)
     }
     ruleString.append(")");
     addRule(ruleString, QString("bufferParameter, functionRun"));
-    qDebug() << ruleString;
 }
 
 void PhyxCalculator::removeFunctionRule(QString name, int parameterCount)
@@ -460,7 +459,7 @@ void PhyxCalculator::clearFlags()
 
 bool PhyxCalculator::setExpression(QString expression)
 {
-    expression = removeWhitespace(expression);
+    expression = removeWhitespace(expression, &expressionWhitespaceList);
 
     if (expression.isEmpty())
     {
@@ -498,7 +497,7 @@ bool PhyxCalculator::evaluate()
     {
         clearResult();
         m_error = false;
-        return evaluate(earleyParser->getTree(), m_expression);
+        return evaluate(earleyParser->getTree(), m_expression, expressionWhitespaceList);
     }
     else
     {
@@ -507,15 +506,20 @@ bool PhyxCalculator::evaluate()
     }
 }
 
-bool PhyxCalculator::evaluate(QList<EarleyTreeItem> earleyTree, QString expression)
+bool PhyxCalculator::evaluate(QList<EarleyTreeItem> earleyTree, QString expression, QList<int> whiteSpaceList)
 {
     stackLevel++;
     for (int i = (earleyTree.size()-1); i >= 0; i--)
     {
         EarleyTreeItem *earleyTreeItem = &earleyTree[i];
 
-        m_errorStartPosition = restoreErrorPosition(earleyTreeItem->startPos);     //just in case
-        m_errorEndPosition   = restoreErrorPosition(earleyTreeItem->endPos)+1;
+        if (this->hasError())
+        {
+            stackLevel--;
+            return false;
+        }
+        m_errorStartPosition = restoreErrorPosition(earleyTreeItem->startPos, whiteSpaceList);     //just in case
+        m_errorEndPosition   = restoreErrorPosition(earleyTreeItem->endPos, whiteSpaceList)+1;
         //PhyxRule phyxRule = phyxRules.value(earleyTreeItem->rule);
 
         //if (!phyxRule.functions.isEmpty())
@@ -531,12 +535,6 @@ bool PhyxCalculator::evaluate(QList<EarleyTreeItem> earleyTree, QString expressi
                         (this->*functionMap.value(function))();
                     else
                         qFatal(tr("Function %1 not found!").arg(function).toLocal8Bit());
-
-                    if (this->hasError())
-                    {
-                        stackLevel--;
-                        return false;
-                    }
                 }
             }
         //}
@@ -1901,12 +1899,13 @@ void PhyxCalculator::constantLoad()
     nameBuffer = parameterBuffer;
 }
 
-bool PhyxCalculator::executeFunction(QString expression, QStringList parameters)
+bool PhyxCalculator::executeFunction(QString expression, QStringList parameters, bool verifyOnly = false)
 {
     QStringList newVariables;   //lists where all temporary variables are stores
     QList<PhyxVariable*> oldVariables;
     bool success;
 
+    //psuh function parameters to stack
     for (int i = 0; i < parameters.size(); i++)
     {
         QString parameterName = parameters.at(i);
@@ -1921,24 +1920,19 @@ bool PhyxCalculator::executeFunction(QString expression, QStringList parameters)
     }
 
     //execute function
-    //get a earley tree for the function
-    QString savedExpression = m_expression;
-    QList<int> savedExpressionWhitespaceList = expressionWhitespaceList;
+    QList<int> whiteSpaceList;
+    m_expression = removeWhitespace(expression, &whiteSpaceList);
     success = /*this->setExpression(expression);*/ earleyParser->parseWord(expression);
     if (success)
     {
-        QList<EarleyTreeItem> earleyTree = earleyParser->getTree();
-        this->evaluate(earleyTree, expression);
+        if (!verifyOnly)
+        {
+            QList<EarleyTreeItem> earleyTree = earleyParser->getTree();                     //get a earley tree for the function
+            success = this->evaluate(earleyTree, m_expression, whiteSpaceList);
+        }
     }
     else
-    {
-        //expressionWhitespaceList = savedExpressionWhitespaceList;
         raiseException(SyntaxError);
-    }
-
-    //restore last expression
-    //this->setExpression(savedExpression);
-    //expressionWhitespaceList = savedExpressionWhitespaceList;
 
     //clear temporary variables
     for (int i = 0; i < parameters.size(); i++)
@@ -1962,17 +1956,14 @@ void PhyxCalculator::functionAdd()
     QString functionExpression = parameterBuffer.mid(equalIndex+1);
     QStringList functionParameters;
     while (!functionParameterStack.isEmpty())
+    {
         functionParameters.append(functionParameterStack.pop());
+        valueBuffer = 1;
+        pushVariable();     //for each parameter push 1 to stack for verifying the syntax of the expression
+    }
 
-    valueBuffer = 1;
-    pushVariable();
-    valueBuffer = 1;
-    pushVariable();
-
-    if (executeFunction(functionExpression, functionParameters))
+    if (executeFunction(functionExpression, functionParameters, true))
         variableManager->addFunction(functionName, functionExpression, functionParameters);
-
-    qDebug() << functionName << functionExpression << functionParameters;
 }
 
 void PhyxCalculator::functionRemove()
@@ -1989,7 +1980,6 @@ void PhyxCalculator::functionRun()
 
     PhyxVariableManager::PhyxFunction *function = variableManager->getFunction(functionName);
     executeFunction(function->expression, function->parameters);
-    qDebug() << functionName;
 }
 
 void PhyxCalculator::bufferUnit()

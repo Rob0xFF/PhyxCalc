@@ -119,7 +119,7 @@ public:
 
     bool setExpression (QString m_expression);          ///< sets the expression, checks what must be parsed and returns wheter the expression is parsable or not
     bool evaluate();
-    bool evaluate(QList<EarleyTreeItem> earleyTree, QString expression);                                    ///< evaluates the expression
+    bool evaluate(QList<EarleyTreeItem> earleyTree, QString expression, QList<int> whiteSpaceList);                                    ///< evaluates the expression
     void loadFile(QString fileName);                    ///< parses a complete txt file
 
     PhyxVariable * variable(QString name) const;
@@ -208,8 +208,8 @@ private:
 
     void initialize();                                                          ///< initializes PhyxCalculator
     void loadGrammar(QString fileName);                                         ///< loads the grammar from a file
-    QString removeWhitespace(QString text);                                     ///< removes the whitespace of a string and saves the count
-    int restoreErrorPosition(int pos);                                          ///< restores the original position of an error in expression
+    QString removeWhitespace(QString text, QList<int> *whiteSpaceList);                                     ///< removes the whitespace of a string and saves the count
+    int restoreErrorPosition(int pos, QList<int> whiteSpaceList);                                          ///< restores the original position of an error in expression
 
     void raiseException(int errorNumber);                                       ///< raises an exception
     void addRule(QString rule, QString functions = "");                         ///< adds a rule
@@ -332,7 +332,7 @@ private:
     void constantLoad();
 
     /** functions for function handling */
-    bool executeFunction(QString expression, QStringList parameters);
+    bool executeFunction(QString expression, QStringList parameters, bool verifyOnly);
     void functionAdd();
     void functionRemove();
     void functionRun();

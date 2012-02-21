@@ -31,6 +31,7 @@ S=|string|=[|p3|]|p3|                       ; unitAdd                           
 S=|string|@|unitGroup|=[|p3|]|p3|           ; unitAdd                                               //define offset unit with unit system
 S=|string|@|unitGroup|@|prefix|=[|p3|]|p3|  ; unitAdd                                               //define offset unit with unit system and prefered prefix
 S=|string|(|parameters|)=|functionString|   ; bufferParameter, functionAdd                          //define function
+S=|function|=                               ; bufferParameter, functionRemove                       //remove function
 S=|p3|->|p3|        ; unitCheckConvertible, unitConvert, outputVariable
 S=|p3|->hex         ; unitCheckDimensionless, valueCheckInteger, valueCheckPositive, bufferHexString, outputString
 S=|p3|->bin         ; unitCheckDimensionless, valueCheckInteger, valueCheckPositive, bufferBinString, outputString
@@ -125,8 +126,8 @@ p14=|p15|
 
 #Priority 15: multiplicative
 p15=|p15|*|p16|        ; unitMul, valueMul
-p15=|p16||p18|         ; unitMul, valueMul
-p15=|p18||p16|         ; unitMul, valueMul
+#p15=|p16||p18|         ; unitMul, valueMul
+#p15=|p18||p16|         ; unitMul, valueMul
 p15=|p15|/|p16|        ; unitDiv, valueDiv
 p15=|p15||mod||p16|    ; unitCheckDimensionless2, valueCheckInteger2, valueMod
 p15=|p16|
@@ -269,16 +270,20 @@ nb=1
 
 #Strings
 chars+=|any+|
-chars+=|any+||chars|
+chars+=|any+||chars+|
+charsFunc=|anyFunc|
+charsFunc=|anyFunc||charsFunc|
 chars=|any|
 chars=|any||chars|
 string="|chars+|"     ; bufferParameter, bufferString
 string=|chars|       ; bufferParameter, bufferString
 any+=\*
 any=\~
+anyFunc=\+
 
 #Function parameters
 parameter=|string|  ; pushFunctionParameter
 parameters=|parameter|
 parameters=|parameter|,|parameters|
-functionString=|chars+|
+parameters=
+functionString=|charsFunc|
