@@ -113,6 +113,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                             QToolTip::showText(helpEvent->globalPos(),
                                                documentList.at(activeTab)->lineParser->constantToolTip(cursor.selectedText()));
                         }
+                        else if (range.format.toolTip() == "function")
+                        {
+                            QToolTip::showText(helpEvent->globalPos(),
+                                               documentList.at(activeTab)->lineParser->functionToolTip(cursor.selectedText()));
+                        }
                         else
                             QToolTip::hideText();
                         break;

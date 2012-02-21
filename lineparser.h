@@ -61,6 +61,7 @@ public:
 
     QString variableToolTip(QString name);
     QString constantToolTip(QString name);
+    QString functionToolTip(QString name);
 
     QString exportFormelEditor();
 

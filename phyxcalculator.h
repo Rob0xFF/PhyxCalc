@@ -125,6 +125,7 @@ public:
     PhyxVariable * variable(QString name) const;
     PhyxVariable * constant(QString name) const;
     PhyxUnit     * unit(QString symbol) const;
+    PhyxVariableManager::PhyxFunction * function(QString name) const;
     PhyxVariableManager::PhyxVariableMap * variables() const;
     PhyxVariableManager::PhyxVariableMap * constants() const;
     PhyxUnitSystem::PhyxUnitMap units() const;

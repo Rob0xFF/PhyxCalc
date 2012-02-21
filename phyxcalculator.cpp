@@ -580,6 +580,11 @@ PhyxUnit *PhyxCalculator::unit(QString symbol) const
     return unitSystem->unit(symbol);
 }
 
+PhyxVariableManager::PhyxFunction *PhyxCalculator::function(QString name) const
+{
+    return variableManager->getFunction(name);
+}
+
 void PhyxCalculator::clearVariables()
 {
     variableManager->clearVariables();

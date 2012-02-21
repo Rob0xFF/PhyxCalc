@@ -145,7 +145,7 @@ void PhyxVariableManager::addFunction(QString name, QString expression, QStringL
     emit functionAdded(name, function->parameterCount());
 }
 
-PhyxVariableManager::PhyxFunction *PhyxVariableManager::getFunction(QString name)
+PhyxVariableManager::PhyxFunction * PhyxVariableManager::getFunction(QString name)
 {
     if (functionMap.contains(name))
         return functionMap.value(name);

@@ -151,6 +151,28 @@ QString LineParser::constantToolTip(QString name)
     return output;
 }
 
+QString LineParser::functionToolTip(QString name)
+{
+    QString output;
+    PhyxVariableManager::PhyxFunction * function = m_phyxCalculator->function(name);
+
+    output.append(tr("<b>Function %1</b>").arg(name));
+    if (function != NULL)
+    {
+        QString parameters;
+        for (int i = function->parameterCount()-1; i >= 0; i--)
+        {
+            if (i < (function->parameterCount()-1))
+                parameters.append(", ");
+            parameters.append(function->parameters.at(i));
+        }
+        output.append(tr("<br>Parameters: %1<br>").arg(parameters));
+        output.append(tr("Expression: %1").arg(function->expression));
+    }
+
+    return output;
+}
+
 void LineParser::replaceCurrentLine(QString text)
 {
     QTextCursor textCursor = m_calculationEdit->textCursor();
