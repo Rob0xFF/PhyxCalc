@@ -34,6 +34,7 @@ void PhyxCalculator::initialize()
     prefixBuffer = "";
     unitBuffer = "";
     flagBuffer = 0;
+    stackLevel = 0;
     m_error = false;
     m_errorNumber = 0;
     m_errorStartPosition = 0;
@@ -155,25 +156,30 @@ void PhyxCalculator::initialize()
     functionMap.insert("constantRemove",&PhyxCalculator::constantRemove);
     functionMap.insert("constantLoad",  &PhyxCalculator::constantLoad);
 
-    functionMap.insert("bufferUnit",    &PhyxCalculator::bufferUnit);
-    functionMap.insert("bufferValue",   &PhyxCalculator::bufferValue);
-    functionMap.insert("bufferHex",     &PhyxCalculator::bufferHex);
-    functionMap.insert("bufferBin",     &PhyxCalculator::bufferBin);
-    functionMap.insert("bufferHexString",&PhyxCalculator::bufferHexString);
-    functionMap.insert("bufferBinString",&PhyxCalculator::bufferBinString);
-    functionMap.insert("bufferPrefix",   &PhyxCalculator::bufferPrefix);
-    functionMap.insert("bufferString",   &PhyxCalculator::bufferString);
-    functionMap.insert("bufferUnitGroup",&PhyxCalculator::bufferUnitGroup);
-    functionMap.insert("pushVariable",  &PhyxCalculator::pushVariable);
+    functionMap.insert("functionAdd",   &PhyxCalculator::functionAdd);
+    functionMap.insert("functionRemove",&PhyxCalculator::functionRemove);
+    functionMap.insert("functionRun",   &PhyxCalculator::functionRun);
 
-    functionMap.insert("setInputOnlyFlag",  &PhyxCalculator::setInputOnlyFlag);
+    functionMap.insert("bufferUnit",            &PhyxCalculator::bufferUnit);
+    functionMap.insert("bufferValue",           &PhyxCalculator::bufferValue);
+    functionMap.insert("bufferHex",             &PhyxCalculator::bufferHex);
+    functionMap.insert("bufferBin",             &PhyxCalculator::bufferBin);
+    functionMap.insert("bufferHexString",       &PhyxCalculator::bufferHexString);
+    functionMap.insert("bufferBinString",       &PhyxCalculator::bufferBinString);
+    functionMap.insert("bufferPrefix",          &PhyxCalculator::bufferPrefix);
+    functionMap.insert("bufferString",          &PhyxCalculator::bufferString);
+    functionMap.insert("bufferUnitGroup",       &PhyxCalculator::bufferUnitGroup);
+    functionMap.insert("pushVariable",          &PhyxCalculator::pushVariable);
+    functionMap.insert("pushFunctionParameter", &PhyxCalculator::pushFunctionParameter);
 
-    functionMap.insert("outputVariable",&PhyxCalculator::outputVariable);
-    functionMap.insert("outputString",  &PhyxCalculator::outputString);
-    functionMap.insert("unitGroupAdd",  &PhyxCalculator::unitGroupAdd);
-    functionMap.insert("unitGroupRemove",&PhyxCalculator::unitGroupRemove);
-    functionMap.insert("prefixAdd",     &PhyxCalculator::prefixAdd);
-    functionMap.insert("prefixRemove",  &PhyxCalculator::prefixRemove);
+    functionMap.insert("setInputOnlyFlag",      &PhyxCalculator::setInputOnlyFlag);
+
+    functionMap.insert("outputVariable",        &PhyxCalculator::outputVariable);
+    functionMap.insert("outputString",          &PhyxCalculator::outputString);
+    functionMap.insert("unitGroupAdd",          &PhyxCalculator::unitGroupAdd);
+    functionMap.insert("unitGroupRemove",       &PhyxCalculator::unitGroupRemove);
+    functionMap.insert("prefixAdd",             &PhyxCalculator::prefixAdd);
+    functionMap.insert("prefixRemove",          &PhyxCalculator::prefixRemove);
 
     functionMap.insert("lowLevelAdd",                   &PhyxCalculator::lowLevelAdd);
     functionMap.insert("lowLevelRun",                   &PhyxCalculator::lowLevelRun);
@@ -219,6 +225,10 @@ void PhyxCalculator::initialize()
             this, SLOT(addConstantRule(QString)));
     connect(variableManager, SIGNAL(constantRemoved(QString)),
             this, SLOT(removeConstantRule(QString)));
+    connect(variableManager, SIGNAL(functionAdded(QString,int)),
+            this, SLOT(addFunctionRule(QString,int)));
+    connect(variableManager, SIGNAL(functionRemoved(QString,int)),
+            this, SLOT(removeFunctionRule(QString,int)));
 }
 
 void PhyxCalculator::loadGrammar(QString fileName)
@@ -397,16 +407,49 @@ void PhyxCalculator::removeUnitGroupRule(QString name)
     earleyParser->removeRule(QString("unitGroup=%1").arg(name));
 }
 
+void PhyxCalculator::addFunctionRule(QString name, int parameterCount)
+{
+    QString ruleString;
+    ruleString.append(QString("function=%1").arg(name));
+    ruleString.append("(");
+    for (int i = 0; i < parameterCount; i++)
+    {
+        if (i > 0)
+            ruleString.append(",");
+        ruleString.append("|p3|");
+    }
+    ruleString.append(")");
+    addRule(ruleString, QString("bufferParameter, functionRun"));
+    qDebug() << ruleString;
+}
+
+void PhyxCalculator::removeFunctionRule(QString name, int parameterCount)
+{
+    QString ruleString;
+    ruleString.append(QString("function=%1").arg(name));
+    ruleString.append("(");
+    for (int i = 0; i < parameterCount; i++)
+    {
+        if (i > 0)
+            ruleString.append(",");
+        ruleString.append("|p3|");
+    }
+    ruleString.append(")");
+    earleyParser->removeRule(ruleString);
+}
+
 void PhyxCalculator::clearStack()
 {
     foreach (PhyxVariable *variable, variableStack)
         delete variable;
     variableStack.clear();
+    lowLevelStack.clear();
+    functionParameterStack.clear();
 }
 
 void PhyxCalculator::clearResult()
 {
-    m_resultValue = PhyxValueDataType(0.0,0.0);
+    m_resultValue = PhyxValueDataType(0.0L,0.0L);
     m_resultUnit = "";
 }
 
@@ -455,45 +498,51 @@ bool PhyxCalculator::evaluate()
     {
         clearResult();
         m_error = false;
-
-        QList<EarleyTreeItem> earleyTree;
-        earleyTree = earleyParser->getTree();
-
-        for (int i = (earleyTree.size()-1); i >= 0; i--)
-        {
-            EarleyTreeItem *earleyTreeItem = &earleyTree[i];
-
-            m_errorStartPosition = restoreErrorPosition(earleyTreeItem->startPos);     //just in case
-            m_errorEndPosition   = restoreErrorPosition(earleyTreeItem->endPos)+1;
-            //PhyxRule phyxRule = phyxRules.value(earleyTreeItem->rule);
-
-            //if (!phyxRule.functions.isEmpty())
-            if (!earleyTreeItem->rule->functions.isEmpty())
-            {
-                foreach (QString function, earleyTreeItem->rule->functions)
-                {
-                    if (function == "bufferParameter")
-                        parameterBuffer = m_expression.mid(earleyTreeItem->startPos, earleyTreeItem->endPos - earleyTreeItem->startPos + 1);
-                    else
-                    {
-                        if (functionMap.value(function, NULL) != NULL)
-                            (this->*functionMap.value(function))();
-                        else
-                            qFatal(tr("Function %1 not found!").arg(function).toLocal8Bit());
-
-                        if (this->hasError())
-                            return false;
-                    }
-                }
-            }
-        }
-        return true;
+        return evaluate(earleyParser->getTree(), m_expression);
     }
     else
     {
         raiseException(SyntaxError);
         return false;
     }
+}
+
+bool PhyxCalculator::evaluate(QList<EarleyTreeItem> earleyTree, QString expression)
+{
+    stackLevel++;
+    for (int i = (earleyTree.size()-1); i >= 0; i--)
+    {
+        EarleyTreeItem *earleyTreeItem = &earleyTree[i];
+
+        m_errorStartPosition = restoreErrorPosition(earleyTreeItem->startPos);     //just in case
+        m_errorEndPosition   = restoreErrorPosition(earleyTreeItem->endPos)+1;
+        //PhyxRule phyxRule = phyxRules.value(earleyTreeItem->rule);
+
+        //if (!phyxRule.functions.isEmpty())
+        //if (!earleyTreeItem->rule->functions.isEmpty())
+        //{
+            foreach (QString function, earleyTreeItem->rule->functions)
+            {
+                if (function == "bufferParameter")
+                    parameterBuffer = expression.mid(earleyTreeItem->startPos, earleyTreeItem->endPos - earleyTreeItem->startPos + 1);
+                else
+                {
+                    if (functionMap.value(function, NULL) != NULL)
+                        (this->*functionMap.value(function))();
+                    else
+                        qFatal(tr("Function %1 not found!").arg(function).toLocal8Bit());
+
+                    if (this->hasError())
+                    {
+                        stackLevel--;
+                        return false;
+                    }
+                }
+            }
+        //}
+    }
+    stackLevel--;
+    return true;
 }
 
 void PhyxCalculator::loadFile(QString fileName)
@@ -1852,6 +1901,97 @@ void PhyxCalculator::constantLoad()
     nameBuffer = parameterBuffer;
 }
 
+bool PhyxCalculator::executeFunction(QString expression, QStringList parameters)
+{
+    QStringList newVariables;   //lists where all temporary variables are stores
+    QList<PhyxVariable*> oldVariables;
+    bool success;
+
+    for (int i = 0; i < parameters.size(); i++)
+    {
+        QString parameterName = parameters.at(i);
+
+        //if variable with same name is defined, temporarily change value
+        if (variableManager->containsVariable(parameterName))
+        {
+            newVariables.append(parameterName);
+            oldVariables.append(variableManager->getVariable(parameterName));
+        }
+        variableManager->addVariable(parameterName, variableStack.pop());
+    }
+
+    //execute function
+    //get a earley tree for the function
+    QString savedExpression = m_expression;
+    QList<int> savedExpressionWhitespaceList = expressionWhitespaceList;
+    success = /*this->setExpression(expression);*/ earleyParser->parseWord(expression);
+    if (success)
+    {
+        QList<EarleyTreeItem> earleyTree = earleyParser->getTree();
+        this->evaluate(earleyTree, expression);
+    }
+    else
+    {
+        //expressionWhitespaceList = savedExpressionWhitespaceList;
+        raiseException(SyntaxError);
+    }
+
+    //restore last expression
+    //this->setExpression(savedExpression);
+    //expressionWhitespaceList = savedExpressionWhitespaceList;
+
+    //clear temporary variables
+    for (int i = 0; i < parameters.size(); i++)
+    {
+        if (!newVariables.contains(parameters.at(i)))
+            variableManager->removeVariable(parameters.at(i));
+    }
+
+    //rename temporary renamed variables back
+    for (int i = 0; i < newVariables.count(); i++)
+        variableManager->addVariable(newVariables.at(i), oldVariables.at(i));
+
+    return success;
+}
+
+void PhyxCalculator::functionAdd()
+{
+    int clipIndex = parameterBuffer.indexOf("(");
+    int equalIndex = parameterBuffer.indexOf("=");
+    QString functionName = parameterBuffer.left(clipIndex);
+    QString functionExpression = parameterBuffer.mid(equalIndex+1);
+    QStringList functionParameters;
+    while (!functionParameterStack.isEmpty())
+        functionParameters.append(functionParameterStack.pop());
+
+    valueBuffer = 1;
+    pushVariable();
+    valueBuffer = 1;
+    pushVariable();
+
+    if (executeFunction(functionExpression, functionParameters))
+        variableManager->addFunction(functionName, functionExpression, functionParameters);
+
+    qDebug() << functionName << functionExpression << functionParameters;
+}
+
+void PhyxCalculator::functionRemove()
+{
+    int clipIndex = parameterBuffer.indexOf("(");
+    QString functionName = parameterBuffer.left(clipIndex);
+    variableManager->removeFunction(functionName);
+}
+
+void PhyxCalculator::functionRun()
+{
+    int clipIndex = parameterBuffer.indexOf("(");
+    QString functionName = parameterBuffer.left(clipIndex);
+
+    PhyxVariableManager::PhyxFunction *function = variableManager->getFunction(functionName);
+    executeFunction(function->expression, function->parameters);
+    qDebug() << functionName;
+}
+
 void PhyxCalculator::bufferUnit()
 {
     //get the unit
@@ -1957,6 +2097,11 @@ void PhyxCalculator::pushVariable()
     prefixBuffer.clear();
 }
 
+void PhyxCalculator::pushFunctionParameter()
+{
+    functionParameterStack.push(stringBuffer);
+}
+
 void PhyxCalculator::setInputOnlyFlag()
 {
     flagBuffer |= InputOnlyFlag;
@@ -1964,17 +2109,20 @@ void PhyxCalculator::setInputOnlyFlag()
 
 void PhyxCalculator::outputVariable()
 {
-    if (!variableStack.isEmpty())
+    if (stackLevel == 0)    //this function has only effect on lowest stack level
     {
-        if (m_result != NULL)   // delete old result
-            delete m_result;
+        if (!variableStack.isEmpty())
+        {
+            if (m_result != NULL)   // delete old result
+                delete m_result;
 
-        PhyxVariable *variable1 = variableStack.pop();
-        m_resultValue = variable1->value();
-        m_resultUnit = variable1->unit()->symbol();
-        m_result = variable1;
+            PhyxVariable *variable1 = variableStack.pop();
+            m_resultValue = variable1->value();
+            m_resultUnit = variable1->unit()->symbol();
+            m_result = variable1;
 
-        emit outputResult();
+            emit outputResult();
+        }
     }
 }
 
@@ -2147,15 +2295,18 @@ void PhyxCalculator::lowLevelAdd()
 
 void PhyxCalculator::lowLevelRun()
 {
-    LowLevelOperationList *operationList1 = lowLevelStack.pop();
-
-    for (int i = operationList1->size()-1; i  >= 0; i--)
+    if (!lowLevelStack.isEmpty())
     {
-        runLowLevelOperation(operationList1->at(i));
-        delete operationList1->at(i);
-    }
+        LowLevelOperationList *operationList1 = lowLevelStack.pop();
 
-    delete operationList1;
+        for (int i = operationList1->size()-1; i  >= 0; i--)
+        {
+            runLowLevelOperation(operationList1->at(i));
+            delete operationList1->at(i);
+        }
+
+        delete operationList1;
+    }
 }
 
 void PhyxCalculator::lowLevelAssignment()
@@ -2254,7 +2405,10 @@ void PhyxCalculator::lowLevelCombinedAssignmentShiftRight()
 
 void PhyxCalculator::lowLevelOutput()
 {
-    PhyxVariable *variable1 = variableStack.pop();
+    if (stackLevel <= 1)    //deactivate this function for stack levels > 1
+    {
+        PhyxVariable *variable1 = variableStack.pop();
 
-    appendLowLevelOperation(QString(), OutputOperation, variable1);
+        appendLowLevelOperation(QString(), OutputOperation, variable1);
+    }
 }

@@ -118,7 +118,8 @@ public:
     typedef QList<LowLevelOperation*>    LowLevelOperationList;
 
     bool setExpression (QString m_expression);          ///< sets the expression, checks what must be parsed and returns wheter the expression is parsable or not
-    bool evaluate();                                    ///< evaluates the expression
+    bool evaluate();
+    bool evaluate(QList<EarleyTreeItem> earleyTree, QString expression);                                    ///< evaluates the expression
     void loadFile(QString fileName);                    ///< parses a complete txt file
 
     PhyxVariable * variable(QString name) const;
@@ -172,7 +173,8 @@ public:
 
 private:
     QStack<PhyxVariable*>       variableStack;                                  /// stack for variable calculation
-    QStack<LowLevelOperationList*> lowLevelStack;                                /// stack for low level operations
+    QStack<LowLevelOperationList*> lowLevelStack;                               /// stack for low level operations
+    QStack<QString>             functionParameterStack;                         /// stack for storing paramters for function definition
     QString                     parameterBuffer;                                /// string for buffering numbers
     QString                     stringBuffer;                                   /// string for buffering strings
     PhyxValueDataType           valueBuffer;
@@ -181,6 +183,7 @@ private:
     QString                     unitGroupBuffer;
     QString                     nameBuffer;
     int                         flagBuffer;                                     /// this buffer holds current set flags (e.g. the inputOnly flag
+    int                         stackLevel;                                     /// this variable holds the current stack level, 0 = lowest
 
     QHash<QString, PhyxRule>    phyxRules;                                      /// map of all rules, key is rule
 
@@ -319,6 +322,7 @@ private:
     void unitClear();
     void unitAdd();
     void unitRemove();
+
     /** functions for variable handling */
     void variableAdd();
     void variableRemove();
@@ -326,6 +330,12 @@ private:
     void constantAdd();
     void constantRemove();
     void constantLoad();
+
+    /** functions for function handling */
+    bool executeFunction(QString expression, QStringList parameters);
+    void functionAdd();
+    void functionRemove();
+    void functionRun();
 
     /** functions for buffering */
     void bufferUnit();
@@ -338,6 +348,7 @@ private:
     void bufferString();
     void bufferUnitGroup();
     void pushVariable();
+    void pushFunctionParameter();
 
     /** flag functions */
     void setInputOnlyFlag();
@@ -392,6 +403,8 @@ private slots:
     void removePrefixRule(QString symbol);
     void addUnitGroupRule(QString name);
     void removeUnitGroupRule(QString name);
+    void addFunctionRule(QString name, int parameterCount);
+    void removeFunctionRule(QString name, int parameterCount);
 };
 
 #endif // PHYXCALCULATOR_H

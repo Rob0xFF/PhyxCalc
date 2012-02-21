@@ -30,6 +30,7 @@ S=|string|@|unitGroup|@|prefix|=[|p3|]  ; unitAdd                               
 S=|string|=[|p3|]|p3|                       ; unitAdd                                               //define offset unit without unit system
 S=|string|@|unitGroup|=[|p3|]|p3|           ; unitAdd                                               //define offset unit with unit system
 S=|string|@|unitGroup|@|prefix|=[|p3|]|p3|  ; unitAdd                                               //define offset unit with unit system and prefered prefix
+S=|string|(|parameters|)=|functionString|   ; bufferParameter, functionAdd                          //define function
 S=|p3|->|p3|        ; unitCheckConvertible, unitConvert, outputVariable
 S=|p3|->hex         ; unitCheckDimensionless, valueCheckInteger, valueCheckPositive, bufferHexString, outputString
 S=|p3|->bin         ; unitCheckDimensionless, valueCheckInteger, valueCheckPositive, bufferBinString, outputString
@@ -191,6 +192,7 @@ p18={|p3|}           ; unitClear
 p18=|pi|             ; valuePi
 p18=|variable|
 p18=|constant|_
+p18=|function|
 pi=π
 pi=pi
 
@@ -274,3 +276,9 @@ string="|chars+|"     ; bufferParameter, bufferString
 string=|chars|       ; bufferParameter, bufferString
 any+=\*
 any=\~
+
+#Function parameters
+parameter=|string|  ; pushFunctionParameter
+parameters=|parameter|
+parameters=|parameter|,|parameters|
+functionString=|chars+|

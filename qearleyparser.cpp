@@ -570,7 +570,7 @@ void QEarleyParser::backtraceTree(EarleyItemList *tree)
 
     while (currentItem->origin != NULL)
     {
-        if (currentItem->isFinal())
+        if (currentItem->isFinal() && !currentItem->rule->functions.isEmpty())
             tree->append(*currentItem);
         currentItem = currentItem->origin;
     }

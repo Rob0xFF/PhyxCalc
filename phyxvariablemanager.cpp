@@ -55,6 +55,23 @@ void PhyxVariableManager::removeVariable(QString name)
     }
 }
 
+void PhyxVariableManager::renameVariable(QString oldName, QString newName)
+{
+    if (variableMap.contains(oldName))
+    {
+        PhyxVariable *variable = variableMap.value(oldName);
+        variableMap.remove(oldName);
+        variableMap.insert(newName, variable);
+        emit variableRemoved(oldName);
+        emit variableAdded(newName);
+    }
+}
+
+bool PhyxVariableManager::containsVariable(QString name) const
+{
+    return variableMap.contains(name);
+}
+
 PhyxVariableManager::PhyxVariableMap *PhyxVariableManager::variables()
 {
     return &variableMap;
@@ -91,9 +108,63 @@ void PhyxVariableManager::removeConstant(QString name)
     }
 }
 
+void PhyxVariableManager::renameConstant(QString oldName, QString newName)
+{
+    if (constantMap.contains(oldName))
+    {
+        PhyxVariable *variable = constantMap.value(oldName);
+        constantMap.remove(oldName);
+        constantMap.insert(newName, variable);
+        emit variableRemoved(oldName);
+        emit variableAdded(newName);
+    }
+}
+
+bool PhyxVariableManager::containsConstant(QString name) const
+{
+    return constantMap.contains(name);
+}
+
 PhyxVariableManager::PhyxVariableMap *PhyxVariableManager::constants()
 {
     return &constantMap;
+}
+
+void PhyxVariableManager::addFunction(QString name, QString expression, QStringList parameters)
+{
+    if (functionMap.contains(name))
+    {
+        emit functionRemoved(name, functionMap.value(name)->parameterCount());
+        functionMap.remove(name);
+    }
+
+    PhyxFunction *function = new PhyxFunction;
+    function->expression = expression;
+    function->parameters = parameters;
+    functionMap.insert(name, function);
+    emit functionAdded(name, function->parameterCount());
+}
+
+PhyxVariableManager::PhyxFunction *PhyxVariableManager::getFunction(QString name)
+{
+    if (functionMap.contains(name))
+        return functionMap.value(name);
+    else
+        return NULL;
+}
+
+void PhyxVariableManager::removeFunction(QString name)
+{
+    if (functionMap.contains(name))
+    {
+        emit functionRemoved(name, functionMap.value(name)->parameterCount());
+        functionMap.remove(name);
+    }
+}
+
+PhyxVariableManager::PhyxFunctionMap *PhyxVariableManager::functions()
+{
+    return &functionMap;
 }
 
 void PhyxVariableManager::clearVariables()

@@ -20,7 +20,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define MATH_OPERATORS "[+\\-*/()<>!^=]"
+#define MATH_OPERATORS "[+\\-\\*/\\(\\)<>!\\^=]"
 
 #include <QFont>
 #include <QColor>
