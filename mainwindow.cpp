@@ -74,7 +74,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         {
              QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
-             if (keyEvent->key() == Qt::Key_Return)
+             if ((keyEvent->key() == Qt::Key_Return) || (keyEvent->key() == Qt::Key_Enter))
              {
                  if (keyEvent->modifiers() != Qt::ControlModifier)
                     documentList.at(activeTab)->lineParser->parseLine();
@@ -415,7 +415,8 @@ void MainWindow::initializeGUI()
     configureMenu->addMenu(ui->menuEdit);
     configureMenu->addMenu(ui->menuCalculation);
     configureMenu->addMenu(ui->menuWindow);
-    configureMenu->addMenu(ui->menuTools);
+    //configureMenu->addMenu(ui->menuTools);
+    configureMenu->addAction(ui->actionSettings);
     configureMenu->addMenu(ui->menuHelp);
     ui->actionConfigure_and_control->setMenu(configureMenu);
     QToolButton *configureButton = new QToolButton();

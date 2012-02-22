@@ -33,7 +33,11 @@ int main(int argc, char *argv[])
     //splash->show();
 
     MainWindow w;
+#ifdef Q_WS_S60
+    w.showFullScreen();
+#else
     w.show();
+#endif
 
    // while (time.elapsed() < 200)
    //     a.processEvents();

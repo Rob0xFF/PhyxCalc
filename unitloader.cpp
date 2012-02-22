@@ -67,15 +67,16 @@ bool UnitLoader::loadSymbols()
     QFile file("./settings/symbols.txt");
     if (file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        QTextStream in(&file);
-        while (!in.atEnd())
+        QString text = QString::fromUtf8(file.readAll());
+        QStringList lines = text.split('\n');
+        for (int i = 0; i < lines.size(); i++)
         {
             QStringList         list,
                                 nameList;
             struct symbolStruct    tempUnit;
 
             //read one line and split it into pieces
-            list = in.readLine().split(";");
+            list = lines.at(i).split(";");
             nameList = list.at(0).split(",");
 
             for (int i = 0; i < nameList.size(); i++)

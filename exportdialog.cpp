@@ -25,13 +25,18 @@ ExportDialog::ExportDialog(QWidget *parent) :
     ui(new Ui::ExportDialog)
 {
     ui->setupUi(this);
+#ifdef Q_WS_S60
+    this->setWindowState(Qt::WindowFullScreen);
+#endif
 
     QPushButton *button = ui->buttonBox->addButton(tr("Copy to Clipboard"), QDialogButtonBox::ActionRole);
     connect(button, SIGNAL(clicked()),
             this, SLOT(copyToClipboard()));
+#ifndef Q_WS_S60
     button = ui->buttonBox->addButton(tr("Open Formel Editor"), QDialogButtonBox::ActionRole);
     connect(button, SIGNAL(clicked()),
             this, SLOT(openFormelEditor()));
+#endif
 }
 
 ExportDialog::~ExportDialog()

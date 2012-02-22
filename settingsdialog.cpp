@@ -25,6 +25,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
+#ifdef Q_WS_S60
+    this->setWindowState(Qt::WindowFullScreen);
+#endif
 }
 
 SettingsDialog::~SettingsDialog()
