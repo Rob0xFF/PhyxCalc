@@ -28,8 +28,8 @@
 #include <QDebug>
 #include <QFile>
 #include <sstream>
-#include "boost/math/special_functions.hpp"
-#include "boost/math/complex.hpp"
+#include <boost/format.hpp>
+#include <boost/math/complex.hpp>
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -38,6 +38,10 @@
 #include "phyxvariable.h"
 #include "phyxvariablemanager.h"
 #include "phyxtesting.h"
+
+#ifndef Q_WS_S60
+#include <boost/math/special_functions.hpp>
+#endif
 
 typedef std::complex<long double>   PhyxValueDataType;      /// the base data type for values
 typedef int                         PhyxUnitDataType;       /// the base data type for units

@@ -1268,14 +1268,22 @@ void PhyxCalculator::valueAvg()
 
 void PhyxCalculator::valuePi()
 {
+#ifndef Q_WS_S60
     valueBuffer = PhyxValueDataType(boost::math::constants::pi<long double>(), 0.0L);
+#else
+    valueBuffer = PhyxValueDataType(static_cast<long double>(M_PIl), 0.0L);
+#endif
     unitBuffer = "";
     pushVariable();
 }
 
 void PhyxCalculator::valueE()
 {
+#ifndef Q_WS_S60
     valueBuffer = PhyxValueDataType(boost::math::constants::e<long double>(), 0.0L);
+#else
+    valueBuffer = PhyxValueDataType(static_cast<long double>(M_El), 0.0L);
+#endif
     unitBuffer = "";
     pushVariable();
 }
@@ -1293,7 +1301,11 @@ void PhyxCalculator::valueTrunc()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
+#ifndef Q_WS_S60
     PhyxValueDataType value(boost::math::trunc<long double>(variable1->value().real()),0.0L);
+#else
+    PhyxValueDataType value(static_cast<long double>(variable1->toInt()),0.0L);
+#endif
     variable1->setValue(value);
     variableStack.push(variable1);
 }
@@ -1311,7 +1323,12 @@ void PhyxCalculator::valueRound()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
+    //boost::math::round<long double>(
+#ifndef Q_WS_S60
     PhyxValueDataType value(boost::math::round<long double>(variable1->value().real()),0.0L);
+#else
+    PhyxValueDataType value(floor(variable1->value().real()+0.5L),0.0L);
+#endif
     variable1->setValue(value);
     variableStack.push(variable1);
 }
