@@ -51,20 +51,20 @@ void PhyxVariable::setUnit(PhyxUnit *unit)
 
 bool PhyxVariable::isComplex()
 {
-    return (m_value.imag() != 0.0L);
+    return (m_value.imag() != PHYX_FLOAT_NULL);
 }
 
 bool PhyxVariable::isPositive()
 {
-    return (m_value.real() >= 0.0L);
+    return (m_value.real() >= PHYX_FLOAT_NULL);
 }
 
 bool PhyxVariable::isInteger()
 {
-    return (!this->isComplex() && (static_cast<long double>(this->toInt()) == m_value.real()));
+    return (!this->isComplex() && (static_cast<PhyxFloatDataType>(this->toInt()) == m_value.real()));
 }
 
-long int PhyxVariable::toInt()
+PhyxIntegerDataType PhyxVariable::toInt()
 {
-    return static_cast<long int>(m_value.real());
+    return static_cast<PhyxIntegerDataType>(m_value.real());
 }

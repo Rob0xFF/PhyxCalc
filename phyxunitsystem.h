@@ -23,13 +23,14 @@
 #include <QObject>
 #include <QStringList>
 #include "phyxunit.h"
+#include "global.h"
 
 class PhyxUnitSystem : public QObject
 {
     Q_OBJECT
 public:
     typedef struct PhyxPrefixStruct{
-        long double value;          /// the value of the prefix
+        PhyxFloatDataType value;          /// the value of the prefix
         QString     unitGroup;      /// the unit system of the prefix
         QString     symbol;         /// the symbol of the prefix
         bool        inputOnly;      /// input only flag, when set this prefix is not used for output

@@ -449,7 +449,7 @@ void PhyxCalculator::clearStack()
 
 void PhyxCalculator::clearResult()
 {
-    m_resultValue = PhyxValueDataType(0.0L,0.0L);
+    m_resultValue = PhyxValueDataType(PHYX_FLOAT_NULL,PHYX_FLOAT_NULL);
     m_resultUnit = "";
 }
 
@@ -609,35 +609,35 @@ PhyxUnitSystem::PhyxUnitMap PhyxCalculator::units() const
 QString PhyxCalculator::complexToString(const PhyxValueDataType number, int precision, char numberFormat)
 {
     QString string;
-    boost::format format(tr("%.%1%2").arg(precision).arg(numberFormat).toStdString());
+    boost::format format(QString("%.%1%2").arg(precision).arg(numberFormat).toStdString());
     int components = 0;
     bool useInteger = false;
 
     //check wheter number is integer or not
-    /*if (number.imag() == 0.0L)
+    /*if (number.imag() == PHYX_FLOAT_NULL)
     {
-        if (static_cast<long double>(static_cast<long int>(number.real())) == number.real())
+        if (static_cast<PhyxFloatDataType>(static_cast<PhyxIntegerDataType>(number.real())) == number.real())
             useInteger = true;
     }*/
 
-    if (number.real() != 0.0L)
+    if (number.real() != PHYX_FLOAT_NULL)
     {
-        std::stringstream ss;
+        std::ostringstream ss;
         if (!useInteger)
             ss << format % number.real();
-        else
-            ss << format % static_cast<long int>(number.real());
+//        else
+//            ss << format % static_cast<PhyxIntegerDataType>(number.real());
         string.append(QString::fromStdString(ss.str()));
         components++;
     }
 
-    if (number.imag() != 0.0L)
+    if (number.imag() != PHYX_FLOAT_NULL)
     {
         if (!string.isEmpty())
             string.append("+");
         if ((number.imag() != 1) && (number.imag() != -1))
         {
-            std::stringstream ss;
+            std::ostringstream ss;
             ss << format % number.imag();
             string.append(QString::fromStdString(ss.str()));
         }
@@ -672,26 +672,26 @@ PhyxValueDataType PhyxCalculator::stringToComplex(QString string)
         if (string.isEmpty())
             string="1";
 
-        long double tmpValue;
+        PhyxFloatDataType tmpValue;
         std::istringstream inStream(string.toStdString());
         inStream >> tmpValue;
-        value = PhyxValueDataType(0.0L,tmpValue);
+        value = PhyxValueDataType(PHYX_FLOAT_NULL,tmpValue);
     }
     else
     {
-        long double tmpValue;
+        PhyxFloatDataType tmpValue;
         std::istringstream inStream(string.toStdString());
         inStream >> tmpValue;
-        value = PhyxValueDataType(tmpValue,0.0L);
+        value = PhyxValueDataType(tmpValue,PHYX_FLOAT_NULL);
     }
 
     return value;
 }
 
-long int PhyxCalculator::hexToLongInt(QString string)
+PhyxIntegerDataType PhyxCalculator::hexToLongInt(QString string)
 {
-    long int value = 0;
-    long int n = 1;
+    PhyxIntegerDataType value = 0;
+    PhyxIntegerDataType n = 1;
 
     string.remove("0x");
     for (int i = string.size()-1; i >= 0; i--)
@@ -708,8 +708,8 @@ long int PhyxCalculator::hexToLongInt(QString string)
 
 long PhyxCalculator::binToLongInt(QString string)
 {
-    long int value = 0;
-    long int n = 1;
+    PhyxIntegerDataType value = 0;
+    PhyxIntegerDataType n = 1;
 
     string.remove("0b");
     for (int i = string.size()-1; i >= 0; i--)
@@ -721,7 +721,7 @@ long PhyxCalculator::binToLongInt(QString string)
     return value;
 }
 
-QString PhyxCalculator::longIntToHex(long int number)
+QString PhyxCalculator::longIntToHex(PhyxIntegerDataType number)
 {
     QString output;
 
@@ -739,7 +739,7 @@ QString PhyxCalculator::longIntToHex(long int number)
     return output;
 }
 
-QString PhyxCalculator::longIntToBin(long int number)
+QString PhyxCalculator::longIntToBin(PhyxIntegerDataType number)
 {
     QString output;
 
@@ -756,8 +756,8 @@ QString PhyxCalculator::longIntToBin(long int number)
 
 PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefx(PhyxValueDataType value, QString unitGroup, QString preferedPrefix) const
 {
-    long double realValue = value.real();
-    long double preferedPrefixValue = 1.0L;
+    PhyxFloatDataType realValue = value.real();
+    PhyxFloatDataType preferedPrefixValue = PHYX_FLOAT_ONE;
     if (!preferedPrefix.isEmpty())
         preferedPrefixValue = unitSystem->prefix(preferedPrefix, unitGroup).value;
 
@@ -769,9 +769,9 @@ PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefx(PhyxValueDataType value,
             continue;
 
         prefixes[i].value /= preferedPrefixValue;
-        long double tmpValue = realValue / prefixes.at(i).value;
+        PhyxFloatDataType tmpValue = realValue / prefixes.at(i).value;
 
-        if (abs(tmpValue) >= 1.0L)
+        if (abs(tmpValue) >= PHYX_FLOAT_ONE)
             return prefixes.at(i);
     }
 
@@ -945,13 +945,13 @@ void PhyxCalculator::valueCheckInteger3th()
 
 void PhyxCalculator::valuePush2()
 {
-    valueBuffer = PhyxValueDataType(2.0L,0.0L);
+    valueBuffer = PhyxValueDataType(PHYX_FLOAT_TWO,PHYX_FLOAT_NULL);
     pushVariable();
 }
 
 void PhyxCalculator::valuePush3()
 {
-    valueBuffer = PhyxValueDataType(3.0L,0.0L);
+    valueBuffer = PhyxValueDataType(PHYX_FLOAT_THREE,PHYX_FLOAT_NULL);
     pushVariable();
 }
 
@@ -1004,7 +1004,7 @@ void PhyxCalculator::valueMod()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(PhyxValueDataType(static_cast<long double>(variable1->toInt() % variable2->toInt()), 0.0L));
+    variable1->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(variable1->toInt() % variable2->toInt()), PHYX_FLOAT_NULL));
     variableStack.push(variable1);
 
     delete variable2;
@@ -1041,7 +1041,7 @@ void PhyxCalculator::valuePow()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    if (variable2->value().imag() == 0.0L)     // precision fix
+    if (variable2->value().imag() == PHYX_FLOAT_NULL)     // precision fix
         variable1->setValue(pow(variable1->value(),variable2->value().real()));
     else
         variable1->setValue(pow(variable1->value(),variable2->value()));
@@ -1194,7 +1194,7 @@ void PhyxCalculator::valueRoot()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxValueDataType one(1.0L,0.0L);
+    PhyxValueDataType one(PHYX_FLOAT_ONE,PHYX_FLOAT_NULL);
     variable1->setValue(pow(variable2->value(), one/variable1->value()));
 
     variableStack.push(variable1);
@@ -1260,7 +1260,7 @@ void PhyxCalculator::valueAvg()
     PhyxVariable *variable2 = variableStack.pop();
 
     variable1->setValue((variable1->value() + variable2->value())
-                        / PhyxValueDataType(2.0L,0.0L));
+                        / PhyxValueDataType(PHYX_FLOAT_TWO,PHYX_FLOAT_NULL));
     variableStack.push(variable1);
 
     delete variable2;
@@ -1269,9 +1269,9 @@ void PhyxCalculator::valueAvg()
 void PhyxCalculator::valuePi()
 {
 #ifndef Q_WS_S60
-    valueBuffer = PhyxValueDataType(boost::math::constants::pi<long double>(), 0.0L);
+    valueBuffer = PhyxValueDataType(boost::math::constants::pi<PhyxFloatDataType>(), PHYX_FLOAT_NULL);
 #else
-    valueBuffer = PhyxValueDataType(static_cast<long double>(M_PI), 0.0L);
+    valueBuffer = PhyxValueDataType(static_cast<PhyxFloatDataType>(M_PI), PHYX_FLOAT_NULL);
 #endif
     unitBuffer = "";
     pushVariable();
@@ -1280,9 +1280,9 @@ void PhyxCalculator::valuePi()
 void PhyxCalculator::valueE()
 {
 #ifndef Q_WS_S60
-    valueBuffer = PhyxValueDataType(boost::math::constants::e<long double>(), 0.0L);
+    valueBuffer = PhyxValueDataType(boost::math::constants::e<PhyxFloatDataType>(), PHYX_FLOAT_NULL);
 #else
-    valueBuffer = PhyxValueDataType(static_cast<long double>(M_E), 0.0L);
+    valueBuffer = PhyxValueDataType(static_cast<PhyxFloatDataType>(M_E), PHYX_FLOAT_NULL);
 #endif
     unitBuffer = "";
     pushVariable();
@@ -1292,7 +1292,7 @@ void PhyxCalculator::valueInt()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxValueDataType value(static_cast<long double>(variable1->toInt()),0.0L);
+    PhyxValueDataType value(static_cast<PhyxFloatDataType>(variable1->toInt()),PHYX_FLOAT_NULL);
     variable1->setValue(value);
     variableStack.push(variable1);
 }
@@ -1302,9 +1302,9 @@ void PhyxCalculator::valueTrunc()
     PhyxVariable *variable1 = variableStack.pop();
 
 #ifndef Q_WS_S60
-    PhyxValueDataType value(boost::math::trunc<long double>(variable1->value().real()),0.0L);
+    PhyxValueDataType value(boost::math::trunc<PhyxFloatDataType>(variable1->value().real()),PHYX_FLOAT_NULL);
 #else
-    PhyxValueDataType value(static_cast<long double>(variable1->toInt()),0.0L);
+    PhyxValueDataType value(static_cast<PhyxFloatDataType>(variable1->toInt()),PHYX_FLOAT_NULL);
 #endif
     variable1->setValue(value);
     variableStack.push(variable1);
@@ -1314,7 +1314,7 @@ void PhyxCalculator::valueFloor()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxValueDataType value(floor(variable1->value().real()),0.0L);
+    PhyxValueDataType value(floor(variable1->value().real()),PHYX_FLOAT_NULL);
     variable1->setValue(value);
     variableStack.push(variable1);
 }
@@ -1324,9 +1324,9 @@ void PhyxCalculator::valueRound()
     PhyxVariable *variable1 = variableStack.pop();
 
 #ifndef Q_WS_S60
-    PhyxValueDataType value(boost::math::round<long double>(variable1->value().real()),0.0L);
+    PhyxValueDataType value(boost::math::round<PhyxFloatDataType>(variable1->value().real()),PHYX_FLOAT_NULL);
 #else
-    PhyxValueDataType value(floor(variable1->value().real()+0.5L),0.0L);
+    PhyxValueDataType value(floor(variable1->value().real()+0.5L),PHYX_FLOAT_NULL);
 #endif
     variable1->setValue(value);
     variableStack.push(variable1);
@@ -1336,7 +1336,7 @@ void PhyxCalculator::valueCeil()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxValueDataType value(ceil(variable1->value().real()),0.0L);
+    PhyxValueDataType value(ceil(variable1->value().real()),PHYX_FLOAT_NULL);
     variable1->setValue(value);
     variableStack.push(variable1);
 }
@@ -1345,15 +1345,15 @@ void PhyxCalculator::valueSign()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    //PhyxValueDataType value(boost::math::copysign(1.0L,variable1->value().real()),0.0L);
-    if (variable1->value().real() >= 0.0L)
+    //PhyxValueDataType value(boost::math::copysign(PHYX_FLOAT_ONE,variable1->value().real()),PHYX_FLOAT_NULL);
+    if (variable1->value().real() >= PHYX_FLOAT_NULL)
     {
-        PhyxValueDataType value(1.0L,0.0L);
+        PhyxValueDataType value(PHYX_FLOAT_ONE,PHYX_FLOAT_NULL);
         variable1->setValue(value);
     }
     else
     {
-        PhyxValueDataType value(-1.0L,0.0L);
+        PhyxValueDataType value(-PHYX_FLOAT_ONE,PHYX_FLOAT_NULL);
         variable1->setValue(value);
     }
 
@@ -1364,16 +1364,16 @@ void PhyxCalculator::valueHeaviside()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    if (variable1->value().real() >= 0.0L)
-        variable1->setValue(PhyxValueDataType(1.0L,0.0L));
+    if (variable1->value().real() >= PHYX_FLOAT_NULL)
+        variable1->setValue(PhyxValueDataType(PHYX_FLOAT_ONE,PHYX_FLOAT_NULL));
     else
-        variable1->setValue(PhyxValueDataType(0.0L,0.0L));
+        variable1->setValue(PhyxValueDataType(PHYX_FLOAT_NULL,PHYX_FLOAT_NULL));
     variableStack.push(variable1);
 }
 
 void PhyxCalculator::valueRand()
 {
-    valueBuffer = PhyxValueDataType(static_cast<long double>(qrand()),0.0L);
+    valueBuffer = PhyxValueDataType(static_cast<PhyxFloatDataType>(qrand()),PHYX_FLOAT_NULL);
     unitBuffer = "";
     pushVariable();
 }
@@ -1382,8 +1382,8 @@ void PhyxCalculator::valueRandint()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    long int max = variable1->toInt();
-    valueBuffer = static_cast<long int>(static_cast<long double>(max) * static_cast<long double>(qrand())/static_cast<long double>(RAND_MAX));
+    PhyxIntegerDataType max = variable1->toInt();
+    valueBuffer = static_cast<PhyxIntegerDataType>(static_cast<PhyxFloatDataType>(max) * static_cast<PhyxFloatDataType>(qrand())/static_cast<PhyxFloatDataType>(RAND_MAX));
     unitBuffer = "";
     pushVariable();
 
@@ -1395,14 +1395,14 @@ void PhyxCalculator::valueRandg()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    long double mean, standard;
+    PhyxFloatDataType mean, standard;
     mean = variable1->value().real();
     standard = variable2->value().real();
 
     boost::variate_generator<boost::mt19937, boost::normal_distribution<> >
         generator(boost::mt19937(QDateTime::currentMSecsSinceEpoch()),
                   boost::normal_distribution<>(mean,standard));
-    variable1->setValue(PhyxValueDataType(static_cast<long double>(generator()),0.0L));
+    variable1->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(generator()),PHYX_FLOAT_NULL));
 
     variableStack.push(variable1);
 
@@ -1413,13 +1413,13 @@ void PhyxCalculator::valueFaculty()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    long double value = 1.0L;
+    PhyxFloatDataType value = PHYX_FLOAT_ONE;
     int n = static_cast<int>(variable1->toInt());
 
     for (int i = 2L; i <=n; i++)
-        value *= static_cast<long double>(i);
+        value *= static_cast<PhyxFloatDataType>(i);
 
-    variable1->setValue(PhyxValueDataType(value,0.0L));
+    variable1->setValue(PhyxValueDataType(value,PHYX_FLOAT_NULL));
     variableStack.push(variable1);
 }
 
@@ -1427,7 +1427,7 @@ void PhyxCalculator::complexReal()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(PhyxValueDataType(real(variable1->value()),0.0L));
+    variable1->setValue(PhyxValueDataType(real(variable1->value()),PHYX_FLOAT_NULL));
     variableStack.push(variable1);
 }
 
@@ -1435,7 +1435,7 @@ void PhyxCalculator::complexImag()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(PhyxValueDataType(imag(variable1->value()),0.0L));
+    variable1->setValue(PhyxValueDataType(imag(variable1->value()),PHYX_FLOAT_NULL));
     variableStack.push(variable1);
 }
 
@@ -1443,7 +1443,7 @@ void PhyxCalculator::complexArg()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(PhyxValueDataType(arg(variable1->value()),0.0L));
+    variable1->setValue(PhyxValueDataType(arg(variable1->value()),PHYX_FLOAT_NULL));
     variableStack.push(variable1);
 }
 
@@ -1451,7 +1451,7 @@ void PhyxCalculator::complexNorm()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(PhyxValueDataType(norm(variable1->value()),0.0L));
+    variable1->setValue(PhyxValueDataType(norm(variable1->value()),PHYX_FLOAT_NULL));
     variableStack.push(variable1);
 }
 
@@ -2034,19 +2034,19 @@ void PhyxCalculator::bufferValue()
 
 void PhyxCalculator::bufferHex()
 {
-    valueBuffer = (PhyxValueDataType)(long double)hexToLongInt(parameterBuffer);
+    valueBuffer = PhyxValueDataType(static_cast<PhyxFloatDataType>(hexToLongInt(parameterBuffer)),PHYX_FLOAT_NULL);
 }
 
 void PhyxCalculator::bufferBin()
 {
-    valueBuffer = (PhyxValueDataType)(long double)binToLongInt(parameterBuffer);
+    valueBuffer = PhyxValueDataType(static_cast<PhyxFloatDataType>(binToLongInt(parameterBuffer)),PHYX_FLOAT_NULL);
 }
 
 void PhyxCalculator::bufferHexString()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    stringBuffer = longIntToHex((long int)variable1->value().real());
+    stringBuffer = longIntToHex((PhyxIntegerDataType)variable1->value().real());
     delete variable1;
 }
 
@@ -2054,7 +2054,7 @@ void PhyxCalculator::bufferBinString()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    stringBuffer = longIntToBin((long int)variable1->value().real());
+    stringBuffer = longIntToBin((PhyxIntegerDataType)variable1->value().real());
     delete variable1;
 }
 

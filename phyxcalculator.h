@@ -43,8 +43,8 @@
 #include <boost/math/special_functions.hpp>
 #endif
 
-typedef std::complex<long double>   PhyxValueDataType;      /// the base data type for values
-typedef int                         PhyxUnitDataType;       /// the base data type for units
+typedef std::complex<PhyxFloatDataType>   PhyxValueDataType;      /// the base data type for values
+//typedef int                         PhyxUnitDataType;       /// the base data type for units
 
 typedef struct {
     QStringList functions;                          /// a list of functions to call
@@ -169,10 +169,10 @@ public:
 
     static QString complexToString(const PhyxValueDataType number, int precision, char numberFormat);
     static PhyxValueDataType stringToComplex(QString string);
-    static long int hexToLongInt(QString string);
-    static long int binToLongInt(QString string);
-    static QString longIntToHex(long int number);
-    static QString longIntToBin(long int number);
+    static PhyxIntegerDataType hexToLongInt(QString string);
+    static PhyxIntegerDataType binToLongInt(QString string);
+    static QString longIntToHex(PhyxIntegerDataType number);
+    static QString longIntToBin(PhyxIntegerDataType number);
 
     ResultVariable formatVariable(PhyxVariable *variable, OutputMode outputMode, PrefixMode prefixMode, int precision, char numberFormat) const;
 

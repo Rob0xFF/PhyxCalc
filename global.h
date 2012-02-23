@@ -30,7 +30,20 @@
     double  value;
     QString unit;
 };*/
-
+#ifndef Q_WS_S60
+#define PHYX_FLOAT_NULL 0.0L
+#define PHYX_FLOAT_ONE 1.0L
+#define PHYX_FLOAT_TWO 2.0L
+#define PHYX_FLOAT_THREE 3.0L
+typedef long double                 PhyxFloatDataType;      /// the data type for floating point variables
+#else
+#define PHYX_FLOAT_NULL 0.0
+#define PHYX_FLOAT_ONE 1.0
+#define PHYX_FLOAT_TWO 2.0
+#define PHYX_FLOAT_THREE 3.0
+typedef double                      PhyxFloatDataType;      /// the data type for floating point variables
+#endif
+typedef long int                    PhyxIntegerDataType;    /// the data type for integers
 
 //structure for colorScheme Items
 typedef struct {

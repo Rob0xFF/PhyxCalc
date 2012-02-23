@@ -27,7 +27,7 @@
 #include "phyxcompoundunit.h"
 
 typedef QSet<QString>               userUnitBuffer;         /// set of input units
-typedef std::complex<long double>   PhyxValueDataType;      /// the base data type for values
+typedef std::complex<PhyxFloatDataType>   PhyxValueDataType;      /// the base data type for values
 
 class PhyxVariable : public QObject
 {
@@ -45,7 +45,7 @@ public:
     bool isComplex();
     bool isPositive();
     bool isInteger();
-    long int toInt();
+    PhyxIntegerDataType toInt();
 
     PhyxValueDataType value() const
     {
