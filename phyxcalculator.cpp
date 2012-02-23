@@ -614,11 +614,11 @@ QString PhyxCalculator::complexToString(const PhyxValueDataType number, int prec
     bool useInteger = false;
 
     //check wheter number is integer or not
-    if (number.imag() == 0.0L)
+    /*if (number.imag() == 0.0L)
     {
-        if ((long double)((long int)number.real()) == number.real())
+        if (static_cast<long double>(static_cast<long int>(number.real())) == number.real())
             useInteger = true;
-    }
+    }*/
 
     if (number.real() != 0.0L)
     {
@@ -626,7 +626,7 @@ QString PhyxCalculator::complexToString(const PhyxValueDataType number, int prec
         if (!useInteger)
             ss << format % number.real();
         else
-            ss << format % (long int)number.real();
+            ss << format % static_cast<long int>(number.real());
         string.append(QString::fromStdString(ss.str()));
         components++;
     }
@@ -675,14 +675,14 @@ PhyxValueDataType PhyxCalculator::stringToComplex(QString string)
         long double tmpValue;
         std::istringstream inStream(string.toStdString());
         inStream >> tmpValue;
-        value = PhyxValueDataType(0.0,tmpValue);
+        value = PhyxValueDataType(0.0L,tmpValue);
     }
     else
     {
         long double tmpValue;
         std::istringstream inStream(string.toStdString());
         inStream >> tmpValue;
-        value = PhyxValueDataType(tmpValue,0.0);
+        value = PhyxValueDataType(tmpValue,0.0L);
     }
 
     return value;
@@ -1271,7 +1271,7 @@ void PhyxCalculator::valuePi()
 #ifndef Q_WS_S60
     valueBuffer = PhyxValueDataType(boost::math::constants::pi<long double>(), 0.0L);
 #else
-    valueBuffer = PhyxValueDataType(static_cast<long double>(M_PIl), 0.0L);
+    valueBuffer = PhyxValueDataType(static_cast<long double>(M_PI), 0.0L);
 #endif
     unitBuffer = "";
     pushVariable();
@@ -1282,7 +1282,7 @@ void PhyxCalculator::valueE()
 #ifndef Q_WS_S60
     valueBuffer = PhyxValueDataType(boost::math::constants::e<long double>(), 0.0L);
 #else
-    valueBuffer = PhyxValueDataType(static_cast<long double>(M_El), 0.0L);
+    valueBuffer = PhyxValueDataType(static_cast<long double>(M_E), 0.0L);
 #endif
     unitBuffer = "";
     pushVariable();
@@ -1323,7 +1323,6 @@ void PhyxCalculator::valueRound()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    //boost::math::round<long double>(
 #ifndef Q_WS_S60
     PhyxValueDataType value(boost::math::round<long double>(variable1->value().real()),0.0L);
 #else
