@@ -26,7 +26,7 @@ ExportDialog::ExportDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 #ifdef Q_WS_S60
-    this->setWindowState(Qt::WindowFullScreen);
+    this->setWindowState(Qt::WindowMaximized);
 #endif
 
     QPushButton *button = ui->buttonBox->addButton(tr("Copy to Clipboard"), QDialogButtonBox::ActionRole);
