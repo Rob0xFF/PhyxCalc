@@ -266,6 +266,7 @@ private:
     void valueMin();
     void valueAvg();
     void valuePi();
+    void valueE();
     void valueInt();
     void valueTrunc();
     void valueFloor();

@@ -191,6 +191,7 @@ p18=polar(|p3|,|p3|) ; valueCheckComplex2, unitCheckDimensionless2, complexPolar
 p18=(|p3|)
 p18={|p3|}           ; unitClear
 p18=|pi|             ; valuePi
+p18=e                ; valueE
 p18=|variable|
 p18=|constant|_
 p18=|function|
