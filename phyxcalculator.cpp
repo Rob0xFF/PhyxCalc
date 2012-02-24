@@ -1194,9 +1194,7 @@ void PhyxCalculator::valueRoot()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxValueDataType one(PHYX_FLOAT_ONE,PHYX_FLOAT_NULL);
-    variable1->setValue(pow(variable2->value(), one/variable1->value()));
-
+    variable1->setValue(exp(log(variable2->value()) / variable1->value()));
     variableStack.push(variable1);
 
     delete variable2;

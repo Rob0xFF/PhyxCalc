@@ -26,7 +26,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 #ifdef Q_WS_S60
-    this->setWindowState(Qt::WindowFullScreen);
+    this->setWindowState(Qt::WindowMaximized);
+    ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 #endif
 }
 

@@ -44,7 +44,6 @@
 #endif
 
 typedef std::complex<PhyxFloatDataType>   PhyxValueDataType;      /// the base data type for values
-//typedef int                         PhyxUnitDataType;       /// the base data type for units
 
 typedef struct {
     QStringList functions;                          /// a list of functions to call
