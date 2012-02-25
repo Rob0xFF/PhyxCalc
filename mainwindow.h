@@ -56,8 +56,18 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    enum ScreenOrientation {
+        ScreenOrientationLockPortrait,
+        ScreenOrientationLockLandscape,
+        ScreenOrientationAuto
+    };
+
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    // Note that this will only have an effect on Symbian and Fremantle.
+    void setOrientation(ScreenOrientation orientation);
+    void showExpanded();
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);

@@ -26,11 +26,11 @@
 #include <QColor>
 #include <QList>
 
-/*struct physicalVariable {
-    double  value;
-    QString unit;
-};*/
-#ifndef Q_WS_S60
+#ifdef Q_OS_ANDROID
+#define _BIG_ENDIAN
+#endif
+
+#ifndef Q_OS_SYMBIAN
 #define PHYX_FLOAT_NULL 0.0L
 #define PHYX_FLOAT_ONE 1.0L
 #define PHYX_FLOAT_TWO 2.0L

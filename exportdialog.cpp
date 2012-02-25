@@ -25,14 +25,14 @@ ExportDialog::ExportDialog(QWidget *parent) :
     ui(new Ui::ExportDialog)
 {
     ui->setupUi(this);
-#ifdef Q_WS_S60
-    this->setWindowState(Qt::WindowMaximized);
-#endif
 
     QPushButton *button = ui->buttonBox->addButton(tr("Copy to Clipboard"), QDialogButtonBox::ActionRole);
     connect(button, SIGNAL(clicked()),
             this, SLOT(copyToClipboard()));
-#ifndef Q_WS_S60
+
+#if defined(Q_OS_SYMBIAN) || defined(Q_OS_ANDROID) || defined(Q_WS_SIMULATOR)
+    this->setWindowState(Qt::WindowMaximized);
+#else
     button = ui->buttonBox->addButton(tr("Open Formel Editor"), QDialogButtonBox::ActionRole);
     connect(button, SIGNAL(clicked()),
             this, SLOT(openFormelEditor()));

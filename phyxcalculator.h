@@ -39,7 +39,7 @@
 #include "phyxvariablemanager.h"
 #include "phyxtesting.h"
 
-#ifndef Q_WS_S60
+#ifndef Q_OS_SYMBIAN
 #include <boost/math/special_functions.hpp>
 #endif
 

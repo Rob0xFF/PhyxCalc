@@ -25,7 +25,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
-#ifdef Q_WS_S60
+#if defined(Q_OS_SYMBIAN) || defined(Q_OS_ANDROID) || defined(Q_WS_SIMULATOR)
     this->setWindowState(Qt::WindowMaximized);
     ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 #endif

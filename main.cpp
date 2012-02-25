@@ -32,12 +32,9 @@ int main(int argc, char *argv[])
     //QSplashScreen *splash = new QSplashScreen(QPixmap("://splash"));
     //splash->show();
 
-    MainWindow w;
-#ifdef Q_WS_S60
-    w.showFullScreen();
-#else
-    w.show();
-#endif
+    MainWindow mainWindow;
+    mainWindow.setOrientation(MainWindow::ScreenOrientationAuto);
+    mainWindow.showExpanded();
 
    // while (time.elapsed() < 200)
    //     a.processEvents();
