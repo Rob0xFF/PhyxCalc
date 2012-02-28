@@ -76,10 +76,12 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
              if ((keyEvent->key() == Qt::Key_Return) || (keyEvent->key() == Qt::Key_Enter))
              {
-                 if (keyEvent->modifiers() != Qt::ControlModifier)
-                    documentList.at(activeTab)->lineParser->parseLine();
+                 if (keyEvent->modifiers() == Qt::ShiftModifier)
+                     documentList.at(activeTab)->lineParser->insertNewLine(true);
+                 else if (keyEvent->modifiers() == Qt::ControlModifier)
+                    documentList.at(activeTab)->lineParser->parseLine(false);
                  else
-                    documentList.at(activeTab)->lineParser->insertNewLine(true);
+                    documentList.at(activeTab)->lineParser->parseLine(true);
 
                  return true;
              }

@@ -58,8 +58,11 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueCheckInteger2",    &PhyxCalculator::valueCheckInteger2);
     functionMap.insert("valueCheckInteger2th",  &PhyxCalculator::valueCheckInteger2th);
     functionMap.insert("valueCheckInteger3th",  &PhyxCalculator::valueCheckInteger3th);
-    functionMap.insert("valuePush2",      &PhyxCalculator::valuePush2);
-    functionMap.insert("valuePush3",      &PhyxCalculator::valuePush3);
+    functionMap.insert("valuePush1",    &PhyxCalculator::valuePush1);
+    functionMap.insert("valuePush2",    &PhyxCalculator::valuePush2);
+    functionMap.insert("valuePush3",    &PhyxCalculator::valuePush3);
+    functionMap.insert("valueCopy",     &PhyxCalculator::valueCopy);
+    functionMap.insert("valueInvert",   &PhyxCalculator::valueInvert);
     functionMap.insert("valueAdd",      &PhyxCalculator::valueAdd);
     functionMap.insert("valueSub",      &PhyxCalculator::valueSub);
     functionMap.insert("valueMul",      &PhyxCalculator::valueMul);
@@ -153,6 +156,10 @@ void PhyxCalculator::initialize()
     functionMap.insert("variableAdd",   &PhyxCalculator::variableAdd);
     functionMap.insert("variableRemove",&PhyxCalculator::variableRemove);
     functionMap.insert("variableLoad",  &PhyxCalculator::variableLoad);
+    functionMap.insert("variablePreDec",&PhyxCalculator::variablePreDec);
+    functionMap.insert("variablePreInc",&PhyxCalculator::variablePreInc);
+    functionMap.insert("variablePostDec",&PhyxCalculator::variablePostDec);
+    functionMap.insert("variablePostInc",&PhyxCalculator::variablePostInc);
     functionMap.insert("constantAdd",   &PhyxCalculator::constantAdd);
     functionMap.insert("constantRemove",&PhyxCalculator::constantRemove);
     functionMap.insert("constantLoad",  &PhyxCalculator::constantLoad);
@@ -943,6 +950,12 @@ void PhyxCalculator::valueCheckInteger3th()
     variableStack.push(variable1);
 }
 
+void PhyxCalculator::valuePush1()
+{
+    valueBuffer = PhyxValueDataType(PHYX_FLOAT_ONE,PHYX_FLOAT_NULL);
+    pushVariable();
+}
+
 void PhyxCalculator::valuePush2()
 {
     valueBuffer = PhyxValueDataType(PHYX_FLOAT_TWO,PHYX_FLOAT_NULL);
@@ -953,6 +966,25 @@ void PhyxCalculator::valuePush3()
 {
     valueBuffer = PhyxValueDataType(PHYX_FLOAT_THREE,PHYX_FLOAT_NULL);
     pushVariable();
+}
+
+void PhyxCalculator::valueCopy()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    PhyxVariable *variable2 = new PhyxVariable();
+    PhyxVariable::copyVariable(variable1, variable2);
+
+    variableStack.push(variable1);
+    variableStack.push(variable2);
+}
+
+void PhyxCalculator::valueInvert()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(-variable1->value());
+    variableStack.push(variable1);
 }
 
 void PhyxCalculator::valueAdd()
@@ -1915,6 +1947,46 @@ void PhyxCalculator::variableLoad()
 {
     variableStack.push(variableManager->getVariable(parameterBuffer));
     nameBuffer = parameterBuffer;
+}
+
+void PhyxCalculator::variablePreInc()
+{
+    valuePush1();
+    valueAdd();
+    valueCopy();
+
+    stringBuffer = nameBuffer;
+    variableAdd();
+}
+
+void PhyxCalculator::variablePreDec()
+{
+    valuePush1();
+    valueSub();
+    valueCopy();
+
+    stringBuffer = nameBuffer;
+    variableAdd();
+}
+
+void PhyxCalculator::variablePostInc()
+{
+    valueCopy();
+    valuePush1();
+    valueAdd();
+
+    stringBuffer = nameBuffer;
+    variableAdd();
+}
+
+void PhyxCalculator::variablePostDec()
+{
+    valueCopy();
+    valuePush1();
+    valueSub();
+
+    stringBuffer = nameBuffer;
+    variableAdd();
 }
 
 void PhyxCalculator::constantAdd()

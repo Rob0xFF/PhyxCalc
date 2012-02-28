@@ -64,7 +64,7 @@
      <x>0</x>
      <y>0</y>
      <width>924</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuWindow">
@@ -365,7 +365,7 @@
     <string>&amp;Redo</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+R</string>
+    <string>Ctrl+Shift+Z</string>
    </property>
   </action>
   <action name="actionVariables">
@@ -451,6 +451,9 @@
    <property name="text">
     <string>&amp;Recalculate All</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
   </action>
   <action name="actionRecalculate_from_Line">
    <property name="icon">
@@ -459,6 +462,9 @@
    </property>
    <property name="text">
     <string>Recalculate from &amp;Line</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+R</string>
    </property>
   </action>
   <action name="actionConfigure_and_control">

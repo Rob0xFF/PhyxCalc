@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="generator" content="AsciiDoc 8.4.5">
+<title>PhyxCalc 3 Documentation</title>
+</head>
+<body>
+<h1>PhyxCalc 3 Documentation</h1>
+<p>
+<strong>(Physical Expression Calculator)</strong><br>
+</p>
+<p>Open Source Software
+Alexander Rössler
+&lt;<a href="mailto:mail.aroessler@gmail.com">mail.aroessler@gmail.com</a>&gt;
+Version 1.0, February 28th 2012</p>
+<hr>
+<h2><a name="_introduction"></a>1. Introduction</h2>
+<p>PhyxCalc introduces a very flexible and comfortable way to calculate mathematical expressions, including physical units and complex numbers, using a flexible text-editor-like environment. In your expressions you can use a predefined selection of common constants and units or defining your own. You can even export your calculated formulas to OpenOffice Math formula editor to include them your everyday documents (support for LaTeX export is planned).</p>
+<p>However please consider following rules:</p>
+<ul>
+<li>
+<p>
+equivocal expressions (e.g. unit m and variable m) can cause problems, so try to avoid them
+</p>
+</li>
+</ul>
+<hr>
+<h2><a name="_editor"></a>2. Editor</h2>
+<p>In the main text edit expressions are both written and calculated. Just enter your expression and press return (or enter on mobile platforms) and the result will be written in the next line. The line will be replaced if it start with an equal sign. Not every result will be shown in the next line, some expressions like variable definitions have no output in the text edit. Inserting symbols and expressions is also possible with various docks, adding your own costomized dock is also possible and will be shown later.</p>
+<p>Example: approximate formula for pi</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>3*ln(640320)/sqrt(163) &lt;Return&gt;
+=3.141592653589793016</pre>
+</td></tr></table>
+<h3><a name="_keyboard_shortcuts"></a>2.1. Keyboard shortcuts</h3>
+<p><strong>Text Editor shortcuts:</strong><br>
+&lt;Return&gt;:               Calculate expression at current line<br>
+&lt;Shift + Enter&gt;:        Insert line break<br>
+&lt;Ctrl + Enter&gt;:         Calculate expression, cursor stays at line<br>
+&lt;Ctrl + Z&gt;:             Undo<br>
+&lt;Ctrl + Shift + Z&gt;:     Redo<br>
+&lt;Ctrl + X&gt;:             Cut<br>
+&lt;Ctrl + C&gt;:             Copy<br>
+&lt;Ctrl + V&gt;:             Paste<br>
+&lt;Ctrl + A&gt;:             Select All<br></p>
+<p><strong>Application shortcuts:</strong><br>
+&lt;F1&gt;:                   Show help<br>
+&lt;Ctrl + N&gt;:             New document<br>
+&lt;Ctrl + O&gt;:             Open document<br>
+&lt;Ctrl + S&gt;:             Save document<br>
+&lt;Ctrl + Shift + S&gt;:     Save all documents<br>
+&lt;Ctrl + W&gt;:             Close document<br>
+&lt;Ctrl + Shift + W&gt;:     Close all documents<br>
+&lt;Ctrl + T&gt;:             Open new tab<br>
+&lt;Ctrl + R&gt;:             Recalculate whole document<br>
+&lt;Ctrl + Shift + R&gt;:     Calculate from line<br>
+&lt;Ctrl + E&gt;:             Open export dialog<br>
+&lt;Ctrl + Q&gt;:             Quit application<br></p>
+<h3><a name="_exporting_formulas"></a>2.2. Exporting formulas</h3>
+<p>To export formulas use the export dialog. Once the dialog is opened, your expressions will be instantly converted. The converted output just insert in your OpenOffice Math.</p>
+<h3><a name="_adding_your_own_docks"></a>2.3. Adding your own docks</h3>
+<p>Adding your own customized docks to PhyxCalc is really simple. Just create a textfile with following outline in your setting directory:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>tooltip; name in the dock; text to insert in the text editor</pre>
+</td></tr></table>
+<p>Example:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>sine function;sin;sin()
+cosine function;cos;cos()
+tangens function;tan;tan()
+arcus sine function;asin;asin()
+arcus cosine function;acos;acos()</pre>
+</td></tr></table>
+<p>Then open the file docks.txt and add a line with the following outline:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>docktitle;yourdockfilename.txt</pre>
+</td></tr></table>
+<p>Example:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>Symbols;symbols.txt</pre>
+</td></tr></table>
+<p>Now restart PhyxCalc and use your dock.</p>
+<hr>
+<h2><a name="_mathematical_functions"></a>3. Mathematical Functions</h2>
+<h3><a name="_precision"></a>3.1. Precision</h3>
+<hr>
+<h2><a name="_variables"></a>4. Variables</h2>
+<hr>
+<h2><a name="_number_formats_and_number_systems"></a>5. Number formats and number systems</h2>
+<hr>
+<h2><a name="_units"></a>6. Units</h2>
+<h3><a name="_defining_new_units"></a>6.1. Defining new units</h3>
+<p></p>
+<p></p>
+<hr><p><small>
+Last updated 2012-02-28 18:12:30 CEST
+</small></p>
+</body>
+</html>

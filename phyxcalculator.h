@@ -235,8 +235,11 @@ private:
     void valueCheckInteger2();      ///< checks wheter the last 2 arguments are integer or not
     void valueCheckInteger2th();    ///< checks wheter the second argument is an integer or not
     void valueCheckInteger3th();    ///< checks wheter the third argument is an integer or not
+    void valuePush1();
     void valuePush2();
     void valuePush3();
+    void valueCopy();
+    void valueInvert();
     void valueAdd();
     void valueSub();
     void valueMul();
@@ -332,6 +335,10 @@ private:
     void variableAdd();
     void variableRemove();
     void variableLoad();
+    void variablePreInc();
+    void variablePreDec();
+    void variablePostInc();
+    void variablePostDec();
     void constantAdd();
     void constantRemove();
     void constantLoad();

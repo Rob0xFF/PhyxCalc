@@ -1,0 +1,94 @@
+= PhyxCalc 3 Documentation
+(Physical Expression Calculator)
+
+Open Source Software
+Alexander Rössler
+<mail.aroessler@gmail.com>
+Version 1.0, February 28th 2012
+
+== Introduction
+PhyxCalc introduces a very flexible and comfortable way to calculate mathematical expressions, including physical units and complex numbers, using a flexible text-editor-like environment. In your expressions you can use a predefined selection of common constants and units or defining your own. You can even export your calculated formulas to OpenOffice Math formula editor to include them your everyday documents (support for LaTeX export is planned).
+
+However please consider following rules:
+
+* equivocal expressions (e.g. unit m and variable m) can cause problems, so try to avoid them
+
+== Editor
+In the main text edit expressions are both written and calculated. Just enter your expression and press return (or enter on mobile platforms) and the result will be written in the next line. The line will be replaced if it start with an equal sign. Not every result will be shown in the next line, some expressions like variable definitions have no output in the text edit. Inserting symbols and expressions is also possible with various docks, adding your own costomized dock is also possible and will be shown later.
+
+Example: approximate formula for pi
+----
+3*ln(640320)/sqrt(163) <Return>
+=3.141592653589793016
+----
+
+=== Keyboard shortcuts
+
+*Text Editor shortcuts:* +
+<Return>:		Calculate expression at current line +
+<Shift + Enter>:	Insert line break +
+<Ctrl + Enter>:		Calculate expression, cursor stays at line +
+<Ctrl + Z>:		Undo +
+<Ctrl + Shift + Z>:	Redo +
+<Ctrl + X>:		Cut +
+<Ctrl + C>:		Copy +
+<Ctrl + V>:		Paste +
+<Ctrl + A>:		Select All +
+
+*Application shortcuts:* +
+<F1>:			Show help +
+<Ctrl + N>:		New document +
+<Ctrl + O>:		Open document +
+<Ctrl + S>:		Save document +
+<Ctrl + Shift + S>:	Save all documents +
+<Ctrl + W>:		Close document +
+<Ctrl + Shift + W>:	Close all documents +
+<Ctrl + T>:		Open new tab +
+<Ctrl + R>:		Recalculate whole document +
+<Ctrl + Shift + R>:	Calculate from line +
+<Ctrl + E>:		Open export dialog +
+<Ctrl + Q>:		Quit application +
+
+=== Exporting formulas
+To export formulas use the export dialog. Once the dialog is opened, your expressions will be instantly converted. The converted output just insert in your OpenOffice Math.
+
+=== Adding your own docks
+Adding your own customized docks to PhyxCalc is really simple. Just create a textfile with following outline in your setting directory:
+----
+tooltip; name in the dock; text to insert in the text editor
+----
+
+Example:
+----
+sine function;sin;sin()
+cosine function;cos;cos()
+tangens function;tan;tan()
+arcus sine function;asin;asin()
+arcus cosine function;acos;acos()
+----
+
+Then open the file docks.txt and add a line with the following outline:
+----
+docktitle;yourdockfilename.txt
+----
+
+Example:
+----
+Symbols;symbols.txt
+----
+
+Now restart PhyxCalc and start using your dock.
+
+== Mathematical Functions
+
+
+=== Operators and symbols
+ 
+=== Precision
+
+== Variables
+
+== Number formats and number systems
+
+== Units
+=== Defining new units

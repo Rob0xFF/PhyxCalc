@@ -42,7 +42,7 @@ LineParser::~LineParser()
 
 }
 
-void LineParser::parseLine()
+void LineParser::parseLine(bool linebreak)
 {
     //replace greek units
     replaceSymbols();
@@ -56,7 +56,8 @@ void LineParser::parseLine()
         m_phyxCalculator->evaluate();
     }
 
-    insertNewLine();
+    if (linebreak)
+        insertNewLine();
 }
 
 void LineParser::parseAll()
@@ -71,7 +72,7 @@ void LineParser::parseAll()
 void LineParser::parseFromCurrentPosition()
 {
     while (!m_calculationEdit->textCursor().atEnd())
-        parseLine();
+        parseLine(true);
 }
 
 void LineParser::replaceSymbols()
@@ -222,7 +223,8 @@ void LineParser::insertNewLine(bool force)
 {
     QTextCursor textCursor = m_calculationEdit->textCursor();
 
-    textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
+    if (!force)
+        textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
 
     if (textCursor.atEnd() || force)
         textCursor.insertText("\n");

@@ -49,7 +49,7 @@ public:
     explicit LineParser(QObject * = 0);
     ~LineParser();
 
-    void parseLine();
+    void parseLine(bool linebreak);
     void parseAll();
     void parseFromCurrentPosition();
 
