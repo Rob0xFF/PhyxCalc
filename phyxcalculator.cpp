@@ -1376,9 +1376,14 @@ void PhyxCalculator::valueSign()
     PhyxVariable *variable1 = variableStack.pop();
 
     //PhyxValueDataType value(boost::math::copysign(PHYX_FLOAT_ONE,variable1->value().real()),PHYX_FLOAT_NULL);
-    if (variable1->value().real() >= PHYX_FLOAT_NULL)
+    if (variable1->value().real() > PHYX_FLOAT_NULL)
     {
         PhyxValueDataType value(PHYX_FLOAT_ONE,PHYX_FLOAT_NULL);
+        variable1->setValue(value);
+    }
+    else if (variable1->value().real() == PHYX_FLOAT_NULL)
+    {
+        PhyxValueDataType value(PHYX_FLOAT_NULL,PHYX_FLOAT_NULL);
         variable1->setValue(value);
     }
     else
@@ -1403,7 +1408,7 @@ void PhyxCalculator::valueHeaviside()
 
 void PhyxCalculator::valueRand()
 {
-    valueBuffer = PhyxValueDataType(static_cast<PhyxFloatDataType>(qrand()),PHYX_FLOAT_NULL);
+    valueBuffer = PhyxValueDataType(static_cast<PhyxFloatDataType>(qrand() / (long double)(RAND_MAX)),PHYX_FLOAT_NULL);
     unitBuffer = "";
     pushVariable();
 }

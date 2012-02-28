@@ -80,10 +80,237 @@ arcus cosine function;acos;acos()</pre>
 <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
 <pre>Symbols;symbols.txt</pre>
 </td></tr></table>
-<p>Now restart PhyxCalc and use your dock.</p>
+<p>Now restart PhyxCalc and start using your dock.</p>
 <hr>
 <h2><a name="_mathematical_functions"></a>3. Mathematical Functions</h2>
-<h3><a name="_precision"></a>3.1. Precision</h3>
+<p>Alle mathematical functions can be written with the first letter uppercase or lowercase or only with uppercase letters. Trigonometric are using radiant, for degrees use dimensionless unit °.</p>
+<h3><a name="_operators_and_symbols"></a>3.1. Operators and symbols</h3>
+<p>PhyxCalc uses C++-like operators and some additional operators for special mathematical functionality. The operators are ordered beginning with highest priority.</p>
+<p><b></b>PhyxCalc Operators</p>
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<thead>
+<tr>
+<th align="left" width="33%" valign="top">Predence </th>
+<th align="left" width="33%" valign="top">Operator </th>
+<th align="left" width="33%" valign="top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" width="33%" valign="top"><p>1</p></td>
+<td align="left" width="33%" valign="top"><p>++ --</p></td>
+<td align="left" width="33%" valign="top"><p>Prefix/postfix increment and decrement</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p></p></td>
+<td align="left" width="33%" valign="top"><p>()</p></td>
+<td align="left" width="33%" valign="top"><p>Braces and function calls</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p></p></td>
+<td align="left" width="33%" valign="top"><p>{}</p></td>
+<td align="left" width="33%" valign="top"><p>Numeric value braces, removing the unit</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>2</p></td>
+<td align="left" width="33%" valign="top"><p>+ -</p></td>
+<td align="left" width="33%" valign="top"><p>Unary plus and minus</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p></p></td>
+<td align="left" width="33%" valign="top"><p>! ~</p></td>
+<td align="left" width="33%" valign="top"><p>Prefix: logical NOT and bitwise NOT</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p></p></td>
+<td align="left" width="33%" valign="top"><p>!</p></td>
+<td align="left" width="33%" valign="top"><p>Postfix: fakulty</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>3</p></td>
+<td align="left" width="33%" valign="top"><p>^ ² ³</p></td>
+<td align="left" width="33%" valign="top"><p>Powers</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>4</p></td>
+<td align="left" width="33%" valign="top"><p>* / mod</p></td>
+<td align="left" width="33%" valign="top"><p>Multiplication, division and remainder (modulo operator)</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>5</p></td>
+<td align="left" width="33%" valign="top"><p>+ -</p></td>
+<td align="left" width="33%" valign="top"><p>Addition and substraction</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>6</p></td>
+<td align="left" width="33%" valign="top"><p>&lt;&lt; &gt;&gt;</p></td>
+<td align="left" width="33%" valign="top"><p>Bitwise left shift and right shift</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>7</p></td>
+<td align="left" width="33%" valign="top"><p>&lt; &lt;= &gt;= &gt;</p></td>
+<td align="left" width="33%" valign="top"><p>Relational &lt;, ≤, ≥ and &gt;</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>8</p></td>
+<td align="left" width="33%" valign="top"><p>== !=</p></td>
+<td align="left" width="33%" valign="top"><p>Relational = and ≠</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>9</p></td>
+<td align="left" width="33%" valign="top"><p>&amp; bAND</p></td>
+<td align="left" width="33%" valign="top"><p>Bitwise AND</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>10</p></td>
+<td align="left" width="33%" valign="top"><p>^^ bXOR</p></td>
+<td align="left" width="33%" valign="top"><p>Bitwise XOR</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>11</p></td>
+<td align="left" width="33%" valign="top"><p>| bOR</p></td>
+<td align="left" width="33%" valign="top"><p>Bitwise OR</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>12</p></td>
+<td align="left" width="33%" valign="top"><p>XAND</p></td>
+<td align="left" width="33%" valign="top"><p>Logical XAND</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>13</p></td>
+<td align="left" width="33%" valign="top"><p>&amp;&amp; AND NAND</p></td>
+<td align="left" width="33%" valign="top"><p>Logical AND and NAND</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>14</p></td>
+<td align="left" width="33%" valign="top"><p>XOR</p></td>
+<td align="left" width="33%" valign="top"><p>Logical XOR</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>15</p></td>
+<td align="left" width="33%" valign="top"><p>|| OR NOR</p></td>
+<td align="left" width="33%" valign="top"><p>Logical OR and NOR</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>16</p></td>
+<td align="left" width="33%" valign="top"><p>?: if then else IF(;;)</p></td>
+<td align="left" width="33%" valign="top"><p>Conditional operators</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>17</p></td>
+<td align="left" width="33%" valign="top"><p>=</p></td>
+<td align="left" width="33%" valign="top"><p>Direct assignment</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p></p></td>
+<td align="left" width="33%" valign="top"><p>+= -=</p></td>
+<td align="left" width="33%" valign="top"><p>Assignment by sum and difference</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p></p></td>
+<td align="left" width="33%" valign="top"><p>*= /= %=</p></td>
+<td align="left" width="33%" valign="top"><p>Assignment by product, quotient and remainder</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p></p></td>
+<td align="left" width="33%" valign="top"><p>&lt;&lt;= &gt;&gt;=</p></td>
+<td align="left" width="33%" valign="top"><p>Assignment by bitwise left shift and right shift</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p></p></td>
+<td align="left" width="33%" valign="top"><p>&amp;= ^= |=</p></td>
+<td align="left" width="33%" valign="top"><p>Assignment by bitwise AND, XOR and OR</p></td>
+</tr>
+<tr>
+<td align="left" width="33%" valign="top"><p>18</p></td>
+<td align="left" width="33%" valign="top"><p>,</p></td>
+<td align="left" width="33%" valign="top"><p>Comma, sequential operator</p></td>
+</tr>
+</tbody>
+</table>
+<p><b></b>Special Operators, see specific sections for more details</p>
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<thead>
+<tr>
+<th align="left" width="50%" valign="top">Operator </th>
+<th align="left" width="50%" valign="top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" width="50%" valign="top"><p>-&gt;</p></td>
+<td align="left" width="50%" valign="top"><p>Converting to something</p></td>
+</tr>
+<tr>
+<td align="left" width="50%" valign="top"><p>=</p></td>
+<td align="left" width="50%" valign="top"><p>Defining and deleting variables</p></td>
+</tr>
+<tr>
+<td align="left" width="50%" valign="top"><p>:=</p></td>
+<td align="left" width="50%" valign="top"><p>Defining and deleting constants</p></td>
+</tr>
+<tr>
+<td align="left" width="50%" valign="top"><p>other</p></td>
+<td align="left" width="50%" valign="top"><p>Defining unit systems, units and prefixes, see units for more details</p></td>
+</tr>
+</tbody>
+</table>
+<h3><a name="_trigonometric_and_hyperbolic_functions"></a>3.2. Trigonometric and hyperbolic functions</h3>
+<p><strong>sin</strong>, <strong>cos</strong>, <strong>tan</strong>, <strong>arcsin</strong>, <strong>arccos</strong>, <strong>arctan</strong><br>
+<strong>sinh</strong>, <strong>cosh</strong>, <strong>tanh</strong>, <strong>arcsinh</strong>, <strong>arccosh</strong>, <strong>arctanh</strong></p>
+<h3><a name="_logarithms_exponential_function_and_roots"></a>3.3. Logarithms, exponential function and roots</h3>
+<p><strong>ln</strong>, <strong>log</strong>&lt;n&gt;, <strong>exp</strong>, <strong>sqrt</strong>=<strong>sqr</strong>, <strong>root</strong>&lt;n&gt;<br>
+Example:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>exp(3)
+=20.08553692318766774
+log2(1024)
+=10
+root12(25)
+=1.307660486011830591</pre>
+</td></tr></table>
+<h3><a name="_threshold_functions"></a>3.4. Threshold functions</h3>
+<p><strong>min</strong>(a,b), <strong>max</strong>(a,b)<br>
+<strong>abs</strong>(x) absolute value<br>
+<strong>sign</strong>(x) signum function: -1, 0, 1 for x&lt;0, x=0, x&gt;0<br>
+<strong>heaviside</strong>(x) heaviside function: 0, 1 for x&lt;0, x&gt;=0<br></p>
+<h3><a name="_discretization_functions"></a>3.5. Discretization functions</h3>
+<p><strong>int</strong> = <strong>trunc</strong>, <strong>ceil</strong>, <strong>floor</strong>, <strong>round</strong><br>
+(truncate, round up, round down, round-to-nearest)</p>
+<h3><a name="_random_functions"></a>3.6. Random functions</h3>
+<p><strong>rnd</strong> = <strong>rand</strong>: generates random number between 0 and 1<br>
+<strong>rndi</strong>(i) = <strong>randi</strong>: generates random number 0&lt;=rndi(i)&lt;i<br>
+<strong>rndg</strong>(m, nd) = <strong>randg</strong>: generates Gaussian distributed number mean value m and normal distribution nd</p>
+<h3><a name="_complex_functions"></a>3.7. Complex functions</h3>
+<p><strong>Re</strong>(z): returns real part of a complex number<br>
+<strong>Im</strong>(z): returns imaginary part of a complex number<br>
+<strong>arg</strong>(z): returns the argument of a complex number<br>
+<strong>norm</strong>(z): returns the norm value of a complex number<br>
+<strong>conj</strong>(z): returns the conjugate of a complex number<br>
+<strong>polar</strong>(rho, theta): returns a complex number corresponding to the complex number defined by its polar components, where rho is the magnitude and theta is the phase angle</p>
+<h3><a name="_defining_custom_functions"></a>3.8. Defining custom functions</h3>
+<p>Defing custom functions in PhyxCalc is pretty easy, just write the name of your function, add the parameters and an expression.</p>
+<p>Example: calculating a diode around its forward voltage</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>Is=10e-15A
+VT=25mV
+I(U)=Is*(exp(U/VT)-1)
+
+I(0.6V)
+=264.8912213µA
+I(0.7V)
+=14.46257064mA
+I(0.8V)
+=789.6296018mA</pre>
+</td></tr></table>
+<h3><a name="_precision"></a>3.9. Precision</h3>
+<p>PhyxCalc is using 64bit and 96bit floating point numbers, depending on operating system. As every computing system not using arbitrary precision, PhyxCalc has accuracy problems. Depending on your expression, this can cause your result to be not as accurate as it should be. See Wikipedia for more information on floating point numbers and accuracy problems: <a href="http://en.wikipedia.org/wiki/Floating_point#Accuracy_problems">http://en.wikipedia.org/wiki/Floating_point#Accuracy_problems</a></p>
 <hr>
 <h2><a name="_variables"></a>4. Variables</h2>
 <hr>
@@ -94,7 +321,7 @@ arcus cosine function;acos;acos()</pre>
 <p></p>
 <p></p>
 <hr><p><small>
-Last updated 2012-02-28 18:12:30 CEST
+Last updated 2012-02-29 00:13:25 CEST
 </small></p>
 </body>
 </html>
