@@ -170,8 +170,10 @@ public:
     static PhyxValueDataType stringToComplex(QString string);
     static PhyxIntegerDataType hexToLongInt(QString string);
     static PhyxIntegerDataType binToLongInt(QString string);
+    static PhyxIntegerDataType bcdToLongInt(PhyxIntegerDataType number);
     static QString longIntToHex(PhyxIntegerDataType number);
     static QString longIntToBin(PhyxIntegerDataType number);
+    static PhyxIntegerDataType longIntToBcd(PhyxIntegerDataType number);
 
     ResultVariable formatVariable(PhyxVariable *variable, OutputMode outputMode, PrefixMode prefixMode, int precision, char numberFormat) const;
 
@@ -284,6 +286,8 @@ private:
     void valueRandint();
     void valueRandg();
     void valueFaculty();
+    void valueBcd();
+    void valueToBcd();
 
     void complexReal();
     void complexImag();
@@ -342,6 +346,12 @@ private:
     void constantAdd();
     void constantRemove();
     void constantLoad();
+
+    /** function for list operations */
+    void listAddStart();
+    void listSubStart();
+    void listMulStart();
+    void listDivStart();
 
     /** functions for function handling */
     bool executeFunction(QString expression, QStringList parameters, bool verifyOnly);

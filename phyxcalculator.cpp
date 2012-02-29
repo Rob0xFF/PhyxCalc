@@ -107,6 +107,8 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueRandint",  &PhyxCalculator::valueRandint);
     functionMap.insert("valueRandg",    &PhyxCalculator::valueRandg);
     functionMap.insert("valueFaculty",  &PhyxCalculator::valueFaculty);
+    functionMap.insert("valueBcd",      &PhyxCalculator::valueBcd);
+    functionMap.insert("valueToBcd",    &PhyxCalculator::valueToBcd);
 
     functionMap.insert("complexReal",   &PhyxCalculator::complexReal);
     functionMap.insert("complexImag",   &PhyxCalculator::complexImag);
@@ -152,6 +154,8 @@ void PhyxCalculator::initialize()
     functionMap.insert("unitClear",     &PhyxCalculator::unitClear);
     functionMap.insert("unitAdd",       &PhyxCalculator::unitAdd);
     functionMap.insert("unitRemove",    &PhyxCalculator::unitRemove);
+
+    functionMap.insert("listAddStart",  &PhyxCalculator::listAddStart);
 
     functionMap.insert("variableAdd",   &PhyxCalculator::variableAdd);
     functionMap.insert("variableRemove",&PhyxCalculator::variableRemove);
@@ -728,9 +732,26 @@ long PhyxCalculator::binToLongInt(QString string)
     return value;
 }
 
+PhyxIntegerDataType PhyxCalculator::bcdToLongInt(PhyxIntegerDataType number)
+{
+    PhyxIntegerDataType output = 0;
+    int i = 0;
+
+    while (number != 0)
+    {
+        PhyxIntegerDataType digit = number & 0x0F;
+        output += pow(10,i) * digit;
+
+        number = number >> 4;
+        i++;
+    }
+    return output;
+}
+
 QString PhyxCalculator::longIntToHex(PhyxIntegerDataType number)
 {
     QString output;
+    int i = 0;
 
     while (number != 0)
     {
@@ -740,7 +761,11 @@ QString PhyxCalculator::longIntToHex(PhyxIntegerDataType number)
         else
             output.prepend(QChar::fromAscii(rest+55));
         number /= 16;
+        i++;
     }
+
+    if ((i % 2) != 0)
+        output.prepend("0");
 
     output.prepend("0x");
     return output;
@@ -749,15 +774,39 @@ QString PhyxCalculator::longIntToHex(PhyxIntegerDataType number)
 QString PhyxCalculator::longIntToBin(PhyxIntegerDataType number)
 {
     QString output;
+    int i = 0;
 
     while (number != 0)
     {
         int rest = number % 2;
         output.prepend(QChar::fromAscii(rest+48));
         number /= 2;
+        i++;
+    }
+
+    while ((i % 8) != 0)
+    {
+        output.prepend("0");
+        i++;
     }
 
     output.prepend("0b");
+    return output;
+}
+
+PhyxIntegerDataType PhyxCalculator::longIntToBcd(PhyxIntegerDataType number)
+{
+    PhyxIntegerDataType output = 0;
+    int i = 0;
+
+    while (number != 0)
+    {
+        PhyxIntegerDataType digit = number % 10;
+        output |= digit << (i*4);
+
+        number /= 10;
+        i++;
+    }
     return output;
 }
 
@@ -1458,6 +1507,22 @@ void PhyxCalculator::valueFaculty()
     variableStack.push(variable1);
 }
 
+void PhyxCalculator::valueBcd()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(bcdToLongInt(variable1->toInt())),PHYX_FLOAT_NULL));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueToBcd()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(longIntToBcd(variable1->toInt())),PHYX_FLOAT_NULL));
+    variableStack.push(variable1);
+}
+
 void PhyxCalculator::complexReal()
 {
     PhyxVariable *variable1 = variableStack.pop();
@@ -2011,6 +2076,11 @@ void PhyxCalculator::constantLoad()
 {
     variableStack.push(variableManager->getConstant(parameterBuffer));
     nameBuffer = parameterBuffer;
+}
+
+void PhyxCalculator::listAddStart()
+{
+    qDebug() << "test";
 }
 
 bool PhyxCalculator::executeFunction(QString expression, QStringList parameters, bool verifyOnly = false)
