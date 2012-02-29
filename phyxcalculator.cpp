@@ -110,6 +110,7 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueFaculty",  &PhyxCalculator::valueFaculty);
     functionMap.insert("valueBcd",      &PhyxCalculator::valueBcd);
     functionMap.insert("valueToBcd",    &PhyxCalculator::valueToBcd);
+    functionMap.insert("valueAns",      &PhyxCalculator::valueAns);
 
     functionMap.insert("complexReal",   &PhyxCalculator::complexReal);
     functionMap.insert("complexImag",   &PhyxCalculator::complexImag);
@@ -260,6 +261,11 @@ void PhyxCalculator::initialize()
             this, SLOT(addFunctionRule(QString,int)));
     connect(variableManager, SIGNAL(functionRemoved(QString,int)),
             this, SLOT(removeFunctionRule(QString,int)));
+
+    //initialize special variable #
+    PhyxVariable *variable = new PhyxVariable();
+    variable->setValue(PhyxValueDataType(PHYX_FLOAT_NULL,PHYX_FLOAT_NULL));
+    variableManager->addVariable("#", variable);
 }
 
 void PhyxCalculator::loadGrammar(QString fileName)
@@ -1548,6 +1554,12 @@ void PhyxCalculator::valueToBcd()
     variableStack.push(variable1);
 }
 
+void PhyxCalculator::valueAns()
+{
+    parameterBuffer = "#";
+    variableLoad();
+}
+
 void PhyxCalculator::complexReal()
 {
     PhyxVariable *variable1 = variableStack.pop();
@@ -2425,10 +2437,12 @@ void PhyxCalculator::outputVariable()
         {
             if (!listModeActive)
             {
-                if (m_result != NULL)   // delete old result
-                    delete m_result;
-
                 PhyxVariable *variable1 = variableStack.pop();
+
+                //set the special variable #
+                variableManager->addVariable("#", variable1);
+                //if (m_result != NULL)   // delete old result
+                //    delete m_result;
                 m_resultValue = variable1->value();
                 m_resultUnit = variable1->unit()->symbol();
                 m_result = variable1;

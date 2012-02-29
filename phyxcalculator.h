@@ -309,6 +309,7 @@ private:
     void valueFaculty();
     void valueBcd();
     void valueToBcd();
+    void valueAns();
 
     void complexReal();
     void complexImag();

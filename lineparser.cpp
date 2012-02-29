@@ -478,6 +478,9 @@ void LineParser::showVariables()
     QMapIterator<QString, PhyxVariable*> i(*m_phyxCalculator->variables());
      while (i.hasNext()) {
          i.next();
+         if (i.key() == "#") //ignore special variable #
+             continue;
+
          PhyxCalculator::ResultVariable variable;
          variable = m_phyxCalculator->formatVariable(i.value(),
                                                      (PhyxCalculator::OutputMode)m_appSettings->output.unitMode,
