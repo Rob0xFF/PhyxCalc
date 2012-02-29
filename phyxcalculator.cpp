@@ -35,6 +35,7 @@ void PhyxCalculator::initialize()
     unitBuffer = "";
     flagBuffer = 0;
     stackLevel = 0;
+    listModeActive = false;
     m_error = false;
     m_errorNumber = 0;
     m_errorStartPosition = 0;
@@ -156,6 +157,24 @@ void PhyxCalculator::initialize()
     functionMap.insert("unitRemove",    &PhyxCalculator::unitRemove);
 
     functionMap.insert("listAddStart",  &PhyxCalculator::listAddStart);
+    functionMap.insert("listSubStart",  &PhyxCalculator::listSubStart);
+    functionMap.insert("listMulStart",  &PhyxCalculator::listMulStart);
+    functionMap.insert("listDivStart",  &PhyxCalculator::listDivStart);
+    functionMap.insert("listModStart",  &PhyxCalculator::listModStart);
+    functionMap.insert("listPowStart",  &PhyxCalculator::listPowStart);
+    functionMap.insert("listBAndStart", &PhyxCalculator::listBAndStart);
+    functionMap.insert("listBOrStart",  &PhyxCalculator::listBOrStart);
+    functionMap.insert("listBXorStart", &PhyxCalculator::listBXorStart);
+    functionMap.insert("listXandStart", &PhyxCalculator::listXandStart);
+    functionMap.insert("listAndStart",  &PhyxCalculator::listAndStart);
+    functionMap.insert("listNandStart", &PhyxCalculator::listNandStart);
+    functionMap.insert("listXorStart",  &PhyxCalculator::listXorStart);
+    functionMap.insert("listOrStart",   &PhyxCalculator::listOrStart);
+    functionMap.insert("listNorStart",  &PhyxCalculator::listNorStart);
+    functionMap.insert("listValueSave", &PhyxCalculator::listValueSave);
+    functionMap.insert("listValueLoad", &PhyxCalculator::listValueLoad);
+    functionMap.insert("listValueSwap", &PhyxCalculator::listValueSwap);
+    functionMap.insert("listEnd",       &PhyxCalculator::listEnd);
 
     functionMap.insert("variableAdd",   &PhyxCalculator::variableAdd);
     functionMap.insert("variableRemove",&PhyxCalculator::variableRemove);
@@ -477,6 +496,12 @@ bool PhyxCalculator::setExpression(QString expression)
     {
         earleyParser->clearWord();
         expressionIsParsable = false;
+        if (listModeActive)
+        {
+            listValueLoad();
+            listEnd();
+            outputVariable();
+        }
     }
     else if (!m_expression.isEmpty() && expression.indexOf(m_expression) == 0)      //new expression is old expression + string
     {
@@ -2080,7 +2105,118 @@ void PhyxCalculator::constantLoad()
 
 void PhyxCalculator::listAddStart()
 {
-    qDebug() << "test";
+    listModeActive = true;
+    listModeType = ListAddType;
+}
+
+void PhyxCalculator::listSubStart()
+{
+    listModeActive = true;
+    listModeType = ListSubType;
+}
+
+void PhyxCalculator::listMulStart()
+{
+    listModeActive = true;
+    listModeType = ListMulType;
+}
+
+void PhyxCalculator::listDivStart()
+{
+    listModeActive = true;
+    listModeType = ListDivType;
+}
+
+void PhyxCalculator::listModStart()
+{
+    listModeActive = true;
+    listModeType = ListModType;
+}
+
+void PhyxCalculator::listPowStart()
+{
+    listModeActive = true;
+    listModeType = ListPowType;
+}
+
+void PhyxCalculator::listBOrStart()
+{
+    listModeActive = true;
+    listModeType = ListBOrType;
+}
+
+void PhyxCalculator::listBAndStart()
+{
+    listModeActive = true;
+    listModeType = ListBAndType;
+}
+
+void PhyxCalculator::listBXorStart()
+{
+    listModeActive = true;
+    listModeType = ListBXorType;
+}
+
+void PhyxCalculator::listXandStart()
+{
+    listModeActive = true;
+    listModeType = ListXandType;
+}
+
+void PhyxCalculator::listAndStart()
+{
+    listModeActive = true;
+    listModeType = ListAndType;
+}
+
+void PhyxCalculator::listNandStart()
+{
+    listModeActive = true;
+    listModeType = ListNandType;
+}
+
+void PhyxCalculator::listXorStart()
+{
+    listModeActive = true;
+    listModeType = ListXorType;
+}
+
+void PhyxCalculator::listOrStart()
+{
+    listModeActive = true;
+    listModeType = ListOrType;
+}
+
+void PhyxCalculator::listNorStart()
+{
+    listModeActive = true;
+    listModeType = ListNorType;
+}
+
+void PhyxCalculator::listValueSave()
+{
+    stringBuffer = tr("current result");
+    variableAdd();
+}
+
+void PhyxCalculator::listValueLoad()
+{
+    parameterBuffer = tr("current result");
+    variableLoad();
+}
+
+void PhyxCalculator::listValueSwap()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+    variableStack.push(variable1);
+    variableStack.push(variable2);
+}
+
+void PhyxCalculator::listEnd()
+{
+    listModeActive = false;
+    variableManager->removeVariable(tr("current result"));
 }
 
 bool PhyxCalculator::executeFunction(QString expression, QStringList parameters, bool verifyOnly = false)
@@ -2287,15 +2423,94 @@ void PhyxCalculator::outputVariable()
     {
         if (!variableStack.isEmpty())
         {
-            if (m_result != NULL)   // delete old result
-                delete m_result;
+            if (!listModeActive)
+            {
+                if (m_result != NULL)   // delete old result
+                    delete m_result;
 
-            PhyxVariable *variable1 = variableStack.pop();
-            m_resultValue = variable1->value();
-            m_resultUnit = variable1->unit()->symbol();
-            m_result = variable1;
+                PhyxVariable *variable1 = variableStack.pop();
+                m_resultValue = variable1->value();
+                m_resultUnit = variable1->unit()->symbol();
+                m_result = variable1;
 
-            emit outputResult();
+                emit outputResult();
+            }
+            else
+            {
+                listValueLoad();
+                listValueSwap();
+                if (listModeType == ListAddType)
+                {
+                    unitCheckConvertible();
+                    if (m_error)
+                        return;
+                    valueAdd();
+                }
+                else if (listModeType == ListSubType)
+                {
+                    unitCheckConvertible();
+                    if (m_error)
+                        return;
+                    valueSub();
+                }
+                else if (listModeType == ListMulType)
+                {
+                    unitMul();
+                    valueMul();
+                }
+                else if (listModeType == ListDivType)
+                {
+                    unitDiv();
+                    valueDiv();
+                }
+                else if (listModeType == ListModType)
+                {
+                    unitCheckDimensionless2();
+                    if (m_error)
+                        return;
+                    valueCheckInteger2();
+                    if (m_error)
+                        return;
+                    valueMod();
+                }
+                else if (listModeType == ListPowType)
+                {
+                    unitCheckDimensionless();
+                    if (m_error)
+                        return;
+                    unitPow();
+                    valuePow();
+                }
+                else
+                {
+                    unitCheckDimensionless2();
+                    if (m_error)
+                        return;
+                    valueCheckInteger2();
+                    if (m_error)
+                        return;
+                    if (listModeType == ListBAndType)
+                        bitAnd();
+                    else if (listModeType == ListBOrType)
+                        bitOr();
+                    else if (listModeType == ListBXorType)
+                        bitXor();
+                    else if (listModeType == ListXandType)
+                        logicXand();
+                    else if (listModeType == ListAndType)
+                        logicAnd();
+                    else if (listModeType == ListNandType)
+                        logicNand();
+                    else if (listModeType == ListXorType)
+                        logicXor();
+                    else if (listModeType == ListOrType)
+                        logicOr();
+                    else if (listModeType == ListNorType)
+                        logicNor();
+                }
+
+                listValueSave();
+            }
         }
     }
 }
@@ -2358,15 +2573,14 @@ void PhyxCalculator::runLowLevelOperation(PhyxCalculator::LowLevelOperation *ope
     }
     else if (operation->type == OutputOperation)
     {
-        if (m_result != NULL)   // delete old result
-            delete m_result;
+        //set stacklevel temporary to 0 to make outputVariable work
+        int tmpStackLevel = stackLevel;
+        stackLevel = 0;
 
-        PhyxVariable *variable1 = operation->variable;
-        m_resultValue = variable1->value();
-        m_resultUnit = variable1->unit()->symbol();
-        m_result = variable1;
+        variableStack.push(operation->variable);
+        outputVariable();
 
-        emit outputResult();
+        stackLevel = tmpStackLevel;
     }
     else if (operation->type == CombinedAssignmentOperationAdd)
     {

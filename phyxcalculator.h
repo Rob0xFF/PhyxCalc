@@ -107,6 +107,24 @@ public:
         OutputOperation                = 0x13
     };
 
+    enum ListOperationType {
+        ListAddType,
+        ListSubType,
+        ListMulType,
+        ListDivType,
+        ListModType,
+        ListPowType,
+        ListBOrType,
+        ListBAndType,
+        ListBXorType,
+        ListXandType,
+        ListAndType,
+        ListNandType,
+        ListXorType,
+        ListOrType,
+        ListNorType
+    };
+
     typedef struct {
         QString value;
         QString unit;
@@ -198,6 +216,9 @@ private:
     PhyxVariableManager         *variableManager;                               /// the variable manager
 
     QList<int>                  expressionWhitespaceList;                       /// this list holds count of removed whitespace for each character of the expression
+
+    bool                        listModeActive;                                 /// holds whete list mode is active or not
+    ListOperationType           listModeType;                                   /// holds current list operation type
 
     QString                     m_expression;                                   /// currently set expression
     bool                        expressionIsParsable;                           /// holds wheter currently set expression is parsable or not
@@ -352,6 +373,21 @@ private:
     void listSubStart();
     void listMulStart();
     void listDivStart();
+    void listModStart();
+    void listPowStart();
+    void listBOrStart();
+    void listBAndStart();
+    void listBXorStart();
+    void listXandStart();
+    void listAndStart();
+    void listNandStart();
+    void listXorStart();
+    void listOrStart();
+    void listNorStart();
+    void listValueSave();
+    void listValueLoad();
+    void listValueSwap();
+    void listEnd();
 
     /** functions for function handling */
     bool executeFunction(QString expression, QStringList parameters, bool verifyOnly);

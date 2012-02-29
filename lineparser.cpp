@@ -50,10 +50,11 @@ void LineParser::parseLine(bool linebreak)
     //read current line
     QString curLineText = getCurrentLine();
 
-    if (!curLineText.isEmpty() && !(curLineText.at(0) == '='))
+    if (curLineText.isEmpty() || !(curLineText.at(0) == '='))
     {
         m_phyxCalculator->setExpression(curLineText);
-        m_phyxCalculator->evaluate();
+        if (!curLineText.isEmpty())
+            m_phyxCalculator->evaluate();
     }
 
     if (linebreak)
