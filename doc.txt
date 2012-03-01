@@ -16,10 +16,22 @@ However please consider following rules:
 == Editor
 In the main text edit expressions are both written and calculated. Just enter your expression and press return (or enter on mobile platforms) and the result will be written in the next line. The line will be replaced if it start with an equal sign. Not every result will be shown in the next line, some expressions like variable definitions have no output in the text edit. Inserting symbols and expressions is also possible with various docks, adding your own costomized dock is also possible and will be shown later.
 
-Example: approximate formula for pi
+*Example:* approximate formula for pi
 ----
 3*ln(640320)/sqrt(163) <Return>
 =3.141592653589793016
+----
+
+=== Comments
+PhyxCalc understands following comment types: +
+*//*    single line comment +
+/* */ multi line comment
+
+*Example:*
+----
+x=2 // a single line comment
+x++ /* a very long comment
+that would not fit in one line */
 ----
 
 === Keyboard shortcuts
@@ -52,13 +64,17 @@ Example: approximate formula for pi
 === Exporting formulas
 To export formulas use the export dialog. Once the dialog is opened, your expressions will be instantly converted. The converted output just insert in your OpenOffice Math.
 
+=== Editing startup definitions
+PhyxCalc loads a lot of predefined units and constants on startup. You can edit these definitions quite easy: just edit the file */settings/definitions.txt* +
+*NOTE:* if you want to restore the default definitions, delete the defintions file and restart PhyxCalc
+
 === Adding your own docks
 Adding your own customized docks to PhyxCalc is really simple. Just create a textfile with following outline in your setting directory:
 ----
 tooltip; name in the dock; text to insert in the text editor
 ----
 
-Example:
+*Example:*
 ----
 sine function;sin;sin()
 cosine function;cos;cos()
@@ -72,7 +88,7 @@ Then open the file docks.txt and add a line with the following outline:
 docktitle;yourdockfilename.txt
 ----
 
-Example:
+*Example:*
 ----
 Symbols;symbols.txt
 ----
@@ -133,7 +149,7 @@ PhyxCalc uses C++-like operators and some additional operators for special mathe
 
 === Logarithms, exponential function and roots
 *ln*, *log*<n>, *exp*, *sqrt*=*sqr*, *root*<n> +
-Example:
+*Example:*
 ----
 exp(3)
 =20.08553692318766774
@@ -145,9 +161,9 @@ root12(25)
 
 === Threshold functions
 *min*(a,b), *max*(a,b) +
-*abs*(x) absolute value +
-*sign*(x) signum function: -1, 0, 1 for x<0, x=0, x>0 +
-*heaviside*(x) heaviside function: 0, 1 for x<0, x>=0 +
+*abs* absolute value +
+*sign* signum function: -1, 0, 1 for x<0, x=0, x>0 +
+*heaviside* heaviside function: 0, 1 for x<0, x>=0 +
 
 === Discretization functions
 *int* = *trunc*, *ceil*, *floor*, *round* +
@@ -155,21 +171,26 @@ root12(25)
 
 === Random functions
 *rnd* = *rand*: generates random number between 0 and 1 +
-*rndi*(i) = *randi*: generates random number 0\<=rndi(i)<i +
+*rndi* = *randi*: generates random number 0\<=rndi(i)<i +
 *rndg*(m, nd) = *randg*: generates Gaussian distributed number mean value m and normal distribution nd
 
 === Complex functions
-*Re*(z): returns real part of a complex number +
-*Im*(z): returns imaginary part of a complex number +
-*arg*(z): returns the argument of a complex number +
-*norm*(z): returns the norm value of a complex number +
-*conj*(z): returns the conjugate of a complex number +
-*polar*(rho, theta): returns a complex number corresponding to the complex number defined by its polar components, where rho is the magnitude and theta is the phase angle
+*Re* returns real part of a complex number +
+*Im* returns imaginary part of a complex number +
+*arg* returns the argument of a complex number +
+*norm* returns the norm value of a complex number +
+*conj* returns the conjugate of a complex number +
+*polar*(rho, theta) returns a complex number corresponding to the complex number defined by its polar components, where rho is the magnitude and theta is the phase angle
+
+=== Other functions
+*ans* answer function, returns last result in memory -> similar to using # variable +
+*bcd* binary coded decimal function, converts a binary decimal coded number back to a dezimal value +
+*tobcd* inverse of the bcd function
 
 === Defining custom functions
 Defing custom functions in PhyxCalc is pretty easy, just write the name of your function, add the parameters and an expression.
 
-Example: calculating a diode around its forward voltage
+*Example:* calculating a the current at a diode around the forward voltage
 ----
 Is=10e-15A
 VT=25mV
@@ -186,10 +207,91 @@ I(0.8V)
 === Precision
 PhyxCalc is using 64bit and 96bit floating point numbers, depending on your operating system. As every computing system not using arbitrary precision, PhyxCalc has accuracy problems. Depending on your expression, this can cause your result to be not as accurate as you wish. See Wikipedia for more information on floating point numbers and accuracy problems: http://en.wikipedia.org/wiki/Floating_point#Accuracy_problems
 
-== Variables
+== List-Addition
+To calculate a long list of numbers you can add a binary operator on the end of the first line. The result of this and the following lines will not be output but instead calculated togheter. You can view the current result in the variable dock. An empty line outputs the result.
 
+The list mode can also be used to split an expression into multiple lines, but keep in mind that every line will be calculated as single term, maybe ignoring operator predence.
 
-== Number formats and number systems
+*Example: addition*
+----
+12+ <Return>
+4 <Return>
+3 <Return>
+5 <Return>
+<Return>
+=24
+----
+
+*Example: multiplication*
+----
+2* <Return>
+2+3 <Return>
+<Return>
+=10  // 2*(2+3) and not 2*2+3
+----
+
+== Variables and Constants
+Variables could be used to save values in memory and as parameters for expressions. There is also a dock, where you can view all currently set variables.
+
+*Defining variables and constants:* +
+<variable name> = <expression> +
+<constant name> := <expression> +
+*NOTE:* only the result of the expression will be saved in the variable, to save the whole expression use functions
+
+*Deleting variables and constants:* +
+<variable name> = +
+<constant name> := +
+
+*Using variables and constants:* +
+<variable name> +
+<constant name>_ +
+
+*Example:*
+----
+x=2 //defining variable x
+c0:=299792458m/s //defining c0, speed of light in vacuum
+
+x*c0_
+=5.99585e+08m/s
+
+x= //deleting variable x
+c0:= //deleting constant c0
+----
+
+The *variable #* is a bit special. Everytime a value is output, the variable # is automatically set to this value, however, this variable can also be used like every other variable. +
+You can also use the *ans function* instead of the # variable.
+
+*Example:*
+----
+5+4
+=9
+#+sqr(#)  //# is like the ans (answer) button on some pocket calculators
+=12
+----
+
+== Number formats and systems
+You can insert numbers in decimal, hexadecimal, octal, binary or scientific format. You can also input complex numbers using the imaginary unit i or j. By default the ouput is automatically shown as integer, floating point number or in scientific format. PhyxCalc uses 19-20 digits precision, depending on the platform you use, however, the ouput precision is set to 6 by default, you can alter this setting in the settings dialog.
+
+Using the \-> operator numbers can also be output in hexadecimal, octal or binary format. However, this is only implemented for positive integers.
+
+*Example:*
+----
+//different number formats
+(10 + 1.1) * 2E-10 / 4e2 + 0xFFAF - 0b10101001
+=65286
+
+//using complex numbers
+(2j+34)*(23.2+4.5i)
+=779.8+199.4i
+
+//differnt number conversions
+23->hex //converting decimal to hexadecimal
+=0x17
+10->bin //converting decimal to binary
+=0b00001010
+0xF0->bin //converting hexadecimal to binary
+=0b11110000
+----
 
 == Units
 === Defining new units

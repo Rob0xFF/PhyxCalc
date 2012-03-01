@@ -28,12 +28,22 @@ equivocal expressions (e.g. unit m and variable m) can cause problems, so try to
 <hr>
 <h2><a name="_editor"></a>2. Editor</h2>
 <p>In the main text edit expressions are both written and calculated. Just enter your expression and press return (or enter on mobile platforms) and the result will be written in the next line. The line will be replaced if it start with an equal sign. Not every result will be shown in the next line, some expressions like variable definitions have no output in the text edit. Inserting symbols and expressions is also possible with various docks, adding your own costomized dock is also possible and will be shown later.</p>
-<p>Example: approximate formula for pi</p>
+<p><strong>Example:</strong> approximate formula for pi</p>
 <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
 <pre>3*ln(640320)/sqrt(163) &lt;Return&gt;
 =3.141592653589793016</pre>
 </td></tr></table>
-<h3><a name="_keyboard_shortcuts"></a>2.1. Keyboard shortcuts</h3>
+<h3><a name="_comments"></a>2.1. Comments</h3>
+<p>PhyxCalc understands following comment types:<br>
+<strong>//</strong>    single line comment<br>
+/* */ multi line comment</p>
+<p><strong>Example:</strong></p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>x=2 // a single line comment
+x++ /* a very long comment
+that would not fit in one line */</pre>
+</td></tr></table>
+<h3><a name="_keyboard_shortcuts"></a>2.2. Keyboard shortcuts</h3>
 <p><strong>Text Editor shortcuts:</strong><br>
 &lt;Return&gt;:               Calculate expression at current line<br>
 &lt;Shift + Enter&gt;:        Insert line break<br>
@@ -57,14 +67,17 @@ equivocal expressions (e.g. unit m and variable m) can cause problems, so try to
 &lt;Ctrl + Shift + R&gt;:     Calculate from line<br>
 &lt;Ctrl + E&gt;:             Open export dialog<br>
 &lt;Ctrl + Q&gt;:             Quit application<br></p>
-<h3><a name="_exporting_formulas"></a>2.2. Exporting formulas</h3>
+<h3><a name="_exporting_formulas"></a>2.3. Exporting formulas</h3>
 <p>To export formulas use the export dialog. Once the dialog is opened, your expressions will be instantly converted. The converted output just insert in your OpenOffice Math.</p>
-<h3><a name="_adding_your_own_docks"></a>2.3. Adding your own docks</h3>
+<h3><a name="_editing_startup_definitions"></a>2.4. Editing startup definitions</h3>
+<p>PhyxCalc loads a lot of predefined units and constants on startup. You can edit these definitions quite easy: just edit the file <strong>/settings/definitions.txt</strong><br>
+<strong>NOTE:</strong> if you want to restore the default definitions, delete the defintions file and restart PhyxCalc</p>
+<h3><a name="_adding_your_own_docks"></a>2.5. Adding your own docks</h3>
 <p>Adding your own customized docks to PhyxCalc is really simple. Just create a textfile with following outline in your setting directory:</p>
 <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
 <pre>tooltip; name in the dock; text to insert in the text editor</pre>
 </td></tr></table>
-<p>Example:</p>
+<p><strong>Example:</strong></p>
 <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
 <pre>sine function;sin;sin()
 cosine function;cos;cos()
@@ -76,7 +89,7 @@ arcus cosine function;acos;acos()</pre>
 <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
 <pre>docktitle;yourdockfilename.txt</pre>
 </td></tr></table>
-<p>Example:</p>
+<p><strong>Example:</strong></p>
 <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
 <pre>Symbols;symbols.txt</pre>
 </td></tr></table>
@@ -266,7 +279,7 @@ cellspacing="0" cellpadding="4">
 <strong>sinh</strong>, <strong>cosh</strong>, <strong>tanh</strong>, <strong>arcsinh</strong>, <strong>arccosh</strong>, <strong>arctanh</strong></p>
 <h3><a name="_logarithms_exponential_function_and_roots"></a>3.3. Logarithms, exponential function and roots</h3>
 <p><strong>ln</strong>, <strong>log</strong>&lt;n&gt;, <strong>exp</strong>, <strong>sqrt</strong>=<strong>sqr</strong>, <strong>root</strong>&lt;n&gt;<br>
-Example:</p>
+<strong>Example:</strong></p>
 <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
 <pre>exp(3)
 =20.08553692318766774
@@ -277,26 +290,30 @@ root12(25)
 </td></tr></table>
 <h3><a name="_threshold_functions"></a>3.4. Threshold functions</h3>
 <p><strong>min</strong>(a,b), <strong>max</strong>(a,b)<br>
-<strong>abs</strong>(x) absolute value<br>
-<strong>sign</strong>(x) signum function: -1, 0, 1 for x&lt;0, x=0, x&gt;0<br>
-<strong>heaviside</strong>(x) heaviside function: 0, 1 for x&lt;0, x&gt;=0<br></p>
+<strong>abs</strong> absolute value<br>
+<strong>sign</strong> signum function: -1, 0, 1 for x&lt;0, x=0, x&gt;0<br>
+<strong>heaviside</strong> heaviside function: 0, 1 for x&lt;0, x&gt;=0<br></p>
 <h3><a name="_discretization_functions"></a>3.5. Discretization functions</h3>
 <p><strong>int</strong> = <strong>trunc</strong>, <strong>ceil</strong>, <strong>floor</strong>, <strong>round</strong><br>
 (truncate, round up, round down, round-to-nearest)</p>
 <h3><a name="_random_functions"></a>3.6. Random functions</h3>
 <p><strong>rnd</strong> = <strong>rand</strong>: generates random number between 0 and 1<br>
-<strong>rndi</strong>(i) = <strong>randi</strong>: generates random number 0&lt;=rndi(i)&lt;i<br>
+<strong>rndi</strong> = <strong>randi</strong>: generates random number 0&lt;=rndi(i)&lt;i<br>
 <strong>rndg</strong>(m, nd) = <strong>randg</strong>: generates Gaussian distributed number mean value m and normal distribution nd</p>
 <h3><a name="_complex_functions"></a>3.7. Complex functions</h3>
-<p><strong>Re</strong>(z): returns real part of a complex number<br>
-<strong>Im</strong>(z): returns imaginary part of a complex number<br>
-<strong>arg</strong>(z): returns the argument of a complex number<br>
-<strong>norm</strong>(z): returns the norm value of a complex number<br>
-<strong>conj</strong>(z): returns the conjugate of a complex number<br>
-<strong>polar</strong>(rho, theta): returns a complex number corresponding to the complex number defined by its polar components, where rho is the magnitude and theta is the phase angle</p>
-<h3><a name="_defining_custom_functions"></a>3.8. Defining custom functions</h3>
+<p><strong>Re</strong> returns real part of a complex number<br>
+<strong>Im</strong> returns imaginary part of a complex number<br>
+<strong>arg</strong> returns the argument of a complex number<br>
+<strong>norm</strong> returns the norm value of a complex number<br>
+<strong>conj</strong> returns the conjugate of a complex number<br>
+<strong>polar</strong>(rho, theta) returns a complex number corresponding to the complex number defined by its polar components, where rho is the magnitude and theta is the phase angle</p>
+<h3><a name="_other_functions"></a>3.8. Other functions</h3>
+<p><strong>ans</strong> answer function, returns last result in memory &#8594; similar to using # variable<br>
+<strong>bcd</strong> binary coded decimal function, converts a binary decimal coded number back to a dezimal value<br>
+<strong>tobcd</strong> inverse of the bcd function</p>
+<h3><a name="_defining_custom_functions"></a>3.9. Defining custom functions</h3>
 <p>Defing custom functions in PhyxCalc is pretty easy, just write the name of your function, add the parameters and an expression.</p>
-<p>Example: calculating a diode around its forward voltage</p>
+<p><strong>Example:</strong> calculating a the current at a diode around the forward voltage</p>
 <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
 <pre>Is=10e-15A
 VT=25mV
@@ -309,19 +326,90 @@ I(0.7V)
 I(0.8V)
 =789.6296018mA</pre>
 </td></tr></table>
-<h3><a name="_precision"></a>3.9. Precision</h3>
-<p>PhyxCalc is using 64bit and 96bit floating point numbers, depending on operating system. As every computing system not using arbitrary precision, PhyxCalc has accuracy problems. Depending on your expression, this can cause your result to be not as accurate as it should be. See Wikipedia for more information on floating point numbers and accuracy problems: <a href="http://en.wikipedia.org/wiki/Floating_point#Accuracy_problems">http://en.wikipedia.org/wiki/Floating_point#Accuracy_problems</a></p>
+<h3><a name="_precision"></a>3.10. Precision</h3>
+<p>PhyxCalc is using 64bit and 96bit floating point numbers, depending on your operating system. As every computing system not using arbitrary precision, PhyxCalc has accuracy problems. Depending on your expression, this can cause your result to be not as accurate as you wish. See Wikipedia for more information on floating point numbers and accuracy problems: <a href="http://en.wikipedia.org/wiki/Floating_point#Accuracy_problems">http://en.wikipedia.org/wiki/Floating_point#Accuracy_problems</a></p>
 <hr>
-<h2><a name="_variables"></a>4. Variables</h2>
+<h2><a name="_list_addition"></a>4. List-Addition</h2>
+<p>To calculate a long list of numbers you can add a binary operator on the end of the first line. The result of this and the following lines will not be output but instead calculated togheter. You can view the current result in the variable dock. An empty line outputs the result.</p>
+<p>The list mode can also be used to split an expression into multiple lines, but keep in mind that every line will be calculated as single term, maybe ignoring operator predence.</p>
+<p><strong>Example: addition</strong></p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>12+ &lt;Return&gt;
+4 &lt;Return&gt;
+3 &lt;Return&gt;
+5 &lt;Return&gt;
+&lt;Return&gt;
+=24</pre>
+</td></tr></table>
+<p><strong>Example: multiplication</strong></p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>2* &lt;Return&gt;
+2+3 &lt;Return&gt;
+&lt;Return&gt;
+=10  // 2*(2+3) and not 2*2+3</pre>
+</td></tr></table>
 <hr>
-<h2><a name="_number_formats_and_number_systems"></a>5. Number formats and number systems</h2>
+<h2><a name="_variables_and_constants"></a>5. Variables and Constants</h2>
+<p>Variables could be used to save values in memory and as parameters for expressions. There is also a dock, where you can view all currently set variables.</p>
+<p><strong>Defining variables and constants:</strong><br>
+&lt;variable name&gt; = &lt;expression&gt;<br>
+&lt;constant name&gt; := &lt;expression&gt;<br>
+<strong>NOTE:</strong> only the result of the expression will be saved in the variable, to save the whole expression use functions</p>
+<p><strong>Deleting variables and constants:</strong><br>
+&lt;variable name&gt; =<br>
+&lt;constant name&gt; :=<br></p>
+<p><strong>Using variables and constants:</strong><br>
+&lt;variable name&gt;<br>
+&lt;constant name&gt;_<br></p>
+<p><strong>Example:</strong></p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>x=2 //defining variable x
+c0:=299792458m/s //defining c0, speed of light in vacuum
+
+x*c0_
+=5.99585e+08m/s
+
+x= //deleting variable x
+c0:= //deleting constant c0</pre>
+</td></tr></table>
+<p>The <strong>variable #</strong> is a bit special. Everytime a value is output, the variable # is automatically set to this value, however, this variable can also be used like every other variable.<br>
+You can also use the <strong>ans function</strong> instead of the # variable.</p>
+<p><strong>Example:</strong></p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>5+4
+=9
+#+sqr(#)  //# is like the ans (answer) button on some pocket calculators
+=12</pre>
+</td></tr></table>
 <hr>
-<h2><a name="_units"></a>6. Units</h2>
-<h3><a name="_defining_new_units"></a>6.1. Defining new units</h3>
+<h2><a name="_number_formats_and_number_systems"></a>6. Number formats and number systems</h2>
+<p>You can insert numbers in decimal, hexadecimal, octal, binary or scientific format. You can also input complex numbers using the imaginary unit i or j. By default the ouput is automatically shown as integer, floating point number or in scientific format. PhyxCalc uses 19-20 digits precision, depending on the platform you use, however, the ouput precision is set to 6 by default, you can alter this setting in the settings dialog.</p>
+<p>Using the &#8594; operator numbers can also be output in hexadecimal, octal or binary format. However, this is only implemented for positive integers.</p>
+<p><strong>Example:</strong></p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>//different number formats
+(10 + 1.1) * 2E-10 / 4e2 + 0xFFAF - 0b10101001
+=65286
+
+//using complex numbers
+(2j+34)*(23.2+4.5i)
+=779.8+199.4i
+
+//differnt number conversions
+23-&gt;hex //converting decimal to hexadecimal
+=0x17
+10-&gt;bin //converting decimal to binary
+=0b00001010
+0xF0-&gt;bin //converting hexadecimal to binary
+=0b11110000</pre>
+</td></tr></table>
+<hr>
+<h2><a name="_units"></a>7. Units</h2>
+<h3><a name="_defining_new_units"></a>7.1. Defining new units</h3>
 <p></p>
 <p></p>
 <hr><p><small>
-Last updated 2012-02-29 00:13:25 CEST
+Last updated 2012-03-01 19:35:45 CEST
 </small></p>
 </body>
 </html>

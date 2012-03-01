@@ -219,7 +219,7 @@ void PhyxSyntaxHighlighter::updateFormats()
 
     //numbers
     rule.format = numberFormat;
-    rule.pattern = QRegExp("(\\b(([0-9]+(\\.[0-9]+)?)|(\\.[0-9]+))([eE][+-]?[0-9]+)?[ij]?)|(\\b[0][x][0-9A-Fa-f]+\\b)|(\\b[0][b][0-1]+\\b)");
+    rule.pattern = QRegExp("(\\b(([0-9]+(\\.[0-9]+)?)|(\\.[0-9]+))([eE][+-]?[0-9]+)?[ij]?)|(\\b[0][x][0-9A-Fa-f]+\\b)|(\\b[0][o][0-7]+\\b)|(\\b[0][b][0-1]+\\b)");
     //highlightingRulesPriority1.append(rule);
     //rule.pattern = QRegExp("\\b[0][x][0-9A-Fa-f]+\\b");
     //highlightingRulesPriority1.append(rule);

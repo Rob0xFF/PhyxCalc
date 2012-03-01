@@ -195,8 +195,10 @@ void PhyxCalculator::initialize()
     functionMap.insert("bufferUnit",            &PhyxCalculator::bufferUnit);
     functionMap.insert("bufferValue",           &PhyxCalculator::bufferValue);
     functionMap.insert("bufferHex",             &PhyxCalculator::bufferHex);
+    functionMap.insert("bufferOct",             &PhyxCalculator::bufferOct);
     functionMap.insert("bufferBin",             &PhyxCalculator::bufferBin);
     functionMap.insert("bufferHexString",       &PhyxCalculator::bufferHexString);
+    functionMap.insert("bufferOctString",       &PhyxCalculator::bufferOctString);
     functionMap.insert("bufferBinString",       &PhyxCalculator::bufferBinString);
     functionMap.insert("bufferPrefix",          &PhyxCalculator::bufferPrefix);
     functionMap.insert("bufferString",          &PhyxCalculator::bufferString);
@@ -765,6 +767,21 @@ PhyxIntegerDataType PhyxCalculator::hexToLongInt(QString string)
     return value;
 }
 
+PhyxIntegerDataType PhyxCalculator::octToLongInt(QString string)
+{
+    PhyxIntegerDataType value = 0;
+    PhyxIntegerDataType n = 1;
+
+    string.remove("0o");
+    for (int i = string.size()-1; i >= 0; i--)
+    {
+        value += (string.at(i).toAscii()-48)*n;
+        n *= 8;
+    }
+
+    return value;
+}
+
 long PhyxCalculator::binToLongInt(QString string)
 {
     PhyxIntegerDataType value = 0;
@@ -816,6 +833,21 @@ QString PhyxCalculator::longIntToHex(PhyxIntegerDataType number)
         output.prepend("0");
 
     output.prepend("0x");
+    return output;
+}
+
+QString PhyxCalculator::longIntToOct(PhyxIntegerDataType number)
+{
+    QString output;
+
+    while (number != 0)
+    {
+        int rest = number % 8;
+        output.prepend(QChar::fromAscii(rest+48));
+        number /= 8;
+    }
+
+    output.prepend("0o");
     return output;
 }
 
@@ -2348,6 +2380,11 @@ void PhyxCalculator::bufferHex()
     valueBuffer = PhyxValueDataType(static_cast<PhyxFloatDataType>(hexToLongInt(parameterBuffer)),PHYX_FLOAT_NULL);
 }
 
+void PhyxCalculator::bufferOct()
+{
+    valueBuffer = PhyxValueDataType(static_cast<PhyxFloatDataType>(octToLongInt(parameterBuffer)),PHYX_FLOAT_NULL);
+}
+
 void PhyxCalculator::bufferBin()
 {
     valueBuffer = PhyxValueDataType(static_cast<PhyxFloatDataType>(binToLongInt(parameterBuffer)),PHYX_FLOAT_NULL);
@@ -2357,7 +2394,15 @@ void PhyxCalculator::bufferHexString()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    stringBuffer = longIntToHex((PhyxIntegerDataType)variable1->value().real());
+    stringBuffer = longIntToHex(static_cast<PhyxIntegerDataType>(variable1->value().real()));
+    delete variable1;
+}
+
+void PhyxCalculator::bufferOctString()
+{
+    PhyxVariable *variable1 = variableStack.pop();
+
+    stringBuffer = longIntToOct(static_cast<PhyxIntegerDataType>(variable1->value().real()));
     delete variable1;
 }
 
@@ -2365,7 +2410,7 @@ void PhyxCalculator::bufferBinString()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    stringBuffer = longIntToBin((PhyxIntegerDataType)variable1->value().real());
+    stringBuffer = longIntToBin(static_cast<PhyxIntegerDataType>(variable1->value().real()));
     delete variable1;
 }
 

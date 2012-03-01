@@ -187,9 +187,11 @@ public:
     static QString complexToString(const PhyxValueDataType number, int precision, char numberFormat, QString imaginaryUnit);
     static PhyxValueDataType stringToComplex(QString string);
     static PhyxIntegerDataType hexToLongInt(QString string);
+    static PhyxIntegerDataType octToLongInt(QString string);
     static PhyxIntegerDataType binToLongInt(QString string);
     static PhyxIntegerDataType bcdToLongInt(PhyxIntegerDataType number);
     static QString longIntToHex(PhyxIntegerDataType number);
+    static QString longIntToOct(PhyxIntegerDataType number);
     static QString longIntToBin(PhyxIntegerDataType number);
     static PhyxIntegerDataType longIntToBcd(PhyxIntegerDataType number);
 
@@ -401,8 +403,10 @@ private:
     void bufferUnit();
     void bufferValue();
     void bufferHex();
+    void bufferOct();
     void bufferBin();
     void bufferHexString();
+    void bufferOctString();
     void bufferBinString();
     void bufferPrefix();
     void bufferString();
