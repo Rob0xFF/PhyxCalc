@@ -76,6 +76,11 @@ void SettingsDialog::setAppSettings(AppSettings *settings)
                 break;
     }
 
+    if (settings->output.imaginaryUnit == "i")
+        ui->imaginaryIRadio->setChecked(true);
+    else if (settings->output.imaginaryUnit == "j")
+        ui->imaginaryJRadio->setChecked(true);
+
     //read line parser options
     ui->expressionOutputNumbersCheck->setChecked(settings->lineParser.expression.outputWithNumbers);
     ui->expressionOutputResultCheck->setChecked(settings->lineParser.expression.outputResult);
@@ -128,6 +133,11 @@ void SettingsDialog::getAppSettings(AppSettings *settings)
         settings->output.prefixMode = 1;
     else if (ui->prefixRadio2->isChecked())
         settings->output.prefixMode = 2;
+
+    if (ui->imaginaryIRadio->isChecked())
+        settings->output.imaginaryUnit = "i";
+    else if (ui->imaginaryJRadio->isChecked())
+        settings->output.imaginaryUnit = "j";
 
     //write line parser options
     settings->lineParser.expression.outputWithNumbers = ui->expressionOutputNumbersCheck->isChecked();

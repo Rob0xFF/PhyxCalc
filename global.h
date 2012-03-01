@@ -60,6 +60,7 @@ typedef struct {
             char format;
         } numbers;
         int unitMode;
+        QString imaginaryUnit;
         int prefixMode;
     } output;
     struct {

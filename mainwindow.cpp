@@ -186,6 +186,7 @@ void MainWindow::loadSettings()
             appSettings.output.numbers.format = settings.value("format", 'g').toInt();
         settings.endGroup();
         appSettings.output.unitMode = settings.value("unitMode",1).toInt();
+        appSettings.output.imaginaryUnit = settings.value("imaginaryUnit", "i").toString();
         appSettings.output.prefixMode = settings.value("prefixMode",1).toInt();
     settings.endGroup();
     settings.beginGroup("lineParser");
@@ -315,6 +316,7 @@ void MainWindow::saveSettings()
             settings.setValue("format", appSettings.output.numbers.format);
         settings.endGroup();
         settings.setValue("unitMode", appSettings.output.unitMode);
+        settings.setValue("imaginaryUnit", appSettings.output.imaginaryUnit);
         settings.setValue("prefixMode", appSettings.output.prefixMode);
     settings.endGroup();
     settings.beginGroup("lineParser");

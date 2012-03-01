@@ -184,7 +184,7 @@ public:
         return m_result;
     }
 
-    static QString complexToString(const PhyxValueDataType number, int precision, char numberFormat);
+    static QString complexToString(const PhyxValueDataType number, int precision, char numberFormat, QString imaginaryUnit);
     static PhyxValueDataType stringToComplex(QString string);
     static PhyxIntegerDataType hexToLongInt(QString string);
     static PhyxIntegerDataType binToLongInt(QString string);
@@ -193,7 +193,7 @@ public:
     static QString longIntToBin(PhyxIntegerDataType number);
     static PhyxIntegerDataType longIntToBcd(PhyxIntegerDataType number);
 
-    ResultVariable formatVariable(PhyxVariable *variable, OutputMode outputMode, PrefixMode prefixMode, int precision, char numberFormat) const;
+    ResultVariable formatVariable(PhyxVariable *variable, OutputMode outputMode, PrefixMode prefixMode, int precision, char numberFormat, QString imaginaryUnit) const;
 
 private:
     QStack<PhyxVariable*>       variableStack;                                  /// stack for variable calculation
@@ -235,8 +235,9 @@ private:
 
     void initialize();                                                          ///< initializes PhyxCalculator
     void loadGrammar(QString fileName);                                         ///< loads the grammar from a file
-    QString removeWhitespace(QString text, QList<int> *whiteSpaceList);                                     ///< removes the whitespace of a string and saves the count
-    int restoreErrorPosition(int pos, QList<int> whiteSpaceList);                                          ///< restores the original position of an error in expression
+    QString stripComments(QString text);                                        ///< strips all comments from the text
+    QString removeWhitespace(QString text, QList<int> *whiteSpaceList);         ///< removes the whitespace of a string and saves the count
+    int restoreErrorPosition(int pos, QList<int> whiteSpaceList);               ///< restores the original position of an error in expression
 
     void raiseException(int errorNumber);                                       ///< raises an exception
     void addRule(QString rule, QString functions = "");                         ///< adds a rule

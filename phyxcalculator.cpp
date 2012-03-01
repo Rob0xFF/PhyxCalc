@@ -312,6 +312,15 @@ void PhyxCalculator::loadGrammar(QString fileName)
         qFatal("Can't open file");
 }
 
+QString PhyxCalculator::stripComments(QString text)
+{
+    //strip singe line comment
+    int pos = text.indexOf("//");
+    if (pos != -1)
+        text = text.left(pos);
+    return text;
+}
+
 QString PhyxCalculator::removeWhitespace(QString text, QList<int> *whiteSpaceList)
 {
     int whitespaceCount = 0;
@@ -496,6 +505,7 @@ void PhyxCalculator::clearFlags()
 
 bool PhyxCalculator::setExpression(QString expression)
 {
+    expression = stripComments(expression);
     expression = removeWhitespace(expression, &expressionWhitespaceList);
 
     if (expression.isEmpty())
@@ -648,7 +658,7 @@ PhyxUnitSystem::PhyxUnitMap PhyxCalculator::units() const
     return unitSystem->units();
 }
 
-QString PhyxCalculator::complexToString(const PhyxValueDataType number, int precision, char numberFormat)
+QString PhyxCalculator::complexToString(const PhyxValueDataType number, int precision, char numberFormat, QString imaginaryUnit)
 {
     QString string;
     boost::format format(QString("%.%1%2").arg(precision).arg(numberFormat).toStdString());
@@ -687,7 +697,7 @@ QString PhyxCalculator::complexToString(const PhyxValueDataType number, int prec
         {
             string.append("-");
         }
-        string.append("i");
+        string.append(imaginaryUnit);
         components++;
     }
 
@@ -872,7 +882,8 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
                                                               OutputMode outputMode,
                                                               PrefixMode prefixMode,
                                                               int precision,
-                                                              char numberFormat) const
+                                                              char numberFormat,
+                                                              QString imaginaryUnit) const
 {
     ResultVariable result;
     PhyxValueDataType value = variable->value();
@@ -917,7 +928,7 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
         break;
     }
 
-    result.value = complexToString(value, precision, numberFormat);
+    result.value = complexToString(value, precision, numberFormat, imaginaryUnit);
 
     return result;
 }

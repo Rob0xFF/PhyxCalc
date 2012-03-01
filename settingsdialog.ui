@@ -79,7 +79,7 @@
    <item row="0" column="1">
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page">
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -205,8 +205,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>414</width>
-            <height>450</height>
+            <width>397</width>
+            <height>519</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -456,6 +456,32 @@
             </widget>
            </item>
            <item>
+            <widget class="QGroupBox" name="groupBox_7">
+             <property name="title">
+              <string>Imaginary unit</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_12">
+              <item>
+               <widget class="QRadioButton" name="imaginaryIRadio">
+                <property name="text">
+                 <string>Use i as imaginary unit</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="imaginaryJRadio">
+                <property name="text">
+                 <string>Use j as imaginary unit</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <widget class="QGroupBox" name="groupBox_4">
              <property name="title">
               <string>Prefix</string>
@@ -503,7 +529,7 @@
             <x>0</x>
             <y>0</y>
             <width>414</width>
-            <height>450</height>
+            <height>258</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_11">
