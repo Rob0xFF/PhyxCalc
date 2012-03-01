@@ -318,6 +318,13 @@ QString PhyxCalculator::stripComments(QString text)
     int pos = text.indexOf("//");
     if (pos != -1)
         text = text.left(pos);
+    //strip multi line comments
+    pos = text.indexOf("/*");
+    if (pos != -1)
+        text = text.left(pos);
+    pos = text.indexOf("*/");
+    if (pos != -1)
+        text = text.mid(pos+2);
     return text;
 }
 

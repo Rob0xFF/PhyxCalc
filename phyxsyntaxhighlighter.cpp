@@ -194,6 +194,7 @@ void PhyxSyntaxHighlighter::updateFormats()
     constantsFormat.setToolTip("constant");
     functionFormat.setToolTip("function");
     unitFormat.setToolTip("unit");
+    commentFormat.setToolTip("comment");
 
     //text
     rule.pattern = QRegExp("[\\S]+");
