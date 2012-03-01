@@ -56,6 +56,7 @@ public:
     void insertNewLine(bool force = false);
     void deleteLine();
     bool resultLineSelected();
+    bool commentLineSelected();
 
     void updateSettings();      ///< updates settings
 

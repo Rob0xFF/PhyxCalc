@@ -277,8 +277,8 @@ Using the \-> operator numbers can also be output in hexadecimal, octal or binar
 *Example:*
 ----
 //different number formats
-(10 + 1.1) * 2E-10 / 4e2 + 0xFFAF - 0b10101001
-=65286
+(10 + 1.1) * 2E-10 / 4e2 + 0xFFAF - 0b10101001 * 0o345
+=26754
 
 //using complex numbers
 (2j+34)*(23.2+4.5i)
@@ -289,9 +289,12 @@ Using the \-> operator numbers can also be output in hexadecimal, octal or binar
 =0x17
 10->bin //converting decimal to binary
 =0b00001010
+34->oct //converting decimal to octal
+=0o42
 0xF0->bin //converting hexadecimal to binary
 =0b11110000
 ----
 
 == Units
+
 === Defining new units

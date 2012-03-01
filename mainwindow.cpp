@@ -77,18 +77,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
              if ((keyEvent->key() == Qt::Key_Return) || (keyEvent->key() == Qt::Key_Enter))
              {
                  //check for comment
-                 QTextCursor cursor = documentList.at(activeTab)->expressionEdit->textCursor();
-                 int pos = cursor.positionInBlock();
-                 foreach (QTextLayout::FormatRange range, cursor.block().layout()->additionalFormats()) //syntaxhighlighter formats are additional formats
-                 {
-                     if (pos >= range.start && pos <= range.start + range.length)    //get current format
-                     {
-                         if (range.format.toolTip() == "comment")   //tooltip is used in syntaxhighlighter
-                         {
-                             return QMainWindow::eventFilter(obj, event);
-                         }
-                     }
-                 }
+                 if (documentList.at(activeTab)->lineParser->commentLineSelected())
+                    return QMainWindow::eventFilter(obj, event);
 
                  if (keyEvent->modifiers() == Qt::ShiftModifier)
                      documentList.at(activeTab)->lineParser->insertNewLine(true);

@@ -50,8 +50,7 @@ void LineParser::parseLine(bool linebreak)
     QString curLineText = getCurrentLine();     //read current line
     if (curLineText.isEmpty() || !(curLineText.at(0) == '='))
     {
-        m_phyxCalculator->setExpression(curLineText);
-        if (!curLineText.isEmpty())
+        if (m_phyxCalculator->setExpression(curLineText))
             m_phyxCalculator->evaluate();
     }
 
@@ -77,7 +76,12 @@ void LineParser::parseAll()
 void LineParser::parseFromCurrentPosition()
 {
     while (!m_calculationEdit->textCursor().atEnd())
-        parseLine(true);
+    {
+        if (commentLineSelected())
+            insertNewLine(false);
+        else
+            parseLine(true);
+    }
 }
 
 void LineParser::replaceSymbols()
@@ -113,6 +117,31 @@ bool LineParser::resultLineSelected()
         return true;
     else
         return false;
+}
+
+bool LineParser::commentLineSelected()
+{
+    QRegExp commentStart("/\\*");
+    QRegExp commentEnd("\\*/");
+    QString line = getCurrentLine();
+
+    //check for multi line comment
+    QString text = m_calculationEdit->toPlainText();
+
+    if ((line.indexOf(commentStart) != -1) || (line.indexOf(commentEnd)))
+        return false;
+
+    int cursorPos = m_calculationEdit->textCursor().position();
+    int startPos = 0;
+    int endPos;
+
+    while (text.indexOf(commentStart,startPos))
+    {
+        endPos = text.indexOf(commentEnd, startPos);
+        if (((cursorPos >= startPos) && (cursorPos < endPos+1)) || (endPos == -1))
+            return true;
+    }
+    return false;
 }
 
 QString LineParser::variableToolTip(QString name)
