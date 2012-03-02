@@ -714,11 +714,11 @@ QString PhyxCalculator::complexToString(const PhyxValueDataType number, int prec
 
     if (string.isEmpty())
         string.append("0");
-    else if (components == 2)
+    /*else if (components == 2)
     {
         string.prepend("(");
         string.append(")");
-    }
+    }*/
 
     return string;
 }

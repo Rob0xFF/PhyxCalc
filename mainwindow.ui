@@ -128,6 +128,7 @@
      <string>&amp;Tools</string>
     </property>
     <addaction name="actionSettings"/>
+    <addaction name="actionOpen_Settings_Directory"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -202,7 +203,7 @@
         <bool>false</bool>
        </property>
        <attribute name="verticalHeaderVisible">
-        <bool>true</bool>
+        <bool>false</bool>
        </attribute>
       </widget>
      </item>
@@ -399,7 +400,7 @@
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>&amp;About..</string>
+    <string>&amp;About PhyxCalc..</string>
    </property>
   </action>
   <action name="actionCut">
@@ -507,6 +508,11 @@
    </property>
    <property name="text">
     <string>Clear Variables</string>
+   </property>
+  </action>
+  <action name="actionOpen_Settings_Directory">
+   <property name="text">
+    <string>Open Settings &amp;Directory</string>
    </property>
   </action>
  </widget>

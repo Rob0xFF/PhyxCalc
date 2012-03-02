@@ -382,14 +382,14 @@ You can also use the <strong>ans function</strong> instead of the # variable.</p
 =12</pre>
 </td></tr></table>
 <hr>
-<h2><a name="_number_formats_and_number_systems"></a>6. Number formats and number systems</h2>
+<h2><a name="_number_formats_and_systems"></a>6. Number formats and systems</h2>
 <p>You can insert numbers in decimal, hexadecimal, octal, binary or scientific format. You can also input complex numbers using the imaginary unit i or j. By default the ouput is automatically shown as integer, floating point number or in scientific format. PhyxCalc uses 19-20 digits precision, depending on the platform you use, however, the ouput precision is set to 6 by default, you can alter this setting in the settings dialog.</p>
-<p>Using the &#8594; operator numbers can also be output in hexadecimal, octal or binary format. However, this is only implemented for positive integers.</p>
+<p>Using the -&gt; operator numbers can also be output in hexadecimal, octal or binary format. However, this is only implemented for positive integers.</p>
 <p><strong>Example:</strong></p>
 <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
 <pre>//different number formats
-(10 + 1.1) * 2E-10 / 4e2 + 0xFFAF - 0b10101001
-=65286
+(10 + 1.1) * 2E-10 / 4e2 + 0xFFAF - 0b10101001 * 0o345
+=26754
 
 //using complex numbers
 (2j+34)*(23.2+4.5i)
@@ -400,6 +400,8 @@ You can also use the <strong>ans function</strong> instead of the # variable.</p
 =0x17
 10-&gt;bin //converting decimal to binary
 =0b00001010
+34-&gt;oct //converting decimal to octal
+=0o42
 0xF0-&gt;bin //converting hexadecimal to binary
 =0b11110000</pre>
 </td></tr></table>
@@ -409,7 +411,7 @@ You can also use the <strong>ans function</strong> instead of the # variable.</p
 <p></p>
 <p></p>
 <hr><p><small>
-Last updated 2012-03-01 19:35:45 CEST
+Last updated 2012-03-01 23:00:23 CEST
 </small></p>
 </body>
 </html>

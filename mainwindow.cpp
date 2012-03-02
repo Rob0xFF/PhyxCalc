@@ -26,7 +26,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    settingsDir = QDir::currentPath() + "/settings/";
+    //nasty workaround for finding the settings directory
+    QSettings tmpConfig(QSettings::IniFormat, QSettings::UserScope, "phyxcalc", "settings");
+    settingsDir = QFileInfo(tmpConfig.fileName()).absolutePath() + "/";
+    //settingsDir = QDir::currentPath() + "/settings/";
     firstStartConfig();
 
     unitLoader = new UnitLoader();
@@ -425,7 +428,9 @@ void MainWindow::initializeGUI()
     configureMenu->addMenu(ui->menuWindow);
     //configureMenu->addMenu(ui->menuTools);
     configureMenu->addAction(ui->actionSettings);
-    configureMenu->addMenu(ui->menuHelp);
+    configureMenu->addAction(ui->actionOpen_Settings_Directory);
+    configureMenu->addAction(ui->actionAbout);
+    //configureMenu->addMenu(ui->menuHelp);
     ui->actionConfigure_and_control->setMenu(configureMenu);
     QToolButton *configureButton = new QToolButton();
     configureButton->setText(tr("Configure"));
@@ -1035,4 +1040,10 @@ void MainWindow::on_action_Slim_Mode_triggered()
 void MainWindow::on_actionClear_Variables_triggered()
 {
     documentList.at(activeTab)->lineParser->clearAllVariables();
+}
+
+void MainWindow::on_actionOpen_Settings_Directory_triggered()
+{
+    QString path = QDir::toNativeSeparators(settingsDir);
+    QDesktopServices::openUrl(QUrl("file:///" + path));
 }
