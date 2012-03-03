@@ -24,11 +24,6 @@ UnitLoader::UnitLoader(QObject *parent) :
 {
 }
 
-bool UnitLoader::load()
-{
-    return loadSymbols();
-}
-
 /*bool UnitLoader::loadUnits()
 {
     QFile file("./settings/units.txt");
@@ -62,9 +57,9 @@ bool UnitLoader::load()
         return false;
 }*/
 
-bool UnitLoader::loadSymbols()
+bool UnitLoader::loadSymbols(QString directory)
 {
-    QFile file("./settings/symbols.txt");
+    QFile file(directory + "symbols.txt");
     if (file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         QString text = QString::fromUtf8(file.readAll());

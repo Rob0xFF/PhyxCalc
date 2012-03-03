@@ -57,5 +57,5 @@ void ExportDialog::copyToClipboard()
 
 void ExportDialog::openFormelEditor()
 {
-    system("libreoffice --math");
+    bool ok = system("libreoffice --math");
 }

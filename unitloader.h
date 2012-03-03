@@ -63,8 +63,7 @@ public:
         //QMap<double, SIUnit>        *siUnits() {return &siUnitMap;}
         //QMap<QString, double>       *siPrefixes() {return &siPrefixMap;}
 
-    bool load();
-
+    bool loadSymbols(QString directory);
 private:
     //QMap<QString, QString>     unitMap;
     QList<symbolStruct>                symbolList;
@@ -72,8 +71,6 @@ private:
     /* loads physcial units and symbols from local file*/
     //bool loadUnits();
     /* loads replacement table for symbols from local file*/
-    bool loadSymbols();
-
 
     //QMap<QString, double>           siPrefixMap;
     //QMap<double, SIUnit>           siBaseUnitMap;

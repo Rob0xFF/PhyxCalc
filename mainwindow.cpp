@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     firstStartConfig();
 
     unitLoader = new UnitLoader();
-    unitLoader->load();
+    unitLoader->loadSymbols(settingsDir);
 
     ui->tabWidget->removeTab(0);
     ui->tabWidget->removeTab(0);
@@ -779,7 +779,7 @@ void MainWindow::loadDock(QString name, QStringList items)
 void MainWindow::loadAllDocks()
 {
     //Load docks.txt
-    QFile file("./settings/docks.txt");
+    QFile file(settingsDir + "docks.txt");
     if (file.open(QIODevice::ReadOnly))
     {
         QStringList dockNameList = QString::fromUtf8(file.readAll()).split("\n");
@@ -791,7 +791,7 @@ void MainWindow::loadAllDocks()
 
             QStringList list = dockNameList.at(i).split(";");
 
-            QFile dockFile("./settings/" + list.at(1));
+            QFile dockFile(settingsDir + list.at(1));
             if (dockFile.open(QIODevice::ReadOnly))
             {
                 //Load the file and split it into string list

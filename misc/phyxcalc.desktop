@@ -1,11 +1,12 @@
+#!/usr/bin/env xdg-open
 [Desktop Entry]
 Encoding=UTF-8
 Version=1.0
-Type=Application
-Terminal=false
 Name=PhyxCalc
+Exec=phyxcalc
+Icon=phyxcalc
+Terminal=false
+Type=Application
 GenericName=Physical Expression Calculator
 Comment=Easy to use calculator, especially for physical calculations
-Exec=phyxcalc
-Icon=phyxcalc64
-Categories=Utility;Calculator;
+Categories=Qt;Utility;Calculator;Science;
