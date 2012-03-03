@@ -21,6 +21,7 @@
 #define EXPORTDIALOG_H
 
 #include <QDialog>
+#include <QDebug>
 #include <QPushButton>
 #include <QClipboard>
 

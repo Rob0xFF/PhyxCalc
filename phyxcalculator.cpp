@@ -2051,7 +2051,7 @@ void PhyxCalculator::unitAdd()
     {
         PhyxVariable *variable1 = NULL;
         PhyxVariable *variable2 = NULL;
-        if (!variableStack.size() == 2)
+        if (variableStack.size() == 2)
         {
             variable2 = variableStack.pop();
             variable1 = variableStack.pop();

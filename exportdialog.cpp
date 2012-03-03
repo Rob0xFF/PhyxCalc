@@ -57,5 +57,6 @@ void ExportDialog::copyToClipboard()
 
 void ExportDialog::openFormelEditor()
 {
-    bool ok = system("libreoffice --math");
+    int returnvar = system("libreoffice --math");
+    qDebug() << "formel editor returned" << returnvar;
 }
