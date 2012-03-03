@@ -667,7 +667,7 @@ PhyxUnitSystem::PhyxUnitMap PhyxCalculator::units() const
     return unitSystem->units();
 }
 
-QString PhyxCalculator::complexToString(const PhyxValueDataType number, int precision, char numberFormat, QString imaginaryUnit)
+QString PhyxCalculator::complexToString(const PhyxValueDataType number, int precision, char numberFormat, QString imaginaryUnit, bool useBraces)
 {
     QString string;
     boost::format format(QString("%.%1%2").arg(precision).arg(numberFormat).toStdString());
@@ -714,11 +714,11 @@ QString PhyxCalculator::complexToString(const PhyxValueDataType number, int prec
 
     if (string.isEmpty())
         string.append("0");
-    /*else if (components == 2)
+    else if ((components == 2) && useBraces)
     {
         string.prepend("(");
         string.append(")");
-    }*/
+    }
 
     return string;
 }
@@ -890,9 +890,8 @@ PhyxIntegerDataType PhyxCalculator::longIntToBcd(PhyxIntegerDataType number)
     return output;
 }
 
-PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefx(PhyxValueDataType value, QString unitGroup, QString preferedPrefix) const
+PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefx(PhyxFloatDataType value, QString unitGroup, QString preferedPrefix) const
 {
-    PhyxFloatDataType realValue = value.real();
     PhyxFloatDataType preferedPrefixValue = PHYX_FLOAT_ONE;
     if (!preferedPrefix.isEmpty())
         preferedPrefixValue = unitSystem->prefix(preferedPrefix, unitGroup).value;
@@ -905,7 +904,7 @@ PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefx(PhyxValueDataType value,
             continue;
 
         prefixes[i].value /= preferedPrefixValue;
-        PhyxFloatDataType tmpValue = realValue / prefixes.at(i).value;
+        PhyxFloatDataType tmpValue = value / prefixes.at(i).value;
 
         if (abs(tmpValue) >= PHYX_FLOAT_ONE)
             return prefixes.at(i);
@@ -940,13 +939,18 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
         {
             if (unit->isSimpleUnit())
             {
-                PhyxUnitSystem::PhyxPrefix prefix = getBestPrefx(value, unit->unitGroup(), unit->preferedPrefix());     //get best prefix
-                value /= PhyxValueDataType(prefix.value, 0.0);
+                if (value.imag() == PHYX_FLOAT_NULL)
+                {
+                    PhyxUnitSystem::PhyxPrefix realPrefix = getBestPrefx(value.real(), unit->unitGroup(), unit->preferedPrefix());     //get best prefix
+                    //PhyxUnitSystem::PhyxPrefix imagPrefix = getBestPrefx(value.imag(), unit->unitGroup(), unit->preferedPrefix());     //get best prefix
+                    //value = PhyxValueDataType(value.real() / realPrefix.value, value.imag() / imagPrefix.value);
+                    value = PhyxValueDataType(value.real() / realPrefix.value, PHYX_FLOAT_NULL);
 
-                if (!unit->preferedPrefix().isEmpty())      // for preferd prefix handling
-                    result.unit.remove(0, unit->preferedPrefix().size());
+                    if (!unit->preferedPrefix().isEmpty())      // for preferd prefix handling
+                        result.unit.remove(0, unit->preferedPrefix().size());
 
-                result.unit.prepend(prefix.symbol);
+                    result.unit.prepend(realPrefix.symbol);
+                }
             }
         }
         else if (prefixMode == UseNoPrefix)
@@ -967,7 +971,7 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
         break;
     }
 
-    result.value = complexToString(value, precision, numberFormat, imaginaryUnit);
+    result.value = complexToString(value, precision, numberFormat, imaginaryUnit, !unit->isOne());
 
     return result;
 }

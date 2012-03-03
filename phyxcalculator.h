@@ -184,7 +184,7 @@ public:
         return m_result;
     }
 
-    static QString complexToString(const PhyxValueDataType number, int precision, char numberFormat, QString imaginaryUnit);
+    static QString complexToString(const PhyxValueDataType number, int precision, char numberFormat, QString imaginaryUnit, bool useBraces = false);
     static PhyxValueDataType stringToComplex(QString string);
     static PhyxIntegerDataType hexToLongInt(QString string);
     static PhyxIntegerDataType octToLongInt(QString string);
@@ -244,7 +244,7 @@ private:
     void raiseException(int errorNumber);                                       ///< raises an exception
     void addRule(QString rule, QString functions = "");                         ///< adds a rule
 
-    PhyxUnitSystem::PhyxPrefix getBestPrefx(PhyxValueDataType value, QString unitGroup, QString preferedPrefix) const;     ///< gets the best fitting prefix
+    PhyxUnitSystem::PhyxPrefix getBestPrefx(PhyxFloatDataType value, QString unitGroup, QString preferedPrefix) const;     ///< gets the best fitting prefix
 
     void clearStack();
     void clearResult();
