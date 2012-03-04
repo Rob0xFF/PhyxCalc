@@ -1,6 +1,6 @@
 Format: 1.0
-Source: phyxcalc-3rev146
-Version: 3rev146
+Source: phyxcalc-3rev149
+Version: 3rev149
 Binary: phyxcalc
 Maintainer: Alexander Rössler <mail.aroessler@gmail.com>
 Architecture: any

@@ -29,6 +29,11 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     this->setWindowState(Qt::WindowMaximized);
     ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 #endif
+
+    //set icons
+    ui->listWidget->item(0)->setIcon(QIcon::fromTheme("code-context",QIcon(":/icons/code-context")));
+    ui->listWidget->item(1)->setIcon(QIcon::fromTheme("edit-text-frame-update",QIcon(":/icons/edit-text-frame-update")));
+    ui->listWidget->item(2)->setIcon(QIcon::fromTheme("accessories-text-editor",QIcon(":/icons/accessories-text-editor")));
 }
 
 SettingsDialog::~SettingsDialog()

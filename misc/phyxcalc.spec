@@ -1,5 +1,5 @@
- #
-# spec file for package phyxcalc (Version 3rev146)
+#
+# spec file for package phyxcalc
 #
 # Copyright (c) 2012 Strahlex
 # This file and all modifications and additions to the pristine
@@ -26,7 +26,7 @@ BuildRequires:  libqt4-devel >= 4.7 boost-devel
 BuildRequires:  update-desktop-files libqt4-devel >= 4.7 boost-devel
 %endif
 
-Version:	3rev146
+Version:	3rev149
 Release:	0
 URL:		http://sourceforge.net/projects/phyxcalc/
 License:	GPLv3
@@ -74,7 +74,8 @@ qmake
 %files
 %defattr(-,root,root,-)
 %doc gpl.txt README doc/doc.html
-%{_bindir}/%{name}
+#%{_bindir}/%{name}
+%{_bindir}/*
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/pixmaps/%{name}.png
 #%dir %{_datadir}/mime/application
@@ -88,5 +89,7 @@ qmake
 #%lang(es) %{_mandir}/es/man1/%{name}.*
 
 %changelog
+* Sat Mar 03 2012 Strahlex <mail.aroessler@gmail.com>
+- fixed some bugs
 * Sat Mar 03 2012 Strahlex <mail.aroessler@gmail.com>
 - added revision 146 to Build Service

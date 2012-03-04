@@ -1,32 +1,33 @@
 <RCC>
     <qresource prefix="/icons">
-        <file>images/application-exit.png</file>
-        <file>images/code-context.png</file>
+        <file alias="application-exit">images/application-exit.png</file>
+        <file alias="code-context">images/code-context.png</file>
         <file alias="configure">images/configure.png</file>
-        <file>images/document-export.png</file>
-        <file>images/document-new.png</file>
-        <file>images/document-open.png</file>
-        <file>images/document-save-all.png</file>
-        <file>images/document-save-as.png</file>
-        <file>images/document-save.png</file>
-        <file>images/edit-redo.png</file>
-        <file>images/edit-undo.png</file>
-        <file>images/tab-new.png</file>
-        <file>images/edit-clear.png</file>
-        <file>images/edit-text-frame-update.png</file>
-        <file>images/edit-copy.png</file>
-        <file>images/edit-cut.png</file>
-        <file>images/edit-paste.png</file>
-        <file>images/document-open-recent.png</file>
-        <file>images/dialog-close.png</file>
-        <file>images/run-build-cursor.png</file>
-        <file>images/run-build.png</file>
-        <file>images/text-x-katefilelist.png</file>
+        <file alias="document-export">images/document-export.png</file>
+        <file alias="document-new">images/document-new.png</file>
+        <file alias="document-open">images/document-open.png</file>
+        <file alias="document-save-all">images/document-save-all.png</file>
+        <file alias="document-save-as">images/document-save-as.png</file>
+        <file alias="document-save">images/document-save.png</file>
+        <file alias="edit-redo">images/edit-redo.png</file>
+        <file alias="edit-undo">images/edit-undo.png</file>
+        <file alias="tab-new">images/tab-new.png</file>
+        <file alias="edit-clear">images/edit-clear.png</file>
+        <file alias="edit-text-frame-update">images/edit-text-frame-update.png</file>
+        <file alias="edit-copy">images/edit-copy.png</file>
+        <file alias="edit-cut">images/edit-cut.png</file>
+        <file alias="edit-paste">images/edit-paste.png</file>
+        <file alias="documents-open-recent">images/document-open-recent.png</file>
+        <file alias="dialog-close">images/dialog-close.png</file>
+        <file alias="run-build-cursor">images/run-build-cursor.png</file>
+        <file alias="run-build">images/run-build.png</file>
+        <file alias="help-about">images/help-about.png</file>
+        <file alias="accessories-text-editor">images/accessories-text-editor.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="splash">images/splash.png</file>
     </qresource>
     <qresource prefix="/appicon">
-        <file alias="icon">images/PhyxCalc.png</file>
+        <file alias="icon">images/phyxcalc.png</file>
     </qresource>
 </RCC>

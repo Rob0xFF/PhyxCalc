@@ -434,9 +434,38 @@ void MainWindow::initializeGUI()
     ui->actionConfigure_and_control->setMenu(configureMenu);
     QToolButton *configureButton = new QToolButton();
     configureButton->setText(tr("Configure"));
-    configureButton->setIcon(QIcon(":/icons/configure"));
     configureButton->setPopupMode(QToolButton::InstantPopup);
     configureButton->setMenu(configureMenu);
+
+    //initialize theme icons
+    ui->actionAbout->setIcon(QIcon::fromTheme("help-about",QIcon(":/icons/help-about")));
+    ui->actionClear_Variables->setIcon(QIcon::fromTheme("edit-clear",QIcon(":/icons/edit-clear")));
+    ui->actionClose->setIcon(QIcon::fromTheme("dialog-close",QIcon(":/icons/dialog-close")));
+    //ui->actionClose_All
+    //ui->actionClose_Other
+    ui->actionConfigure_and_control->setIcon(QIcon::fromTheme("configure",QIcon(":/icons/configure")));
+    //ui->actionConstants
+    ui->actionCopy->setIcon(QIcon::fromTheme("edit-copy",QIcon(":/icons/edit-copy")));
+    ui->actionCut->setIcon(QIcon::fromTheme("edit-cut",QIcon(":/icons/edit-cut")));
+    ui->actionExit->setIcon(QIcon::fromTheme("application-exit",QIcon(":/icons/application-exit")));
+    ui->actionExport->setIcon(QIcon::fromTheme("document-export",QIcon(":/icons/document-export")));
+    ui->actionNew->setIcon(QIcon::fromTheme("document-new",QIcon(":/icons/document-new")));
+    ui->actionNew_Tab->setIcon(QIcon::fromTheme("tab-new",QIcon(":/icons/tab-new")));
+    ui->actionOpen->setIcon(QIcon::fromTheme("document-open",QIcon(":/icons/document-open")));
+    //ui->actionOpen_Settings_Directory
+    ui->actionPaste->setIcon(QIcon::fromTheme("edit-paste",QIcon(":/icons/edit-paste")));
+    //ui->actionPhyxCalc
+    ui->actionRecalculate_All->setIcon(QIcon::fromTheme("run-build",QIcon(":/icons/run-build")));
+    ui->actionRecalculate_from_Line->setIcon(QIcon::fromTheme("run-build-cursor",QIcon(":/icons/run-build-cursor")));
+    ui->actionRedo->setIcon(QIcon::fromTheme("edit-redo",QIcon(":/icons/edit-redo")));
+    ui->actionSave->setIcon(QIcon::fromTheme("document-save",QIcon(":/icons/document-save")));
+    ui->actionSave_All->setIcon(QIcon::fromTheme("document-save-all",QIcon(":/icons/document-save-all")));
+    ui->actionSave_As->setIcon(QIcon::fromTheme("document-save-as",QIcon(":/icons/document-save-as")));
+    ui->actionSettings->setIcon(QIcon::fromTheme("configure",QIcon(":/icons/configure")));
+    ui->actionUndo->setIcon(QIcon::fromTheme("edit-undo",QIcon(":/icons/edit-undo")));
+    //ui->actionVariables
+    //ui->action_Slim_Mode
+    configureButton->setIcon(QIcon::fromTheme("configure",QIcon(":/icons/configure")));
 
     //initialize Main Toolbar
     /*ui->mainToolBar->addAction(ui->actionNew);

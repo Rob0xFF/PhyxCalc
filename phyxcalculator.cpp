@@ -596,7 +596,7 @@ bool PhyxCalculator::evaluate(QList<EarleyTreeItem> earleyTree, QString expressi
                     if (functionMap.value(function, NULL) != NULL)
                         (this->*functionMap.value(function))();
                     else
-                        qFatal(tr("Function %1 not found!").arg(function).toLocal8Bit());
+                        qFatal("Function %s not found!", function.toAscii().constData());
                 }
             }
         //}

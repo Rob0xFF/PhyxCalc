@@ -51,27 +51,15 @@
       <property name="text">
        <string>Line Parser</string>
       </property>
-      <property name="icon">
-       <iconset resource="images.qrc">
-        <normaloff>:/icons/images/code-context.png</normaloff>:/icons/images/code-context.png</iconset>
-      </property>
      </item>
      <item>
       <property name="text">
        <string>Output</string>
       </property>
-      <property name="icon">
-       <iconset resource="images.qrc">
-        <normaloff>:/icons/images/edit-text-frame-update.png</normaloff>:/icons/images/edit-text-frame-update.png</iconset>
-      </property>
      </item>
      <item>
       <property name="text">
        <string>Text Editor</string>
-      </property>
-      <property name="icon">
-       <iconset resource="images.qrc">
-        <normaloff>:/icons/images/text-x-katefilelist.png</normaloff>:/icons/images/text-x-katefilelist.png</iconset>
       </property>
      </item>
     </widget>
@@ -111,8 +99,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>422</width>
-            <height>454</height>
+            <width>174</width>
+            <height>109</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -825,9 +813,7 @@ border: 2px solid</string>
   <zorder>buttonBox</zorder>
   <zorder>stackedWidget</zorder>
  </widget>
- <resources>
-  <include location="images.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>
