@@ -115,7 +115,7 @@ bool PhyxUnitSystem::removeUnit(QString symbol)
     return true;
 }
 
-void PhyxUnitSystem::addPrefix(QString symbol, double value, QString unitGroup, bool inputOnly)
+void PhyxUnitSystem::addPrefix(QString symbol, PhyxFloatDataType value, QString unitGroup, bool inputOnly)
 {
     PhyxPrefix prefix;
     prefix.value = value;

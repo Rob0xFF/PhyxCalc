@@ -22,6 +22,7 @@
 
 #include <QObject>
 #include <QMap>
+#include "global.h"
 
 class PhyxUnit : public QObject
 {
@@ -29,8 +30,8 @@ class PhyxUnit : public QObject
     Q_PROPERTY(QString symbol READ symbol WRITE setSymbol)
     Q_PROPERTY(QString name READ name WRITE setName)
     //Q_PROPERTY(UnitType type READ type WRITE setType)
-    Q_PROPERTY(double offset READ offset WRITE setOffset)
-    Q_PROPERTY(double scaleFactor READ scaleFactor WRITE setScaleFactor)
+    Q_PROPERTY(PhyxFloatDataType offset READ offset WRITE setOffset)
+    Q_PROPERTY(PhyxFloatDataType scaleFactor READ scaleFactor WRITE setScaleFactor)
     Q_PROPERTY(PowerMap powers READ powers WRITE setPowers)
     //Q_PROPERTY(double prefixPower READ prefixPower WRITE setPrefixPower)
     Q_PROPERTY(UnitFlags flags READ flags WRITE setFlags)
@@ -59,17 +60,17 @@ public:
     };
     Q_DECLARE_FLAGS(UnitFlags, UnitFlag)
 
-    typedef QMap<QString, double> PowerMap;
+    typedef QMap<QString, PhyxFloatDataType> PowerMap;
 
-    void powerAppend(QString base, double power);       /// adds a power to the map
-    void powerMultiply(QString base, double factor);    /// multiplies a power with factor
-    void powerDivide(QString base, double factor);      /// devides a power with factor
-    void powersMultiply(PowerMap powers);               /// multiplies powers of the unit with other powers
-    void powersDivide(PowerMap powers);                 /// devides powers of the unit with other powers
-    void powersRaise(double power);                     /// raises all powers to power
-    void powersRoot(double root);                       /// takes the root of all powers
-    bool powersCompare(PowerMap powers);                /// compares powers of the unit with other powers and returns ==
-    void powersClear();                                 /// clears all powers
+    void powerAppend(QString base, PhyxFloatDataType power);        /// adds a power to the map
+    void powerMultiply(QString base, PhyxFloatDataType factor);     /// multiplies a power with factor
+    void powerDivide(QString base, PhyxFloatDataType factor);       /// devides a power with factor
+    void powersMultiply(PowerMap powers);                           /// multiplies powers of the unit with other powers
+    void powersDivide(PowerMap powers);                             /// devides powers of the unit with other powers
+    void powersRaise(PhyxFloatDataType power);                      /// raises all powers to power
+    void powersRoot(PhyxFloatDataType root);                        /// takes the root of all powers
+    bool powersCompare(PowerMap powers);                            /// compares powers of the unit with other powers and returns ==
+    void powersClear();                                             /// clears all powers
 
     /*void prefixMultiply(double factor);
     void prefixDevide(double factor);
@@ -97,11 +98,11 @@ public:
     {
         return m_name;
     }
-    double      offset() const
+    PhyxFloatDataType      offset() const
     {
         return m_offset;
     }
-    double      scaleFactor() const
+    PhyxFloatDataType      scaleFactor() const
     {
         return m_scaleFactor;
     }
@@ -125,8 +126,8 @@ public:
 private:
     QString     m_symbol;                  /// the symbol of the unit
     QString     m_name;                    /// the name of the unit
-    double      m_offset;                  /// offset for OffsetUnit and GalileanUnit
-    double      m_scaleFactor;             /// scale factor for GalileanUnit and LogarithmicUnit
+    PhyxFloatDataType      m_offset;       /// offset for OffsetUnit and GalileanUnit
+    PhyxFloatDataType      m_scaleFactor;  /// scale factor for GalileanUnit and LogarithmicUnit
     PowerMap    m_powers;                  /// this map holds the powers of the base units
     //double      m_prefixPower;             /// for Si units -> the power of the prefix (10^x)
     UnitFlags   m_flags;                   /// flags of the unit
@@ -147,11 +148,11 @@ void setName(QString arg)
 {
     m_name = arg;
 }
-void setOffset(double arg)
+void setOffset(PhyxFloatDataType arg)
 {
     m_offset = arg;
 }
-void setScaleFactor(double arg)
+void setScaleFactor(PhyxFloatDataType arg)
 {
     m_scaleFactor = arg;
 }

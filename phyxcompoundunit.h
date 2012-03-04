@@ -30,8 +30,8 @@ class PhyxCompoundUnit : public PhyxUnit
 {
     /// a compound of the compound unit
     typedef struct CompoundStruct{
-        PhyxUnit    *unit;  /// the unit of the compound
-        double      power;  /// the power of the compound
+        PhyxUnit                *unit;  /// the unit of the compound
+        PhyxFloatDataType       power;  /// the power of the compound
 
         bool operator == (CompoundStruct compound){
             return (unit->isSame(compound.unit) && (power == compound.power));
@@ -60,8 +60,8 @@ public:
     bool sub(PhyxCompoundUnit *unit);
     void multiply(PhyxCompoundUnit *unit);
     void divide(PhyxCompoundUnit *unit);
-    void raise(double power);
-    void root(double root);
+    void raise(PhyxFloatDataType power);
+    void root(PhyxFloatDataType root);
 
     bool convertTo(PhyxCompoundUnit *unit);             ///< converts the variable to the given unit, returns successful
     void fromSimpleUnit(PhyxUnit *unit);                ///< make a compound unit from a simple unit
@@ -87,14 +87,14 @@ private:
     PhyxUnitSystem * m_unitSystem;
 
     PhyxCompoundList  m_compounds;    /// holds all compounds of a unit: e.g.: m/s -> compuound 1: m^1, compound 2: s^-1
-    void compoundAppend(PhyxUnit *unit, double power);                  ///< adds a power to the map
-    void compoundMultiply(PhyxUnit *unit, double factor);               ///< multiplies a power with factor
-    void compoundDivide(PhyxUnit *unit, double factor);                 ///< devides a power with factor
+    void compoundAppend(PhyxUnit *unit, PhyxFloatDataType power);                  ///< adds a power to the map
+    void compoundMultiply(PhyxUnit *unit, PhyxFloatDataType factor);               ///< multiplies a power with factor
+    void compoundDivide(PhyxUnit *unit, PhyxFloatDataType factor);                 ///< devides a power with factor
     void compoundEqualize(int unitIndex, PhyxCompoundUnit *parentUnit); ///< equalizes one compound with the matching compound in the given unit
     void compoundsMultiply(PhyxCompoundList compounds);                 ///< multiplies powers of the unit with other powers
     void compoundsDivide(PhyxCompoundList compounds);                   ///< devides powers of the unit with other powers
-    void compoundsRaise(double power);                                  ///< raises all powers to power
-    void compoundsRoot(double root);                                    ///< takes the root of all powers
+    void compoundsRaise(PhyxFloatDataType power);                                  ///< raises all powers to power
+    void compoundsRoot(PhyxFloatDataType root);                                    ///< takes the root of all powers
     void compoundsClear();                                              ///< clear all compounds
     void compoundsSetNull();                                            ///< sets the powers of all compounds to 0
     int  compoundsNonNullCount();                                       ///< returns the number of compounds that are not 0
@@ -102,8 +102,8 @@ private:
     void verify();                                           ///< searches for the unit in the unit system
 
 signals:
-    void offsetValue(double value);                         ///< offsets the value of the variable
-    void scaleValue(double scaleFactor);                    ///< scales the value of the variable
+    void offsetValue(PhyxFloatDataType value);                         ///< offsets the value of the variable
+    void scaleValue(PhyxFloatDataType scaleFactor);                    ///< scales the value of the variable
     
 public slots:
 

@@ -566,6 +566,8 @@ bool MainWindow::closeTab(int index)
         ui->tabWidget->setTabText(0, tr("Untitled"));
     }
 
+    emit tabChanged(activeTab);
+
     return true;
 }
 

@@ -53,7 +53,7 @@ public:
    //                     PhyxUnit::UnitFlags flags);                 ///< adds a derived unit, based on a variable
     void addDerivedUnit(PhyxUnit *unit);                            ///< adds a derived unit
     bool removeUnit(QString symbol);                                ///< removes a unit, returns successful
-    void addPrefix(QString symbol, double value, QString unitGroup, bool inputOnly = false);///< adds a prefix
+    void addPrefix(QString symbol, PhyxFloatDataType value, QString unitGroup, bool inputOnly = false);///< adds a prefix
     bool removePrefix(QString symbol);                              ///< removes a prefix, returns successful
     void addUnitGroup(QString name);                                ///< adds a unit group
     bool removeUnitGroup(QString name);                             ///< removes a unit group, returns succesful

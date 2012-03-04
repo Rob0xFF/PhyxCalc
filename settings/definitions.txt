@@ -55,6 +55,7 @@ Wh@si@k=[1kW*h]         //Energie: Kilowattstunden
 C@si=[A*s]          //Ladung: Coulomb
 V@si=[J/C]          //elektrische Spannung: Volt
 Ω@si=[V/A]          //elektrischer Widerstand: Ohm
+S@si=[1/Ω]          //elektrischer Leitwert: Siemens
 F@si=[C/V]          //elektrische Kapazität: Farad
 H@si=[V*s/A]        //Induktivität: Henry
 T@si=[V*s/m^2]      //magnetische Flussdichte: Tesla

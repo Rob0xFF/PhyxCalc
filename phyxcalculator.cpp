@@ -946,10 +946,19 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
                     //value = PhyxValueDataType(value.real() / realPrefix.value, value.imag() / imagPrefix.value);
                     value = PhyxValueDataType(value.real() / realPrefix.value, PHYX_FLOAT_NULL);
 
-                    if (!unit->preferedPrefix().isEmpty())      // for preferd prefix handling
+                    if (!unit->preferedPrefix().isEmpty())      // preferd prefix handling
                         result.unit.remove(0, unit->preferedPrefix().size());
 
                     result.unit.prepend(realPrefix.symbol);
+                } else if (value.real() == PHYX_FLOAT_NULL)
+                {
+                    PhyxUnitSystem::PhyxPrefix imagPrefix = getBestPrefx(value.imag(), unit->unitGroup(), unit->preferedPrefix());     //get best prefix
+                    value = PhyxValueDataType(PHYX_FLOAT_NULL, value.imag() / imagPrefix.value);
+
+                    if (!unit->preferedPrefix().isEmpty())      // preferd prefix handling
+                        result.unit.remove(0, unit->preferedPrefix().size());
+
+                    result.unit.prepend(imagPrefix.symbol);
                 }
             }
         }
@@ -1542,7 +1551,7 @@ void PhyxCalculator::valueHeaviside()
 
 void PhyxCalculator::valueRand()
 {
-    valueBuffer = PhyxValueDataType(static_cast<PhyxFloatDataType>(qrand() / (long double)(RAND_MAX)),PHYX_FLOAT_NULL);
+    valueBuffer = PhyxValueDataType(static_cast<PhyxFloatDataType>(qrand() / static_cast<PhyxFloatDataType>(RAND_MAX)),PHYX_FLOAT_NULL);
     unitBuffer = "";
     pushVariable();
 }
@@ -2041,7 +2050,7 @@ void PhyxCalculator::unitClear()
 {
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setUnit(new PhyxUnit());
+    variable1->setUnit(new PhyxCompoundUnit());
     variableStack.push(variable1);
 }
 
@@ -2448,7 +2457,7 @@ void PhyxCalculator::pushVariable()
     //handle units with prefered prefix (like kg)
     QString preferedPrefix;
     QString unitGroup;
-    double preferedPrefixValue = 1;
+    PhyxFloatDataType preferedPrefixValue = PHYX_FLOAT_ONE;
     if (!variable->unit()->isDimensionlessUnit())
     {
         preferedPrefix  = variable->unit()->compounds().first().unit->preferedPrefix();

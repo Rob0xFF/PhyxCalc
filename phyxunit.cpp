@@ -31,14 +31,14 @@ PhyxUnit::PhyxUnit(QObject *parent) :
     m_flags = 0;
 }
 
-void PhyxUnit::powerAppend(QString base, double power)
+void PhyxUnit::powerAppend(QString base, PhyxFloatDataType power)
 {
     m_powers.insert(base, power);
 }
 
-void PhyxUnit::powerMultiply(QString base, double factor)
+void PhyxUnit::powerMultiply(QString base, PhyxFloatDataType factor)
 {
-    double power;
+    PhyxFloatDataType power;
     if (m_powers.contains(base))
     {
         power = m_powers.value(base);
@@ -49,15 +49,15 @@ void PhyxUnit::powerMultiply(QString base, double factor)
         power = factor;
     }
 
-    if (power == 0)
+    if (power == PHYX_FLOAT_NULL)
         m_powers.remove(base);
     else
         m_powers.insert(base, power);
 }
 
-void PhyxUnit::powerDivide(QString base, double factor)
+void PhyxUnit::powerDivide(QString base, PhyxFloatDataType factor)
 {
-    double power;
+    PhyxFloatDataType power;
     if (m_powers.contains(base))
     {
         power = m_powers.value(base);
@@ -68,7 +68,7 @@ void PhyxUnit::powerDivide(QString base, double factor)
         power = -factor;
     }
 
-    if (power == 0)
+    if (power == PHYX_FLOAT_NULL)
         m_powers.remove(base);
     else
         m_powers.insert(base, power);
@@ -76,7 +76,7 @@ void PhyxUnit::powerDivide(QString base, double factor)
 
 void PhyxUnit::powersMultiply(PhyxUnit::PowerMap powers)
 {
-    QMapIterator<QString, double> i(powers);
+    QMapIterator<QString, PhyxFloatDataType> i(powers);
      while (i.hasNext()) {
          i.next();
          powerMultiply(i.key(), i.value());
@@ -85,25 +85,25 @@ void PhyxUnit::powersMultiply(PhyxUnit::PowerMap powers)
 
 void PhyxUnit::powersDivide(PhyxUnit::PowerMap powers)
 {
-    QMapIterator<QString, double> i(powers);
+    QMapIterator<QString, PhyxFloatDataType> i(powers);
      while (i.hasNext()) {
          i.next();
          powerDivide(i.key(), i.value());
      }
 }
 
-void PhyxUnit::powersRaise(double power)
+void PhyxUnit::powersRaise(PhyxFloatDataType power)
 {
-    QMapIterator<QString, double> i(m_powers);
+    QMapIterator<QString, PhyxFloatDataType> i(m_powers);
      while (i.hasNext()) {
          i.next();
          m_powers.insert(i.key(), i.value() * power);
      }
 }
 
-void PhyxUnit::powersRoot(double root)
+void PhyxUnit::powersRoot(PhyxFloatDataType root)
 {
-    QMapIterator<QString, double> i(m_powers);
+    QMapIterator<QString, PhyxFloatDataType> i(m_powers);
      while (i.hasNext()) {
          i.next();
          m_powers.insert(i.key(), i.value() / root);
@@ -129,7 +129,7 @@ bool PhyxUnit::isBaseUnit()
 {
     if (((m_scaleFactor == 1) && (m_offset == 0) && (m_powers.size() == 1)))
     {
-        QMapIterator<QString, double> i(m_powers);
+        QMapIterator<QString, PhyxFloatDataType> i(m_powers);
         i.next();
         if (i.value() == 1)
             return true;
@@ -183,13 +183,13 @@ void PhyxUnit::copyUnit(PhyxUnit *source, PhyxUnit *destination)
 QString PhyxUnit::dimensionString() const       //this can't handle units with prefered prefix
 {
     QString outputString;
-    QMapIterator<QString, double> i(m_powers);
+    QMapIterator<QString, PhyxFloatDataType> i(m_powers);
     while (i.hasNext())
     {
         i.next();
         if (!outputString.isEmpty())
             outputString.append('*');
-        outputString.append(QString("%1%2").arg(i.key()).arg(i.value()));
+        outputString.append(QString("%1%2").arg(i.key()).arg(static_cast<double>(i.value())));
     }
 
     // unicodify string

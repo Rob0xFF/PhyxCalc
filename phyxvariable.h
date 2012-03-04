@@ -71,17 +71,17 @@ void setValue(PhyxValueDataType arg)
 void setUnit(PhyxCompoundUnit * arg)
 {
     m_unit = arg;
-    connect(m_unit, SIGNAL(offsetValue(double)),
-            this, SLOT(offsetValue(double)));
-    connect(m_unit, SIGNAL(scaleValue(double)),
-            this, SLOT(scaleValue(double)));
+    connect(m_unit, SIGNAL(offsetValue(PhyxFloatDataType)),
+            this, SLOT(offsetValue(PhyxFloatDataType)));
+    connect(m_unit, SIGNAL(scaleValue(PhyxFloatDataType)),
+            this, SLOT(scaleValue(PhyxFloatDataType)));
 }
 void setUnit(PhyxUnit *unit);
-void offsetValue(double offset)
+void offsetValue(PhyxFloatDataType offset)
 {
     m_value += offset;
 }
-void scaleValue(double scaleFactor)
+void scaleValue(PhyxFloatDataType scaleFactor)
 {
     m_value *= scaleFactor;
 }
