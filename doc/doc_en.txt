@@ -96,7 +96,7 @@ Symbols;symbols.txt
 Now restart PhyxCalc and start using your dock.
 
 == Mathematical Functions
-Alle mathematical functions can be written with the first letter uppercase or lowercase or only with uppercase letters. Trigonometric are using radiant, for degrees use dimensionless unit °.
+All mathematical functions can be written with the first letter uppercase or lowercase or only with uppercase letters. Trigonometric are using radiant, for degrees use dimensionless unit °.
 
 === Operators and symbols
 PhyxCalc uses C++-like operators and some additional operators for special mathematical functionality. The operators are ordered beginning with highest priority.

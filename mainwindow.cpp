@@ -145,7 +145,7 @@ void MainWindow::copyResource(QString name)
 {
     if (!QFile::exists(settingsDir + name))
     {
-        QFile::copy(":/settings/" + name, settingsDir + name);
+        QFile::copy(":/" + name, settingsDir + name);
         QFile::setPermissions(settingsDir + name, QFile::ReadOwner | QFile::WriteOwner);
     }
 }
@@ -429,6 +429,7 @@ void MainWindow::initializeGUI()
     //configureMenu->addMenu(ui->menuTools);
     configureMenu->addAction(ui->actionSettings);
     configureMenu->addAction(ui->actionOpen_Settings_Directory);
+    configureMenu->addAction(ui->actionHelp);
     configureMenu->addAction(ui->actionAbout);
     //configureMenu->addMenu(ui->menuHelp);
     ui->actionConfigure_and_control->setMenu(configureMenu);
@@ -449,6 +450,7 @@ void MainWindow::initializeGUI()
     ui->actionCut->setIcon(QIcon::fromTheme("edit-cut",QIcon(":/icons/edit-cut")));
     ui->actionExit->setIcon(QIcon::fromTheme("application-exit",QIcon(":/icons/application-exit")));
     ui->actionExport->setIcon(QIcon::fromTheme("document-export",QIcon(":/icons/document-export")));
+    ui->actionHelp->setIcon(QIcon::fromTheme("help-contents", QIcon(":/icons/help-contents")));
     ui->actionNew->setIcon(QIcon::fromTheme("document-new",QIcon(":/icons/document-new")));
     ui->actionNew_Tab->setIcon(QIcon::fromTheme("tab-new",QIcon(":/icons/tab-new")));
     ui->actionOpen->setIcon(QIcon::fromTheme("document-open",QIcon(":/icons/document-open")));
@@ -1077,4 +1079,11 @@ void MainWindow::on_actionOpen_Settings_Directory_triggered()
 {
     QString path = QDir::toNativeSeparators(settingsDir);
     QDesktopServices::openUrl(QUrl("file:///" + path));
+}
+
+void MainWindow::on_actionHelp_triggered()
+{
+    HelpDialog helpDialog;
+    helpDialog.setHelpFile(":/doc/doc_en.html");
+    helpDialog.exec();
 }

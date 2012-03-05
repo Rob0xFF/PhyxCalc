@@ -50,7 +50,8 @@ SOURCES += main.cpp\
     phyxcompoundunit.cpp \
     phyxtesting.cpp \
     phyxvariablemanager.cpp \
-    phyxsyntaxhighlighter.cpp
+    phyxsyntaxhighlighter.cpp \
+    helpdialog.cpp
 
 HEADERS  += mainwindow.h \
             lineparser.h \
@@ -67,11 +68,13 @@ HEADERS  += mainwindow.h \
     phyxcompoundunit.h \
     phyxtesting.h \
     phyxvariablemanager.h \
-    phyxsyntaxhighlighter.h
+    phyxsyntaxhighlighter.h \
+    helpdialog.h
 
 FORMS    += mainwindow.ui \
     exportdialog.ui \
-    settingsdialog.ui
+    settingsdialog.ui \
+    helpdialog.ui
 
 RESOURCES += \
     images.qrc \

@@ -38,6 +38,7 @@
 #include "lineparser.h"
 #include "unitloader.h"
 #include "exportdialog.h"
+#include "helpdialog.h"
 //#include "flowlayout.h"
 #include "settingsdialog.h"
 #include "global.h"
@@ -153,6 +154,7 @@ private slots:
     void on_action_Slim_Mode_triggered();
     void on_actionClear_Variables_triggered();
     void on_actionOpen_Settings_Directory_triggered();
+    void on_actionHelp_triggered();
 };
 
 #endif // MAINWINDOW_H

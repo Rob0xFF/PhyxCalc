@@ -23,6 +23,7 @@
         <file alias="run-build">images/run-build.png</file>
         <file alias="help-about">images/help-about.png</file>
         <file alias="accessories-text-editor">images/accessories-text-editor.png</file>
+        <file alias="help-contents">images/help-contents.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="splash">images/splash.png</file>

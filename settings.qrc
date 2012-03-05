@@ -11,5 +11,6 @@
         <file>settings/settings.ini</file>
         <file>settings/symbols.txt</file>
         <file>settings/definitions.txt</file>
+        <file>doc/doc_en.html</file>
     </qresource>
 </RCC>

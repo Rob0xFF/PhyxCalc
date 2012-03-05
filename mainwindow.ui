@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>924</width>
-    <height>504</height>
+    <width>768</width>
+    <height>490</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -63,7 +63,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>924</width>
+     <width>768</width>
      <height>20</height>
     </rect>
    </property>
@@ -91,7 +91,7 @@
       <string>Open &amp;Recent</string>
      </property>
      <property name="icon">
-      <iconset resource="images.qrc">
+      <iconset>
        <normaloff>:/icons/images/document-open-recent.png</normaloff>:/icons/images/document-open-recent.png</iconset>
      </property>
     </widget>
@@ -134,6 +134,7 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <addaction name="actionHelp"/>
     <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuCalculation">
@@ -240,7 +241,7 @@
   </widget>
   <action name="actionNew_Tab">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/tab-new.png</normaloff>:/icons/images/tab-new.png</iconset>
    </property>
    <property name="text">
@@ -252,7 +253,7 @@
   </action>
   <action name="actionNew">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/document-new.png</normaloff>:/icons/images/document-new.png</iconset>
    </property>
    <property name="text">
@@ -267,7 +268,7 @@
   </action>
   <action name="actionOpen">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/document-open.png</normaloff>:/icons/images/document-open.png</iconset>
    </property>
    <property name="text">
@@ -279,7 +280,7 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/document-save.png</normaloff>:/icons/images/document-save.png</iconset>
    </property>
    <property name="text">
@@ -291,7 +292,7 @@
   </action>
   <action name="actionSave_As">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/document-save-as.png</normaloff>:/icons/images/document-save-as.png</iconset>
    </property>
    <property name="text">
@@ -300,7 +301,7 @@
   </action>
   <action name="actionSave_All">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/document-save-all.png</normaloff>:/icons/images/document-save-all.png</iconset>
    </property>
    <property name="text">
@@ -312,7 +313,7 @@
   </action>
   <action name="actionClose">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/dialog-close.png</normaloff>:/icons/images/dialog-close.png</iconset>
    </property>
    <property name="text">
@@ -332,7 +333,7 @@
   </action>
   <action name="actionExit">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/application-exit.png</normaloff>:/icons/images/application-exit.png</iconset>
    </property>
    <property name="text">
@@ -347,7 +348,7 @@
   </action>
   <action name="actionUndo">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/edit-undo.png</normaloff>:/icons/images/edit-undo.png</iconset>
    </property>
    <property name="text">
@@ -359,7 +360,7 @@
   </action>
   <action name="actionRedo">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/edit-redo.png</normaloff>:/icons/images/edit-redo.png</iconset>
    </property>
    <property name="text">
@@ -379,7 +380,7 @@
   </action>
   <action name="actionExport">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/document-export.png</normaloff>:/icons/images/document-export.png</iconset>
    </property>
    <property name="text">
@@ -405,7 +406,7 @@
   </action>
   <action name="actionCut">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/edit-cut.png</normaloff>:/icons/images/edit-cut.png</iconset>
    </property>
    <property name="text">
@@ -417,7 +418,7 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/edit-copy.png</normaloff>:/icons/images/edit-copy.png</iconset>
    </property>
    <property name="text">
@@ -429,7 +430,7 @@
   </action>
   <action name="actionPaste">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/edit-paste.png</normaloff>:/icons/images/edit-paste.png</iconset>
    </property>
    <property name="text">
@@ -446,7 +447,7 @@
   </action>
   <action name="actionRecalculate_All">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/run-build.png</normaloff>:/icons/images/run-build.png</iconset>
    </property>
    <property name="text">
@@ -458,7 +459,7 @@
   </action>
   <action name="actionRecalculate_from_Line">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/run-build-cursor.png</normaloff>:/icons/images/run-build-cursor.png</iconset>
    </property>
    <property name="text">
@@ -503,7 +504,7 @@
   </action>
   <action name="actionClear_Variables">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/icons/images/edit-clear.png</normaloff>:/icons/images/edit-clear.png</iconset>
    </property>
    <property name="text">
@@ -513,6 +514,14 @@
   <action name="actionOpen_Settings_Directory">
    <property name="text">
     <string>Open Settings &amp;Directory</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="text">
+    <string>Help</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
    </property>
   </action>
  </widget>
