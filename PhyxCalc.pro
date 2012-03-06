@@ -89,7 +89,8 @@ OTHER_FILES += \
     settings/electronicFunctions.txt \
     settings/functionsDock.txt \
     settings/numbersDock.txt \
-    settings/operatorsDock.txt
+    settings/operatorsDock.txt \
+    doc/doc_en.txt
 
 # Please do not modify the following two lines. Required for deployment.
 include(deployment.pri)

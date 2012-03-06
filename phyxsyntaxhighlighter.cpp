@@ -31,7 +31,7 @@ void PhyxSyntaxHighlighter::setVariableHighlightingRules(QStringList variableLis
     variableHighlightingRules.clear();
     foreach (QString variableName, variableList)
     {
-        QString pattern = QString("%1\\b").arg(variableName);
+        QString pattern = QString("%1").arg(variableName);
         HighlightingRule rule;
         rule.pattern = QRegExp(pattern);
         rule.format = variablesFormat;
@@ -45,7 +45,7 @@ void PhyxSyntaxHighlighter::setConstantHighlightingRules(QStringList variableLis
     constantHighlightingRules.clear();
     foreach (QString variableName, variableList)
     {
-        QString pattern = QString("%1_\\b").arg(variableName);
+        QString pattern = QString("%1_").arg(variableName);
         HighlightingRule rule;
         rule.pattern = QRegExp(pattern);
         rule.format = constantsFormat;
@@ -60,11 +60,25 @@ void PhyxSyntaxHighlighter::setUnitHighlightingRules(QStringList unitList)
     foreach (QString variableName, unitList)
     {
         variableName.replace("$","\\$");
-        QString pattern = QString("%1\\b").arg(variableName);
+        QString pattern = QString("%1").arg(variableName);
         HighlightingRule rule;
         rule.pattern = QRegExp(pattern);
         rule.format = unitFormat;
         unitHighlightingRules.append(rule);
+    }
+    rehighlight();
+}
+
+void PhyxSyntaxHighlighter::setFunctionHighlightinhRules(QStringList functionList)
+{
+    functionHighlightingRules.clear();
+    foreach (QString variableName, functionList)
+    {
+        QString pattern = QString("%1").arg(variableName);
+        HighlightingRule rule;
+        rule.pattern = QRegExp(pattern);
+        rule.format = functionFormat;
+        functionHighlightingRules.append(rule);
     }
     rehighlight();
 }
@@ -108,6 +122,7 @@ void PhyxSyntaxHighlighter::highlightBlock(const QString &text)
     highlightRules(text, unitHighlightingRules);
     highlightRules(text, constantHighlightingRules);
     highlightRules(text, variableHighlightingRules);
+    highlightRules(text, functionHighlightingRules);
     highlightRules(text, highlightingRulesPriority2);
 
     setCurrentBlockState(0);
@@ -211,9 +226,9 @@ void PhyxSyntaxHighlighter::updateFormats()
     }
 
     //functions
-    rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
-    rule.format = functionFormat;
-    highlightingRulesPriority2.append(rule);
+    //rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
+    //rule.format = functionFormat;
+    //highlightingRulesPriority2.append(rule);
 
     //errorFormat.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
 
@@ -224,7 +239,7 @@ void PhyxSyntaxHighlighter::updateFormats()
     //rule.pattern = QRegExp("\\b[0][x][0-9A-Fa-f]+\\b");
     //highlightingRulesPriority1.append(rule);
     //rule.pattern = QRegExp("\\b[0][b][0-1]+\\b");
-    highlightingRulesPriority1.append(rule);
+    highlightingRulesPriority2.append(rule);
 
     //single line comments
     rule.pattern = QRegExp("//[^\n]*");

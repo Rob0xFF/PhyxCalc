@@ -234,6 +234,66 @@ void PhyxCalculator::initialize()
     loadGrammar(":/settings/grammar");
     earleyParser->setStartSymbol("S");
 
+    standardFunctionList.append("sin");
+    standardFunctionList.append("arcsin");
+    standardFunctionList.append("asin");
+    standardFunctionList.append("cos");
+    standardFunctionList.append("arccos");
+    standardFunctionList.append("acos");
+    standardFunctionList.append("tan");
+    standardFunctionList.append("arctan");
+    standardFunctionList.append("atan");
+    standardFunctionList.append("sinh");
+    standardFunctionList.append("arcsinh");
+    standardFunctionList.append("asinh");
+    standardFunctionList.append("cosh");
+    standardFunctionList.append("arccosh");
+    standardFunctionList.append("acosh");
+    standardFunctionList.append("tanh");
+    standardFunctionList.append("arctanh");
+    standardFunctionList.append("atanh");
+    standardFunctionList.append("exp");
+    standardFunctionList.append("ln");
+    standardFunctionList.append("log");
+    standardFunctionList.append("root");
+    standardFunctionList.append("sqrt");
+    standardFunctionList.append("sqr");
+    standardFunctionList.append("abs");
+    standardFunctionList.append("max");
+    standardFunctionList.append("min");
+    standardFunctionList.append("avg");
+    standardFunctionList.append("int");
+    standardFunctionList.append("trunc");
+    standardFunctionList.append("floor");
+    standardFunctionList.append("round");
+    standardFunctionList.append("ceil");
+    standardFunctionList.append("sign");
+    standardFunctionList.append("heaviside");
+    standardFunctionList.append("rand");
+    standardFunctionList.append("rnd");
+    standardFunctionList.append("randi");
+    standardFunctionList.append("rndi");
+    standardFunctionList.append("randg");
+    standardFunctionList.append("rndg");
+    standardFunctionList.append("re");
+    standardFunctionList.append("im");
+    standardFunctionList.append("arg");
+    standardFunctionList.append("norm");
+    standardFunctionList.append("conj");
+    standardFunctionList.append("polar");
+    standardFunctionList.append("bcd");
+    standardFunctionList.append("tobcd");
+    standardFunctionList.append("ans");
+
+    for (int i = standardFunctionList.size()-1; i >= 0 ; i--)
+    {
+        QString name = standardFunctionList.at(i);
+        name[0] = name.at(0).toUpper();
+        standardFunctionList.append(name);
+        name = name.toUpper();
+        standardFunctionList.append(name);
+    }
+
     //initialize unit system
     unitSystem = new PhyxUnitSystem();
     connect(unitSystem, SIGNAL(unitAdded(QString)),
@@ -475,6 +535,7 @@ void PhyxCalculator::addFunctionRule(QString name, int parameterCount)
     }
     ruleString.append(")");
     addRule(ruleString, QString("bufferParameter, functionRun"));
+    emit functionsChanged();
 }
 
 void PhyxCalculator::removeFunctionRule(QString name, int parameterCount)
@@ -490,6 +551,7 @@ void PhyxCalculator::removeFunctionRule(QString name, int parameterCount)
     }
     ruleString.append(")");
     earleyParser->removeRule(ruleString);
+    emit functionsChanged();
 }
 
 void PhyxCalculator::clearStack()
@@ -571,6 +633,10 @@ bool PhyxCalculator::evaluate()
 bool PhyxCalculator::evaluate(QList<EarleyTreeItem> earleyTree, QString expression, QList<int> whiteSpaceList)
 {
     stackLevel++;
+#ifdef QT_DEBUG
+        qDebug() << "evaluating expression:" << expression;
+        qDebug() << "stack level:" << stackLevel;
+#endif
     for (int i = (earleyTree.size()-1); i >= 0; i--)
     {
         EarleyTreeItem *earleyTreeItem = &earleyTree[i];
@@ -593,15 +659,23 @@ bool PhyxCalculator::evaluate(QList<EarleyTreeItem> earleyTree, QString expressi
                     parameterBuffer = expression.mid(earleyTreeItem->startPos, earleyTreeItem->endPos - earleyTreeItem->startPos + 1);
                 else
                 {
+#ifdef QT_DEBUG
+                    qDebug() << function;
+#endif
                     if (functionMap.value(function, NULL) != NULL)
                         (this->*functionMap.value(function))();
+#ifdef QT_DEBUG
                     else
                         qFatal("Function %s not found!", function.toAscii().constData());
+#endif
                 }
             }
         //}
     }
     stackLevel--;
+#ifdef QT_DEBUG
+    qDebug() << "returned to stack level:" << stackLevel;
+#endif
     return true;
 }
 
@@ -665,6 +739,21 @@ PhyxVariableManager::PhyxVariableMap *PhyxCalculator::constants() const
 PhyxUnitSystem::PhyxUnitMap PhyxCalculator::units() const
 {
     return unitSystem->units();
+}
+
+QStringList PhyxCalculator::functions() const
+{
+    QStringList functionList;
+    functionList.append(standardFunctionList);
+    PhyxVariableManager::PhyxFunctionMap *functionMap = variableManager->functions();
+    QMapIterator<QString, PhyxVariableManager::PhyxFunction*> mapIterator(*functionMap);
+    while (mapIterator.hasNext())
+    {
+        mapIterator.next();
+        functionList.append(mapIterator.key());
+    }
+
+    return functionList;
 }
 
 QString PhyxCalculator::complexToString(const PhyxValueDataType number, int precision, char numberFormat, QString imaginaryUnit, bool useBraces)
@@ -2507,7 +2596,7 @@ void PhyxCalculator::setInputOnlyFlag()
 
 void PhyxCalculator::outputVariable()
 {
-    if (stackLevel == 0)    //this function has only effect on lowest stack level
+    if (stackLevel == 1)    //this function has only effect on lowest stack level
     {
         if (!variableStack.isEmpty())
         {
@@ -2665,7 +2754,7 @@ void PhyxCalculator::runLowLevelOperation(PhyxCalculator::LowLevelOperation *ope
     {
         //set stacklevel temporary to 0 to make outputVariable work
         int tmpStackLevel = stackLevel;
-        stackLevel = 0;
+        stackLevel = 1;
 
         variableStack.push(operation->variable);
         outputVariable();

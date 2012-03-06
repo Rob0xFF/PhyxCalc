@@ -127,6 +127,7 @@ public slots:
     void showVariables();
     void showConstants();
     void updateUnits();
+    void updateFunctions();
     void clearAllVariables();
     void outputResult();
     void outputError();

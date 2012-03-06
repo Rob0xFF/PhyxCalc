@@ -1,22 +1,21 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf8">
 <meta name="generator" content="AsciiDoc 8.4.5">
-<title>PhyxCalc 3 Documentation</title>
+<title>PhyxCalc 3 Help</title>
 </head>
 <body>
-<h1>PhyxCalc 3 Documentation</h1>
+<h1>PhyxCalc 3 Help</h1>
 <p>
-<strong>(Physical Expression Calculator)</strong><br>
 </p>
-<p>Open Source Software
-Alexander Rössler
-&lt;<a href="mailto:mail.aroessler@gmail.com">mail.aroessler@gmail.com</a>&gt;
-Version 1.0, February 28th 2012</p>
+<p>Open Source Software<br>
+Alexander Rössler &lt;<a href="mailto:mail.aroessler@gmail.com">mail.aroessler@gmail.com</a>&gt;<br>
+Christian Schirm<br>
+Version 1.0, March 3th 2012</p>
 <hr>
 <h2><a name="_introduction"></a>1. Introduction</h2>
-<p>PhyxCalc introduces a very flexible and comfortable way to calculate mathematical expressions, including physical units and complex numbers, using a flexible text-editor-like environment. In your expressions you can use a predefined selection of common constants and units or defining your own. You can even export your calculated formulas to OpenOffice Math formula editor to include them your everyday documents (support for LaTeX export is planned).</p>
+<p>PhyxCalc introduces a very flexible and comfortable way to calculate mathematical expressions, including physical units and complex numbers, using a flexible text-editor-like environment. In your expressions you can use a predefined selection of common constants and units or defining your own. You can even export your calculated formulas to OpenOffice Math formula editor to include them in your everyday documents (support for LaTeX export is planned).</p>
 <p>However please consider following rules:</p>
 <ul>
 <li>
@@ -27,7 +26,7 @@ equivocal expressions (e.g. unit m and variable m) can cause problems, so try to
 </ul>
 <hr>
 <h2><a name="_editor"></a>2. Editor</h2>
-<p>In the main text edit expressions are both written and calculated. Just enter your expression and press return (or enter on mobile platforms) and the result will be written in the next line. The line will be replaced if it start with an equal sign. Not every result will be shown in the next line, some expressions like variable definitions have no output in the text edit. Inserting symbols and expressions is also possible with various docks, adding your own costomized dock is also possible and will be shown later.</p>
+<p>In the main text edit expressions are both written and calculated. Just enter your expression and press return (or enter on mobile platforms) and the result will be written in the next line. The line will be replaced if it starts with an equal sign. Not every result will be shown in the next line, some expressions like variable definitions have no output in the text edit. Inserting symbols and expressions is also possible with various docks, adding your own costomized dock is also possible and will be shown later.</p>
 <p><strong>Example:</strong> approximate formula for pi</p>
 <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
 <pre>3*ln(640320)/sqrt(163) &lt;Return&gt;
@@ -70,7 +69,7 @@ that would not fit in one line */</pre>
 <h3><a name="_exporting_formulas"></a>2.3. Exporting formulas</h3>
 <p>To export formulas use the export dialog. Once the dialog is opened, your expressions will be instantly converted. The converted output just insert in your OpenOffice Math.</p>
 <h3><a name="_editing_startup_definitions"></a>2.4. Editing startup definitions</h3>
-<p>PhyxCalc loads a lot of predefined units and constants on startup. You can edit these definitions quite easy: just edit the file <strong>/settings/definitions.txt</strong><br>
+<p>PhyxCalc loads a lot of predefined units and constants on startup. You can edit these definitions quite easy: just edit the file <strong>definitions.txt</strong> in your settings directory. You can easily open your settings directory in the menu.+
 <strong>NOTE:</strong> if you want to restore the default definitions, delete the defintions file and restart PhyxCalc</p>
 <h3><a name="_adding_your_own_docks"></a>2.5. Adding your own docks</h3>
 <p>Adding your own customized docks to PhyxCalc is really simple. Just create a textfile with following outline in your setting directory:</p>
@@ -96,7 +95,7 @@ arcus cosine function;acos;acos()</pre>
 <p>Now restart PhyxCalc and start using your dock.</p>
 <hr>
 <h2><a name="_mathematical_functions"></a>3. Mathematical Functions</h2>
-<p>Alle mathematical functions can be written with the first letter uppercase or lowercase or only with uppercase letters. Trigonometric are using radiant, for degrees use dimensionless unit °.</p>
+<p>All mathematical functions can be written with the first letter uppercase or lowercase or only with uppercase letters. Trigonometric functions are using radiant, for degrees use dimensionless unit °.</p>
 <h3><a name="_operators_and_symbols"></a>3.1. Operators and symbols</h3>
 <p>PhyxCalc uses C++-like operators and some additional operators for special mathematical functionality. The operators are ordered beginning with highest priority.</p>
 <p><b></b>PhyxCalc Operators</p>
@@ -312,8 +311,8 @@ root12(25)
 <strong>bcd</strong> binary coded decimal function, converts a binary decimal coded number back to a dezimal value<br>
 <strong>tobcd</strong> inverse of the bcd function</p>
 <h3><a name="_defining_custom_functions"></a>3.9. Defining custom functions</h3>
-<p>Defing custom functions in PhyxCalc is pretty easy, just write the name of your function, add the parameters and an expression.</p>
-<p><strong>Example:</strong> calculating a the current at a diode around the forward voltage</p>
+<p>Defing custom functions in PhyxCalc is pretty easy, just write the name of your function, then add the parameters and an expression.</p>
+<p><strong>Example:</strong> calculating the current at a diode around the forward voltage</p>
 <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
 <pre>Is=10e-15A
 VT=25mV
@@ -330,7 +329,7 @@ I(0.8V)
 <p>PhyxCalc is using 64bit and 96bit floating point numbers, depending on your operating system. As every computing system not using arbitrary precision, PhyxCalc has accuracy problems. Depending on your expression, this can cause your result to be not as accurate as you wish. See Wikipedia for more information on floating point numbers and accuracy problems: <a href="http://en.wikipedia.org/wiki/Floating_point#Accuracy_problems">http://en.wikipedia.org/wiki/Floating_point#Accuracy_problems</a></p>
 <hr>
 <h2><a name="_list_addition"></a>4. List-Addition</h2>
-<p>To calculate a long list of numbers you can add a binary operator on the end of the first line. The result of this and the following lines will not be output but instead calculated togheter. You can view the current result in the variable dock. An empty line outputs the result.</p>
+<p>To calculate a long list of numbers you can add a binary operator to the end of the first line. The result of this and the following lines will not be output, but instead calculated togheter. You can view the current result in the variable dock. An empty line outputs the result.</p>
 <p>The list mode can also be used to split an expression into multiple lines, but keep in mind that every line will be calculated as single term, maybe ignoring operator predence.</p>
 <p><strong>Example: addition</strong></p>
 <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
@@ -383,13 +382,13 @@ You can also use the <strong>ans function</strong> instead of the # variable.</p
 </td></tr></table>
 <hr>
 <h2><a name="_number_formats_and_systems"></a>6. Number formats and systems</h2>
-<p>You can insert numbers in decimal, hexadecimal, octal, binary or scientific format. You can also input complex numbers using the imaginary unit i or j. By default the ouput is automatically shown as integer, floating point number or in scientific format. PhyxCalc uses 19-20 digits precision, depending on the platform you use, however, the ouput precision is set to 6 by default, you can alter this setting in the settings dialog.</p>
+<p>You can insert numbers in decimal, hexadecimal, octal, binary or scientific format. You can also input complex numbers using the imaginary unit i or j. By default the ouput is automatically shown as integer, floating point number or in scientific format. Floating point numbers can also be input without leading zero. PhyxCalc uses 19-20 digits precision, depending on the platform you use, however, the ouput precision is set to 6 by default, you can alter this setting in the settings dialog.</p>
 <p>Using the -&gt; operator numbers can also be output in hexadecimal, octal or binary format. However, this is only implemented for positive integers.</p>
 <p><strong>Example:</strong></p>
 <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
 <pre>//different number formats
-(10 + 1.1) * 2E-10 / 4e2 + 0xFFAF - 0b10101001 * 0o345
-=26754
+(10 + 1.1) * 2E-10 / 4e2 + 0xFFAF - (0b10101001 + 0.12) * 0o345
+=26726.5
 
 //using complex numbers
 (2j+34)*(23.2+4.5i)
@@ -407,11 +406,104 @@ You can also use the <strong>ans function</strong> instead of the # variable.</p
 </td></tr></table>
 <hr>
 <h2><a name="_units"></a>7. Units</h2>
-<h3><a name="_defining_new_units"></a>7.1. Defining new units</h3>
+<p>With PhyxCalc you have the ability to use units togheter with numbers. Derived units must be splitted with the multiplication sign *. Units can be output with base units or simplified to derived units. You  can also use prefixes, if the unit system, the unit is defined in, supports them. Units can be deleted by overwriting them with an empty expression.</p>
+<h3><a name="_unit_systems"></a>7.1. Unit Systems</h3>
+<p>All units connected togheter should use the same unit system. Within one unit system, units will be converted into each other if possible. All units not contained in a unit system can not use prefixes. For example the SI unit system consists of 7 base units, all units that are part of the SI system can be expressed with the 7 base units. Also all SI units can use the SI prefixes.</p>
+<p><strong>Unit systems can be defined like this:</strong><br>
+[&lt;name of the unit system&gt;]<br>
+[&lt;name of the unit system&gt;]:=</p>
+<p><strong>Examples:</strong></p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>[si] //defines a unit system
+[si]:= //deletes the unit system</pre>
+</td></tr></table>
+<h3><a name="_base_units"></a>7.2. Base Units</h3>
+<p>All unit systems use a set of base units. Also units defined without a unit system need base units.</p>
+<p><strong>Base units can be defined like this:</strong><br>
+&lt;name of the unit&gt;=[]<br>
+&lt;name of the unit&gt;@&lt;name of the unit system&gt;=[]<br>
+&lt;name of the unit&gt;@&lt;name of the unit system&gt;@&lt;prefered prefix&gt;=[]</p>
+<p><strong>Examples:</strong></p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>feet=[] //defines the base unit feet
+m@si=[] //defines the base unit meter in the unit system si
+g@si@k=[] //defines the base unit gramm in the unit system si with the prefered prefix k (=kg)</pre>
+</td></tr></table>
+<h3><a name="_derived_units"></a>7.3. Derived Units</h3>
+<p>Derived units are units that consists of several base units, like for example C (= A*s).</p>
+<p><strong>Derived units can be defined like this:</strong><br>
+&lt;name of the unit&gt;=[&lt;expression&gt;]<br>
+&lt;name of the unit&gt;@&lt;name of the unit system&gt;=[&lt;expression&gt;]<br>
+&lt;name of the unit&gt;@&lt;name of the unit system&gt;@&lt;prefered prefix&gt;=[&lt;expression&gt;]</p>
+<p><strong>Examples:</strong></p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>ppm=[1E-6]  //parts per million
+J@si=[N*m]  //energy: Joule
+Wh@si@k=[1kW*h] //energy: kilowatts per hour</pre>
+</td></tr></table>
+<h3><a name="_offset_units"></a>7.4. Offset Units</h3>
+<p>Some units also have a offset to a derived or base unit, like for example °C. However, offset units are by default not used for output.</p>
+<p><strong>Offset units can be defined like this:</strong><br>
+&lt;name of the unit&gt;=[&lt;expression&gt;]&lt;offset&gt;<br>
+&lt;name of the unit&gt;@&lt;name of the unit system&gt;=[&lt;expression&gt;]&lt;offset&gt;<br>
+&lt;name of the unit&gt;@&lt;name of the unit system&gt;@&lt;prefered prefix&gt;=[&lt;expression&gt;]&lt;offset&gt;</p>
+<p><strong>Examples:</strong></p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>°C=[1K]-273.15      //temperature: degrees Celsius
+°F=[5/9*1K]-459.67*5/9 //temperature: degrees Fahrenheit</pre>
+</td></tr></table>
+<h3><a name="_unit_prefixes"></a>7.5. Unit Prefixes</h3>
+<p>Units contained in unit systems can also use prefixes.</p>
+<p><strong>Prefixes can be defined like this:</strong><br>
+&lt;name of the prefix&gt;:&lt;name of the unit system&gt;=[&lt;expression&gt;]<br>
+&lt;name of the prefix&gt;:&lt;name of the unit system&gt;:i=[&lt;expression&gt;]<br>
+&lt;name of the prefix&gt;:=</p>
+<p><strong>Examples:</strong></p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>//SI prefixes
+y:si=[1e-24]
+z:si=[1e-21]
+a:si=[1e-18]
+f:si=[1e-15]
+p:si=[1e-12]
+n:si=[1e-9]
+µ:si=[1e-6]
+m:si=[1e-3]
+c:si:i=[1e-2] //i is the input only flag, prefixes with this flag can only be use for input
+d:si:i=[1e-1]
+da:si:i=[1e1]
+h:si:i=[1e2]
+k:si=[1e3]
+M:si=[1e6]
+G:si=[1e9]
+T:si=[1e12]
+P:si=[1e15]
+E:si=[1e18]
+Z:si=[1e21]
+Y:si=[1e24]
+
+p:= //deletes the prefix p (pico)</pre>
+</td></tr></table>
+<hr>
+<h2><a name="_conversion"></a>8. Conversion</h2>
+<p>Expressions can be converted to defined units with the operator -&gt;.</p>
+<p>Example:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>20m/s -&gt; km/h
+=72km/h</pre>
+</td></tr></table>
+<hr>
+<h2><a name="_quick_notation_and_multiple_meanings"></a>9. Quick Notation and Multiple Meanings</h2>
+<p>Braces behind functions can be left out. Multiplication without multiplication sign is currently not implemented. However keep in mind, that multiple meanings could occur, when you for example define a unit with the same name a unit has.</p>
+<p><strong>Examples:</strong></p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td>
+<pre>sqr2
+=1.41421</pre>
+</td></tr></table>
 <p></p>
 <p></p>
 <hr><p><small>
-Last updated 2012-03-01 23:00:23 CEST
+Last updated 2012-03-06 19:35:12 CEST
 </small></p>
 </body>
 </html>

@@ -41,6 +41,7 @@ public:
     void setVariableHighlightingRules(QStringList variableList);
     void setConstantHighlightingRules(QStringList variableList);
     void setUnitHighlightingRules(QStringList unitList);
+    void setFunctionHighlightinhRules(QStringList functionList);
     void addError(int line, int pos, int length);
     void removeError(int line, int pos);
     void updateFormats();
@@ -70,6 +71,7 @@ private:
     QVector<HighlightingRule> variableHighlightingRules;
     QVector<HighlightingRule> constantHighlightingRules;
     QVector<HighlightingRule> unitHighlightingRules;
+    QVector<HighlightingRule> functionHighlightingRules;
     QList<Error>              errorList;
 
     QRegExp commentStartExpression;

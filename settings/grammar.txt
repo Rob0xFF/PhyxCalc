@@ -167,13 +167,19 @@ p16=|p17|
 p17=|p3|!            ;  unitCheckDimensionless, valueCheckInteger, valueCheckPositive, valueFaculty
 p17=~|p3|            ; unitCheckDimensionless, valueCheckComplex, bitInv
 p17=!|p3|            ; unitCheckDimensionless, valueCheckComplex, logicNot
-p17=-|p17|           ; valueInvert
-p17=+|p17|
+p17=-|p18|           ; valueInvert
+p17=+|p18|
+p17=-|var|           ; pushVariable, valueInvert
+p17=+|var|           ; pushVariable
 p17=|var|            ; pushVariable
 p17=|p18|
 
 funcParam=|var|      ; pushVariable
+funcParam=+|var|     ; pushVariable
+funcParam=-|var|     ; pushVariable, valueInvert
 funcParam=|p18|
+funcParam=+|p18|
+funcParam=-|p18|     ; valueInvert
 
 #Priority 18: functions, postfix, variables, constants, pi
 p18=sin|funcParam|        ; unitCheckDimensionless, valueSin

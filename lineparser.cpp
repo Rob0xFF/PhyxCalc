@@ -35,6 +35,8 @@ LineParser::LineParser(QObject *)
             this, SLOT(showConstants()));
     connect(m_phyxCalculator, SIGNAL(unitsChanged()),
             this, SLOT(updateUnits()));
+    connect(m_phyxCalculator, SIGNAL(functionsChanged()),
+            this, SLOT(updateFunctions()));
 }
 
 LineParser::~LineParser()
@@ -341,6 +343,7 @@ void LineParser::updateSettings()
     showConstants();
     showVariables();
     updateUnits();
+    updateFunctions();
 }
 
 QString LineParser::removeWhitespace(QString string)
@@ -520,6 +523,8 @@ void LineParser::showVariables()
     QMapIterator<QString, PhyxVariable*> i(*m_phyxCalculator->variables());
      while (i.hasNext()) {
          i.next();
+         variableNames.append(i.key());
+
          if (i.key() == "#") //ignore special variable #
              continue;
 
@@ -540,8 +545,6 @@ void LineParser::showVariables()
          m_variableTable->setItem(row, 2, newItem);
 
          row++;
-
-         variableNames.append(i.key());
      }
 
      if (m_syntaxHighlighter != NULL)
@@ -603,6 +606,15 @@ void LineParser::updateUnits()
         unitList.append(mapIterator.key());
     }
     m_syntaxHighlighter->setUnitHighlightingRules(unitList);
+}
+
+void LineParser::updateFunctions()
+{
+    if (isLoading() || m_syntaxHighlighter == NULL)
+        return;
+
+    QStringList functionList = m_phyxCalculator->functions();
+    m_syntaxHighlighter->setFunctionHighlightinhRules(functionList);
 }
 
 void LineParser::clearAllVariables()

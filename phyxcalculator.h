@@ -150,6 +150,7 @@ public:
     PhyxVariableManager::PhyxVariableMap * variables() const;
     PhyxVariableManager::PhyxVariableMap * constants() const;
     PhyxUnitSystem::PhyxUnitMap units() const;
+    QStringList functions() const;
     QString expression() const
     {
         return m_expression;
@@ -234,6 +235,7 @@ private:
 
 
     QHash<QString, void (PhyxCalculator::*)()> functionMap;                     /// functions mapped with their names
+    QStringList                 standardFunctionList;                           /// a stringlist containing all standard function names
 
     void initialize();                                                          ///< initializes PhyxCalculator
     void loadGrammar(QString fileName);                                         ///< loads the grammar from a file
@@ -449,6 +451,7 @@ signals:
     void variablesChanged();        ///< is emited when variables have changed
     void constantsChanged();        ///< is emited when constants have changed
     void unitsChanged();            ///< is emited when units have changed
+    void functionsChanged();        ///< is emited when functions have changed
     void outputResult();            ///< is emited when result should be output
     void outputError();             ///< is emited when an error should be output
     void outputText(QString text);  ///< is emited when text should be output
