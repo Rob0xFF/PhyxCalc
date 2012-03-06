@@ -9,6 +9,8 @@ HelpDialog::HelpDialog(QWidget *parent) :
 #if defined(Q_OS_SYMBIAN) || defined(Q_OS_ANDROID) || defined(Q_WS_SIMULATOR)
     this->setWindowState(Qt::WindowMaximized);
 #endif
+
+    this->setWindowIcon(QIcon::fromTheme("help-contents",QIcon(":/icons/help-contents")));
 }
 
 void HelpDialog::setHelpFile(QString fileName)

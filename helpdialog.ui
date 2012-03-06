@@ -13,9 +13,6 @@
   <property name="windowTitle">
    <string>PhyxCalc Help</string>
   </property>
-  <property name="windowIcon">
-   <iconset theme="help-contents"/>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTextBrowser" name="textBrowser"/>
