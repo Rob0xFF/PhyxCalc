@@ -6,7 +6,7 @@ PhyxCalc 3 Help
 Open Source Software +
 Alexander Rössler <mail.aroessler@gmail.com> +
 Christian Schirm +
-Version 1.0, March 3th 2012
+Version 1.0, March 6th 2012
 
 == Introduction
 PhyxCalc introduces a very flexible and comfortable way to calculate mathematical expressions, including physical units and complex numbers, using a flexible text-editor-like environment. In your expressions you can use a predefined selection of common constants and units or defining your own. You can even export your calculated formulas to OpenOffice Math formula editor to include them in your everyday documents (support for LaTeX export is planned).

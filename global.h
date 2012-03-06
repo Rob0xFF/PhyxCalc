@@ -20,6 +20,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#define VERSION "3rev155"
 #define MATH_OPERATORS "[+\\-\\*/\\(\\)<>!\\^=]"
 
 #include <QFont>
