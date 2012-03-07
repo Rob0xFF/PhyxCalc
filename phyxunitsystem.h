@@ -62,8 +62,8 @@ public:
     PhyxUnit * unit(QString symbol) const;                          ///< gives back a reference to the unit
     PhyxUnitMap units() const;                                      ///< gives back a map holding all defined units
 
-    PhyxPrefix  prefix(QString symbol, QString unitGroup) const;    ///< returns the value of a prefix
-    QList<PhyxPrefix> prefixes(QString unitGroup) const;            ///< returns all prefixes for one unitGroup sorted
+    PhyxPrefix  prefix(QString symbol, QString unitGroup) const;  ///< returns the value of a prefix
+    QList<PhyxPrefix> prefixes(QString unitGroup = QString()) const;            ///< returns all prefixes for one unitGroup sorted
 
     bool    verifyUnit(PhyxUnit *unit);                             ///< finds unit in the system and sets all the missing information, return wheter unit was found or not
 private:

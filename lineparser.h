@@ -28,6 +28,7 @@
 #include <QTextEdit>
 #include <QTableWidgetItem>
 #include <QTableWidget>
+#include <QListWidget>
 #include "unitloader.h"
 #include "global.h"
 #include "phyxcalculator.h"
@@ -39,6 +40,9 @@ class LineParser: public QObject
     Q_PROPERTY(QTextEdit *calculationEdit READ calculationEdit WRITE setCalculationEdit)
     Q_PROPERTY(QTableWidget *variableTable READ variableTable WRITE setVariableTable)
     Q_PROPERTY(QTableWidget *constantsTable READ constantsTable WRITE setConstantsTable)
+    Q_PROPERTY(QTableWidget *unitsTable READ unitsTable WRITE setUnitsTable)
+    Q_PROPERTY(QTableWidget *prefixesTable READ prefixesTable WRITE setPrefixesTable)
+    Q_PROPERTY(QListWidget  *functionsList READ functionsList WRITE setFunctionsList)
     Q_PROPERTY(AppSettings *appSettings READ appSettings WRITE setAppSettings)
     Q_PROPERTY(UnitLoader *unitLoader READ unitLoader WRITE setUnitLoader)
     Q_PROPERTY(PhyxCalculator *phyxCalculator READ phyxCalculator)
@@ -99,6 +103,21 @@ public:
         return m_loading;
     }
 
+    QTableWidget * unitsTable() const
+    {
+        return m_unitsTable;
+    }
+
+    QListWidget  * functionsList() const
+    {
+        return m_functionsList;
+    }
+
+    QTableWidget * prefixesTable() const
+    {
+        return m_prefixesTable;
+    }
+
 private:
     QTextEdit       *m_calculationEdit;
     QTableWidget    *m_variableTable;
@@ -123,10 +142,17 @@ private:
 
     bool m_loading;
 
+    QTableWidget * m_unitsTable;
+
+    QListWidget  * m_functionsList;
+
+    QTableWidget * m_prefixesTable;
+
 public slots:
     void showVariables();
     void showConstants();
     void updateUnits();
+    void updatePrefixes();
     void updateFunctions();
     void clearAllVariables();
     void outputResult();
@@ -159,6 +185,18 @@ public slots:
         m_loading = arg;
         if (!arg)
             updateSettings();
+    }
+    void setUnitsTable(QTableWidget * arg)
+    {
+        m_unitsTable = arg;
+    }
+    void setFunctionsList(QListWidget  * arg)
+    {
+        m_functionsList = arg;
+    }
+    void setPrefixesTable(QTableWidget * arg)
+    {
+        m_prefixesTable = arg;
     }
 };
 

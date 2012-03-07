@@ -146,10 +146,12 @@ public:
     PhyxVariable * variable(QString name) const;
     PhyxVariable * constant(QString name) const;
     PhyxUnit     * unit(QString symbol) const;
+    PhyxUnitSystem::PhyxPrefix prefix(QString symbol, QString unitGroup) const;
     PhyxVariableManager::PhyxFunction * function(QString name) const;
     PhyxVariableManager::PhyxVariableMap * variables() const;
     PhyxVariableManager::PhyxVariableMap * constants() const;
     PhyxUnitSystem::PhyxUnitMap units() const;
+    QList<PhyxUnitSystem::PhyxPrefix> prefixes() const;
     QStringList functions() const;
     QString expression() const
     {
@@ -451,6 +453,7 @@ signals:
     void variablesChanged();        ///< is emited when variables have changed
     void constantsChanged();        ///< is emited when constants have changed
     void unitsChanged();            ///< is emited when units have changed
+    void prefixesChanged();         ///< is emited when prefixes have changed
     void functionsChanged();        ///< is emited when functions have changed
     void outputResult();            ///< is emited when result should be output
     void outputError();             ///< is emited when an error should be output

@@ -35,6 +35,8 @@ LineParser::LineParser(QObject *)
             this, SLOT(showConstants()));
     connect(m_phyxCalculator, SIGNAL(unitsChanged()),
             this, SLOT(updateUnits()));
+    connect(m_phyxCalculator, SIGNAL(prefixesChanged()),
+            this, SLOT(updatePrefixes()));
     connect(m_phyxCalculator, SIGNAL(functionsChanged()),
             this, SLOT(updateFunctions()));
 }
@@ -343,6 +345,7 @@ void LineParser::updateSettings()
     showConstants();
     showVariables();
     updateUnits();
+    updatePrefixes();
     updateFunctions();
 }
 
@@ -594,18 +597,87 @@ void LineParser::showConstants()
 
 void LineParser::updateUnits()
 {
-    if (isLoading() || m_syntaxHighlighter == NULL)
+    if (isLoading())
         return;
 
-    QStringList unitList;
-    PhyxUnitSystem::PhyxUnitMap unitMap = m_phyxCalculator->units();
-    QMapIterator<QString, PhyxUnit*> mapIterator(unitMap);
-    while (mapIterator.hasNext())
+    int row = 0;
+    QTableWidgetItem *newItem;
+    QStringList     unitNames;
+
+    m_unitsTable->clearContents();
+    m_unitsTable->setRowCount(0);
+
+    QMapIterator<QString, PhyxUnit*> i(m_phyxCalculator->units());
+     while (i.hasNext()) {
+         i.next();
+         unitNames.append(i.key());
+
+        QString scaleFactor = PhyxCalculator::complexToString(PhyxValueDataType(i.value()->scaleFactor(), PHYX_FLOAT_NULL),
+                                                              m_appSettings->output.numbers.decimalPrecision,
+                                                              m_appSettings->output.numbers.format,
+                                                              m_appSettings->output.imaginaryUnit,
+                                                              false);
+         QString offset = PhyxCalculator::complexToString(PhyxValueDataType(i.value()->offset(), PHYX_FLOAT_NULL),
+                                                          m_appSettings->output.numbers.decimalPrecision,
+                                                          m_appSettings->output.numbers.format,
+                                                          m_appSettings->output.imaginaryUnit,
+                                                          false);
+
+         m_unitsTable->setRowCount(row+1);
+         newItem = new QTableWidgetItem(i.value()->preferedPrefix() + i.key());   // name
+         m_unitsTable->setItem(row, 0, newItem);
+         newItem = new QTableWidgetItem(i.value()->dimensionString()); //dimension
+         m_unitsTable->setItem(row, 1, newItem);
+         newItem = new QTableWidgetItem(scaleFactor); //scale factor
+         m_unitsTable->setItem(row, 2, newItem);
+         newItem = new QTableWidgetItem(offset); //offset
+         m_unitsTable->setItem(row, 3, newItem);
+         newItem = new QTableWidgetItem(i.value()->unitGroup()); //unit system
+         m_unitsTable->setItem(row, 4, newItem);
+
+         row++;
+     }
+
+     if (m_syntaxHighlighter != NULL)
+         m_syntaxHighlighter->setUnitHighlightingRules(unitNames);
+}
+
+void LineParser::updatePrefixes()
+{
+    if (isLoading())
+        return;
+
+    int row = 0;
+    QTableWidgetItem *newItem;
+    //QStringList     unitNames;
+
+    m_prefixesTable->clearContents();
+    m_prefixesTable->setRowCount(0);
+
+    QList<PhyxUnitSystem::PhyxPrefix> prefixList = m_phyxCalculator->prefixes();
+    for (int i = 0; i < prefixList.size(); i++)
     {
-        mapIterator.next();
-        unitList.append(mapIterator.key());
-    }
-    m_syntaxHighlighter->setUnitHighlightingRules(unitList);
+         //unitNames.append(i.key());
+
+        QString value = PhyxCalculator::complexToString(PhyxValueDataType(prefixList.at(i).value, PHYX_FLOAT_NULL),
+                                                              m_appSettings->output.numbers.decimalPrecision,
+                                                              m_appSettings->output.numbers.format,
+                                                              m_appSettings->output.imaginaryUnit,
+                                                              false);
+
+         m_prefixesTable->setRowCount(row+1);
+         newItem = new QTableWidgetItem(prefixList.at(i).symbol);   // symbol
+         m_prefixesTable->setItem(row, 0, newItem);
+         newItem = new QTableWidgetItem(value); //value
+         m_prefixesTable->setItem(row, 1, newItem);
+         newItem = new QTableWidgetItem(prefixList.at(i).unitGroup); //unit system
+         m_prefixesTable->setItem(row, 2, newItem);
+
+         row++;
+     }
+
+     //if (m_syntaxHighlighter != NULL)
+     //    m_syntaxHighlighter->setUnitHighlightingRules(unitNames);
 }
 
 void LineParser::updateFunctions()

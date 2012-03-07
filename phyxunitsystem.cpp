@@ -233,7 +233,7 @@ QList<PhyxUnitSystem::PhyxPrefix> PhyxUnitSystem::prefixes(QString unitGroup) co
     while (mapIterator.hasNext())
     {
         mapIterator.next();
-        if (mapIterator.value().unitGroup == unitGroup)
+        if ((mapIterator.value().unitGroup == unitGroup) || (unitGroup.isEmpty()))
             prefixes.append(mapIterator.value());
     }
 

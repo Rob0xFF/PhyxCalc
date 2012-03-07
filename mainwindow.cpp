@@ -187,6 +187,20 @@ void MainWindow::loadSettings()
         ui->constantsTable->setColumnWidth(2, settings.value("column3Width",80).toInt());
     settings.endGroup();
 
+    settings.beginGroup("unitsDock");
+        ui->unitsTable->setColumnWidth(0, settings.value("column1Width",60).toInt());
+        ui->unitsTable->setColumnWidth(1, settings.value("column2Width",80).toInt());
+        ui->unitsTable->setColumnWidth(2, settings.value("column3Width",80).toInt());
+        ui->unitsTable->setColumnWidth(3, settings.value("column4Width",80).toInt());
+        ui->unitsTable->setColumnWidth(4, settings.value("column5Width",80).toInt());
+    settings.endGroup();
+
+    settings.beginGroup("prefixesDock");
+        ui->prefixesTable->setColumnWidth(0, settings.value("column1Width",60).toInt());
+        ui->prefixesTable->setColumnWidth(1, settings.value("column2Width",80).toInt());
+        ui->prefixesTable->setColumnWidth(2, settings.value("column3Width",80).toInt());
+    settings.endGroup();
+
     settings.beginGroup("output");
         settings.beginGroup("numbers");
             appSettings.output.numbers.decimalPrecision = settings.value("decimalPrecision", 6).toInt();
@@ -317,6 +331,20 @@ void MainWindow::saveSettings()
         settings.setValue("column3Width",ui->constantsTable->columnWidth(2));
     settings.endGroup();
 
+    settings.beginGroup("unitsDock");
+        settings.setValue("column1Width",ui->unitsTable->columnWidth(0));
+        settings.setValue("column2Width",ui->unitsTable->columnWidth(1));
+        settings.setValue("column3Width",ui->unitsTable->columnWidth(2));
+        settings.setValue("column4Width",ui->unitsTable->columnWidth(3));
+        settings.setValue("column5Width",ui->unitsTable->columnWidth(4));
+    settings.endGroup();
+
+    settings.beginGroup("prefixesDock");
+        settings.setValue("column1Width",ui->prefixesTable->columnWidth(0));
+        settings.setValue("column2Width",ui->prefixesTable->columnWidth(1));
+        settings.setValue("column3Width",ui->prefixesTable->columnWidth(2));
+    settings.endGroup();
+
     settings.beginGroup("output");
         settings.beginGroup("numbers");
             settings.setValue("decimalPrecision", appSettings.output.numbers.decimalPrecision);
@@ -420,6 +448,58 @@ void MainWindow::initializeGUI()
     connect(ui->constantsDock, SIGNAL(visibilityChanged(bool)),
             ui->actionConstants, SLOT(setChecked(bool)));
 
+    //initialize units Dock
+    ui->unitsTable->setColumnCount(5);
+    ui->unitsTable->setRowCount(0);
+    ui->unitsTable->setSortingEnabled(true);
+
+    newItem = new QTableWidgetItem(tr("Unit"));
+    newItem->setFont(font);
+    ui->unitsTable->setHorizontalHeaderItem(0, newItem);
+    newItem = new QTableWidgetItem(tr("Dimension"));
+    newItem->setFont(font);
+    ui->unitsTable->setHorizontalHeaderItem(1, newItem);
+    newItem = new QTableWidgetItem(tr("Scale Factor"));
+    newItem->setFont(font);
+    ui->unitsTable->setHorizontalHeaderItem(2, newItem);
+    newItem = new QTableWidgetItem(tr("Offset"));
+    newItem->setFont(font);
+    ui->unitsTable->setHorizontalHeaderItem(3, newItem);
+    newItem = new QTableWidgetItem(tr("Unit System"));
+    newItem->setFont(font);
+    ui->unitsTable->setHorizontalHeaderItem(4, newItem);
+
+    connect(ui->actionUnits, SIGNAL(toggled(bool)),
+            ui->unitsDock, SLOT(setVisible(bool)));
+    connect(ui->unitsDock, SIGNAL(visibilityChanged(bool)),
+            ui->actionUnits, SLOT(setChecked(bool)));
+
+    //initialize prefixes Dock
+    ui->prefixesTable->setColumnCount(3);
+    ui->prefixesTable->setRowCount(0);
+    ui->prefixesTable->setSortingEnabled(true);
+
+    newItem = new QTableWidgetItem(tr("Prefix"));
+    newItem->setFont(font);
+    ui->prefixesTable->setHorizontalHeaderItem(0, newItem);
+    newItem = new QTableWidgetItem(tr("Value"));
+    newItem->setFont(font);
+    ui->prefixesTable->setHorizontalHeaderItem(1, newItem);
+    newItem = new QTableWidgetItem(tr("Unit System"));
+    newItem->setFont(font);
+    ui->prefixesTable->setHorizontalHeaderItem(2, newItem);
+
+    connect(ui->actionPrefixes, SIGNAL(toggled(bool)),
+            ui->prefixesDock, SLOT(setVisible(bool)));
+    connect(ui->prefixesDock, SIGNAL(visibilityChanged(bool)),
+            ui->actionPrefixes, SLOT(setChecked(bool)));
+
+    //initialize functions Dock
+    connect(ui->actionFunctions, SIGNAL(toggled(bool)),
+            ui->functionsDock, SLOT(setVisible(bool)));
+    connect(ui->functionsDock, SIGNAL(visibilityChanged(bool)),
+            ui->actionFunctions, SLOT(setChecked(bool)));
+
     //initialize special buttons
     QMenu *configureMenu = new QMenu();
     configureMenu->addMenu(ui->menuFile);
@@ -454,7 +534,7 @@ void MainWindow::initializeGUI()
     ui->actionNew->setIcon(QIcon::fromTheme("document-new",QIcon(":/icons/document-new")));
     ui->actionNew_Tab->setIcon(QIcon::fromTheme("tab-new",QIcon(":/icons/tab-new")));
     ui->actionOpen->setIcon(QIcon::fromTheme("document-open",QIcon(":/icons/document-open")));
-    //ui->actionOpen_Settings_Directory
+    ui->actionOpen_Settings_Directory->setIcon(QIcon::fromTheme("document-open",QIcon(":/icons/document-open")));
     ui->actionPaste->setIcon(QIcon::fromTheme("edit-paste",QIcon(":/icons/edit-paste")));
     //ui->actionPhyxCalc
     ui->actionRecalculate_All->setIcon(QIcon::fromTheme("run-build",QIcon(":/icons/run-build")));
@@ -521,6 +601,9 @@ void MainWindow::addNewTab()
     newDocument->lineParser->setUnitLoader(unitLoader);
     newDocument->lineParser->setVariableTable(ui->variableTable);
     newDocument->lineParser->setConstantsTable(ui->constantsTable);
+    newDocument->lineParser->setUnitsTable(ui->unitsTable);
+    newDocument->lineParser->setPrefixesTable(ui->prefixesTable);
+    newDocument->lineParser->setFunctionsList(ui->functionsList);
     newDocument->lineParser->setCalculationEdit(newDocument->expressionEdit);
     newDocument->lineParser->setAppSettings(&appSettings);
     newDocument->lineParser->phyxCalculator()->loadFile(settingsDir + "/definitions.txt");

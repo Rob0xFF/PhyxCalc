@@ -505,11 +505,13 @@ void PhyxCalculator::removeConstantRule(QString name)
 void PhyxCalculator::addPrefixRule(QString symbol)
 {
     addRule(QString("prefix=%1").arg(symbol), QString("bufferParameter, bufferPrefix"));
+    emit prefixesChanged();
 }
 
 void PhyxCalculator::removePrefixRule(QString symbol)
 {
     earleyParser->removeRule(QString("prefix=%1").arg(symbol));
+    emit prefixesChanged();
 }
 
 void PhyxCalculator::addUnitGroupRule(QString name)
@@ -716,6 +718,11 @@ PhyxUnit *PhyxCalculator::unit(QString symbol) const
     return unitSystem->unit(symbol);
 }
 
+PhyxUnitSystem::PhyxPrefix PhyxCalculator::prefix(QString symbol, QString unitGroup) const
+{
+    return unitSystem->prefix(symbol, unitGroup);
+}
+
 PhyxVariableManager::PhyxFunction *PhyxCalculator::function(QString name) const
 {
     return variableManager->getFunction(name);
@@ -739,6 +746,11 @@ PhyxVariableManager::PhyxVariableMap *PhyxCalculator::constants() const
 PhyxUnitSystem::PhyxUnitMap PhyxCalculator::units() const
 {
     return unitSystem->units();
+}
+
+QList<PhyxUnitSystem::PhyxPrefix> PhyxCalculator::prefixes() const
+{
+    return unitSystem->prefixes();
 }
 
 QStringList PhyxCalculator::functions() const
