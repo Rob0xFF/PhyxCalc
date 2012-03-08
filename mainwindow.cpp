@@ -495,6 +495,12 @@ void MainWindow::initializeGUI()
             ui->actionPrefixes, SLOT(setChecked(bool)));
 
     //initialize functions Dock
+
+    ui->functionsList->setViewMode(QListView::IconMode);
+    ui->functionsList->setResizeMode(QListView::Adjust);
+
+    connect(ui->functionsList, SIGNAL(itemClicked(QListWidgetItem*)),
+            this, SLOT(dockWidgetPressed(QListWidgetItem*)));
     connect(ui->actionFunctions, SIGNAL(toggled(bool)),
             ui->functionsDock, SLOT(setVisible(bool)));
     connect(ui->functionsDock, SIGNAL(visibilityChanged(bool)),
@@ -614,6 +620,8 @@ void MainWindow::addNewTab()
     newDocument->expressionEdit->installEventFilter(this);
     connect(newDocument->expressionEdit->document(), SIGNAL(modificationChanged(bool)),
             this, SLOT(documentModified(bool)));
+    connect(newDocument->lineParser, SIGNAL(listWidgetUpdate(QListWidget*,QStringList)),
+            this, SLOT(loadListWidget(QListWidget*,QStringList)));
 
     layout->addWidget(newDocument->expressionEdit);
     layout->setMargin(0);
@@ -792,18 +800,10 @@ void MainWindow::dockWidgetPressed(QListWidgetItem *item)
     documentList.at(activeTab)->expressionEdit->setFocus();
 }
 
-void MainWindow::loadDock(QString name, QStringList items)
+void MainWindow::loadDock(const QString &name, const QStringList &items)
 {
-    //int row;
-    //int column;
-    //int rowSize = 4;
-    int maximumWidth = 0;
-    int currentWidth;
-
     QDockWidget *dockWidget = new QDockWidget(name, this);
     QWidget *widget = new QWidget(dockWidget);
-    //QButtonGroup *buttonGroup = new QButtonGroup(this);
-    //FlowLayout *flowLayout = new FlowLayout;
     QBoxLayout *boxLayout = new QBoxLayout(QBoxLayout::TopToBottom, widget);
     boxLayout->setMargin(0);
     QAction *menuAction = new QAction(ui->menuDocks);
@@ -814,12 +814,42 @@ void MainWindow::loadDock(QString name, QStringList items)
     //listWidget->setSpacing(5);
     listWidget->setResizeMode(QListView::Adjust);
 
-    QFont font = listWidget->font();
-    font.setPointSize(12);
-    listWidget->setFont(font);
+    //QFont font = listWidget->font();
+    //font.setPointSize(12);
+    //listWidget->setFont(font);
 
     dockWidget->setObjectName(name);
     this->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
+
+    loadListWidget(listWidget, items);  //load the itemlist
+
+    //put the dock togheter
+    dockWidget->setWidget(widget);
+    widget->setLayout(boxLayout);
+    boxLayout->addWidget(listWidget);
+
+    //add an menu entry for the dock
+    menuAction->setCheckable(true);
+    menuAction->setText(name);
+    ui->menuDocks->addAction(menuAction);
+
+    //connect all sorts of signals and slots
+    connect(listWidget, SIGNAL(itemClicked(QListWidgetItem*)),
+            this, SLOT(dockWidgetPressed(QListWidgetItem*)));
+    connect(menuAction, SIGNAL(toggled(bool)),
+            dockWidget, SLOT(setVisible(bool)));
+
+    connect(dockWidget, SIGNAL(visibilityChanged(bool)),
+            menuAction, SLOT(setChecked(bool)));
+}
+
+void MainWindow::loadListWidget(QListWidget *listWidget, const QStringList &items)
+{
+    if (listWidget->count() != 0)
+        listWidget->clear();
+
+    int maximumWidth = 0;
+    int currentWidth;
 
     for (int i = 0; i < items.size(); i++)
     {
@@ -839,21 +869,10 @@ void MainWindow::loadDock(QString name, QStringList items)
         toolTip = list.at(0);
         function = list.at(2);
 
-        //create a new button
-        /*QPushButton *button = new QPushButton(buttonName);
-        button->setToolTip(toolTip + ": " + function);
-        buttonGroup->addButton(button);*/
-
         //create a new list widget item
         QListWidgetItem *item = new QListWidgetItem(widgetName);
         item->setToolTip(toolTip + ": " + function);
         listWidget->addItem(item);
-
-        //calculate row and column
-        /*row = i / rowSize;
-        column = i % rowSize;*/
-
-        //flowLayout->addWidget(button);
 
         //save the maximum width
         QFontMetrics fontMetrics = listWidget->fontMetrics();
@@ -863,33 +882,10 @@ void MainWindow::loadDock(QString name, QStringList items)
     }
 
     //set the minimum width
-    //foreach (QAbstractButton *button, buttonGroup->buttons())
-    //    button->setMinimumWidth(maximumWidth);
     for (int i = 0; i < listWidget->count(); i++)
     {
         listWidget->item(i)->setSizeHint(QSize(maximumWidth, 20));
     }
-
-    //put the dock togheter
-    dockWidget->setWidget(widget);
-    widget->setLayout(boxLayout);
-    boxLayout->addWidget(listWidget);
-
-    //add an menu entry for the dock
-    menuAction->setCheckable(true);
-    menuAction->setText(name);
-    ui->menuDocks->addAction(menuAction);
-
-    //connect all sorts of signals and slots
-    /*connect(buttonGroup, SIGNAL(buttonClicked(QAbstractButton*)),
-            this, SLOT(dockButtonPressed(QAbstractButton*)));*/
-    connect(listWidget, SIGNAL(itemClicked(QListWidgetItem*)),
-            this, SLOT(dockWidgetPressed(QListWidgetItem*)));
-    connect(menuAction, SIGNAL(toggled(bool)),
-            dockWidget, SLOT(setVisible(bool)));
-
-    connect(dockWidget, SIGNAL(visibilityChanged(bool)),
-            menuAction, SLOT(setChecked(bool)));
 }
 
 void MainWindow::loadAllDocks()

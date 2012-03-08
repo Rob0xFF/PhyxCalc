@@ -148,6 +148,9 @@ private:
 
     QTableWidget * m_prefixesTable;
 
+signals:
+    void listWidgetUpdate(QListWidget*, QStringList);
+
 public slots:
     void showVariables();
     void showConstants();

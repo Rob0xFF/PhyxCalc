@@ -687,6 +687,23 @@ void LineParser::updateFunctions()
 
     QStringList functionList = m_phyxCalculator->functions();
     m_syntaxHighlighter->setFunctionHighlightinhRules(functionList);
+
+    //remove duplicates
+    for (int i = 0; i < functionList.size(); i++)
+    {
+        if (functionList.at(i).at(0).isLower())
+        {
+        QString name = functionList.at(i);
+        name[0] = name.at(0).toUpper();
+        functionList.removeAll(name);
+        name = name.toUpper();
+        functionList.removeAll(name);
+        }
+
+        functionList[i] = tr("%1 function;%1;%1").arg(functionList.at(i));
+    }
+    functionList.sort();
+    listWidgetUpdate(m_functionsList, functionList);
 }
 
 void LineParser::clearAllVariables()

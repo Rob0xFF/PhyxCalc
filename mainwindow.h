@@ -96,7 +96,7 @@ private:
     void openDocument(QString fileName, bool newTab = true);
 
     void loadAllDocks();
-    void loadDock(QString name, QStringList items);
+    void loadDock(const QString &name, const QStringList & items);
 
     void updateRecentDocuments();
     void addRecentDocument(QString name);
@@ -112,6 +112,7 @@ private slots:
 
     void documentModified(bool modified);
 
+    void loadListWidget(QListWidget *listWidget, const QStringList &items);
     void dockButtonPressed(QAbstractButton *button);
     void dockWidgetPressed(QListWidgetItem *item);
 

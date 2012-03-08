@@ -528,14 +528,21 @@ void PhyxCalculator::addFunctionRule(QString name, int parameterCount)
 {
     QString ruleString;
     ruleString.append(QString("function=%1").arg(name));
-    ruleString.append("(");
-    for (int i = 0; i < parameterCount; i++)
+    if (parameterCount == 1)
     {
-        if (i > 0)
-            ruleString.append(",");
-        ruleString.append("|p3|");
+        ruleString.append("|funcParam|");
     }
-    ruleString.append(")");
+    else if (parameterCount > 1)
+    {
+        ruleString.append("(");
+        for (int i = 0; i < parameterCount; i++)
+        {
+            if (i > 0)
+                ruleString.append(",");
+            ruleString.append("|p3|");
+        }
+        ruleString.append(")");
+    }
     addRule(ruleString, QString("bufferParameter, functionRun"));
     emit functionsChanged();
 }
@@ -544,14 +551,21 @@ void PhyxCalculator::removeFunctionRule(QString name, int parameterCount)
 {
     QString ruleString;
     ruleString.append(QString("function=%1").arg(name));
-    ruleString.append("(");
-    for (int i = 0; i < parameterCount; i++)
+    if (parameterCount == 1)
     {
-        if (i > 0)
-            ruleString.append(",");
-        ruleString.append("|p3|");
+        ruleString.append("|funcParam|");
     }
-    ruleString.append(")");
+    else if (parameterCount > 1)
+    {
+        ruleString.append("(");
+        for (int i = 0; i < parameterCount; i++)
+        {
+            if (i > 0)
+                ruleString.append(",");
+            ruleString.append("|p3|");
+        }
+        ruleString.append(")");
+    }
     earleyParser->removeRule(ruleString);
     emit functionsChanged();
 }
@@ -2471,8 +2485,19 @@ void PhyxCalculator::functionRemove()
 
 void PhyxCalculator::functionRun()
 {
-    int clipIndex = parameterBuffer.indexOf("(");
-    QString functionName = parameterBuffer.left(clipIndex);
+    //int clipIndex = parameterBuffer.indexOf("(");
+    QString functionName;//= parameterBuffer.left(clipIndex);
+    QStringList functionList = functions();
+    functionList.sort();
+
+    for (int i = functionList.size()-1; i >= 0; i--)
+    {
+        if (parameterBuffer.indexOf(functionList.at(i)) == 0)
+        {
+            functionName = functionList.at(i);
+            break;
+        }
+    }
 
     PhyxVariableManager::PhyxFunction *function = variableManager->getFunction(functionName);
     executeFunction(function->expression, function->parameters);
