@@ -553,27 +553,29 @@ void MainWindow::initializeGUI()
     ui->actionUndo->setIcon(QIcon::fromTheme("edit-undo",QIcon(":/icons/edit-undo")));
     //ui->actionVariables
     //ui->action_Slim_Mode
-    configureButton->setIcon(QIcon::fromTheme("configure",QIcon(":/icons/configure")));
+    configureButton->setIcon(QIcon(":/appicon/icon"));//QIcon::fromTheme("configure",QIcon(":/icons/configure")));
 
     //initialize Main Toolbar
-    /*ui->mainToolBar->addAction(ui->actionNew);
+    configureAction = ui->mainToolBar->addWidget(configureButton);
+    ui->mainToolBar->addSeparator();
+    ui->mainToolBar->addAction(ui->actionNew);
     ui->mainToolBar->addAction(ui->actionOpen);
     ui->mainToolBar->addSeparator();
     ui->mainToolBar->addAction(ui->actionSave);
     ui->mainToolBar->addAction(ui->actionSave_As);
     ui->mainToolBar->addSeparator();
-    ui->mainToolBar->addAction(ui->actionUndo);
-    ui->mainToolBar->addAction(ui->actionRedo);
-    ui->mainToolBar->addSeparator();
+    //ui->mainToolBar->addAction(ui->actionUndo);
+    //ui->mainToolBar->addAction(ui->actionRedo);
+    //ui->mainToolBar->addSeparator();
     ui->mainToolBar->addAction(ui->actionRecalculate_All);
     ui->mainToolBar->addAction(ui->actionRecalculate_from_Line);
     ui->mainToolBar->addAction(ui->actionClear_Variables);
     ui->mainToolBar->addSeparator();
+#ifndef MOBILE_VERSION
     ui->mainToolBar->addAction(ui->actionExport);
     ui->mainToolBar->addSeparator();
+#endif
     ui->mainToolBar->addAction(ui->actionClose);
-    ui->mainToolBar->addSeparator();*/
-    configureAction = ui->mainToolBar->addWidget(configureButton);
 }
 
 void MainWindow::switchLayout(int number)

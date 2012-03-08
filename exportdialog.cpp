@@ -30,7 +30,7 @@ ExportDialog::ExportDialog(QWidget *parent) :
     connect(button, SIGNAL(clicked()),
             this, SLOT(copyToClipboard()));
 
-#if defined(Q_OS_SYMBIAN) || defined(Q_OS_ANDROID) || defined(Q_WS_SIMULATOR)
+#ifdef MOBILE_VERSION
     this->setWindowState(Qt::WindowMaximized);
 #else
     button = ui->buttonBox->addButton(tr("Open Formel Editor"), QDialogButtonBox::ActionRole);

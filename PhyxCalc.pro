@@ -87,7 +87,6 @@ OTHER_FILES += \
     settings/settings.ini \
     settings/docks.txt \
     settings/electronicFunctions.txt \
-    settings/functionsDock.txt \
     settings/numbersDock.txt \
     settings/operatorsDock.txt \
     doc/doc_en.txt

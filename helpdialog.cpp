@@ -6,7 +6,7 @@ HelpDialog::HelpDialog(QWidget *parent) :
     ui(new Ui::HelpDialog)
 {
     ui->setupUi(this);
-#if defined(Q_OS_SYMBIAN) || defined(Q_OS_ANDROID) || defined(Q_WS_SIMULATOR)
+#ifdef MOBILE_VERSION
     this->setWindowState(Qt::WindowMaximized);
 #endif
 

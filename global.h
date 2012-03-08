@@ -23,6 +23,10 @@
 #define VERSION "3rev155"
 #define MATH_OPERATORS "[+\\-\\*/\\(\\)<>!\\^=]"
 
+#if defined(Q_OS_SYMBIAN) || defined(Q_OS_ANDROID) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
+#define MOBILE_VERSION
+#endif
+
 #include <QFont>
 #include <QColor>
 #include <QList>
