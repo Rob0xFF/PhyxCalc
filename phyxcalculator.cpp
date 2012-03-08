@@ -603,7 +603,9 @@ bool PhyxCalculator::setExpression(QString expression)
         {
             listValueLoad();
             listEnd();
+            stackLevel = 1; //enable output
             outputVariable();
+            stackLevel = 0;
         }
     }
     else if (!m_expression.isEmpty() && expression.indexOf(m_expression) == 0)      //new expression is old expression + string
@@ -920,7 +922,7 @@ PhyxIntegerDataType PhyxCalculator::bcdToLongInt(PhyxIntegerDataType number)
     while (number != 0)
     {
         PhyxIntegerDataType digit = number & 0x0F;
-        output += pow(10,i) * digit;
+        output += pow(10.0,i) * digit;
 
         number = number >> 4;
         i++;

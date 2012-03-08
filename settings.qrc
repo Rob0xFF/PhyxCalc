@@ -4,7 +4,6 @@
     </qresource>
     <qresource prefix="/">
         <file>settings/electronicFunctions.txt</file>
-        <file>settings/functionsDock.txt</file>
         <file>settings/numbersDock.txt</file>
         <file>settings/operatorsDock.txt</file>
         <file>settings/docks.txt</file>

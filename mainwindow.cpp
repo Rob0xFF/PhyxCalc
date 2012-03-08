@@ -159,7 +159,6 @@ void MainWindow::firstStartConfig()
     copyResource("symbols.txt");
     copyResource("docks.txt");
     copyResource("numbersDock.txt");
-    copyResource("functionsDock.txt");
     copyResource("operatorsDock.txt");
     copyResource("electronicFunctions.txt");
 }
