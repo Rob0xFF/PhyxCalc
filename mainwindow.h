@@ -31,8 +31,6 @@
 #include <QToolButton>
 #include <QToolTip>
 #include <QTextLayout>
-#include <QDesktopServices>
-#include <QUrl>
 #include "lineparser.h"
 #include "unitloader.h"
 #include "exportdialog.h"
@@ -152,7 +150,6 @@ private slots:
     void on_actionRecalculate_from_Line_triggered();
     void on_action_Slim_Mode_triggered();
     void on_actionClear_Variables_triggered();
-    void on_actionOpen_Settings_Directory_triggered();
     void on_actionHelp_triggered();
 };
 

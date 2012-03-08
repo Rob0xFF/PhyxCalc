@@ -512,8 +512,8 @@ void MainWindow::initializeGUI()
     configureMenu->addMenu(ui->menuCalculation);
     configureMenu->addMenu(ui->menuWindow);
     //configureMenu->addMenu(ui->menuTools);
+    configureMenu->addMenu(ui->menuDocks);
     configureMenu->addAction(ui->actionSettings);
-    configureMenu->addAction(ui->actionOpen_Settings_Directory);
     configureMenu->addAction(ui->actionHelp);
     configureMenu->addAction(ui->actionAbout);
     //configureMenu->addMenu(ui->menuHelp);
@@ -539,7 +539,6 @@ void MainWindow::initializeGUI()
     ui->actionNew->setIcon(QIcon::fromTheme("document-new",QIcon(":/icons/document-new")));
     ui->actionNew_Tab->setIcon(QIcon::fromTheme("tab-new",QIcon(":/icons/tab-new")));
     ui->actionOpen->setIcon(QIcon::fromTheme("document-open",QIcon(":/icons/document-open")));
-    ui->actionOpen_Settings_Directory->setIcon(QIcon::fromTheme("document-open",QIcon(":/icons/document-open")));
     ui->actionPaste->setIcon(QIcon::fromTheme("edit-paste",QIcon(":/icons/edit-paste")));
     //ui->actionPhyxCalc
     ui->actionRecalculate_All->setIcon(QIcon::fromTheme("run-build",QIcon(":/icons/run-build")));
@@ -1104,6 +1103,7 @@ void MainWindow::on_actionPaste_triggered()
 void MainWindow::on_actionSettings_triggered()
 {
     SettingsDialog settingsDialog;
+    settingsDialog.setSettingsDir(settingsDir);
     settingsDialog.setAppSettings(&appSettings);
     settingsDialog.exec();
     settingsDialog.getAppSettings(&appSettings);
@@ -1153,12 +1153,6 @@ void MainWindow::on_action_Slim_Mode_triggered()
 void MainWindow::on_actionClear_Variables_triggered()
 {
     documentList.at(activeTab)->lineParser->clearAllVariables();
-}
-
-void MainWindow::on_actionOpen_Settings_Directory_triggered()
-{
-    QString path = QDir::toNativeSeparators(settingsDir);
-    QDesktopServices::openUrl(QUrl("file:///" + path));
 }
 
 void MainWindow::on_actionHelp_triggered()

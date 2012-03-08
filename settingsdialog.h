@@ -23,6 +23,9 @@
 #include <QDialog>
 #include <QColorDialog>
 #include <QListWidgetItem>
+#include <QDir>
+#include <QDesktopServices>
+#include <QUrl>
 #include "global.h"
 
 namespace Ui {
@@ -32,6 +35,7 @@ namespace Ui {
 class SettingsDialog : public QDialog
 {
     Q_OBJECT
+    Q_PROPERTY(QString settingsDir READ settingsDir WRITE setSettingsDir)
 
 public:
     explicit SettingsDialog(QWidget *parent = 0);
@@ -40,7 +44,20 @@ public:
     void setAppSettings(AppSettings *settings);
     void getAppSettings(AppSettings *settings);
 
+    QString settingsDir() const
+    {
+        return m_settingsDir;
+    }
+
+public slots:
+    void setSettingsDir(QString arg)
+    {
+        m_settingsDir = arg;
+    }
+
 private slots:
+    void openSettingsDir();
+
     void on_listWidget_currentRowChanged(int currentRow);
 
     void on_formatRadioCustom_toggled(bool checked);
@@ -68,6 +85,7 @@ private:
     void setColorSchemeBackground(QColor color);
     void setColorSchemeBold(bool bold);
     void setColorSchemeItalic(bool italic);
+    QString m_settingsDir;
 };
 
 #endif // SETTINGSDIALOG_H

@@ -34,6 +34,11 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui->listWidget->item(0)->setIcon(QIcon::fromTheme("code-context",QIcon(":/icons/code-context")));
     ui->listWidget->item(1)->setIcon(QIcon::fromTheme("edit-text-frame-update",QIcon(":/icons/edit-text-frame-update")));
     ui->listWidget->item(2)->setIcon(QIcon::fromTheme("accessories-text-editor",QIcon(":/icons/accessories-text-editor")));
+
+    QPushButton *button = ui->buttonBox->addButton(tr("Open Settings Directory"), QDialogButtonBox::ActionRole);
+    button->setIcon(QIcon::fromTheme("document-open",QIcon(":/icons/document-open")));
+    connect(button, SIGNAL(clicked()),
+            this, SLOT(openSettingsDir()));
 }
 
 SettingsDialog::~SettingsDialog()
@@ -166,6 +171,12 @@ void SettingsDialog::getAppSettings(AppSettings *settings)
         settings->textEditor.colorScheme[i].bold            = ui->colorSchemeList->currentItem()->font().bold();
         settings->textEditor.colorScheme[i].italic          = ui->colorSchemeList->currentItem()->font().italic();
     }
+}
+
+void SettingsDialog::openSettingsDir()
+{
+    QString path = QDir::toNativeSeparators(m_settingsDir);
+    QDesktopServices::openUrl(QUrl("file:///" + path));
 }
 
 void SettingsDialog::on_listWidget_currentRowChanged(int currentRow)

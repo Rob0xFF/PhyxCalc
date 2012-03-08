@@ -131,7 +131,6 @@
      <string>&amp;Tools</string>
     </property>
     <addaction name="actionSettings"/>
-    <addaction name="actionOpen_Settings_Directory"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -549,11 +548,6 @@
    </property>
    <property name="text">
     <string>Clear Variables</string>
-   </property>
-  </action>
-  <action name="actionOpen_Settings_Directory">
-   <property name="text">
-    <string>Open Settings &amp;Directory</string>
    </property>
   </action>
   <action name="actionHelp">
