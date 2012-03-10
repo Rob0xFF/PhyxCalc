@@ -73,7 +73,8 @@ public:
         ValueComplexError,
         StringNotValidError,
         PrefixError,
-        UnknownVariableError
+        UnknownVariableError,
+        ProgramError
     };
 
     enum OutputMode {

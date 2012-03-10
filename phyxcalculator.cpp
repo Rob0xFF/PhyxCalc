@@ -420,11 +420,13 @@ int PhyxCalculator::restoreErrorPosition(int pos, QList<int> whiteSpaceList)
 
 void PhyxCalculator::raiseException(int errorNumber)
 {
-    //qDebug() << exception;
     m_error = true;
     m_errorNumber = errorNumber;
     clearStack();
     emit outputError();
+#ifdef QT_DEBUG
+    qDebug() << "error occured:" << m_errorNumber << errorString();
+#endif
 }
 
 QString PhyxCalculator::errorString() const
@@ -445,9 +447,12 @@ QString PhyxCalculator::errorString() const
                             break;
     case UnitsNotConvertibleError: output.append(tr("Units not convertible"));
                             break;
-    case PrefixError: output.append(tr("Prefix does not fit unit"));
+    case PrefixError:       output.append(tr("Prefix does not fit unit"));
                             break;
     case UnknownVariableError:  output.append(tr("Unknown variable"));
+                            break;
+    case ProgramError:      output.append(tr("Calculation error"));
+                            break;
     }
 
     return tr("error at position %1-%2: %3").arg(m_errorStartPosition).arg(m_errorEndPosition).arg(output);
@@ -658,21 +663,24 @@ bool PhyxCalculator::evaluate(QList<EarleyTreeItem> earleyTree, QString expressi
     for (int i = (earleyTree.size()-1); i >= 0; i--)
     {
         EarleyTreeItem *earleyTreeItem = &earleyTree[i];
-
-        if (this->hasError())
-        {
-            stackLevel--;
-            return false;
-        }
-        m_errorStartPosition = restoreErrorPosition(earleyTreeItem->startPos, whiteSpaceList);     //just in case
-        m_errorEndPosition   = restoreErrorPosition(earleyTreeItem->endPos, whiteSpaceList)+1;
         //PhyxRule phyxRule = phyxRules.value(earleyTreeItem->rule);
 
+        m_errorStartPosition = restoreErrorPosition(earleyTreeItem->startPos, whiteSpaceList);     //just in case
+        m_errorEndPosition   = restoreErrorPosition(earleyTreeItem->endPos, whiteSpaceList)+1;
         //if (!phyxRule.functions.isEmpty())
         //if (!earleyTreeItem->rule->functions.isEmpty())
         //{
             foreach (QString function, earleyTreeItem->rule->functions)
             {
+                if (this->hasError())
+                {
+                    stackLevel--;
+#ifdef QT_DEBUG
+                    qDebug() << "returned to stack level:" << stackLevel;
+#endif
+                    return false;
+                }
+
                 if (function == "bufferParameter")
                     parameterBuffer = expression.mid(earleyTreeItem->startPos, earleyTreeItem->endPos - earleyTreeItem->startPos + 1);
                 else
@@ -1104,6 +1112,11 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
 
 void PhyxCalculator::valueCheckComplex()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     if (variable1->isComplex())
@@ -1114,6 +1127,11 @@ void PhyxCalculator::valueCheckComplex()
 
 void PhyxCalculator::valueCheckComplex2()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1126,6 +1144,11 @@ void PhyxCalculator::valueCheckComplex2()
 
 void PhyxCalculator::valueCheckComplex2th()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1138,6 +1161,11 @@ void PhyxCalculator::valueCheckComplex2th()
 
 void PhyxCalculator::valueCheckComplex3th()
 {
+    if (variableStack.size() < 3)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable3 = variableStack.pop();
@@ -1152,6 +1180,11 @@ void PhyxCalculator::valueCheckComplex3th()
 
 void PhyxCalculator::valueCheckPositive()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     if (!variable1->isPositive())
@@ -1162,6 +1195,11 @@ void PhyxCalculator::valueCheckPositive()
 
 void PhyxCalculator::valueCheckInteger()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     if (!variable1->isInteger())
@@ -1172,6 +1210,11 @@ void PhyxCalculator::valueCheckInteger()
 
 void PhyxCalculator::valueCheckInteger2()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1186,6 +1229,11 @@ void PhyxCalculator::valueCheckInteger2()
 
 void PhyxCalculator::valueCheckInteger2th()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1198,6 +1246,11 @@ void PhyxCalculator::valueCheckInteger2th()
 
 void PhyxCalculator::valueCheckInteger3th()
 {
+    if (variableStack.size() < 3)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable3 = variableStack.pop();
@@ -1230,6 +1283,11 @@ void PhyxCalculator::valuePush3()
 
 void PhyxCalculator::valueCopy()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     PhyxVariable *variable2 = new PhyxVariable();
@@ -1241,6 +1299,11 @@ void PhyxCalculator::valueCopy()
 
 void PhyxCalculator::valueInvert()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(-variable1->value());
@@ -1249,6 +1312,11 @@ void PhyxCalculator::valueInvert()
 
 void PhyxCalculator::valueAdd()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1260,6 +1328,11 @@ void PhyxCalculator::valueAdd()
 
 void PhyxCalculator::valueSub()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1271,6 +1344,11 @@ void PhyxCalculator::valueSub()
 
 void PhyxCalculator::valueMul()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1282,6 +1360,11 @@ void PhyxCalculator::valueMul()
 
 void PhyxCalculator::valueDiv()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1293,6 +1376,11 @@ void PhyxCalculator::valueDiv()
 
 void PhyxCalculator::valueMod()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1304,6 +1392,11 @@ void PhyxCalculator::valueMod()
 
 void PhyxCalculator::valueNeg()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(-variable1->value());
@@ -1312,6 +1405,11 @@ void PhyxCalculator::valueNeg()
 
 void PhyxCalculator::valueNoPow()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1330,6 +1428,11 @@ void PhyxCalculator::valueNoPow()
 
 void PhyxCalculator::valuePow()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1344,6 +1447,11 @@ void PhyxCalculator::valuePow()
 
 void PhyxCalculator::valueSin()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(sin(variable1->value()));
@@ -1352,6 +1460,11 @@ void PhyxCalculator::valueSin()
 
 void PhyxCalculator::valueArcsin()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(boost::math::asin(variable1->value()));
@@ -1360,6 +1473,11 @@ void PhyxCalculator::valueArcsin()
 
 void PhyxCalculator::valueCos()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(cos(variable1->value()));
@@ -1368,6 +1486,11 @@ void PhyxCalculator::valueCos()
 
 void PhyxCalculator::valueArccos()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(boost::math::acos(variable1->value()));
@@ -1376,6 +1499,11 @@ void PhyxCalculator::valueArccos()
 
 void PhyxCalculator::valueTan()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(tan(variable1->value()));
@@ -1384,6 +1512,11 @@ void PhyxCalculator::valueTan()
 
 void PhyxCalculator::valueArctan()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(boost::math::atan(variable1->value()));
@@ -1392,6 +1525,11 @@ void PhyxCalculator::valueArctan()
 
 void PhyxCalculator::valueSinh()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(sinh(variable1->value()));
@@ -1400,6 +1538,11 @@ void PhyxCalculator::valueSinh()
 
 void PhyxCalculator::valueArcsinh()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(boost::math::asinh(variable1->value()));
@@ -1408,6 +1551,11 @@ void PhyxCalculator::valueArcsinh()
 
 void PhyxCalculator::valueCosh()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(cosh(variable1->value()));
@@ -1416,6 +1564,11 @@ void PhyxCalculator::valueCosh()
 
 void PhyxCalculator::valueArccosh()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(boost::math::acosh(variable1->value()));
@@ -1424,6 +1577,11 @@ void PhyxCalculator::valueArccosh()
 
 void PhyxCalculator::valueTanh()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(tanh(variable1->value()));
@@ -1432,6 +1590,11 @@ void PhyxCalculator::valueTanh()
 
 void PhyxCalculator::valueArctanh()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(boost::math::atanh(variable1->value()));
@@ -1440,6 +1603,11 @@ void PhyxCalculator::valueArctanh()
 
 void PhyxCalculator::valueExp()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(exp(variable1->value()));
@@ -1448,6 +1616,11 @@ void PhyxCalculator::valueExp()
 
 void PhyxCalculator::valueLn()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(log(variable1->value()));
@@ -1456,6 +1629,11 @@ void PhyxCalculator::valueLn()
 
 void PhyxCalculator::valueLog10()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(log10(variable1->value()));
@@ -1464,6 +1642,11 @@ void PhyxCalculator::valueLog10()
 
 void PhyxCalculator::valueLog2()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(log(variable1->value()));
@@ -1472,6 +1655,11 @@ void PhyxCalculator::valueLog2()
 
 void PhyxCalculator::valueLogn()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1483,6 +1671,11 @@ void PhyxCalculator::valueLogn()
 
 void PhyxCalculator::valueRoot()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1494,6 +1687,11 @@ void PhyxCalculator::valueRoot()
 
 void PhyxCalculator::valueSqrt()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(sqrt(variable1->value()));
@@ -1502,6 +1700,11 @@ void PhyxCalculator::valueSqrt()
 
 void PhyxCalculator::valueAbs()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(abs(variable1->value()));
@@ -1510,6 +1713,11 @@ void PhyxCalculator::valueAbs()
 
 void PhyxCalculator::valueMax()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1527,6 +1735,11 @@ void PhyxCalculator::valueMax()
 
 void PhyxCalculator::valueMin()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1546,6 +1759,11 @@ void PhyxCalculator::valueMin()
 
 void PhyxCalculator::valueAvg()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1580,6 +1798,11 @@ void PhyxCalculator::valueE()
 
 void PhyxCalculator::valueInt()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     PhyxValueDataType value(static_cast<PhyxFloatDataType>(variable1->toInt()),PHYX_FLOAT_NULL);
@@ -1589,6 +1812,11 @@ void PhyxCalculator::valueInt()
 
 void PhyxCalculator::valueTrunc()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
 #ifndef Q_WS_S60
@@ -1602,6 +1830,11 @@ void PhyxCalculator::valueTrunc()
 
 void PhyxCalculator::valueFloor()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     PhyxValueDataType value(floor(variable1->value().real()),PHYX_FLOAT_NULL);
@@ -1611,6 +1844,11 @@ void PhyxCalculator::valueFloor()
 
 void PhyxCalculator::valueRound()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
 #ifndef Q_WS_S60
@@ -1624,6 +1862,11 @@ void PhyxCalculator::valueRound()
 
 void PhyxCalculator::valueCeil()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     PhyxValueDataType value(ceil(variable1->value().real()),PHYX_FLOAT_NULL);
@@ -1633,6 +1876,11 @@ void PhyxCalculator::valueCeil()
 
 void PhyxCalculator::valueSign()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     //PhyxValueDataType value(boost::math::copysign(PHYX_FLOAT_ONE,variable1->value().real()),PHYX_FLOAT_NULL);
@@ -1657,6 +1905,11 @@ void PhyxCalculator::valueSign()
 
 void PhyxCalculator::valueHeaviside()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     if (variable1->value().real() >= PHYX_FLOAT_NULL)
@@ -1675,6 +1928,11 @@ void PhyxCalculator::valueRand()
 
 void PhyxCalculator::valueRandint()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     PhyxIntegerDataType max = variable1->toInt();
@@ -1687,6 +1945,11 @@ void PhyxCalculator::valueRandint()
 
 void PhyxCalculator::valueRandg()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1706,6 +1969,11 @@ void PhyxCalculator::valueRandg()
 
 void PhyxCalculator::valueFaculty()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     PhyxFloatDataType value = PHYX_FLOAT_ONE;
@@ -1720,6 +1988,11 @@ void PhyxCalculator::valueFaculty()
 
 void PhyxCalculator::valueBcd()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(bcdToLongInt(variable1->toInt())),PHYX_FLOAT_NULL));
@@ -1728,6 +2001,11 @@ void PhyxCalculator::valueBcd()
 
 void PhyxCalculator::valueToBcd()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(longIntToBcd(variable1->toInt())),PHYX_FLOAT_NULL));
@@ -1742,6 +2020,11 @@ void PhyxCalculator::valueAns()
 
 void PhyxCalculator::complexReal()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(PhyxValueDataType(real(variable1->value()),PHYX_FLOAT_NULL));
@@ -1750,6 +2033,11 @@ void PhyxCalculator::complexReal()
 
 void PhyxCalculator::complexImag()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(PhyxValueDataType(imag(variable1->value()),PHYX_FLOAT_NULL));
@@ -1758,6 +2046,11 @@ void PhyxCalculator::complexImag()
 
 void PhyxCalculator::complexArg()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(PhyxValueDataType(arg(variable1->value()),PHYX_FLOAT_NULL));
@@ -1766,6 +2059,11 @@ void PhyxCalculator::complexArg()
 
 void PhyxCalculator::complexNorm()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(PhyxValueDataType(norm(variable1->value()),PHYX_FLOAT_NULL));
@@ -1774,6 +2072,11 @@ void PhyxCalculator::complexNorm()
 
 void PhyxCalculator::complexConj()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(conj(variable1->value()));
@@ -1782,6 +2085,11 @@ void PhyxCalculator::complexConj()
 
 void PhyxCalculator::complexPolar()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1793,6 +2101,11 @@ void PhyxCalculator::complexPolar()
 
 void PhyxCalculator::logicAnd()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1804,6 +2117,11 @@ void PhyxCalculator::logicAnd()
 
 void PhyxCalculator::logicOr()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1815,6 +2133,11 @@ void PhyxCalculator::logicOr()
 
 void PhyxCalculator::logicNand()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1826,6 +2149,11 @@ void PhyxCalculator::logicNand()
 
 void PhyxCalculator::logicNor()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1837,6 +2165,11 @@ void PhyxCalculator::logicNor()
 
 void PhyxCalculator::logicXand()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1849,6 +2182,11 @@ void PhyxCalculator::logicXand()
 
 void PhyxCalculator::logicXor()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1861,6 +2199,11 @@ void PhyxCalculator::logicXor()
 
 void PhyxCalculator::logicNot()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(!variable1->value().real());
@@ -1870,6 +2213,11 @@ void PhyxCalculator::logicNot()
 
 void PhyxCalculator::logicEqual()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1883,6 +2231,11 @@ void PhyxCalculator::logicEqual()
 
 void PhyxCalculator::logicNotEqual()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -1896,6 +2249,11 @@ void PhyxCalculator::logicNotEqual()
 
 void PhyxCalculator::logicGreater()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1909,6 +2267,11 @@ void PhyxCalculator::logicGreater()
 
 void PhyxCalculator::logicGreaterOrEqual()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1922,6 +2285,11 @@ void PhyxCalculator::logicGreaterOrEqual()
 
 void PhyxCalculator::logicSmaller()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1935,6 +2303,11 @@ void PhyxCalculator::logicSmaller()
 
 void PhyxCalculator::logicSmallerOrEqual()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1948,6 +2321,11 @@ void PhyxCalculator::logicSmallerOrEqual()
 
 void PhyxCalculator::bitAnd()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1959,6 +2337,11 @@ void PhyxCalculator::bitAnd()
 
 void PhyxCalculator::bitOr()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1970,6 +2353,11 @@ void PhyxCalculator::bitOr()
 
 void PhyxCalculator::bitXor()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -1981,6 +2369,11 @@ void PhyxCalculator::bitXor()
 
 void PhyxCalculator::bitInv()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(~variable1->toInt());
@@ -1989,6 +2382,11 @@ void PhyxCalculator::bitInv()
 
 void PhyxCalculator::bitShiftLeft()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -2000,6 +2398,11 @@ void PhyxCalculator::bitShiftLeft()
 
 void PhyxCalculator::bitShiftRight()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -2011,6 +2414,11 @@ void PhyxCalculator::bitShiftRight()
 
 void PhyxCalculator::conditionIfElse()
 {
+    if (variableStack.size() < 3)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable3 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
@@ -2031,6 +2439,11 @@ void PhyxCalculator::conditionIfElse()
 
 void PhyxCalculator::unitCheckDimensionless()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     if (!variable1->unit()->isDimensionlessUnit())
@@ -2043,6 +2456,11 @@ void PhyxCalculator::unitCheckDimensionless()
 
 void PhyxCalculator::unitCheckDimensionless2()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -2060,6 +2478,11 @@ void PhyxCalculator::unitCheckDimensionless2()
 
 void PhyxCalculator::unitCheckDimensionless2th()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
@@ -2074,6 +2497,11 @@ void PhyxCalculator::unitCheckDimensionless2th()
 
 void PhyxCalculator::unitCheckDimensionless3th()
 {
+    if (variableStack.size() < 3)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable3 = variableStack.pop();
@@ -2090,6 +2518,11 @@ void PhyxCalculator::unitCheckDimensionless3th()
 
 void PhyxCalculator::unitCheckConvertible()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -2105,6 +2538,11 @@ void PhyxCalculator::unitCheckConvertible()
 void PhyxCalculator::unitConvert()
 {
     // conversion works -> bug with output, bug with unit symbol (not correct)
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -2117,6 +2555,11 @@ void PhyxCalculator::unitConvert()
 
 void PhyxCalculator::unitMul()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -2127,6 +2570,11 @@ void PhyxCalculator::unitMul()
 
 void PhyxCalculator::unitDiv()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -2137,6 +2585,11 @@ void PhyxCalculator::unitDiv()
 
 void PhyxCalculator::unitPow()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -2147,6 +2600,11 @@ void PhyxCalculator::unitPow()
 
 void PhyxCalculator::unitRoot()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
@@ -2157,6 +2615,11 @@ void PhyxCalculator::unitRoot()
 
 void PhyxCalculator::unitSqrt()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->unit()->root(2);
@@ -2165,6 +2628,11 @@ void PhyxCalculator::unitSqrt()
 
 void PhyxCalculator::unitClear()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setUnit(new PhyxCompoundUnit());
@@ -2219,6 +2687,11 @@ void PhyxCalculator::unitRemove()
 
 void PhyxCalculator::variableAdd()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variableManager->addVariable(stringBuffer, variable1);
@@ -2278,6 +2751,11 @@ void PhyxCalculator::variablePostDec()
 
 void PhyxCalculator::constantAdd()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     variableManager->addConstant(stringBuffer, variable1);
@@ -2399,6 +2877,11 @@ void PhyxCalculator::listValueLoad()
 
 void PhyxCalculator::listValueSwap()
 {
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
     variableStack.push(variable1);
@@ -2533,6 +3016,11 @@ void PhyxCalculator::bufferBin()
 
 void PhyxCalculator::bufferHexString()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     stringBuffer = longIntToHex(static_cast<PhyxIntegerDataType>(variable1->value().real()));
@@ -2541,6 +3029,11 @@ void PhyxCalculator::bufferHexString()
 
 void PhyxCalculator::bufferOctString()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     stringBuffer = longIntToOct(static_cast<PhyxIntegerDataType>(variable1->value().real()));
@@ -2549,6 +3042,11 @@ void PhyxCalculator::bufferOctString()
 
 void PhyxCalculator::bufferBinString()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     stringBuffer = longIntToBin(static_cast<PhyxIntegerDataType>(variable1->value().real()));
@@ -2641,6 +3139,11 @@ void PhyxCalculator::outputVariable()
         {
             if (!listModeActive)
             {
+                if (variableStack.size() < 1)
+                {
+                    raiseException(ProgramError);
+                    return;
+                }
                 PhyxVariable *variable1 = variableStack.pop();
 
                 //set the special variable #
@@ -2752,6 +3255,11 @@ void PhyxCalculator::unitGroupRemove()
 
 void PhyxCalculator::prefixAdd()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
     unitSystem->addPrefix(stringBuffer, variable1->value().real(), unitGroupBuffer, (flagBuffer & InputOnlyFlag));
 
@@ -2917,6 +3425,11 @@ void PhyxCalculator::lowLevelRun()
 
 void PhyxCalculator::lowLevelAssignment()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     appendLowLevelOperation(stringBuffer, AssignmentOperation, variable1);
@@ -2931,6 +3444,11 @@ void PhyxCalculator::lowLevelAssignmentRemove()
 
 void PhyxCalculator::lowLevelCombinedAssignmentAdd()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationAdd, variable1);
@@ -2939,6 +3457,11 @@ void PhyxCalculator::lowLevelCombinedAssignmentAdd()
 
 void PhyxCalculator::lowLevelCombinedAssignmentSub()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationSub, variable1);
@@ -2947,6 +3470,11 @@ void PhyxCalculator::lowLevelCombinedAssignmentSub()
 
 void PhyxCalculator::lowLevelCombinedAssignmentMul()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationMul, variable1);
@@ -2955,6 +3483,11 @@ void PhyxCalculator::lowLevelCombinedAssignmentMul()
 
 void PhyxCalculator::lowLevelCombinedAssignmentDiv()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationDiv, variable1);
@@ -2963,6 +3496,11 @@ void PhyxCalculator::lowLevelCombinedAssignmentDiv()
 
 void PhyxCalculator::lowLevelCombinedAssignmentMod()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationMod, variable1);
@@ -2971,6 +3509,11 @@ void PhyxCalculator::lowLevelCombinedAssignmentMod()
 
 void PhyxCalculator::lowLevelCombinedAssignmentAnd()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationAnd, variable1);
@@ -2979,6 +3522,11 @@ void PhyxCalculator::lowLevelCombinedAssignmentAnd()
 
 void PhyxCalculator::lowLevelCombinedAssignmentOr()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationOr, variable1);
@@ -2987,6 +3535,11 @@ void PhyxCalculator::lowLevelCombinedAssignmentOr()
 
 void PhyxCalculator::lowLevelCombinedAssignmentXor()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationXor, variable1);
@@ -2995,6 +3548,11 @@ void PhyxCalculator::lowLevelCombinedAssignmentXor()
 
 void PhyxCalculator::lowLevelCombinedAssignmentShiftLeft()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationShiftLeft, variable1);
@@ -3003,6 +3561,11 @@ void PhyxCalculator::lowLevelCombinedAssignmentShiftLeft()
 
 void PhyxCalculator::lowLevelCombinedAssignmentShiftRight()
 {
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
     PhyxVariable *variable1 = variableStack.pop();
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationShiftRight, variable1);
@@ -3013,6 +3576,11 @@ void PhyxCalculator::lowLevelOutput()
 {
     if (stackLevel <= 1)    //deactivate this function for stack levels > 1
     {
+        if (variableStack.size() < 1)
+        {
+            raiseException(ProgramError);
+            return;
+        }
         PhyxVariable *variable1 = variableStack.pop();
 
         appendLowLevelOperation(QString(), OutputOperation, variable1);
