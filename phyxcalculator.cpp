@@ -608,7 +608,7 @@ void PhyxCalculator::removeFunctionRule(QString name, int parameterCount)
 void PhyxCalculator::clearStack()
 {
     foreach (PhyxVariable *variable, variableStack)
-        delete variable;
+        variable->deleteLater();
     variableStack.clear();
     lowLevelStack.clear();
     functionParameterStack.clear();
@@ -1353,7 +1353,7 @@ void PhyxCalculator::valueAdd()
     variable1->setValue(variable1->value() + variable2->value());
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::valueSub()
@@ -1369,7 +1369,7 @@ void PhyxCalculator::valueSub()
     variable1->setValue(variable1->value() - variable2->value());
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::valueMul()
@@ -1385,7 +1385,7 @@ void PhyxCalculator::valueMul()
     variable1->setValue(variable1->value() * variable2->value());
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::valueDiv()
@@ -1401,7 +1401,7 @@ void PhyxCalculator::valueDiv()
     variable1->setValue(variable1->value() / variable2->value());
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::valueMod()
@@ -1417,7 +1417,7 @@ void PhyxCalculator::valueMod()
     variable1->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(variable1->toInt() % variable2->toInt()), PHYX_FLOAT_NULL));
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::valueNeg()
@@ -1452,7 +1452,7 @@ void PhyxCalculator::valueNoPow()
     else
     {
         variableStack.push(variable1);
-        delete variable2;
+        variable2->deleteLater();
     }
 }
 
@@ -1472,7 +1472,7 @@ void PhyxCalculator::valuePow()
         variable1->setValue(pow(variable1->value(),variable2->value()));
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::valueSin()
@@ -1852,7 +1852,7 @@ void PhyxCalculator::valueLogn()
     variable1->setValue(log(variable2->value()) / log(variable1->value()));
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::valueRoot()
@@ -1868,7 +1868,7 @@ void PhyxCalculator::valueRoot()
     variable1->setValue(exp(log(variable2->value()) / variable1->value()));
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::valueSqrt()
@@ -1910,12 +1910,12 @@ void PhyxCalculator::valueMax()
     if (variable1->value().real() >= variable2->value().real())
     {
         variableStack.push(variable1);
-        delete variable2;
+        variable2->deleteLater();
     }
     else
     {
         variableStack.push(variable2);
-        delete variable1;
+        variable1->deleteLater();
     }
 }
 
@@ -1932,15 +1932,15 @@ void PhyxCalculator::valueMin()
     if (variable1->value().real()<= variable2->value().real())
     {
         variableStack.push(variable1);
-        delete variable2;
+        variable2->deleteLater();
     }
     else
     {
         variableStack.push(variable2);
-        delete variable1;
+        variable1->deleteLater();
     }
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::valueAvg()
@@ -1957,7 +1957,7 @@ void PhyxCalculator::valueAvg()
                         / PhyxValueDataType(PHYX_FLOAT_TWO,PHYX_FLOAT_NULL));
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::valuePi()
@@ -2126,7 +2126,7 @@ void PhyxCalculator::valueRandint()
     unitBuffer = "";
     pushVariable();
 
-    delete variable1;
+    variable1->deleteLater();
 }
 
 void PhyxCalculator::valueRandg()
@@ -2150,7 +2150,7 @@ void PhyxCalculator::valueRandg()
 
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::valueFaculty()
@@ -2282,7 +2282,7 @@ void PhyxCalculator::complexPolar()
     variable1->setValue(std::polar(variable1->value().real(), variable2->value().real()));
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::logicAnd()
@@ -2298,7 +2298,7 @@ void PhyxCalculator::logicAnd()
     variable1->setValue(variable1->value().real() && variable2->value().real());
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::logicOr()
@@ -2314,7 +2314,7 @@ void PhyxCalculator::logicOr()
     variable1->setValue(variable1->value().real() || variable2->value().real());
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::logicNand()
@@ -2330,7 +2330,7 @@ void PhyxCalculator::logicNand()
     variable1->setValue(!(variable1->value().real() && variable2->value().real()));
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::logicNor()
@@ -2346,7 +2346,7 @@ void PhyxCalculator::logicNor()
     variable1->setValue(!(variable1->value().real() || variable2->value().real()));
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::logicXand()
@@ -2363,7 +2363,7 @@ void PhyxCalculator::logicXand()
                         || (!variable1->value().real() && !variable2->value().real()));
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::logicXor()
@@ -2380,7 +2380,7 @@ void PhyxCalculator::logicXor()
                         || (!variable1->value().real() && variable2->value().real()));
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::logicNot()
@@ -2411,8 +2411,8 @@ void PhyxCalculator::logicEqual()
     variable3->setValue((variable1->value() == variable2->value()) && variable1->unit()->isSame(variable2->unit()));
     variableStack.push(variable3);
 
-    delete variable1;
-    delete variable2;
+    variable1->deleteLater();
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::logicNotEqual()
@@ -2429,8 +2429,8 @@ void PhyxCalculator::logicNotEqual()
     variable3->setValue((variable1->value() != variable2->value()) || !variable1->unit()->isSame(variable2->unit()));
     variableStack.push(variable3);
 
-    delete variable1;
-    delete variable2;
+    variable1->deleteLater();
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::logicGreater()
@@ -2447,8 +2447,8 @@ void PhyxCalculator::logicGreater()
     variable3->setValue(variable1->value().real() > variable2->value().real());
     variableStack.push(variable3);
 
-    delete variable1;
-    delete variable2;
+    variable1->deleteLater();
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::logicGreaterOrEqual()
@@ -2465,8 +2465,8 @@ void PhyxCalculator::logicGreaterOrEqual()
     variable3->setValue(variable1->value().real() >= variable2->value().real());
     variableStack.push(variable3);
 
-    delete variable1;
-    delete variable2;
+    variable1->deleteLater();
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::logicSmaller()
@@ -2483,8 +2483,8 @@ void PhyxCalculator::logicSmaller()
     variable3->setValue(variable1->value().real() < variable2->value().real());
     variableStack.push(variable3);
 
-    delete variable1;
-    delete variable2;
+    variable1->deleteLater();
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::logicSmallerOrEqual()
@@ -2501,8 +2501,8 @@ void PhyxCalculator::logicSmallerOrEqual()
     variable3->setValue(variable1->value().real() <= variable2->value().real());
     variableStack.push(variable3);
 
-    delete variable1;
-    delete variable2;
+    variable1->deleteLater();
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::bitAnd()
@@ -2518,7 +2518,7 @@ void PhyxCalculator::bitAnd()
     variable1->setValue(variable1->toInt() & variable2->toInt());
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::bitOr()
@@ -2534,7 +2534,7 @@ void PhyxCalculator::bitOr()
     variable1->setValue(variable1->toInt() | variable2->toInt());
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::bitXor()
@@ -2550,7 +2550,7 @@ void PhyxCalculator::bitXor()
     variable1->setValue(variable1->toInt() ^ variable2->toInt());
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::bitInv()
@@ -2579,7 +2579,7 @@ void PhyxCalculator::bitShiftLeft()
     variable1->setValue(variable1->toInt() << variable2->toInt());
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::bitShiftRight()
@@ -2595,7 +2595,7 @@ void PhyxCalculator::bitShiftRight()
     variable1->setValue(variable1->toInt() >> variable2->toInt());
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::conditionIfElse()
@@ -2612,15 +2612,15 @@ void PhyxCalculator::conditionIfElse()
     if (variable1->toInt())
     {
         variableStack.push(variable2);
-        delete variable3;
+        variable3->deleteLater();
     }
     else
     {
         variableStack.push(variable3);
-        delete variable2;
+        variable2->deleteLater();
     }
 
-    delete variable1;
+    variable1->deleteLater();
 }
 
 void PhyxCalculator::unitCheckDimensionless()
@@ -2736,7 +2736,7 @@ void PhyxCalculator::unitConvert()
     variable1->convertUnit(variable2->unit());
     variableStack.push(variable1);
 
-    delete variable2;
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::unitMul()
@@ -2857,7 +2857,7 @@ void PhyxCalculator::unitAdd()
 
         unitSystem->addDerivedUnit(unit);
 
-        delete variable1;
+        variable1->deleteLater();
     }
 
     stringBuffer.clear();
@@ -3124,7 +3124,7 @@ bool PhyxCalculator::executeFunction(QString expression, QStringList parameters,
 
     //rename temporary renamed variables back
     for (int i = 0; i < newVariables.count(); i++)
-        variableManager->addVariable(newVariables.at(i), oldVariables.at(i));
+        variableManager->addVariable(newVariables.at(i), oldVariables[i]);
 
     return success;
 }
@@ -3210,7 +3210,7 @@ void PhyxCalculator::bufferHexString()
     PhyxVariable *variable1 = variableStack.pop();
 
     stringBuffer = longIntToHex(static_cast<PhyxIntegerDataType>(variable1->value().real()));
-    delete variable1;
+    variable1->deleteLater();
 }
 
 void PhyxCalculator::bufferOctString()
@@ -3223,7 +3223,7 @@ void PhyxCalculator::bufferOctString()
     PhyxVariable *variable1 = variableStack.pop();
 
     stringBuffer = longIntToOct(static_cast<PhyxIntegerDataType>(variable1->value().real()));
-    delete variable1;
+    variable1->deleteLater();
 }
 
 void PhyxCalculator::bufferBinString()
@@ -3236,7 +3236,7 @@ void PhyxCalculator::bufferBinString()
     PhyxVariable *variable1 = variableStack.pop();
 
     stringBuffer = longIntToBin(static_cast<PhyxIntegerDataType>(variable1->value().real()));
-    delete variable1;
+    variable1->deleteLater();
 }
 
 void PhyxCalculator::bufferPrefix()
@@ -3452,7 +3452,7 @@ void PhyxCalculator::prefixAdd()
     unitGroupBuffer.clear();
     stringBuffer.clear();
     clearFlags();
-    delete variable1;
+    variable1->deleteLater();
 }
 
 void PhyxCalculator::prefixRemove()

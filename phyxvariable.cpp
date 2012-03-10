@@ -23,12 +23,12 @@ PhyxVariable::PhyxVariable(QObject *parent) :
     QObject(parent)
 {
     m_value = 1;
-    setUnit(new PhyxCompoundUnit(this));
+    m_unit = new PhyxCompoundUnit();
 }
 
 PhyxVariable::~PhyxVariable()
 {
-    delete m_unit;
+    m_unit->deleteLater();
 }
 
 bool PhyxVariable::convertUnit(PhyxCompoundUnit *unit)

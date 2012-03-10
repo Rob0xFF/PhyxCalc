@@ -31,11 +31,11 @@ PhyxCompoundUnit::PhyxCompoundUnit(PhyxUnit *unit)
 
 PhyxCompoundUnit::~PhyxCompoundUnit()
 {
-    /*for (int i = 0; i < m_compounds.size(); i++)
+    for (int i = 0; i < m_compounds.size(); i++)
     {
-        delete m_compounds.at(i).unit;
+        m_compounds.at(i).unit->deleteLater();
     }
-    m_compounds.clear();*/
+    m_compounds.clear();
 }
 
 void PhyxCompoundUnit::copyCompoundUnit(PhyxCompoundUnit *source, PhyxCompoundUnit *destination)
@@ -44,7 +44,7 @@ void PhyxCompoundUnit::copyCompoundUnit(PhyxCompoundUnit *source, PhyxCompoundUn
     destination->setUnitSystem(source->unitSystem());
     destination->setScaleFactor(source->scaleFactor());
     destination->setOffset(source->offset());
-    destination->setCompounds(source->compounds());
+    destination->setCompounds(copyCompounds(source));
 }
 
 bool PhyxCompoundUnit::isSame(PhyxCompoundUnit *unit)
@@ -79,7 +79,7 @@ bool PhyxCompoundUnit::isSimpleUnit()
 
 void PhyxCompoundUnit::compoundAppend(PhyxUnit *unit, PhyxFloatDataType power)
 {
-    PhyxUnit *newUnit = new PhyxUnit(this);
+    PhyxUnit *newUnit = new PhyxUnit();
     PhyxUnit::copyUnit(unit, newUnit);
 
     m_compounds.append(PhyxCompound());
@@ -102,7 +102,7 @@ void PhyxCompoundUnit::compoundSimplify(int index)
 
     if (unit->isOne())
     {
-        delete m_compounds.at(index).unit;
+        m_compounds.at(index).unit->deleteLater();
         m_compounds.removeAt(index);
     }
     else
@@ -186,7 +186,7 @@ void PhyxCompoundUnit::compoundsClear()
 {
     for (int i = (m_compounds.size()-1); i >= 0; i--)
     {
-        delete m_compounds.at(i).unit;
+        m_compounds.at(i).unit->deleteLater();
         m_compounds.removeAt(i);
     }
 }
@@ -209,6 +209,24 @@ int PhyxCompoundUnit::compoundsNonNullCount()
     return count;
 }
 
+const PhyxCompoundUnit::PhyxCompoundList PhyxCompoundUnit::copyCompounds(PhyxCompoundUnit *sourceUnit)
+{
+    PhyxCompoundList destinationCompounds;
+    PhyxCompoundList sourceCompounds = sourceUnit->compounds();
+
+
+    for (int i = 0; i < sourceCompounds.size(); i++)
+    {
+        PhyxCompound compound;
+        PhyxUnit *unit = new PhyxUnit(sourceUnit);
+        copyUnit(sourceCompounds.at(i).unit, unit);
+        compound.power = sourceCompounds.at(i).power;
+        compound.unit = unit;
+        destinationCompounds.append(compound);
+    }
+    return destinationCompounds;
+}
+
 
 void PhyxCompoundUnit::verify()
 {
@@ -216,15 +234,14 @@ void PhyxCompoundUnit::verify()
     {
         if (!(this->isSimpleUnit() || this->isOne()))
         {
-            PhyxUnit *unit = new PhyxUnit(this);
+            PhyxUnit *unit = new PhyxUnit();
             unit->setPowers(this->powers());
             if (m_unitSystem->verifyUnit(unit))
             {
                 compoundsSetNull();
                 compoundAppend(unit, 1);
             }
-            else
-                delete unit;
+            unit->deleteLater();
         }
     }
 }

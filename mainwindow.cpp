@@ -731,7 +731,7 @@ bool MainWindow::saveDocument(Document *document, bool force, bool exit)
     QFile file(document->path + document->name);
     if (file.open(QIODevice::WriteOnly))
     {
-        file.write(text.toLocal8Bit());
+        file.write(text.toUtf8());
         file.close();
 
         document->expressionEdit->document()->setModified(false);
@@ -759,7 +759,7 @@ void MainWindow::openDocument(QString fileName, bool newTab)
     QFile file(fileName);
     if (file.open(QIODevice::ReadOnly))
     {
-        QString text = QString::fromLocal8Bit(file.readAll());
+        QString text = QString::fromUtf8(file.readAll());
         document->expressionEdit->setText(text);
         file.close();
 

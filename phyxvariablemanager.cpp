@@ -27,7 +27,7 @@ PhyxVariableManager::PhyxVariableManager(QObject *parent) :
 void PhyxVariableManager::addVariable(QString name, PhyxVariable *variable)
 {
     if (variableMap.contains(name))
-        delete variableMap.value(name);
+        variableMap.value(name)->deleteLater();
 
     variableMap.insert(name, variable);
     emit variableAdded(name);
@@ -49,7 +49,7 @@ void PhyxVariableManager::removeVariable(QString name)
 {
     if (variableMap.contains(name))
     {
-        delete variableMap.value(name);
+        variableMap.value(name)->deleteLater();
         variableMap.remove(name);
         emit variableRemoved(name);
     }
@@ -80,7 +80,7 @@ PhyxVariableManager::PhyxVariableMap *PhyxVariableManager::variables()
 void PhyxVariableManager::addConstant(QString name, PhyxVariable *variable)
 {
     if (constantMap.contains(name))
-        delete constantMap.value(name);
+        constantMap.value(name)->deleteLater();
 
     constantMap.insert(name, variable);
     emit constantAdded(name);
@@ -102,7 +102,7 @@ void PhyxVariableManager::removeConstant(QString name)
 {
     if (constantMap.contains(name))
     {
-        delete constantMap.value(name);
+        constantMap.value(name)->deleteLater();
         constantMap.remove(name);
         emit constantRemoved(name);
     }
@@ -178,6 +178,6 @@ void PhyxVariableManager::clearVariables()
 
         variableMap.remove(name);
         emit variableRemoved(name);
-        delete variable;
+        variable->deleteLater();
     }
 }

@@ -31,22 +31,22 @@ PhyxUnitSystem::~PhyxUnitSystem()
     while (i.hasNext())
     {
         i.next();
-        delete i.value();
+        i.value()->deleteLater();
     }
     QMapIterator<QString, PhyxUnit*> i2(derivedUnitsMap);
     while (i2.hasNext())
     {
         i2.next();
-        delete i2.value();
+        i2.value()->deleteLater();
     }
 }
 
 void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags, QString unitGroup, QString preferedPrefix)
 {
     if (baseUnitsMap.contains(symbol))
-        delete baseUnitsMap.take(symbol);
+        baseUnitsMap.take(symbol)->deleteLater();
 
-   PhyxUnit *unit = new PhyxUnit(this);
+   PhyxUnit *unit = new PhyxUnit();
    unit->setSymbol(symbol);
    unit->powerAppend(preferedPrefix + symbol,1);
    unit->setFlags(flags);
@@ -56,7 +56,7 @@ void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags, QStr
 
     if (derivedUnitsMap.contains(symbol))
     {
-        delete derivedUnitsMap.take(symbol);
+        derivedUnitsMap.take(symbol)->deleteLater();
         recalculate();
     }
 
@@ -89,13 +89,12 @@ void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags, QStr
 void PhyxUnitSystem::addDerivedUnit(PhyxUnit *unit)
 {
     if (baseUnitsMap.contains(unit->symbol()))
-        delete baseUnitsMap.take(unit->symbol());
+        baseUnitsMap.take(unit->symbol())->deleteLater();
 
     if (derivedUnitsMap.contains(unit->symbol()))
-        delete derivedUnitsMap.take(unit->symbol());
+        derivedUnitsMap.take(unit->symbol())->deleteLater();
 
    derivedUnitsMap.insert(unit->symbol(), unit);
-   unit->setParent(this);
    recalculate();
 
    emit unitAdded(unit->symbol());
@@ -104,10 +103,10 @@ void PhyxUnitSystem::addDerivedUnit(PhyxUnit *unit)
 bool PhyxUnitSystem::removeUnit(QString symbol)
 {
     if (baseUnitsMap.contains(symbol))
-        delete baseUnitsMap.take(symbol);
+        baseUnitsMap.take(symbol)->deleteLater();
 
     if (derivedUnitsMap.contains(symbol))
-        delete derivedUnitsMap.take(symbol);
+        derivedUnitsMap.take(symbol)->deleteLater();
 
     recalculate();
 

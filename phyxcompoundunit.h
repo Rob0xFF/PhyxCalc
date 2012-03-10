@@ -99,7 +99,7 @@ private:
     void compoundsClear();                                              ///< clear all compounds
     void compoundsSetNull();                                            ///< sets the powers of all compounds to 0
     int  compoundsNonNullCount();                                       ///< returns the number of compounds that are not 0
-
+    static PhyxCompoundList const copyCompounds(PhyxCompoundUnit *sourceUnit);   ///< copies the compounds
     void verify();                                           ///< searches for the unit in the unit system
 
 signals:
