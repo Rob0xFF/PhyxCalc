@@ -46,7 +46,7 @@ void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags, QStr
     if (baseUnitsMap.contains(symbol))
         delete baseUnitsMap.take(symbol);
 
-   PhyxUnit *unit = new PhyxUnit();
+   PhyxUnit *unit = new PhyxUnit(this);
    unit->setSymbol(symbol);
    unit->powerAppend(preferedPrefix + symbol,1);
    unit->setFlags(flags);
@@ -95,6 +95,7 @@ void PhyxUnitSystem::addDerivedUnit(PhyxUnit *unit)
         delete derivedUnitsMap.take(unit->symbol());
 
    derivedUnitsMap.insert(unit->symbol(), unit);
+   unit->setParent(this);
    recalculate();
 
    emit unitAdded(unit->symbol());

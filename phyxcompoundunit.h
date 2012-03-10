@@ -46,6 +46,7 @@ class PhyxCompoundUnit : public PhyxUnit
 public:
     explicit PhyxCompoundUnit(QObject *parent = 0);
     explicit PhyxCompoundUnit(PhyxUnit *unit);
+    ~PhyxCompoundUnit();
 
     void compoundSimplify(int index);                   ///< simplifies a unit
     void compoundsEqualize(PhyxCompoundUnit *unit);     ///< equalizes two units

@@ -138,7 +138,7 @@ void PhyxVariableManager::addFunction(QString name, QString expression, QStringL
         functionMap.remove(name);
     }
 
-    PhyxFunction *function = new PhyxFunction;
+    PhyxFunction *function = new PhyxFunction();
     function->expression = expression;
     function->parameters = parameters;
     functionMap.insert(name, function);

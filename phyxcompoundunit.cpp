@@ -29,6 +29,15 @@ PhyxCompoundUnit::PhyxCompoundUnit(PhyxUnit *unit)
     this->fromSimpleUnit(unit);
 }
 
+PhyxCompoundUnit::~PhyxCompoundUnit()
+{
+    /*for (int i = 0; i < m_compounds.size(); i++)
+    {
+        delete m_compounds.at(i).unit;
+    }
+    m_compounds.clear();*/
+}
+
 void PhyxCompoundUnit::copyCompoundUnit(PhyxCompoundUnit *source, PhyxCompoundUnit *destination)
 {
     destination->setPowers(source->powers());
@@ -70,7 +79,7 @@ bool PhyxCompoundUnit::isSimpleUnit()
 
 void PhyxCompoundUnit::compoundAppend(PhyxUnit *unit, PhyxFloatDataType power)
 {
-    PhyxUnit *newUnit = new PhyxUnit();
+    PhyxUnit *newUnit = new PhyxUnit(this);
     PhyxUnit::copyUnit(unit, newUnit);
 
     m_compounds.append(PhyxCompound());
@@ -207,7 +216,7 @@ void PhyxCompoundUnit::verify()
     {
         if (!(this->isSimpleUnit() || this->isOne()))
         {
-            PhyxUnit *unit = new PhyxUnit();
+            PhyxUnit *unit = new PhyxUnit(this);
             unit->setPowers(this->powers());
             if (m_unitSystem->verifyUnit(unit))
             {

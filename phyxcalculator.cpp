@@ -295,7 +295,7 @@ void PhyxCalculator::initialize()
     }
 
     //initialize unit system
-    unitSystem = new PhyxUnitSystem();
+    unitSystem = new PhyxUnitSystem(this);
     connect(unitSystem, SIGNAL(unitAdded(QString)),
             this, SLOT(addUnitRule(QString)));
     connect(unitSystem, SIGNAL(unitRemoved(QString)),
@@ -310,7 +310,7 @@ void PhyxCalculator::initialize()
             this, SLOT(removeUnitGroupRule(QString)));
 
     //initialize variable manager
-    variableManager = new PhyxVariableManager();
+    variableManager = new PhyxVariableManager(this);
     connect(variableManager, SIGNAL(variableAdded(QString)),
             this, SLOT(addVariableRule(QString)));
     connect(variableManager, SIGNAL(variableRemoved(QString)),
@@ -325,7 +325,7 @@ void PhyxCalculator::initialize()
             this, SLOT(removeFunctionRule(QString,int)));
 
     //initialize special variable #
-    PhyxVariable *variable = new PhyxVariable();
+    PhyxVariable *variable = new PhyxVariable(this);
     variable->setValue(PhyxValueDataType(PHYX_FLOAT_NULL,PHYX_FLOAT_NULL));
     variableManager->addVariable("#", variable);
 }
@@ -1290,7 +1290,7 @@ void PhyxCalculator::valueCopy()
     }
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxVariable *variable2 = new PhyxVariable();
+    PhyxVariable *variable2 = new PhyxVariable(this);
     PhyxVariable::copyVariable(variable1, variable2);
 
     variableStack.push(variable1);
@@ -2221,7 +2221,7 @@ void PhyxCalculator::logicEqual()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    PhyxVariable *variable3 = new PhyxVariable();
+    PhyxVariable *variable3 = new PhyxVariable(this);
     variable3->setValue((variable1->value() == variable2->value()) && variable1->unit()->isSame(variable2->unit()));
     variableStack.push(variable3);
 
@@ -2239,7 +2239,7 @@ void PhyxCalculator::logicNotEqual()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    PhyxVariable *variable3 = new PhyxVariable();
+    PhyxVariable *variable3 = new PhyxVariable(this);
     variable3->setValue((variable1->value() != variable2->value()) || !variable1->unit()->isSame(variable2->unit()));
     variableStack.push(variable3);
 
@@ -2257,7 +2257,7 @@ void PhyxCalculator::logicGreater()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxVariable *variable3 = new PhyxVariable();
+    PhyxVariable *variable3 = new PhyxVariable(this);
     variable3->setValue(variable1->value().real() > variable2->value().real());
     variableStack.push(variable3);
 
@@ -2275,7 +2275,7 @@ void PhyxCalculator::logicGreaterOrEqual()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxVariable *variable3 = new PhyxVariable();
+    PhyxVariable *variable3 = new PhyxVariable(this);
     variable3->setValue(variable1->value().real() >= variable2->value().real());
     variableStack.push(variable3);
 
@@ -2293,7 +2293,7 @@ void PhyxCalculator::logicSmaller()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxVariable *variable3 = new PhyxVariable();
+    PhyxVariable *variable3 = new PhyxVariable(this);
     variable3->setValue(variable1->value().real() < variable2->value().real());
     variableStack.push(variable3);
 
@@ -2311,7 +2311,7 @@ void PhyxCalculator::logicSmallerOrEqual()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    PhyxVariable *variable3 = new PhyxVariable();
+    PhyxVariable *variable3 = new PhyxVariable(this);
     variable3->setValue(variable1->value().real() <= variable2->value().real());
     variableStack.push(variable3);
 
@@ -2635,7 +2635,7 @@ void PhyxCalculator::unitClear()
     }
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setUnit(new PhyxCompoundUnit());
+    variable1->setUnit(new PhyxCompoundUnit(this));
     variableStack.push(variable1);
 }
 
@@ -2659,7 +2659,7 @@ void PhyxCalculator::unitAdd()
 
         variable1->unit()->simplify();
 
-        PhyxUnit *unit = new PhyxUnit();
+        PhyxUnit *unit = new PhyxUnit(this);
         unit->setPowers(variable1->unit()->powers());
         unit->setUnitGroup(unitGroupBuffer);
         unit->setPreferedPrefix(prefixBuffer);
@@ -3075,7 +3075,7 @@ void PhyxCalculator::bufferUnitGroup()
 void PhyxCalculator::pushVariable()
 {
     //create new variable
-    PhyxVariable *variable = new PhyxVariable();
+    PhyxVariable *variable = new PhyxVariable(this);
     variable->unit()->setUnitSystem(unitSystem);
     if (!unitBuffer.isEmpty())
         variable->setUnit(unitSystem->unit(unitBuffer));

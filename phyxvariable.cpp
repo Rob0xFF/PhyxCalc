@@ -23,7 +23,7 @@ PhyxVariable::PhyxVariable(QObject *parent) :
     QObject(parent)
 {
     m_value = 1;
-    setUnit(new PhyxCompoundUnit());
+    setUnit(new PhyxCompoundUnit(this));
 }
 
 PhyxVariable::~PhyxVariable()
@@ -38,9 +38,9 @@ bool PhyxVariable::convertUnit(PhyxCompoundUnit *unit)
 
 void PhyxVariable::copyVariable(PhyxVariable *source, PhyxVariable *destination)
 {
-    PhyxCompoundUnit *unit = new PhyxCompoundUnit();
-    PhyxCompoundUnit::copyCompoundUnit(source->unit(), unit);
-    destination->setUnit(unit);
+    //PhyxCompoundUnit *unit = new PhyxCompoundUnit();
+    PhyxCompoundUnit::copyCompoundUnit(source->unit(), destination->unit());
+    //destination->setUnit(unit);
     destination->setValue(source->value());
 }
 

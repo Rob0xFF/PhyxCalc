@@ -22,7 +22,7 @@
 LineParser::LineParser(QObject *)
 {
     m_loading = true;
-    m_phyxCalculator = new PhyxCalculator();
+    m_phyxCalculator = new PhyxCalculator(this);
     connect(m_phyxCalculator, SIGNAL(outputResult()),
             this, SLOT(outputResult()));
     connect(m_phyxCalculator, SIGNAL(outputError()),
