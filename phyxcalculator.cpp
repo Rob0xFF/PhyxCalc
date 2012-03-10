@@ -78,12 +78,24 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueArccos",   &PhyxCalculator::valueArccos);
     functionMap.insert("valueTan",      &PhyxCalculator::valueTan);
     functionMap.insert("valueArctan",   &PhyxCalculator::valueArctan);
+    functionMap.insert("valueCot",      &PhyxCalculator::valueCot);
+    functionMap.insert("valueArccot",   &PhyxCalculator::valueArccot);
+    functionMap.insert("valueSec",      &PhyxCalculator::valueSec);
+    functionMap.insert("valueArcsec",   &PhyxCalculator::valueArcsec);
+    functionMap.insert("valueCsc",      &PhyxCalculator::valueCsc);
+    functionMap.insert("valueArccsc",   &PhyxCalculator::valueArccsc);
     functionMap.insert("valueSinh",     &PhyxCalculator::valueSinh);
     functionMap.insert("valueArcsinh",  &PhyxCalculator::valueArcsinh);
     functionMap.insert("valueCosh",     &PhyxCalculator::valueCosh);
     functionMap.insert("valueArccosh",  &PhyxCalculator::valueArccosh);
     functionMap.insert("valueTanh",     &PhyxCalculator::valueTanh);
     functionMap.insert("valueArctanh",  &PhyxCalculator::valueArctanh);
+    functionMap.insert("valueCoth",      &PhyxCalculator::valueCoth);
+    functionMap.insert("valueArccoth",   &PhyxCalculator::valueArccoth);
+    functionMap.insert("valueSech",      &PhyxCalculator::valueSech);
+    functionMap.insert("valueArcsech",   &PhyxCalculator::valueArcsech);
+    functionMap.insert("valueCsch",      &PhyxCalculator::valueCsch);
+    functionMap.insert("valueArccsch",   &PhyxCalculator::valueArccsch);
     functionMap.insert("valueExp",      &PhyxCalculator::valueExp);
     functionMap.insert("valueLn",       &PhyxCalculator::valueLn);
     functionMap.insert("valueLog10",    &PhyxCalculator::valueLog10);
@@ -243,6 +255,15 @@ void PhyxCalculator::initialize()
     standardFunctionList.append("tan");
     standardFunctionList.append("arctan");
     standardFunctionList.append("atan");
+    standardFunctionList.append("cot");
+    standardFunctionList.append("arccot");
+    standardFunctionList.append("acot");
+    standardFunctionList.append("sec");
+    standardFunctionList.append("arcsec");
+    standardFunctionList.append("asec");
+    standardFunctionList.append("csc");
+    standardFunctionList.append("arccsc");
+    standardFunctionList.append("acsc");
     standardFunctionList.append("sinh");
     standardFunctionList.append("arcsinh");
     standardFunctionList.append("asinh");
@@ -252,6 +273,15 @@ void PhyxCalculator::initialize()
     standardFunctionList.append("tanh");
     standardFunctionList.append("arctanh");
     standardFunctionList.append("atanh");
+    standardFunctionList.append("coth");
+    standardFunctionList.append("arccoth");
+    standardFunctionList.append("acoth");
+    standardFunctionList.append("sech");
+    standardFunctionList.append("arcsech");
+    standardFunctionList.append("asech");
+    standardFunctionList.append("csch");
+    standardFunctionList.append("arccsch");
+    standardFunctionList.append("acsch");
     standardFunctionList.append("exp");
     standardFunctionList.append("ln");
     standardFunctionList.append("log");
@@ -1523,6 +1553,84 @@ void PhyxCalculator::valueArctan()
     variableStack.push(variable1);
 }
 
+void PhyxCalculator::valueCot()
+{
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/tan(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueArccot()
+{
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/boost::math::atan(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueSec()
+{
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/cos(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueArcsec()
+{
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/boost::math::acos(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueCsc()
+{
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/sin(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueArccsc()
+{
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/boost::math::asin(variable1->value()));
+    variableStack.push(variable1);
+}
+
 void PhyxCalculator::valueSinh()
 {
     if (variableStack.size() < 1)
@@ -1598,6 +1706,84 @@ void PhyxCalculator::valueArctanh()
     PhyxVariable *variable1 = variableStack.pop();
 
     variable1->setValue(boost::math::atanh(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueCoth()
+{
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/tanh(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueArccoth()
+{
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/boost::math::atanh(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueSech()
+{
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/cosh(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueArcsech()
+{
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/boost::math::acosh(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueCsch()
+{
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/sinh(variable1->value()));
+    variableStack.push(variable1);
+}
+
+void PhyxCalculator::valueArccsch()
+{
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
+    PhyxVariable *variable1 = variableStack.pop();
+
+    variable1->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/boost::math::asinh(variable1->value()));
     variableStack.push(variable1);
 }
 

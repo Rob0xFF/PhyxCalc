@@ -147,7 +147,9 @@ PhyxCalc uses C++-like operators and some additional operators for special mathe
  
 === Trigonometric and hyperbolic functions
 *sin*, *cos*, *tan*, *arcsin*, *arccos*, *arctan* +
-*sinh*, *cosh*, *tanh*, *arcsinh*, *arccosh*, *arctanh*
+*cot*, *sec*, *csc*, *arccot*, *arcsec*, *arccsc* +
+*sinh*, *cosh*, *tanh*, *arcsinh*, *arccosh*, *arctanh* +
+*coth*, *sech*, *csch*, *arccoth*, *arcsech*, *arccsch*
 
 === Logarithms, exponential function and roots
 *ln*, *log*<n>, *exp*, *sqrt*=*sqr*, *root*<n> +
