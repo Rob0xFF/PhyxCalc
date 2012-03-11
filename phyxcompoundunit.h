@@ -45,7 +45,6 @@ class PhyxCompoundUnit : public PhyxUnit
 
 public:
     explicit PhyxCompoundUnit(QObject *parent = 0);
-    explicit PhyxCompoundUnit(PhyxUnit *unit);
     ~PhyxCompoundUnit();
 
     void compoundSimplify(int index);                   ///< simplifies a unit
@@ -88,19 +87,21 @@ private:
     PhyxUnitSystem * m_unitSystem;
 
     PhyxCompoundList  m_compounds;    /// holds all compounds of a unit: e.g.: m/s -> compuound 1: m^1, compound 2: s^-1
-    void compoundAppend(PhyxUnit *unit, PhyxFloatDataType power);                  ///< adds a power to the map
-    void compoundMultiply(PhyxUnit *unit, PhyxFloatDataType factor);               ///< multiplies a power with factor
-    void compoundDivide(PhyxUnit *unit, PhyxFloatDataType factor);                 ///< devides a power with factor
+    void compoundAppend(PhyxUnit *unit, PhyxFloatDataType power);       ///< adds a power to the map
+    void compoundMultiply(PhyxUnit *unit, PhyxFloatDataType factor);    ///< multiplies a power with factor
+    void compoundDivide(PhyxUnit *unit, PhyxFloatDataType factor);      ///< devides a power with factor
     void compoundEqualize(int unitIndex, PhyxCompoundUnit *parentUnit); ///< equalizes one compound with the matching compound in the given unit
+    void compoundStrip(int index);                                      ///< splits an compound into its powers
     void compoundsMultiply(PhyxCompoundList compounds);                 ///< multiplies powers of the unit with other powers
     void compoundsDivide(PhyxCompoundList compounds);                   ///< devides powers of the unit with other powers
-    void compoundsRaise(PhyxFloatDataType power);                                  ///< raises all powers to power
-    void compoundsRoot(PhyxFloatDataType root);                                    ///< takes the root of all powers
+    void compoundsRaise(PhyxFloatDataType power);                       ///< raises all powers to power
+    void compoundsRoot(PhyxFloatDataType root);                         ///< takes the root of all powers
     void compoundsClear();                                              ///< clear all compounds
     void compoundsSetNull();                                            ///< sets the powers of all compounds to 0
     int  compoundsNonNullCount();                                       ///< returns the number of compounds that are not 0
-    static PhyxCompoundList const copyCompounds(PhyxCompoundUnit *sourceUnit);   ///< copies the compounds
-    void verify();                                           ///< searches for the unit in the unit system
+    bool compoundsCompare(PhyxCompoundList const compounds);                  ///< compares other compounds with the compounds of this unit
+    //static PhyxCompoundList const copyCompounds(PhyxCompoundUnit *sourceUnit);   ///< copies the compounds
+    void verify();                                                      ///< searches for the unit in the unit system
 
 signals:
     void offsetValue(PhyxFloatDataType value);                         ///< offsets the value of the variable

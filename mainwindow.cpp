@@ -145,7 +145,7 @@ void MainWindow::copyResource(QString name)
 {
     if (!QFile::exists(settingsDir + name))
     {
-        QFile::copy(":/" + name, settingsDir + name);
+        QFile::copy(":/settings/" + name, settingsDir + name);
         QFile::setPermissions(settingsDir + name, QFile::ReadOwner | QFile::WriteOwner);
     }
 }

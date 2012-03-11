@@ -26,22 +26,28 @@ PhyxUnit::PhyxUnit(QObject *parent) :
     m_name   = "";
     m_unitGroup = "";
     m_preferedPrefix = "";
-    m_offset = 0;
-    m_scaleFactor = 1;
+    m_offset = PHYX_FLOAT_NULL;
+    m_scaleFactor = PHYX_FLOAT_ONE;
     m_flags = 0;
+    m_powers = new PowerMap();
+}
+
+PhyxUnit::~PhyxUnit()
+{
+    delete m_powers;
 }
 
 void PhyxUnit::powerAppend(QString base, PhyxFloatDataType power)
 {
-    m_powers.insert(base, power);
+    m_powers->insert(base, power);
 }
 
 void PhyxUnit::powerMultiply(QString base, PhyxFloatDataType factor)
 {
     PhyxFloatDataType power;
-    if (m_powers.contains(base))
+    if (m_powers->contains(base))
     {
-        power = m_powers.value(base);
+        power = m_powers->value(base);
         power += factor;
     }
     else
@@ -50,17 +56,17 @@ void PhyxUnit::powerMultiply(QString base, PhyxFloatDataType factor)
     }
 
     if (power == PHYX_FLOAT_NULL)
-        m_powers.remove(base);
+        m_powers->remove(base);
     else
-        m_powers.insert(base, power);
+        m_powers->insert(base, power);
 }
 
 void PhyxUnit::powerDivide(QString base, PhyxFloatDataType factor)
 {
-    PhyxFloatDataType power;
-    if (m_powers.contains(base))
+    /*PhyxFloatDataType power;
+    if (m_powers->contains(base))
     {
-        power = m_powers.value(base);
+        power = m_powers->value(base);
         power -= factor;
     }
     else
@@ -69,23 +75,24 @@ void PhyxUnit::powerDivide(QString base, PhyxFloatDataType factor)
     }
 
     if (power == PHYX_FLOAT_NULL)
-        m_powers.remove(base);
+        m_powers->remove(base);
     else
-        m_powers.insert(base, power);
+        m_powers->insert(base, power);*/
+    powerMultiply(base, -factor);
 }
 
-void PhyxUnit::powersMultiply(PhyxUnit::PowerMap powers)
+void PhyxUnit::powersMultiply(PhyxUnit::PowerMap *powers)
 {
-    QMapIterator<QString, PhyxFloatDataType> i(powers);
+    QMapIterator<QString, PhyxFloatDataType> i(*powers);
      while (i.hasNext()) {
          i.next();
          powerMultiply(i.key(), i.value());
      }
 }
 
-void PhyxUnit::powersDivide(PhyxUnit::PowerMap powers)
+void PhyxUnit::powersDivide(PowerMap *powers)
 {
-    QMapIterator<QString, PhyxFloatDataType> i(powers);
+    QMapIterator<QString, PhyxFloatDataType> i(*powers);
      while (i.hasNext()) {
          i.next();
          powerDivide(i.key(), i.value());
@@ -94,44 +101,44 @@ void PhyxUnit::powersDivide(PhyxUnit::PowerMap powers)
 
 void PhyxUnit::powersRaise(PhyxFloatDataType power)
 {
-    QMapIterator<QString, PhyxFloatDataType> i(m_powers);
+    QMapIterator<QString, PhyxFloatDataType> i(*m_powers);
      while (i.hasNext()) {
          i.next();
-         m_powers.insert(i.key(), i.value() * power);
+         m_powers->insert(i.key(), i.value() * power);
      }
 }
 
 void PhyxUnit::powersRoot(PhyxFloatDataType root)
 {
-    QMapIterator<QString, PhyxFloatDataType> i(m_powers);
+    QMapIterator<QString, PhyxFloatDataType> i(*m_powers);
      while (i.hasNext()) {
          i.next();
-         m_powers.insert(i.key(), i.value() / root);
+         m_powers->insert(i.key(), i.value() / root);
      }
 }
 
-bool PhyxUnit::powersCompare(PhyxUnit::PowerMap powers)
+bool PhyxUnit::powersCompare(PhyxUnit::PowerMap *powers)
 {
-    return m_powers == powers;
+    return *m_powers == *powers;
 }
 
 void PhyxUnit::powersClear()
 {
-    m_powers.clear();
+    m_powers->clear();
 }
 
 bool PhyxUnit::isOne()
 {
-    return ((m_scaleFactor == 1) && (m_offset == 0) && (m_powers.isEmpty()));
+    return ((m_scaleFactor == PHYX_FLOAT_ONE) && (m_offset == PHYX_FLOAT_NULL) && (m_powers->isEmpty()));
 }
 
 bool PhyxUnit::isBaseUnit()
 {
-    if (((m_scaleFactor == 1) && (m_offset == 0) && (m_powers.size() == 1)))
+    if (((m_scaleFactor == PHYX_FLOAT_ONE) && (m_offset == PHYX_FLOAT_NULL) && (m_powers->size() == 1)))
     {
-        QMapIterator<QString, PhyxFloatDataType> i(m_powers);
+        QMapIterator<QString, PhyxFloatDataType> i(*m_powers);
         i.next();
-        if (i.value() == 1)
+        if (i.value() == PHYX_FLOAT_ONE)
             return true;
         else
             return false;
@@ -142,17 +149,17 @@ bool PhyxUnit::isBaseUnit()
 
 bool PhyxUnit::isDimensionlessUnit()
 {
-    return ((m_offset == 0) && (m_powers.isEmpty()));
+    return ((m_offset == PHYX_FLOAT_NULL) && (m_powers->isEmpty()));
 }
 
 bool PhyxUnit::isProductUnit()
 {
-    return ((m_scaleFactor == 1) && (m_offset == 0) && (m_powers.size() >= 1));
+    return ((m_scaleFactor == PHYX_FLOAT_ONE) && (m_offset == PHYX_FLOAT_NULL) && (m_powers->size() >= 1));
 }
 
 bool PhyxUnit::isGalileanUnit()
 {
-    return (((m_scaleFactor != 1) || (m_offset != 0)) && (m_powers.size() >= 1));
+    return (((m_scaleFactor != PHYX_FLOAT_ONE) || (m_offset != PHYX_FLOAT_NULL)) && (m_powers->size() >= 1));
 }
 
 bool PhyxUnit::isConvertible(PhyxUnit *unit)
@@ -183,7 +190,7 @@ void PhyxUnit::copyUnit(PhyxUnit *source, PhyxUnit *destination)
 QString PhyxUnit::dimensionString() const       //this can't handle units with prefered prefix
 {
     QString outputString;
-    QMapIterator<QString, PhyxFloatDataType> i(m_powers);
+    QMapIterator<QString, PhyxFloatDataType> i(*m_powers);
     while (i.hasNext())
     {
         i.next();

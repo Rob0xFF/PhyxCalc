@@ -32,7 +32,8 @@ S=|string|@|unitGroup|=[|p3|]|p3|           ; unitAdd                           
 S=|string|@|unitGroup|@|prefix|=[|p3|]|p3|  ; unitAdd                                               //define offset unit with unit system and prefered prefix
 S=|string|(|parameters|)=|functionString|   ; bufferParameter, functionAdd                          //define function
 S=|function|=                               ; bufferParameter, functionRemove                       //remove function
-S=|p3|->|p3|        ; unitCheckConvertible, unitConvert, outputVariable
+S=|p3|->|convertTarget| ; unitCheckConvertible, unitConvert, unitClear, outputConvertedUnit
+convertTarget=|p3|  ; bufferParameter
 S=|p3|->hex         ; unitCheckDimensionless, valueCheckInteger, valueCheckPositive, bufferHexString, outputString
 S=|p3|->oct         ; unitCheckDimensionless, valueCheckInteger, valueCheckPositive, bufferOctString, outputString
 S=|p3|->bin         ; unitCheckDimensionless, valueCheckInteger, valueCheckPositive, bufferBinString, outputString

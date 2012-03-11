@@ -249,7 +249,7 @@ private:
     void raiseException(int errorNumber);                                       ///< raises an exception
     void addRule(QString rule, QString functions = "");                         ///< adds a rule
 
-    PhyxUnitSystem::PhyxPrefix getBestPrefx(PhyxFloatDataType value, QString unitGroup, QString preferedPrefix) const;     ///< gets the best fitting prefix
+    PhyxUnitSystem::PhyxPrefix getBestPrefix(PhyxFloatDataType value, QString unitGroup, QString preferedPrefix) const;     ///< gets the best fitting prefix
 
     void clearStack();
     void clearResult();
@@ -436,6 +436,7 @@ private:
 
     void outputVariable();
     void outputString();
+    void outputConvertedUnit();
 
     /** special functions */
     void unitGroupAdd();
@@ -471,6 +472,7 @@ signals:
     void outputResult();            ///< is emited when result should be output
     void outputError();             ///< is emited when an error should be output
     void outputText(QString text);  ///< is emited when text should be output
+    void outputConverted(QString text); ///< is emited when a converted unit should be output
     
 public slots:
     void clearVariables();

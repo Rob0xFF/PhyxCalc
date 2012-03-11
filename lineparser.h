@@ -161,6 +161,7 @@ public slots:
     void outputResult();
     void outputError();
     void outputText(QString text);
+    void outputConverted(QString text);
 
     void setCalculationEdit(QTextEdit * arg)
     {

@@ -27,6 +27,8 @@ LineParser::LineParser(QObject *)
             this, SLOT(outputResult()));
     connect(m_phyxCalculator, SIGNAL(outputError()),
             this, SLOT(outputError()));
+    connect(m_phyxCalculator, SIGNAL(outputConverted(QString)),
+            this, SLOT(outputConverted(QString)));
     connect(m_phyxCalculator, SIGNAL(outputText(QString)),
             this, SLOT(outputText(QString)));
     connect(m_phyxCalculator, SIGNAL(variablesChanged()),
@@ -740,4 +742,19 @@ void LineParser::outputText(QString text)
 {
     text.prepend("=");
     insertOutput(text);
+}
+
+void LineParser::outputConverted(QString text)
+{
+    PhyxCalculator::ResultVariable result = m_phyxCalculator->formatVariable(m_phyxCalculator->result(),
+                                                                             (PhyxCalculator::OutputMode)m_appSettings->output.unitMode,
+                                                                             (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode,
+                                                                             m_appSettings->output.numbers.decimalPrecision,
+                                                                             m_appSettings->output.numbers.format,
+                                                                             m_appSettings->output.imaginaryUnit);
+    QString output;
+    output.append("=");
+    output.append(result.value);
+    output.append(text);
+    insertOutput(output);
 }

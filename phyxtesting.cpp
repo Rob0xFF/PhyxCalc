@@ -61,7 +61,7 @@ void PhyxTesting::testUnits()
 
     qDebug() << "Adding % to unit system";
     newUnit = new PhyxUnit();
-    newUnit->setPowers(PhyxUnit::PowerMap());
+    //newUnit->setPowers(PhyxUnit::PowerMap());
     newUnit->setScaleFactor(0.01);
     newUnit->setSymbol("%");
     unitSystem.addDerivedUnit(newUnit);

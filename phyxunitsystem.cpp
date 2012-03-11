@@ -48,7 +48,7 @@ void PhyxUnitSystem::addBaseUnit(QString symbol, PhyxUnit::UnitFlags flags, QStr
 
    PhyxUnit *unit = new PhyxUnit();
    unit->setSymbol(symbol);
-   unit->powerAppend(preferedPrefix + symbol,1);
+   unit->powerAppend(preferedPrefix + symbol, PHYX_FLOAT_ONE);
    unit->setFlags(flags);
    unit->setUnitGroup(unitGroup);
    unit->setPreferedPrefix(preferedPrefix);
@@ -249,7 +249,7 @@ QList<PhyxUnitSystem::PhyxPrefix> PhyxUnitSystem::prefixes(QString unitGroup) co
     return prefixes;
 }
 
-bool PhyxUnitSystem::verifyUnit(PhyxUnit *unit)
+PhyxUnit *PhyxUnitSystem::verifyUnit(PhyxUnit *unit) const
 {
     if (unit->isBaseUnit())
     {
@@ -259,8 +259,11 @@ bool PhyxUnitSystem::verifyUnit(PhyxUnit *unit)
             i.next();
             if (i.value()->isSame(unit))
             {
-                PhyxUnit::copyUnit(i.value(), unit);
-                return true;
+                //PhyxUnit::copyUnit(i.value(), unit);
+               // unit->deleteLater();
+                //unit = i.value();
+                return i.value();
+                //return true;
             }
         }
     }
@@ -294,10 +297,14 @@ bool PhyxUnitSystem::verifyUnit(PhyxUnit *unit)
             else
                 match = matchList.first();
 
-            PhyxUnit::copyUnit(match, unit);
-            return true;
+            //PhyxUnit::copyUnit(match, unit);
+            //unit->deleteLater();
+            //unit = match;
+            return match;
+            //return true;
         }
     }
 
-    return false;
+    return NULL;
+    //return false;
 }

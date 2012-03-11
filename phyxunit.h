@@ -32,7 +32,7 @@ class PhyxUnit : public QObject
     //Q_PROPERTY(UnitType type READ type WRITE setType)
     Q_PROPERTY(PhyxFloatDataType offset READ offset WRITE setOffset)
     Q_PROPERTY(PhyxFloatDataType scaleFactor READ scaleFactor WRITE setScaleFactor)
-    Q_PROPERTY(PowerMap powers READ powers WRITE setPowers)
+    Q_PROPERTY(PowerMap *powers READ powers WRITE setPowers)
     //Q_PROPERTY(double prefixPower READ prefixPower WRITE setPrefixPower)
     Q_PROPERTY(UnitFlags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString unitGroup READ unitGroup WRITE setUnitGroup)
@@ -42,6 +42,7 @@ class PhyxUnit : public QObject
 
 public:
     explicit PhyxUnit(QObject *parent = 0);
+    ~PhyxUnit();
 
     /** Possible unit types */
     /*enum UnitType {
@@ -65,11 +66,11 @@ public:
     void powerAppend(QString base, PhyxFloatDataType power);        /// adds a power to the map
     void powerMultiply(QString base, PhyxFloatDataType factor);     /// multiplies a power with factor
     void powerDivide(QString base, PhyxFloatDataType factor);       /// devides a power with factor
-    void powersMultiply(PowerMap powers);                           /// multiplies powers of the unit with other powers
-    void powersDivide(PowerMap powers);                             /// devides powers of the unit with other powers
+    void powersMultiply(PowerMap *powers);                           /// multiplies powers of the unit with other powers
+    void powersDivide(PowerMap *powers);                             /// devides powers of the unit with other powers
     void powersRaise(PhyxFloatDataType power);                      /// raises all powers to power
     void powersRoot(PhyxFloatDataType root);                        /// takes the root of all powers
-    bool powersCompare(PowerMap powers);                            /// compares powers of the unit with other powers and returns ==
+    bool powersCompare(PowerMap *powers);                            /// compares powers of the unit with other powers and returns ==
     void powersClear();                                             /// clears all powers
 
     /*void prefixMultiply(double factor);
@@ -110,7 +111,7 @@ public:
     {
         return m_flags;
     }
-    PowerMap    powers() const
+    PowerMap   *powers() const
     {
         return m_powers;
     }
@@ -128,7 +129,7 @@ private:
     QString     m_name;                    /// the name of the unit
     PhyxFloatDataType      m_offset;       /// offset for OffsetUnit and GalileanUnit
     PhyxFloatDataType      m_scaleFactor;  /// scale factor for GalileanUnit and LogarithmicUnit
-    PowerMap    m_powers;                  /// this map holds the powers of the base units
+    PowerMap    *m_powers;                  /// this map holds the powers of the base units
     //double      m_prefixPower;             /// for Si units -> the power of the prefix (10^x)
     UnitFlags   m_flags;                   /// flags of the unit
 
@@ -160,9 +161,12 @@ void setFlags(UnitFlags arg)
 {
     m_flags = arg;
 }
-void setPowers(PowerMap arg)
+void setPowers(PowerMap *arg)
 {
-    m_powers = arg;
+    m_powers->clear();
+    for (int i = 0; i < arg->keys().size(); i++)
+        m_powers->insert(arg->keys().at(i), arg->value(arg->keys().at(i)));
+   // m_powers = arg;
 }
 void setUnitGroup(QString arg)
 {

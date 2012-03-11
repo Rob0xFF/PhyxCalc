@@ -24,18 +24,13 @@ PhyxCompoundUnit::PhyxCompoundUnit(QObject *parent) :
 {
 }
 
-PhyxCompoundUnit::PhyxCompoundUnit(PhyxUnit *unit)
-{
-    this->fromSimpleUnit(unit);
-}
-
 PhyxCompoundUnit::~PhyxCompoundUnit()
 {
-    for (int i = 0; i < m_compounds.size(); i++)
+    /*for (int i = 0; i < m_compounds.size(); i++)
     {
         m_compounds.at(i).unit->deleteLater();
-    }
-    m_compounds.clear();
+    }*/
+    //m_compounds.clear();
 }
 
 void PhyxCompoundUnit::copyCompoundUnit(PhyxCompoundUnit *source, PhyxCompoundUnit *destination)
@@ -44,12 +39,12 @@ void PhyxCompoundUnit::copyCompoundUnit(PhyxCompoundUnit *source, PhyxCompoundUn
     destination->setUnitSystem(source->unitSystem());
     destination->setScaleFactor(source->scaleFactor());
     destination->setOffset(source->offset());
-    destination->setCompounds(copyCompounds(source));
+    destination->setCompounds(source->compounds());//copyCompounds(source));
 }
 
 bool PhyxCompoundUnit::isSame(PhyxCompoundUnit *unit)
 {
-    return (this->powersCompare(unit->powers()) && (m_compounds == unit->compounds()));
+    return (this->powersCompare(unit->powers()) && (compoundsCompare(unit->compounds())));//m_compounds == unit->compounds()));
 }
 
 bool PhyxCompoundUnit::isConvertible(PhyxCompoundUnit *unit)
@@ -79,35 +74,61 @@ bool PhyxCompoundUnit::isSimpleUnit()
 
 void PhyxCompoundUnit::compoundAppend(PhyxUnit *unit, PhyxFloatDataType power)
 {
-    PhyxUnit *newUnit = new PhyxUnit();
-    PhyxUnit::copyUnit(unit, newUnit);
+    //PhyxUnit *newUnit = new PhyxUnit();
+    //PhyxUnit::copyUnit(unit, newUnit);
+    int pos = -1;
+    for (int i = 0; i < m_compounds.size(); i++)
+    {
+        if (m_compounds.at(i).unit == unit)
+        {
+            pos = i;
+            break;
+        }
+    }
+    if (pos == -1)
+    {
+        m_compounds.append(PhyxCompound());
+        pos = m_compounds.size()-1;
+    }
 
-    m_compounds.append(PhyxCompound());
-    m_compounds.last().unit = newUnit;
-    m_compounds.last().power = power;
+    m_compounds[pos].unit = unit;//newUnit;
+    m_compounds[pos].power = power;
 
-    if (newUnit->offset() != PHYX_FLOAT_NULL)                 // simplify offset units
-        compoundSimplify(m_compounds.size()-1);
+    //if (unit->offset() != PHYX_FLOAT_NULL)                 // simplify offset units
+    //    compoundSimplify(pos);
 }
 
 void PhyxCompoundUnit::compoundSimplify(int index)
 {
     PhyxUnit *unit = m_compounds.at(index).unit;
     PhyxFloatDataType power = m_compounds.at(index).power;
+    //qDebug() << static_cast<double>(power) << unit->symbol() << static_cast<double>(unit->scaleFactor()) << static_cast<double>(unit->offset()) << index;
 
     emit scaleValue(pow(unit->scaleFactor(), power));
     emit offsetValue(-unit->offset());
-    unit->setOffset(PHYX_FLOAT_NULL);
-    unit->setScaleFactor(PHYX_FLOAT_ONE);
 
-    if (unit->isOne())
+    if (power == PHYX_FLOAT_NULL)  //if unit is 1 remove it
     {
-        m_compounds.at(index).unit->deleteLater();
-        m_compounds.removeAt(index);
+        m_compounds[index].power = PHYX_FLOAT_NULL;
     }
     else
     {
-        m_unitSystem->verifyUnit(unit);
+
+        PhyxUnit *tmpUnit = new PhyxUnit();
+        copyUnit(unit,tmpUnit);
+        tmpUnit->setOffset(PHYX_FLOAT_NULL);
+        tmpUnit->setScaleFactor(PHYX_FLOAT_ONE);
+        PhyxUnit *newUnit = m_unitSystem->verifyUnit(tmpUnit);
+        if (newUnit != NULL)
+        {
+            compoundDivide(unit, power);    //remove old unit
+            compoundMultiply(newUnit, PHYX_FLOAT_ONE); //add new unit
+        }
+        else
+        {
+            compoundStrip(index);             //strip compound
+        }
+        tmpUnit->deleteLater();
     }
 }
 
@@ -115,14 +136,9 @@ void PhyxCompoundUnit::compoundMultiply(PhyxUnit *unit, PhyxFloatDataType factor
 {
     for (int i = 0; i < m_compounds.size(); i++)
     {
-        if (m_compounds.at(i).unit->isSame(unit))   //if compounds contain unit
+        if (m_compounds.at(i).unit == unit)   //if compounds contain unit
         {
             m_compounds[i].power += factor;      // multiply the with the factor
-            /*if (m_compounds.at(i).power == 0)       // if new power = 0
-            {
-                delete m_compounds.at(i).unit;      //remove the compound
-                m_compounds.removeAt(i);
-            }*/
             return;
         }
     }
@@ -143,12 +159,25 @@ void PhyxCompoundUnit::compoundEqualize(int unitIndex, PhyxCompoundUnit *parentU
         PhyxUnit *unit = m_compounds.at(unitIndex).unit;
         if (tmpUnit->isConvertible(unit))
         {
-            if (!tmpUnit->isSame(unit))
+            if (tmpUnit != unit)
             {
                 this->compoundSimplify(unitIndex);
                 parentUnit->compoundSimplify(i);
             }
         }
+    }
+}
+
+void PhyxCompoundUnit::compoundStrip(int index)
+{
+    PhyxCompound compound = m_compounds.at(index);
+    compoundDivide(compound.unit, compound.power); //remove the old unit
+    PowerMap *powers = compound.unit->powers();
+    QMapIterator<QString, PhyxFloatDataType> i(*powers);
+    while (i.hasNext())
+    {
+       i.next();
+       compoundMultiply(m_unitSystem->unit(i.key()), i.value());    //add all powers
     }
 }
 
@@ -166,6 +195,10 @@ void PhyxCompoundUnit::compoundsDivide(PhyxCompoundList compounds)
 
 void PhyxCompoundUnit::compoundsEqualize(PhyxCompoundUnit *unit)
 {
+    if (this->isDimensionlessUnit())    //simplify all dimensionless units, since they can make problems
+        this->simplify();
+    if (unit->isDimensionlessUnit())
+        unit->simplify();
     for (int i = 0; i < m_compounds.size(); i++)
         compoundEqualize(i, unit);
 }
@@ -186,7 +219,7 @@ void PhyxCompoundUnit::compoundsClear()
 {
     for (int i = (m_compounds.size()-1); i >= 0; i--)
     {
-        m_compounds.at(i).unit->deleteLater();
+        //m_compounds.at(i).unit->deleteLater();
         m_compounds.removeAt(i);
     }
 }
@@ -209,7 +242,29 @@ int PhyxCompoundUnit::compoundsNonNullCount()
     return count;
 }
 
-const PhyxCompoundUnit::PhyxCompoundList PhyxCompoundUnit::copyCompounds(PhyxCompoundUnit *sourceUnit)
+bool PhyxCompoundUnit::compoundsCompare(const PhyxCompoundList compounds)
+{
+    for (int i = 0; i < m_compounds.size(); i++)
+    {
+        if (m_compounds.at(i).power != PHYX_FLOAT_NULL)
+        {
+            bool match = false;
+            for (int i2 = 0; i2 < compounds.size(); i2++)
+            {
+                if (m_compounds[i] == compounds[i2])
+                {
+                    match = true;
+                    break;
+                }
+            }
+            if (!match)
+                 return false;
+        }
+    }
+    return true;
+}
+
+/*const PhyxCompoundUnit::PhyxCompoundList PhyxCompoundUnit::copyCompounds(PhyxCompoundUnit *sourceUnit)
 {
     PhyxCompoundList destinationCompounds;
     PhyxCompoundList sourceCompounds = sourceUnit->compounds();
@@ -225,8 +280,7 @@ const PhyxCompoundUnit::PhyxCompoundList PhyxCompoundUnit::copyCompounds(PhyxCom
         destinationCompounds.append(compound);
     }
     return destinationCompounds;
-}
-
+}*/
 
 void PhyxCompoundUnit::verify()
 {
@@ -236,12 +290,13 @@ void PhyxCompoundUnit::verify()
         {
             PhyxUnit *unit = new PhyxUnit();
             unit->setPowers(this->powers());
-            if (m_unitSystem->verifyUnit(unit))
+            PhyxUnit *newUnit = m_unitSystem->verifyUnit(unit);
+            unit->deleteLater();
+            if (newUnit != NULL)
             {
                 compoundsSetNull();
-                compoundAppend(unit, 1);
+                compoundAppend(newUnit, PHYX_FLOAT_ONE);
             }
-            unit->deleteLater();
         }
     }
 }
@@ -334,14 +389,18 @@ bool PhyxCompoundUnit::convertTo(PhyxCompoundUnit *unit)
 void PhyxCompoundUnit::fromSimpleUnit(PhyxUnit *unit)
 {
     compoundsClear();
-    compoundAppend(unit,1);
+    compoundAppend(unit,PHYX_FLOAT_ONE);
     setPowers(unit->powers());
 }
 
 void PhyxCompoundUnit::simplify()
 {
-    for (int i = (m_compounds.size() - 1); i >= 0; i--)
-        compoundSimplify(i);
+    //PhyxCompoundList compounds = m_compounds;
+    for (int i = 0; i < m_compounds.size(); i++)
+    {
+        if (m_compounds.at(i).power != PHYX_FLOAT_NULL)
+            compoundSimplify(i);
+    }
 }
 
 const QString PhyxCompoundUnit::symbol()
@@ -458,6 +517,21 @@ const QString PhyxCompoundUnit::unitGroup()
             if (m_compounds.at(i).power != PHYX_FLOAT_NULL)
                 return m_compounds.at(i).unit->unitGroup();
         }
+    }
+    else
+    {
+        QString tmpUnitGroup;   //if all compounds have the same unit group, return this unit group
+        for (int i = 0; i < m_compounds.size(); i++)
+        {
+            if (m_compounds.at(i).power != PHYX_FLOAT_NULL)
+            {
+                if (tmpUnitGroup.isEmpty())
+                    tmpUnitGroup = m_compounds.at(i).unit->unitGroup();
+                else if (m_compounds.at(i).unit->unitGroup() != tmpUnitGroup)
+                    return QString();
+            }
+        }
+        return tmpUnitGroup;
     }
 
     return QString();

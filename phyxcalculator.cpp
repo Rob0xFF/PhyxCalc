@@ -222,6 +222,7 @@ void PhyxCalculator::initialize()
 
     functionMap.insert("outputVariable",        &PhyxCalculator::outputVariable);
     functionMap.insert("outputString",          &PhyxCalculator::outputString);
+    functionMap.insert("outputConvertedUnit",   &PhyxCalculator::outputConvertedUnit);
     functionMap.insert("unitGroupAdd",          &PhyxCalculator::unitGroupAdd);
     functionMap.insert("unitGroupRemove",       &PhyxCalculator::unitGroupRemove);
     functionMap.insert("prefixAdd",             &PhyxCalculator::prefixAdd);
@@ -1045,24 +1046,26 @@ PhyxIntegerDataType PhyxCalculator::longIntToBcd(PhyxIntegerDataType number)
     return output;
 }
 
-PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefx(PhyxFloatDataType value, QString unitGroup, QString preferedPrefix) const
+PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefix(PhyxFloatDataType value, QString unitGroup, QString preferedPrefix) const
 {
     PhyxFloatDataType preferedPrefixValue = PHYX_FLOAT_ONE;
     if (!preferedPrefix.isEmpty())
         preferedPrefixValue = unitSystem->prefix(preferedPrefix, unitGroup).value;
 
-
-    QList<PhyxUnitSystem::PhyxPrefix> prefixes = unitSystem->prefixes(unitGroup);
-    for (int i = prefixes.size()-1; i >= 0; i--)
+    if (!unitGroup.isEmpty())
     {
-        if (prefixes.at(i).inputOnly)
-            continue;
+        QList<PhyxUnitSystem::PhyxPrefix> prefixes = unitSystem->prefixes(unitGroup);
+        for (int i = prefixes.size()-1; i >= 0; i--)
+        {
+            if (prefixes.at(i).inputOnly)
+                continue;
 
-        prefixes[i].value /= preferedPrefixValue;
-        PhyxFloatDataType tmpValue = value / prefixes.at(i).value;
+            prefixes[i].value /= preferedPrefixValue;
+            PhyxFloatDataType tmpValue = value / prefixes.at(i).value;
 
-        if (abs(tmpValue) >= PHYX_FLOAT_ONE)
-            return prefixes.at(i);
+            if (abs(tmpValue) >= PHYX_FLOAT_ONE)
+                return prefixes.at(i);
+        }
     }
 
     PhyxUnitSystem::PhyxPrefix prefix;
@@ -1096,7 +1099,7 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
             {
                 if (value.imag() == PHYX_FLOAT_NULL)
                 {
-                    PhyxUnitSystem::PhyxPrefix realPrefix = getBestPrefx(value.real(), unit->unitGroup(), unit->preferedPrefix());     //get best prefix
+                    PhyxUnitSystem::PhyxPrefix realPrefix = getBestPrefix(value.real(), unit->unitGroup(), unit->preferedPrefix());     //get best prefix
                     //PhyxUnitSystem::PhyxPrefix imagPrefix = getBestPrefx(value.imag(), unit->unitGroup(), unit->preferedPrefix());     //get best prefix
                     //value = PhyxValueDataType(value.real() / realPrefix.value, value.imag() / imagPrefix.value);
                     value = PhyxValueDataType(value.real() / realPrefix.value, PHYX_FLOAT_NULL);
@@ -1107,7 +1110,7 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
                     result.unit.prepend(realPrefix.symbol);
                 } else if (value.real() == PHYX_FLOAT_NULL)
                 {
-                    PhyxUnitSystem::PhyxPrefix imagPrefix = getBestPrefx(value.imag(), unit->unitGroup(), unit->preferedPrefix());     //get best prefix
+                    PhyxUnitSystem::PhyxPrefix imagPrefix = getBestPrefix(value.imag(), unit->unitGroup(), unit->preferedPrefix());     //get best prefix
                     value = PhyxValueDataType(PHYX_FLOAT_NULL, value.imag() / imagPrefix.value);
 
                     if (!unit->preferedPrefix().isEmpty())      // preferd prefix handling
@@ -2732,8 +2735,14 @@ void PhyxCalculator::unitConvert()
     PhyxVariable *variable2 = variableStack.pop();
     PhyxVariable *variable1 = variableStack.pop();
 
-    variable1->setValue(variable1->value() / variable2->value());
+        if (parameterBuffer.at(0).isNumber())
+        {
+            parameterBuffer.prepend("*");
+        }
+
     variable1->convertUnit(variable2->unit());
+    variable1->setValue(variable1->value() / variable2->value());
+
     variableStack.push(variable1);
 
     variable2->deleteLater();
@@ -2840,12 +2849,17 @@ void PhyxCalculator::unitAdd()
             variable2 = variableStack.pop();
             variable1 = variableStack.pop();
         }
-        else
+        else if (variableStack.size() == 1)
             variable1 = variableStack.pop();
+        else
+        {
+            raiseException(ProgramError);
+            return;
+        }
 
         variable1->unit()->simplify();
 
-        PhyxUnit *unit = new PhyxUnit(this);
+        PhyxUnit *unit = new PhyxUnit();
         unit->setPowers(variable1->unit()->powers());
         unit->setUnitGroup(unitGroupBuffer);
         unit->setPreferedPrefix(prefixBuffer);
@@ -3283,7 +3297,7 @@ void PhyxCalculator::pushVariable()
         PhyxUnitSystem::PhyxPrefix prefix = unitSystem->prefix(prefixBuffer, variable->unit()->unitGroup());
         if (!prefix.unitGroup.isEmpty())
         {
-            PhyxValueDataType value = PhyxValueDataType(prefix.value, 0.0);
+            PhyxValueDataType value = PhyxValueDataType(prefix.value, PHYX_FLOAT_NULL);
 
             value /= preferedPrefixValue;
             valueBuffer *= value;
@@ -3296,13 +3310,13 @@ void PhyxCalculator::pushVariable()
         }
     }
     else
-        variable->setValue(valueBuffer / PhyxValueDataType(preferedPrefixValue,0.0));
+        variable->setValue(valueBuffer / PhyxValueDataType(preferedPrefixValue,PHYX_FLOAT_NULL));
 
     //push it to the stack
     variableStack.push(variable);
 
     //cleanup
-    valueBuffer = 1;
+    valueBuffer = PHYX_FLOAT_ONE;
     unitBuffer.clear();
     prefixBuffer.clear();
 }
@@ -3425,6 +3439,23 @@ void PhyxCalculator::outputVariable()
 void PhyxCalculator::outputString()
 {
     emit outputText(stringBuffer);
+}
+
+void PhyxCalculator::outputConvertedUnit()
+{
+    if (variableStack.size() < 1)
+    {
+        raiseException(ProgramError);
+        return;
+    }
+    PhyxVariable *variable1 = variableStack.pop();
+
+    m_resultValue = variable1->value();
+    m_resultUnit = "";
+    m_result = variable1;
+
+    emit outputConverted(parameterBuffer);
+    parameterBuffer.clear();
 }
 
 void PhyxCalculator::unitGroupAdd()
