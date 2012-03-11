@@ -1117,6 +1117,7 @@ void MainWindow::on_actionAbout_triggered()
     QMessageBox::about(this, tr("About PhyxCalc"),
                        tr("<h2>PhyxCalc %1</h2>"
                           "Based on Qt 4.8 <br><br>"
+                          "Built on %2 <br><br>"
                           "Copyright 2011 by Christian Schirm and Alexander R&ouml;ssler"
                           "<br><br>"
                           "PhyxCalc is free software: you can redistribute it and/or modify<br>"
@@ -1132,7 +1133,7 @@ void MainWindow::on_actionAbout_triggered()
                           "You should have received a copy of the GNU General Public License<br>"
                           "along with PhyxCalc.  If not, see <a href='http://www.gnu.org/licenses'>http://www.gnu.org/licenses</a>"
                           "<br><br>"
-                          "For questions, improvements or bugs visit: <a href='https://sourceforge.net/p/phyxcalc/'>https://sourceforge.net/p/phyxcalc/</a>").arg(VERSION));
+                          "For questions, improvements or bugs visit: <a href='https://sourceforge.net/p/phyxcalc/'>https://sourceforge.net/p/phyxcalc/</a>").arg(VERSION, LAST_CHANGE));
 }
 
 void MainWindow::on_actionRecalculate_All_triggered()
