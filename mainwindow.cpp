@@ -1114,6 +1114,10 @@ void MainWindow::on_actionSettings_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
+    QString version(VERSION_REV);
+    version.remove("$Rev: ");
+    version.remove(" $");
+    version.prepend(VERSION_MAJOR);
     QMessageBox::about(this, tr("About PhyxCalc"),
                        tr("<h2>PhyxCalc %1</h2>"
                           "Based on Qt 4.8 <br><br>"
@@ -1133,7 +1137,7 @@ void MainWindow::on_actionAbout_triggered()
                           "You should have received a copy of the GNU General Public License<br>"
                           "along with PhyxCalc.  If not, see <a href='http://www.gnu.org/licenses'>http://www.gnu.org/licenses</a>"
                           "<br><br>"
-                          "For questions, improvements or bugs visit: <a href='https://sourceforge.net/p/phyxcalc/'>https://sourceforge.net/p/phyxcalc/</a>").arg(VERSION, LAST_CHANGE));
+                          "For questions, improvements or bugs visit: <a href='https://sourceforge.net/p/phyxcalc/'>https://sourceforge.net/p/phyxcalc/</a>").arg(version, LAST_CHANGE));
 }
 
 void MainWindow::on_actionRecalculate_All_triggered()

@@ -20,8 +20,9 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define VERSION "3rev$Rev$"
-#define LAST_CHANGE "$LastChangedDate$"
+#define VERSION_MAJOR "3rev"
+#define VERSION_REV "$Rev$"
+#define LAST_CHANGE __DATE__ " " __TIME__
 #define MATH_OPERATORS "[+\\-\\*/\\(\\)<>!\\^=]"
 
 #if defined(Q_OS_SYMBIAN) || defined(Q_OS_ANDROID) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
