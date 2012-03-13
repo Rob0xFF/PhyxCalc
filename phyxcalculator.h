@@ -256,6 +256,10 @@ private:
 
     void clearFlags();
 
+    /** cpp level functions */
+    PhyxIntegerDataType gcd(PhyxIntegerDataType x, PhyxIntegerDataType y);  ///< returns the greatest common divisor of x and y
+    PhyxIntegerDataType lcm(PhyxIntegerDataType x, PhyxIntegerDataType y);  ///< returns the lowest common multiple of x and y
+
     /** functions for value calculation */
     void valueCheckComplex();
     void valueCheckComplex2();
@@ -330,6 +334,8 @@ private:
     void valueBcd();
     void valueToBcd();
     void valueAns();
+    void valueGcd();
+    void valueLcm();
 
     void complexReal();
     void complexImag();

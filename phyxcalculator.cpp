@@ -123,6 +123,8 @@ void PhyxCalculator::initialize()
     functionMap.insert("valueBcd",      &PhyxCalculator::valueBcd);
     functionMap.insert("valueToBcd",    &PhyxCalculator::valueToBcd);
     functionMap.insert("valueAns",      &PhyxCalculator::valueAns);
+    functionMap.insert("valueGcd",      &PhyxCalculator::valueGcd);
+    functionMap.insert("valueLcm",      &PhyxCalculator::valueLcm);
 
     functionMap.insert("complexReal",   &PhyxCalculator::complexReal);
     functionMap.insert("complexImag",   &PhyxCalculator::complexImag);
@@ -315,6 +317,8 @@ void PhyxCalculator::initialize()
     standardFunctionList.append("bcd");
     standardFunctionList.append("tobcd");
     standardFunctionList.append("ans");
+    standardFunctionList.append("gcd");
+    standardFunctionList.append("lcm");
 
     for (int i = standardFunctionList.size()-1; i >= 0 ; i--)
     {
@@ -1141,6 +1145,25 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
     result.value = complexToString(value, precision, numberFormat, imaginaryUnit, !unit->isOne());
 
     return result;
+}
+
+PhyxIntegerDataType PhyxCalculator::gcd(PhyxIntegerDataType x, PhyxIntegerDataType y)
+{
+    //euclidean algorithm
+    while (x != y)
+    {
+        if (x < y)
+            y -= x;
+        else
+            x -= y;
+    }
+
+    return x;
+}
+
+PhyxIntegerDataType PhyxCalculator::lcm(PhyxIntegerDataType x, PhyxIntegerDataType y)
+{
+    return abs(x*y)/gcd(x,y);
 }
 
 void PhyxCalculator::valueCheckComplex()
@@ -2205,6 +2228,44 @@ void PhyxCalculator::valueAns()
 {
     parameterBuffer = "#";
     variableLoad();
+}
+
+void PhyxCalculator::valueGcd()
+{
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    PhyxIntegerDataType x = abs(variable1->toInt());
+    PhyxIntegerDataType y = abs(variable2->toInt());
+
+    variable1->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(gcd(x,y)), PHYX_FLOAT_NULL));
+    variableStack.push(variable1);
+
+    variable2->deleteLater();
+}
+
+void PhyxCalculator::valueLcm()
+{
+    if (variableStack.size() < 2)
+    {
+        raiseException(ProgramError);
+        return;
+    }
+    PhyxVariable *variable1 = variableStack.pop();
+    PhyxVariable *variable2 = variableStack.pop();
+
+    PhyxIntegerDataType x = abs(variable1->toInt());
+    PhyxIntegerDataType y = abs(variable2->toInt());
+
+    variable1->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(lcm(x,y)), PHYX_FLOAT_NULL));
+    variableStack.push(variable1);
+
+    variable2->deleteLater();
 }
 
 void PhyxCalculator::complexReal()
