@@ -366,7 +366,57 @@ QString LineParser::exportFormelEditor()
         depth;
     QRegExp regExp;
 
+    enum ExportTarget {
+        MathTarget,
+        LatexTarget
+    };
+
+    QString subscriptStart,
+            subscriptEnd,
+            invisibleBraceStart,
+            invisibleBraceEnd,
+            fractionBrace1Start,
+            fractionBrace1End,
+            fractionBrace2Start,
+            fractionBrace2End,
+            fractionOver,
+            curlyBraceStart,
+            curlyBraceEnd,
+            functionPattern;
+
+    ExportTarget target = LatexTarget;
+
+    if ((target == LatexTarget) || (target == MathTarget))
+    {
+        subscriptStart = "_{";
+        subscriptEnd = "}";
+        invisibleBraceStart = "{";
+        invisibleBraceEnd = "}";
+        fractionBrace1Start = "{";
+        fractionBrace1End = "}";
+        fractionBrace2Start = "{";
+        fractionBrace2End = "}";
+    }
+    if (target == LatexTarget)
+    {
+        fractionOver = " \\over ";
+        curlyBraceStart = " \\{ ";
+        curlyBraceEnd = " \\} ";
+        functionPattern = "\\operatorname{%1}";
+    }
+    else if (target == MathTarget)
+    {
+        fractionOver = " over ";
+        curlyBraceStart = " lbrace ";
+        curlyBraceEnd = " rbrace ";
+        functionPattern = "%1";
+    }
+
     text = m_calculationEdit->toPlainText().trimmed();
+
+    //replace curly braces
+    text.replace("{", curlyBraceStart);
+    text.replace("}", curlyBraceEnd);
 
     //append results to the end of line
     textLines = text.split('\n');
@@ -386,35 +436,34 @@ QString LineParser::exportFormelEditor()
     }
     text = textLines.join("\n");
 
-    //add the _ for physical units +++ must be reworked
-    /*QMapIterator<QString, QString> j(*unitLoader->units());
-     while (j.hasNext()) {
-         j.next();
-         //regExp.setPattern(tr("[^A-Z]%1[^ =\n]").arg(j.key()));
-         int pos = text.indexOf(j.key());//regExp);
-         while (pos != -1)
-         {
-             //check for all kinds of cases where formating is not wished
-             if (pos+j.key().size() < text.size()
-                     && (!text.at(pos+j.key().size()).isSpace())
-                     && (QString(text.at(pos+j.key().size())).indexOf(QRegExp(MATH_OPERATORS)) == -1))
-             {
-                 if ((pos == 0) || ((text.at(pos-1) != '_')
-                                    && (!unitLoader->units()->contains(text.at(pos-1)))
-                                    && (!text.at(pos-1).isNumber())))
-                 {
-                     text.insert(pos+j.key().size(), '_');
-                 }
-             }
-             pos = text.indexOf(j.key(),pos+1);
-         }
-     }*/
 
+    //replace functions
+    QStringList functions = m_phyxCalculator->functions();
+    functions.sort();
+    int maxSize = 0;
+    for (int i = 0; i < functions.size(); i++)
+     {
+        if (functions.at(i).size() > maxSize)
+            maxSize = functions.at(i).size();
+    }
+    for (int size = maxSize; size > 0 ; size--)
+    {
+        for (int i = functions.size()-1; i >= 0; i--)
+        {
+            QString function = functions.at(i);
+            if (function.size() == size)
+            {
+                if (!(function.contains("sqr",Qt::CaseInsensitive) || function.contains("root", Qt::CaseInsensitive)))
+                    text.replace(function, functionPattern.arg(function));
+            }
+        }
+    }
 
+    //Add the _ to Units
     QMapIterator<QString, PhyxVariable*> mapIterator(*m_phyxCalculator->variables());
 
      //get the size of the biggest item
-     int maxSize = 0;
+     maxSize = 0;
      while (mapIterator.hasNext()) {
          mapIterator.next();
          if (mapIterator.key().size() > maxSize)
@@ -429,83 +478,147 @@ QString LineParser::exportFormelEditor()
               mapIterator.next();
               if (mapIterator.key().size() == j) {
                   QString variableName = mapIterator.key();
-                  variableName.insert(1,"_\"");
-                  variableName.append('"');
 
+                  variableName.insert(1,subscriptStart);            //here the variable names get replaced
+                  variableName.append(subscriptEnd);
                   text.replace(mapIterator.key(), variableName);
               }
           }
          mapIterator.toFront();
      }
 
-    //search for / and replace it with regexp
-    regExp.setPattern("[)][^)]*[/][^(]*[(]");
-    pos = text.indexOf(regExp);
-    while (pos != -1)
-    {
-        depth = 0;
-        for (int i = pos; i >= 0; i--)
+     //Replace fractions
+     textLines = text.split('\n');
+     for (int n = 0; n < textLines.size(); n++)
+     {
+        QString line = textLines.at(n);
+        //search for / and replace it with regexp
+        regExp.setPattern("[)][^)]*[/][^(]*[(]");
+        pos = line.indexOf(regExp);
+        while (pos != -1)
         {
-            if (text.at(i) == ')')
+            depth = 0;
+            for (int i = pos; i >= 0; i--)
             {
-                if (depth == 0)
-                    text[i] = '}';
-
-                depth++;
-            }
-            else if (text.at(i) == '(')
-            {
-                if (depth == 1)
+                if (line.at(i) == ')')
                 {
-                    text[i] = '{';
-                    break;
-                }
-                else
-                    depth--;
-            }
-        }
-        depth = 0;
-        for (int i = pos+1; i < text.size(); i++)
-        {
-            if (text.at(i) == '(')
-            {
-                if (depth == 0)
-                    text[i] = '{';
+                    if (depth == 0)
+                    {
+                        //line[i] = '}';
+                        line.replace(i,1,fractionBrace1End);
+                        pos+=fractionBrace1End.size()-1;
+                    }
 
-                depth++;
-            }
-            else if (text.at(i) == ')')
-            {
-                if (depth == 1)
+                    depth++;
+                }
+                else if (line.at(i) == '(')
                 {
-                    text[i] = '}';
-                    break;
+                    if (depth == 1)
+                    {
+                        line.replace(i,1,fractionBrace1Start);
+                        pos+=fractionBrace1Start.size()-1;
+                        break;
+                    }
+                    else
+                        depth--;
                 }
-                else
-                    depth--;
             }
+            depth = 0;
+            for (int i = pos+1; i < line.size(); i++)
+            {
+                if (line.at(i) == '(')
+                {
+                    if (depth == 0)
+                        line.replace(i,1,fractionBrace2Start);
+
+                    depth++;
+                }
+                else if (line.at(i) == ')')
+                {
+                    if (depth == 1)
+                    {
+                        line.replace(i,1,fractionBrace2End);
+                        break;
+                    }
+                    else
+                        depth--;
+                }
+            }
+
+            /*if (target == LatexTarget)
+            {
+                int secondPos = line.indexOf("/",pos);
+                line[secondPos] = ' ';
+            }*/
+            pos = line.indexOf(regExp, pos+1);
         }
 
-        pos = text.indexOf(regExp, pos+1);
-    }
+        //complete it with replacing /
+        line.replace(QRegExp("[ ]*[/][ ]*"), fractionOver);
 
-    //complete it with replacing /
-    text.replace(QRegExp("[ ]*[/][ ]*"), " over ");
+        textLines[n] = line;
+     }
+    text = textLines.join("\n");
 
     //replace greek letters with the formel edit ones
     for (int k = 0; k < m_unitLoader->symbols()->size(); k++)
     {
-        text.replace(m_unitLoader->symbols()->at(k).symbol, "%" + m_unitLoader->symbols()->at(k).name + " ", Qt::CaseSensitive);
+        if (target == LatexTarget)
+        {
+            QString latexString = m_unitLoader->symbols()->at(k).name;
+            QChar first = latexString.at(0);
+            if (first.isUpper())
+                latexString = latexString.toLower();
+            latexString[0] = first;
+            latexString.prepend("\\");
+            latexString.append(" ");
+            text.replace(m_unitLoader->symbols()->at(k).symbol, latexString, Qt::CaseSensitive);
+        }
+        else if (target == MathTarget)
+        {
+            text.replace(m_unitLoader->symbols()->at(k).symbol, "%" + m_unitLoader->symbols()->at(k).name + " ", Qt::CaseSensitive);
+        }
+    }
+
+    //replace functions
+    if (target == LatexTarget)
+    {
+
+        text.replace(QRegExp("[sS][qQ][rR][tT]?"), "\\sqrt");
+
+        regExp = QRegExp("[rR][oO][oO][tT]([\\d\\.]+)");
+        int pos = 0;
+        while ((pos = regExp.indexIn(text, pos)) != -1) {
+         QString replacement = QString("\\sqrt[%1]").arg(regExp.cap(1));
+         text.replace(pos,regExp.matchedLength(),replacement);
+         pos += replacement.size();
+
+        }
+    }
+
+    //replace the #
+    if (target == LatexTarget)
+    {
+        text.replace("#","\\#");
     }
 
     //Append the formel editor newline to every line
     textLines = text.split('\n');
     for (int i = 0; i < textLines.size(); i++)
     {
-        if (i != textLines.size()-1)
+        if (target == LatexTarget)
         {
-            textLines[i].append(" newline");
-            textLines[i] = textLines.at(i).trimmed();
+            textLines[i].prepend("$$ ");
+            textLines[i].append(" $$");
+        }
+        else if (target == MathTarget)
+        {
+            if (i != textLines.size()-1)
+            {
+
+                textLines[i].append(" newline");
+                textLines[i] = textLines.at(i).trimmed();
+            }
         }
     }
     text = textLines.join("\n");
