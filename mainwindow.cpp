@@ -204,6 +204,7 @@ void MainWindow::loadSettings()
         settings.beginGroup("numbers");
             appSettings.output.numbers.decimalPrecision = settings.value("decimalPrecision", 6).toInt();
             appSettings.output.numbers.format = settings.value("format", 'g').toInt();
+            appSettings.output.numbers.useFractions = settings.value("useFractions", false).toBool();
         settings.endGroup();
         appSettings.output.unitMode = settings.value("unitMode",1).toInt();
         appSettings.output.imaginaryUnit = settings.value("imaginaryUnit", "i").toString();
@@ -348,6 +349,7 @@ void MainWindow::saveSettings()
         settings.beginGroup("numbers");
             settings.setValue("decimalPrecision", appSettings.output.numbers.decimalPrecision);
             settings.setValue("format", appSettings.output.numbers.format);
+            settings.setValue("useFractions", appSettings.output.numbers.useFractions);
         settings.endGroup();
         settings.setValue("unitMode", appSettings.output.unitMode);
         settings.setValue("imaginaryUnit", appSettings.output.imaginaryUnit);

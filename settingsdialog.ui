@@ -194,7 +194,7 @@
             <x>0</x>
             <y>0</y>
             <width>397</width>
-            <height>519</height>
+            <height>544</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -227,6 +227,13 @@
               <string>Numbers</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_3">
+              <item>
+               <widget class="QCheckBox" name="fractionCheck">
+                <property name="text">
+                 <string>Output as fractions</string>
+                </property>
+               </widget>
+              </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout">
                 <item>

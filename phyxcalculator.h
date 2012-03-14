@@ -127,6 +127,11 @@ public:
     };
 
     typedef struct {
+      PhyxFloatDataType numerator;
+      PhyxFloatDataType denominator;
+    } PhyxFraction;
+
+    typedef struct {
         QString value;
         QString unit;
     } ResultVariable;   /// this struct is for outputting the formated variable
@@ -188,7 +193,7 @@ public:
         return m_result;
     }
 
-    static QString complexToString(const PhyxValueDataType number, int precision, char numberFormat, QString imaginaryUnit, bool useBraces = false);
+    static QString complexToString(const PhyxValueDataType number, int precision, char numberFormat, QString imaginaryUnit, bool useBraces = false, bool useFractions = false);
     static PhyxValueDataType stringToComplex(QString string);
     static PhyxIntegerDataType hexToLongInt(QString string);
     static PhyxIntegerDataType octToLongInt(QString string);
@@ -198,8 +203,12 @@ public:
     static QString longIntToOct(PhyxIntegerDataType number);
     static QString longIntToBin(PhyxIntegerDataType number);
     static PhyxIntegerDataType longIntToBcd(PhyxIntegerDataType number);
+    static PhyxIntegerDataType gcd(PhyxIntegerDataType x, PhyxIntegerDataType y);  ///< returns the greatest common divisor of x and y
+    static PhyxIntegerDataType lcm(PhyxIntegerDataType x, PhyxIntegerDataType y);  ///< returns the lowest common multiple of x and y
+    static PhyxFloatDataType toInt(PhyxFloatDataType x);
+    static PhyxFraction decimalToFraction(PhyxFloatDataType decimal, PhyxFloatDataType accuracyFactor);
 
-    ResultVariable formatVariable(PhyxVariable *variable, OutputMode outputMode, PrefixMode prefixMode, int precision, char numberFormat, QString imaginaryUnit) const;
+    ResultVariable formatVariable(PhyxVariable *variable, OutputMode outputMode, PrefixMode prefixMode, int precision, char numberFormat, QString imaginaryUnit, bool useFractions) const;
 
 private:
     QStack<PhyxVariable*>       variableStack;                                  /// stack for variable calculation
@@ -255,10 +264,6 @@ private:
     void clearResult();
 
     void clearFlags();
-
-    /** cpp level functions */
-    PhyxIntegerDataType gcd(PhyxIntegerDataType x, PhyxIntegerDataType y);  ///< returns the greatest common divisor of x and y
-    PhyxIntegerDataType lcm(PhyxIntegerDataType x, PhyxIntegerDataType y);  ///< returns the lowest common multiple of x and y
 
     /** functions for value calculation */
     void valueCheckComplex();

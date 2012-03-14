@@ -165,7 +165,8 @@ QString LineParser::variableToolTip(QString name)
                                                 (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode,
                                                 m_appSettings->output.numbers.decimalPrecision,
                                                 m_appSettings->output.numbers.format,
-                                                m_appSettings->output.imaginaryUnit);
+                                                m_appSettings->output.imaginaryUnit,
+                                                m_appSettings->output.numbers.useFractions);
 
     output.append(tr("<b>Variable %1</b><br>").arg(name));
     output.append(tr("Value: %1%2").arg(outputVariable.value).arg(outputVariable.unit));
@@ -187,7 +188,8 @@ QString LineParser::constantToolTip(QString name)
                                                 (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode,
                                                 m_appSettings->output.numbers.decimalPrecision,
                                                 m_appSettings->output.numbers.format,
-                                                m_appSettings->output.imaginaryUnit);
+                                                m_appSettings->output.imaginaryUnit,
+                                                m_appSettings->output.numbers.useFractions);
 
     output.append(tr("<b>Constant %1</b><br>").arg(name));
     output.append(tr("Value: %1%2").arg(outputVariable.value).arg(outputVariable.unit));
@@ -652,7 +654,8 @@ void LineParser::showVariables()
                                                      (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode,
                                                      m_appSettings->output.numbers.decimalPrecision,
                                                      m_appSettings->output.numbers.format,
-                                                     m_appSettings->output.imaginaryUnit);
+                                                     m_appSettings->output.imaginaryUnit,
+                                                     m_appSettings->output.numbers.useFractions);
 
          m_variableTable->setRowCount(row+1);
          newItem = new QTableWidgetItem(i.key());   // name
@@ -691,7 +694,8 @@ void LineParser::showConstants()
                                                      (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode,
                                                      m_appSettings->output.numbers.decimalPrecision,
                                                      m_appSettings->output.numbers.format,
-                                                     m_appSettings->output.imaginaryUnit);
+                                                     m_appSettings->output.imaginaryUnit,
+                                                     m_appSettings->output.numbers.useFractions);
 
          m_constantsTable->setRowCount(row+1);
          newItem = new QTableWidgetItem(i.key());   // name
@@ -731,12 +735,14 @@ void LineParser::updateUnits()
                                                               m_appSettings->output.numbers.decimalPrecision,
                                                               m_appSettings->output.numbers.format,
                                                               m_appSettings->output.imaginaryUnit,
-                                                              false);
+                                                              false,
+                                                              m_appSettings->output.numbers.useFractions);
          QString offset = PhyxCalculator::complexToString(PhyxValueDataType(i.value()->offset(), PHYX_FLOAT_NULL),
                                                           m_appSettings->output.numbers.decimalPrecision,
                                                           m_appSettings->output.numbers.format,
                                                           m_appSettings->output.imaginaryUnit,
-                                                          false);
+                                                          false,
+                                                          m_appSettings->output.numbers.useFractions);
 
          m_unitsTable->setRowCount(row+1);
          newItem = new QTableWidgetItem(i.value()->preferedPrefix() + i.key());   // name
@@ -833,7 +839,8 @@ void LineParser::outputResult()
                                                                              (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode,
                                                                              m_appSettings->output.numbers.decimalPrecision,
                                                                              m_appSettings->output.numbers.format,
-                                                                             m_appSettings->output.imaginaryUnit);
+                                                                             m_appSettings->output.imaginaryUnit,
+                                                                             m_appSettings->output.numbers.useFractions);
     QString output;
     output.append("=");
     output.append(result.value);
@@ -864,7 +871,8 @@ void LineParser::outputConverted(QString text)
                                                                              (PhyxCalculator::PrefixMode)m_appSettings->output.prefixMode,
                                                                              m_appSettings->output.numbers.decimalPrecision,
                                                                              m_appSettings->output.numbers.format,
-                                                                             m_appSettings->output.imaginaryUnit);
+                                                                             m_appSettings->output.imaginaryUnit,
+                                                                             m_appSettings->output.numbers.useFractions);
     QString output;
     output.append("=");
     output.append(result.value);

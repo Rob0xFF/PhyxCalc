@@ -42,12 +42,20 @@
 #define PHYX_FLOAT_ONE 1.0L
 #define PHYX_FLOAT_TWO 2.0L
 #define PHYX_FLOAT_THREE 3.0L
+#define PHYX_FLOAT_TEN 10.0L
+#define FRACTION_MAX 1.0e-19L
+#define FRACTION_MIN 1.0e+19L
+#define FRACTION_BIGGEST 999999999999999999.0L
 typedef long double                 PhyxFloatDataType;      /// the data type for floating point variables
 #else
 #define PHYX_FLOAT_NULL 0.0
 #define PHYX_FLOAT_ONE 1.0
 #define PHYX_FLOAT_TWO 2.0
 #define PHYX_FLOAT_THREE 3.0
+#define PHYX_FLOAT_TEN 10.0
+#define FRACTION_MAX 1.0e-19
+#define FRACTION_MIN 1.0e+19
+#define FRACTION_BIGGEST 999999999999999999.0
 typedef double                      PhyxFloatDataType;      /// the data type for floating point variables
 #endif
 typedef long int                    PhyxIntegerDataType;    /// the data type for integers
@@ -65,6 +73,7 @@ typedef struct {
         struct {
             int decimalPrecision;
             char format;
+            bool useFractions;
         } numbers;
         int unitMode;
         QString imaginaryUnit;

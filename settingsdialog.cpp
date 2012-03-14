@@ -67,6 +67,7 @@ void SettingsDialog::setAppSettings(AppSettings *settings)
              break;
     }
     ui->decimalPrecisionSpin->setValue(settings->output.numbers.decimalPrecision);
+    ui->fractionCheck->setChecked(settings->output.numbers.useFractions);
 
     switch (settings->output.unitMode)
     {
@@ -129,8 +130,8 @@ void SettingsDialog::getAppSettings(AppSettings *settings)
     else if (ui->formatRadioX->isChecked())
         settings->output.numbers.format = 'X';
 
-
     settings->output.numbers.decimalPrecision = ui->decimalPrecisionSpin->value();
+    settings->output.numbers.useFractions = ui->fractionCheck->isChecked();
 
     if (ui->unitRadio1->isChecked())
         settings->output.unitMode = 1;

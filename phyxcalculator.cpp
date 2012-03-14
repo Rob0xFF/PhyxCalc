@@ -30,7 +30,7 @@ void PhyxCalculator::initialize()
     //initialize variables
     m_expression = "";
     expressionIsParsable = false;
-    valueBuffer = 1;
+    valueBuffer = PHYX_FLOAT_ONE;
     prefixBuffer = "";
     unitBuffer = "";
     flagBuffer = 0;
@@ -827,12 +827,17 @@ QStringList PhyxCalculator::functions() const
     return functionList;
 }
 
-QString PhyxCalculator::complexToString(const PhyxValueDataType number, int precision, char numberFormat, QString imaginaryUnit, bool useBraces)
+QString PhyxCalculator::complexToString(const PhyxValueDataType number,
+                                        int precision,
+                                        char numberFormat,
+                                        QString imaginaryUnit,
+                                        bool useBraces,
+                                        bool useFractions)
 {
     QString string;
     boost::format format(QString("%.%1%2").arg(precision).arg(numberFormat).toStdString());
     int components = 0;
-    bool useInteger = false;
+    //bool useInteger = false;
 
     //check wheter number is integer or not
     /*if (number.imag() == PHYX_FLOAT_NULL)
@@ -844,11 +849,27 @@ QString PhyxCalculator::complexToString(const PhyxValueDataType number, int prec
     if (number.real() != PHYX_FLOAT_NULL)
     {
         std::ostringstream ss;
-        if (!useInteger)
+        if (!useFractions)
+        {
+            //if (!useInteger)
             ss << format % number.real();
-//        else
-//            ss << format % static_cast<PhyxIntegerDataType>(number.real());
-        string.append(QString::fromStdString(ss.str()));
+    //      else
+    //            ss << format % static_cast<PhyxIntegerDataType>(number.real());
+            string.append(QString::fromStdString(ss.str()));
+        }
+        else
+        {
+            PhyxFraction fraction = decimalToFraction(number.real(),precision);
+            ss << format % fraction.numerator;
+            string.append(QString::fromStdString(ss.str()));
+            if (fraction.denominator != PHYX_FLOAT_ONE)
+            {
+                string.append("/");
+                ss.str("");
+                ss << format % fraction.denominator;
+                string.append(QString::fromStdString(ss.str()));
+            }
+        }
         components++;
     }
 
@@ -859,8 +880,24 @@ QString PhyxCalculator::complexToString(const PhyxValueDataType number, int prec
         if ((number.imag() != 1) && (number.imag() != -1))
         {
             std::ostringstream ss;
-            ss << format % number.imag();
-            string.append(QString::fromStdString(ss.str()));
+            if (!useFractions)
+            {
+                ss << format % number.imag();
+                string.append(QString::fromStdString(ss.str()));
+            }
+            else
+            {
+                PhyxFraction fraction = decimalToFraction(number.imag(),precision);
+                ss << format % fraction.numerator;
+                string.append(QString::fromStdString(ss.str()));
+                if (fraction.denominator != PHYX_FLOAT_ONE)
+                {
+                    string.append("/");
+                    ss.str("");
+                    ss << format % fraction.denominator;
+                    string.append(QString::fromStdString(ss.str()));
+                }
+            }
         }
         else if (number.imag() == -1)
         {
@@ -1050,6 +1087,83 @@ PhyxIntegerDataType PhyxCalculator::longIntToBcd(PhyxIntegerDataType number)
     return output;
 }
 
+PhyxIntegerDataType PhyxCalculator::gcd(PhyxIntegerDataType x, PhyxIntegerDataType y)
+{
+    //euclidean algorithm
+    while (x != y)
+    {
+        if (x < y)
+            y -= x;
+        else
+            x -= y;
+    }
+    return x;
+}
+
+PhyxIntegerDataType PhyxCalculator::lcm(PhyxIntegerDataType x, PhyxIntegerDataType y)
+{
+    return (fabs(x)/gcd(x,y))*fabs(y);
+}
+
+PhyxFloatDataType PhyxCalculator::toInt(PhyxFloatDataType x)
+{
+    return static_cast<PhyxFloatDataType>(static_cast<PhyxIntegerDataType>(x));
+}
+
+PhyxCalculator::PhyxFraction PhyxCalculator::decimalToFraction(PhyxFloatDataType decimal, PhyxFloatDataType accuracyFactor)
+{
+    //source: http://www.google.at/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cts=1331720360130&ved=0CCwQFjAA&url=http%3A%2F%2Fhomepage.smc.edu%2Fkennedy_john%2FDEC2FRAC.PDF&ei=bmZgT6KWJZHCtAbZs6CVBg&usg=AFQjCNFtOSqNWlkYGJt0iY89ziqgssxF3w
+    PhyxFloatDataType decimalSign;
+    PhyxFloatDataType z;
+    PhyxFloatDataType previousDenominator;
+    PhyxFloatDataType scratchValue;
+    //PhyxFloatDataType fractionNumerator;
+    //PhyxFloatDataType fractionDenominator;
+    PhyxFraction fraction;
+
+    accuracyFactor = pow(PHYX_FLOAT_TEN, -accuracyFactor);
+
+    if (decimal < PHYX_FLOAT_NULL)      //save the sign
+        decimalSign = -PHYX_FLOAT_ONE;
+    else
+        decimalSign = PHYX_FLOAT_ONE;
+
+    decimal = fabs(decimal);
+
+    if (decimal == toInt(decimal))   //handle integers
+    {
+        fraction.numerator = decimal*decimalSign;
+        fraction.denominator = PHYX_FLOAT_ONE;
+        return fraction;
+    }
+    if (decimal < FRACTION_MIN)
+    {
+        fraction.numerator = decimalSign;
+        fraction.denominator = FRACTION_BIGGEST;
+        return fraction;
+    }
+    if (decimal > FRACTION_MAX)
+    {
+        fraction.numerator = FRACTION_BIGGEST*decimalSign;
+        fraction.denominator = PHYX_FLOAT_ONE;
+        return fraction;
+    }
+    z = decimal;
+    previousDenominator = PHYX_FLOAT_NULL;
+    fraction.denominator = PHYX_FLOAT_ONE;
+    do
+    {
+        z = PHYX_FLOAT_ONE/(z-toInt(z));
+        scratchValue = fraction.denominator;
+        fraction.denominator = fraction.denominator * toInt(z)+previousDenominator;
+        previousDenominator = scratchValue;
+        fraction.numerator = toInt(decimal*fraction.denominator + (PHYX_FLOAT_ONE/PHYX_FLOAT_TWO)); //rounding
+    }
+    while (!((fabs(decimal-(fraction.numerator/fraction.denominator)) < accuracyFactor) || (z == toInt(z))));
+    fraction.numerator = decimalSign*fraction.numerator;
+    return fraction;
+}
+
 PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefix(PhyxFloatDataType value, QString unitGroup, QString preferedPrefix) const
 {
     PhyxFloatDataType preferedPrefixValue = PHYX_FLOAT_ONE;
@@ -1067,13 +1181,13 @@ PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefix(PhyxFloatDataType value
             prefixes[i].value /= preferedPrefixValue;
             PhyxFloatDataType tmpValue = value / prefixes.at(i).value;
 
-            if (abs(tmpValue) >= PHYX_FLOAT_ONE)
+            if (fabs(tmpValue) >= PHYX_FLOAT_ONE)
                 return prefixes.at(i);
         }
     }
 
     PhyxUnitSystem::PhyxPrefix prefix;
-    prefix.value = 1;
+    prefix.value = PHYX_FLOAT_ONE;
     prefix.symbol = "";
     return prefix;
 }
@@ -1083,7 +1197,8 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
                                                               PrefixMode prefixMode,
                                                               int precision,
                                                               char numberFormat,
-                                                              QString imaginaryUnit) const
+                                                              QString imaginaryUnit,
+                                                              bool useFractions) const
 {
     ResultVariable result;
     PhyxValueDataType value = variable->value();
@@ -1142,28 +1257,9 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
         break;
     }
 
-    result.value = complexToString(value, precision, numberFormat, imaginaryUnit, !unit->isOne());
+    result.value = complexToString(value, precision, numberFormat, imaginaryUnit, !unit->isOne(), useFractions);
 
     return result;
-}
-
-PhyxIntegerDataType PhyxCalculator::gcd(PhyxIntegerDataType x, PhyxIntegerDataType y)
-{
-    //euclidean algorithm
-    while (x != y)
-    {
-        if (x < y)
-            y -= x;
-        else
-            x -= y;
-    }
-
-    return x;
-}
-
-PhyxIntegerDataType PhyxCalculator::lcm(PhyxIntegerDataType x, PhyxIntegerDataType y)
-{
-    return abs(x*y)/gcd(x,y);
 }
 
 void PhyxCalculator::valueCheckComplex()
@@ -2240,8 +2336,8 @@ void PhyxCalculator::valueGcd()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    PhyxIntegerDataType x = abs(variable1->toInt());
-    PhyxIntegerDataType y = abs(variable2->toInt());
+    PhyxIntegerDataType x = fabs(variable1->toInt());
+    PhyxIntegerDataType y = fabs(variable2->toInt());
 
     variable1->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(gcd(x,y)), PHYX_FLOAT_NULL));
     variableStack.push(variable1);
@@ -2259,8 +2355,8 @@ void PhyxCalculator::valueLcm()
     PhyxVariable *variable1 = variableStack.pop();
     PhyxVariable *variable2 = variableStack.pop();
 
-    PhyxIntegerDataType x = abs(variable1->toInt());
-    PhyxIntegerDataType y = abs(variable2->toInt());
+    PhyxIntegerDataType x = fabs(variable1->toInt());
+    PhyxIntegerDataType y = fabs(variable2->toInt());
 
     variable1->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(lcm(x,y)), PHYX_FLOAT_NULL));
     variableStack.push(variable1);

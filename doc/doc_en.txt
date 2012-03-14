@@ -189,8 +189,8 @@ root12(25)
 *ans* answer function, returns last result in memory -> similar to using # variable +
 *bcd* binary coded decimal function, converts a binary decimal coded number back to a dezimal value +
 *tobcd* inverse of the bcd function +
-*gcd* greatest common divisor +
-*lcm* least common multiple
+*gcd*(x,y) greatest common divisor of x and y +
+*lcm*(x,y) least common multiple of x and y
 
 === Defining custom functions
 Defing custom functions in PhyxCalc is pretty easy, just write the name of your function, then add the parameters and an expression.
