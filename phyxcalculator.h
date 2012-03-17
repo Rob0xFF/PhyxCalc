@@ -214,6 +214,7 @@ private:
     QStack<PhyxVariable*>       variableStack;                                  /// stack for variable calculation
     QStack<LowLevelOperationList*> lowLevelStack;                               /// stack for low level operations
     QStack<QString>             functionParameterStack;                         /// stack for storing paramters for function definition
+    QList<PhyxVariable*>        variableList;                                   /// list containing currently loaded variables
     QString                     parameterBuffer;                                /// string for buffering numbers
     QString                     stringBuffer;                                   /// string for buffering strings
     PhyxValueDataType           valueBuffer;
@@ -221,6 +222,7 @@ private:
     QString                     unitBuffer;
     QString                     unitGroupBuffer;
     QString                     nameBuffer;
+    QString                     expressionBuffer;
     int                         flagBuffer;                                     /// this buffer holds current set flags (e.g. the inputOnly flag
     int                         stackLevel;                                     /// this variable holds the current stack level, 0 = lowest
 
@@ -247,6 +249,7 @@ private:
 
 
     QHash<QString, void (PhyxCalculator::*)()> functionMap;                     /// functions mapped with their names
+    QMap<QString, QList<EarleyTreeItem> > expressionCacheMap;                   /// a cache for expressions, stores treeitem lists for lately executed expressions
     QStringList                 standardFunctionList;                           /// a stringlist containing all standard function names
 
     void initialize();                                                          ///< initializes PhyxCalculator
@@ -265,6 +268,9 @@ private:
 
     void clearFlags();
 
+    void popVariables(int count);                       /// checks wheter enough variables are in the stack and loads them
+    void pushVariables(int count, int deleteCount);     /// push the given number of variables to the stack and delete the given number
+
     /** functions for value calculation */
     void valueCheckComplex();
     void valueCheckComplex2();
@@ -279,7 +285,6 @@ private:
     void valuePush2();
     void valuePush3();
     void valueCopy();
-    void valueInvert();
     void valueAdd();
     void valueSub();
     void valueMul();
@@ -438,6 +443,7 @@ private:
     void bufferBinString();
     void bufferPrefix();
     void bufferString();
+    void bufferExpression();
     void bufferUnitGroup();
     void pushVariable();
     void pushFunctionParameter();
@@ -445,6 +451,7 @@ private:
     /** flag functions */
     void setInputOnlyFlag();
 
+    /** output functions*/
     void outputVariable();
     void outputString();
     void outputConvertedUnit();
@@ -473,6 +480,8 @@ private:
     void lowLevelCombinedAssignmentShiftLeft();
     void lowLevelCombinedAssignmentShiftRight();
     void lowLevelOutput();
+
+    void tableCreate();
 
 signals:
     void variablesChanged();        ///< is emited when variables have changed

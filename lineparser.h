@@ -29,6 +29,7 @@
 #include <QTableWidgetItem>
 #include <QTableWidget>
 #include <QListWidget>
+#include <QCheckBox>
 #include "unitloader.h"
 #include "global.h"
 #include "phyxcalculator.h"

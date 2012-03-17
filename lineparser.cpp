@@ -665,6 +665,9 @@ void LineParser::showVariables()
          newItem = new QTableWidgetItem(variable.unit);
          m_variableTable->setItem(row, 2, newItem);
 
+         //QCheckBox *checkBox = new QCheckBox();
+         //checkBox->setChecked(true);
+         //m_variableTable->setCellWidget(0, 0, checkBox);
          row++;
      }
 
