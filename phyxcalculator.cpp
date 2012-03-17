@@ -57,6 +57,7 @@ void PhyxCalculator::initialize()
     //map functions
     functionMap.insert("valueCheckComplex",     &PhyxCalculator::valueCheckComplex);
     functionMap.insert("valueCheckComplex2",    &PhyxCalculator::valueCheckComplex2);
+    functionMap.insert("valueCheckComplex3",    &PhyxCalculator::valueCheckComplex3);
     functionMap.insert("valueCheckComplex2th",  &PhyxCalculator::valueCheckComplex2th);
     functionMap.insert("valueCheckComplex3th",  &PhyxCalculator::valueCheckComplex3th);
     functionMap.insert("valueCheckPositive",    &PhyxCalculator::valueCheckPositive);
@@ -1296,7 +1297,7 @@ void PhyxCalculator::valueCheckComplex()
 {
     popVariables(1);
 
-    if (variableStack[0]->isComplex())
+    if (variableList[0]->isComplex())
         raiseException(ValueComplexError);
 
     pushVariables(1,0);
@@ -1306,17 +1307,27 @@ void PhyxCalculator::valueCheckComplex2()
 {
     popVariables(2);
 
-    if (variableStack[0]->isComplex() || variableStack[1]->isComplex())
+    if (variableList[0]->isComplex() || variableList[1]->isComplex())
         raiseException(ValueComplexError);
 
     pushVariables(2,0);
+}
+
+void PhyxCalculator::valueCheckComplex3()
+{
+    popVariables(3);
+
+    if (variableList[0]->isComplex() || variableList[1]->isComplex() || variableList[2]->isComplex())
+        raiseException(ValueComplexError);
+
+    pushVariables(3,0);
 }
 
 void PhyxCalculator::valueCheckComplex2th()
 {
     popVariables(2);
 
-    if (variableStack[1]->isComplex())
+    if (variableList[1]->isComplex())
         raiseException(ValueComplexError);
 
     pushVariables(2,0);
@@ -1326,7 +1337,7 @@ void PhyxCalculator::valueCheckComplex3th()
 {
     popVariables(3);
 
-    if (variableStack[0]->isComplex())
+    if (variableList[0]->isComplex())
         raiseException(ValueComplexError);
 
     pushVariables(3,0);
@@ -1336,7 +1347,7 @@ void PhyxCalculator::valueCheckPositive()
 {
     popVariables(1);
 
-    if (!variableStack[0]->isPositive())
+    if (!variableList[0]->isPositive())
         raiseException(ValueNotPositiveError);
 
     pushVariables(1,0);
@@ -1346,7 +1357,7 @@ void PhyxCalculator::valueCheckInteger()
 {
     popVariables(1);
 
-    if (!variableStack[0]->isInteger())
+    if (!variableList[0]->isInteger())
         raiseException(ValueNotIntegerError);
 
     pushVariables(1,0);
@@ -1356,9 +1367,9 @@ void PhyxCalculator::valueCheckInteger2()
 {
     popVariables(2);
 
-    if (!variableStack[0]->isInteger())
+    if (!variableList[0]->isInteger())
         raiseException(ValueNotIntegerError);
-    else if (!variableStack[1]->isInteger())
+    else if (!variableList[1]->isInteger())
         raiseException(ValueNotIntegerError);
 
     pushVariables(2,0);
@@ -1368,7 +1379,7 @@ void PhyxCalculator::valueCheckInteger2th()
 {
     popVariables(2);
 
-    if (!variableStack[0]->isInteger())
+    if (!variableList[0]->isInteger())
         raiseException(ValueNotIntegerError);
 
     pushVariables(2,0);
@@ -1378,7 +1389,7 @@ void PhyxCalculator::valueCheckInteger3th()
 {
     popVariables(3);
 
-    if (!variableStack[0]->isInteger())
+    if (!variableList[0]->isInteger())
         raiseException(ValueNotIntegerError);
 
     pushVariables(3,0);

@@ -274,6 +274,7 @@ private:
     /** functions for value calculation */
     void valueCheckComplex();
     void valueCheckComplex2();
+    void valueCheckComplex3();
     void valueCheckComplex2th();
     void valueCheckComplex3th();
     void valueCheckPositive();
