@@ -127,6 +127,28 @@ public:
     };
 
     typedef struct {
+        QStringList functionList;
+        QString expression;
+        QList<int>  startPosList;
+        QList<int>  endPosList;
+
+        QString const function(int pos) {
+            return functionList.at(pos);
+        }
+        QString const parameter(int pos) {
+            return expression.mid(startPosList.at(pos), endPosList.at(pos) - startPosList.at(pos) + 1);
+        }
+        void appendItem(QString function, int startPos, int endPos) {
+            functionList.append(function);
+            startPosList.append(startPos);
+            endPosList.append(endPos);
+        }
+        int size() {
+            return functionList.size();
+        }
+    } ExpressionCacheItem;
+
+    typedef struct {
       PhyxFloatDataType numerator;
       PhyxFloatDataType denominator;
     } PhyxFraction;
@@ -146,7 +168,8 @@ public:
 
     bool setExpression (QString m_expression);          ///< sets the expression, checks what must be parsed and returns wheter the expression is parsable or not
     bool evaluate();
-    bool evaluate(QList<EarleyTreeItem> earleyTree, QString expression, QList<int> whiteSpaceList);                                    ///< evaluates the expression
+    bool evaluate(QList<EarleyTreeItem> earleyTree, const QString expression, const QList<int> whiteSpaceList);                                    ///< evaluates the expression
+    bool evaluate(ExpressionCacheItem cacheItem, const QList<int> whiteSpaceList);
     void loadFile(QString fileName);                    ///< parses a complete txt file
 
     PhyxVariable * variable(QString name) const;
@@ -154,11 +177,13 @@ public:
     PhyxUnit     * unit(QString symbol) const;
     PhyxUnitSystem::PhyxPrefix prefix(QString symbol, QString unitGroup) const;
     PhyxVariableManager::PhyxFunction * function(QString name) const;
+    PhyxVariableManager::PhyxDataset * dataset(int index) const;
     PhyxVariableManager::PhyxVariableMap * variables() const;
     PhyxVariableManager::PhyxVariableMap * constants() const;
     PhyxUnitSystem::PhyxUnitMap units() const;
     QList<PhyxUnitSystem::PhyxPrefix> prefixes() const;
     QStringList functions() const;
+    PhyxVariableManager::PhyxDatasetList * datasets() const;
     QString expression() const
     {
         return m_expression;
@@ -237,6 +262,8 @@ private:
     bool                        listModeActive;                                 /// holds whete list mode is active or not
     ListOperationType           listModeType;                                   /// holds current list operation type
 
+    bool                        noGuiUpdate;                                    /// if this variable is set, no GUI update should be performed (e.g. when running functions)
+
     QString                     m_expression;                                   /// currently set expression
     bool                        expressionIsParsable;                           /// holds wheter currently set expression is parsable or not
     PhyxValueDataType           m_resultValue;                                  /// value of the result
@@ -249,8 +276,10 @@ private:
 
 
     QHash<QString, void (PhyxCalculator::*)()> functionMap;                     /// functions mapped with their names
-    QMap<QString, QList<EarleyTreeItem> > expressionCacheMap;                   /// a cache for expressions, stores treeitem lists for lately executed expressions
+    QMap<QString, ExpressionCacheItem > expressionCacheMap;                   /// a cache for faster execution of expressions
     QStringList                 standardFunctionList;                           /// a stringlist containing all standard function names
+
+    ExpressionCacheItem const earleyTreeToCacheItem(QList<EarleyTreeItem> const earleyTree, const QString expression);
 
     void initialize();                                                          ///< initializes PhyxCalculator
     void loadGrammar(QString fileName);                                         ///< loads the grammar from a file
@@ -490,10 +519,13 @@ signals:
     void unitsChanged();            ///< is emited when units have changed
     void prefixesChanged();         ///< is emited when prefixes have changed
     void functionsChanged();        ///< is emited when functions have changed
+    void datasetsChanged();         ///< is emited when datasets have changed
     void outputResult();            ///< is emited when result should be output
     void outputError();             ///< is emited when an error should be output
     void outputText(QString text);  ///< is emited when text should be output
     void outputConverted(QString text); ///< is emited when a converted unit should be output
+    void outputTable();
+    void outputPlot();
     
 public slots:
     void clearVariables();

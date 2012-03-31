@@ -41,6 +41,8 @@ LineParser::LineParser(QObject *)
             this, SLOT(updatePrefixes()));
     connect(m_phyxCalculator, SIGNAL(functionsChanged()),
             this, SLOT(updateFunctions()));
+    connect(m_phyxCalculator, SIGNAL(datasetsChanged()),
+            this, SLOT(updateDatasets()));
 }
 
 LineParser::~LineParser()
@@ -351,6 +353,7 @@ void LineParser::updateSettings()
     updateUnits();
     updatePrefixes();
     updateFunctions();
+    updateDatasets();
 }
 
 QString LineParser::removeWhitespace(QString string)
@@ -828,6 +831,11 @@ void LineParser::updateFunctions()
     }
     functionList.sort();
     listWidgetUpdate(m_functionsList, functionList);
+}
+
+void LineParser::updateDatasets()
+{
+    m_plotWindow->setDatasets(m_phyxCalculator->datasets());
 }
 
 void LineParser::clearAllVariables()

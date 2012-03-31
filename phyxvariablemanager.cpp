@@ -167,6 +167,33 @@ PhyxVariableManager::PhyxFunctionMap *PhyxVariableManager::functions()
     return &functionMap;
 }
 
+void PhyxVariableManager::addDataset(PhyxVariableManager::PhyxDataset *dataset)
+{
+    datasetList.append(dataset);
+}
+
+PhyxVariableManager::PhyxDataset *PhyxVariableManager::getDataset(int index) const
+{
+    if (index < datasetList.size())
+        return datasetList[index];
+    else
+        return NULL;
+}
+
+void PhyxVariableManager::removeDataset(int index)
+{
+    PhyxDataset *dataset = datasetList[index];
+    for (int i = 0; i < dataset->unit.size(); i++)
+        dataset->unit.at(i)->deleteLater();
+    datasetList.removeAt(index);
+    delete dataset;
+}
+
+PhyxVariableManager::PhyxDatasetList *PhyxVariableManager::datasets()
+{
+    return &datasetList;
+}
+
 void PhyxVariableManager::clearVariables()
 {
     QMapIterator<QString, PhyxVariable*> i(variableMap);

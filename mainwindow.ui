@@ -84,6 +84,7 @@
     <addaction name="actionNew_Tab"/>
     <addaction name="menuDocks"/>
     <addaction name="action_Slim_Mode"/>
+    <addaction name="action_Plot_Window"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -585,6 +586,14 @@
   <action name="actionNew_Tab">
    <property name="text">
     <string>&amp;New Tab</string>
+   </property>
+  </action>
+  <action name="action_Plot_Window">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Plot Window</string>
    </property>
   </action>
   <zorder>prefixesDock</zorder>

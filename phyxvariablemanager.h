@@ -37,6 +37,13 @@ public:
     } PhyxFunction;
     typedef QMap<QString, PhyxFunction*> PhyxFunctionMap;
 
+    typedef struct {
+        QString name;
+        QList<PhyxCompoundUnit*> unit;
+        QList<QList<PhyxValueDataType> > data;
+    } PhyxDataset;
+    typedef QList<PhyxDataset*> PhyxDatasetList;
+
     explicit PhyxVariableManager(QObject *parent = 0);
 
     void addVariable(QString name, PhyxVariable *variable);
@@ -55,11 +62,16 @@ public:
     PhyxFunction * getFunction(QString name);
     void removeFunction(QString name);
     PhyxFunctionMap * functions();
+    void addDataset(PhyxDataset* dataset);
+    PhyxDataset * getDataset(int index) const;
+    void removeDataset(int index);
+    PhyxDatasetList * datasets();
 
 private:
     PhyxVariableMap variableMap;
     PhyxVariableMap constantMap;
     PhyxFunctionMap functionMap;
+    PhyxDatasetList datasetList;
     
 signals:
     void variableAdded(QString name);

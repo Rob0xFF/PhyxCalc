@@ -576,6 +576,8 @@ void MainWindow::initializeGUI()
     ui->mainToolBar->addSeparator();
 #endif
     ui->mainToolBar->addAction(ui->actionClose);
+
+    plotWindow = new PlotWindow(this); //create plotwindow
 }
 
 void MainWindow::switchLayout(int number)
@@ -613,6 +615,7 @@ void MainWindow::addNewTab()
     newDocument->lineParser->setPrefixesTable(ui->prefixesTable);
     newDocument->lineParser->setFunctionsList(ui->functionsList);
     newDocument->lineParser->setCalculationEdit(newDocument->expressionEdit);
+    newDocument->lineParser->setPlotWindow(plotWindow);
     newDocument->lineParser->setAppSettings(&appSettings);
     newDocument->lineParser->phyxCalculator()->loadFile(settingsDir + "/definitions.txt");
     newDocument->name = "";
@@ -1167,4 +1170,12 @@ void MainWindow::on_actionHelp_triggered()
     HelpDialog helpDialog;
     helpDialog.setHelpFile(":/doc/doc_en.html");
     helpDialog.exec();
+}
+
+void MainWindow::on_action_Plot_Window_triggered(bool checked)
+{
+    if (checked)
+        plotWindow->show();
+    else
+        plotWindow->hide();
 }

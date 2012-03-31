@@ -37,6 +37,7 @@
 #include "helpdialog.h"
 //#include "flowlayout.h"
 #include "settingsdialog.h"
+#include "plotwindow.h"
 #include "global.h"
 
 typedef struct {
@@ -75,6 +76,8 @@ protected:
 private:
     Ui::MainWindow  *ui;
     QAction *configureAction;           /// configure action for slim mode
+
+    PlotWindow *plotWindow;
 
     QList<Document*> documentList;
     UnitLoader      *unitLoader;
@@ -151,6 +154,7 @@ private slots:
     void on_action_Slim_Mode_triggered();
     void on_actionClear_Variables_triggered();
     void on_actionHelp_triggered();
+    void on_action_Plot_Window_triggered(bool checked);
 };
 
 #endif // MAINWINDOW_H

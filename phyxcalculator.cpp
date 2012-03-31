@@ -36,6 +36,7 @@ void PhyxCalculator::initialize()
     flagBuffer = 0;
     stackLevel = 0;
     listModeActive = false;
+    noGuiUpdate = false;
     m_error = false;
     m_errorNumber = 0;
     m_errorStartPosition = 0;
@@ -466,7 +467,8 @@ void PhyxCalculator::raiseException(int errorNumber)
     m_error = true;
     m_errorNumber = errorNumber;
     clearStack();
-    emit outputError();
+    if (!noGuiUpdate)
+        emit outputError();
 #ifdef QT_DEBUG
     qDebug() << "error occured:" << m_errorNumber << errorString();
 #endif
@@ -517,49 +519,57 @@ void PhyxCalculator::addRule(QString rule, QString functions)
 void PhyxCalculator::addUnitRule(QString symbol)
 {
     addRule(QString("unit=%1").arg(symbol), QString("bufferParameter, bufferUnit"));
-    emit unitsChanged();
+    if (!noGuiUpdate)
+        emit unitsChanged();
 }
 
 void PhyxCalculator::removeUnitRule(QString symbol)
 {
     earleyParser->removeRule(QString("unit=%1").arg(symbol));
-    emit unitsChanged();
+    if (!noGuiUpdate)
+        emit unitsChanged();
 }
 
 void PhyxCalculator::addVariableRule(QString name)
 {
     addRule(QString("variable=%1").arg(name), QString("bufferParameter, variableLoad"));
-    emit variablesChanged();
+    if (!noGuiUpdate)
+        emit variablesChanged();
 }
 
 void PhyxCalculator::removeVariableRule(QString name)
 {
     earleyParser->removeRule(QString("variable=%1").arg(name));
-    emit variablesChanged();
+    if (!noGuiUpdate)
+        emit variablesChanged();
 }
 
 void PhyxCalculator::addConstantRule(QString name)
 {
     addRule(QString("constant=%1").arg(name), QString("bufferParameter, constantLoad"));
-    emit constantsChanged();
+    if (!noGuiUpdate)
+        emit constantsChanged();
 }
 
 void PhyxCalculator::removeConstantRule(QString name)
 {
     earleyParser->removeRule(QString("constant=%1").arg(name));
-    emit constantsChanged();
+    if (!noGuiUpdate)
+        emit constantsChanged();
 }
 
 void PhyxCalculator::addPrefixRule(QString symbol)
 {
     addRule(QString("prefix=%1").arg(symbol), QString("bufferParameter, bufferPrefix"));
-    emit prefixesChanged();
+    if (!noGuiUpdate)
+        emit prefixesChanged();
 }
 
 void PhyxCalculator::removePrefixRule(QString symbol)
 {
     earleyParser->removeRule(QString("prefix=%1").arg(symbol));
-    emit prefixesChanged();
+    if (!noGuiUpdate)
+        emit prefixesChanged();
 }
 
 void PhyxCalculator::addUnitGroupRule(QString name)
@@ -592,7 +602,8 @@ void PhyxCalculator::addFunctionRule(QString name, int parameterCount)
         ruleString.append(")");
     }
     addRule(ruleString, QString("bufferParameter, functionRun"));
-    emit functionsChanged();
+    if (!noGuiUpdate)
+        emit functionsChanged();
 }
 
 void PhyxCalculator::removeFunctionRule(QString name, int parameterCount)
@@ -615,7 +626,8 @@ void PhyxCalculator::removeFunctionRule(QString name, int parameterCount)
         ruleString.append(")");
     }
     earleyParser->removeRule(ruleString);
-    emit functionsChanged();
+    if (!noGuiUpdate)
+        emit functionsChanged();
 }
 
 void PhyxCalculator::clearStack()
@@ -696,7 +708,7 @@ bool PhyxCalculator::evaluate()
     }
 }
 
-bool PhyxCalculator::evaluate(QList<EarleyTreeItem> earleyTree, QString expression, QList<int> whiteSpaceList)
+bool PhyxCalculator::evaluate(QList<EarleyTreeItem> earleyTree, const QString expression, const QList<int> whiteSpaceList)
 {
     stackLevel++;
 #ifdef QT_DEBUG
@@ -730,8 +742,8 @@ bool PhyxCalculator::evaluate(QList<EarleyTreeItem> earleyTree, QString expressi
                 {
 #ifdef QT_DEBUG
                     qDebug() << function;
-#endif
                     if (functionMap.value(function, NULL) != NULL)
+#endif
                         (this->*functionMap.value(function))();
 #ifdef QT_DEBUG
                     else
@@ -740,6 +752,52 @@ bool PhyxCalculator::evaluate(QList<EarleyTreeItem> earleyTree, QString expressi
                 }
             }
         //}
+    }
+    stackLevel--;
+#ifdef QT_DEBUG
+    qDebug() << "returned to stack level:" << stackLevel;
+#endif
+    return true;
+}
+
+bool PhyxCalculator::evaluate(PhyxCalculator::ExpressionCacheItem cacheItem, const QList<int> whiteSpaceList)
+{
+    stackLevel++;
+#ifdef QT_DEBUG
+        qDebug() << "evaluating expression:" << cacheItem.expression;
+        qDebug() << "stack level:" << stackLevel;
+#endif
+    for (int i = 0; i < cacheItem.size(); i++)
+    {
+        m_errorStartPosition = restoreErrorPosition(cacheItem.startPosList.at(i), whiteSpaceList);     //just in case
+        m_errorEndPosition   = restoreErrorPosition(cacheItem.endPosList.at(i), whiteSpaceList)+1;
+
+        if (this->hasError())
+        {
+            stackLevel--;
+#ifdef QT_DEBUG
+            qDebug() << "returned to stack level:" << stackLevel;
+#endif
+            return false;
+        }
+
+        QString function = cacheItem.function(i);
+
+        if (function == "bufferParameter")
+            parameterBuffer = cacheItem.parameter(i);
+        else
+        {
+#ifdef QT_DEBUG
+            qDebug() << function;
+
+        if (functionMap.value(function, NULL) != NULL)
+#endif
+            (this->*functionMap.value(function))();
+#ifdef QT_DEBUG
+        else
+             qFatal("Function %s not found!", function.toAscii().constData());
+#endif
+        }
     }
     stackLevel--;
 #ifdef QT_DEBUG
@@ -795,6 +853,11 @@ PhyxVariableManager::PhyxFunction *PhyxCalculator::function(QString name) const
     return variableManager->getFunction(name);
 }
 
+PhyxVariableManager::PhyxDataset *PhyxCalculator::dataset(int index) const
+{
+    return variableManager->getDataset(index);
+}
+
 void PhyxCalculator::clearVariables()
 {
     variableManager->clearVariables();
@@ -833,6 +896,11 @@ QStringList PhyxCalculator::functions() const
     }
 
     return functionList;
+}
+
+PhyxVariableManager::PhyxDatasetList *PhyxCalculator::datasets() const
+{
+    return variableManager->datasets();
 }
 
 QString PhyxCalculator::complexToString(const PhyxValueDataType number,
@@ -1270,6 +1338,21 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
     return result;
 }
 
+const PhyxCalculator::ExpressionCacheItem PhyxCalculator::earleyTreeToCacheItem(const QList<EarleyTreeItem> earleyTree, QString const expression)
+{
+    ExpressionCacheItem cacheItem;
+    for (int i = (earleyTree.size()-1); i >= 0; i--)
+    {
+        for (int ii = 0; ii < earleyTree.at(i).rule->functions.size(); ii++)
+        {
+            cacheItem.appendItem(earleyTree.at(i).rule->functions.at(ii), earleyTree.at(i).startPos, earleyTree.at(i).endPos);
+        }
+    }
+    cacheItem.expression = expression;
+
+    return cacheItem;
+}
+
 void PhyxCalculator::popVariables(int count)
 {
     if (variableStack.size() < count)
@@ -1290,6 +1373,7 @@ void PhyxCalculator::pushVariables(int count, int deleteCount)
     for (int i = count; i < (count + deleteCount); i++)
     {
         variableList[i]->deleteLater();
+        variableList[i] = NULL;
     }
 }
 
@@ -2439,8 +2523,6 @@ void PhyxCalculator::unitAdd()
     }
     else
     {
-        variableList[0] = NULL;
-        variableList[1] = NULL;
         if (variableStack.size() == 2)
         {
             popVariables(2);
@@ -2687,6 +2769,9 @@ bool PhyxCalculator::executeFunction(QString expression, QStringList parameters,
     QList<PhyxVariable*> oldVariables;
     bool success;
 
+    //prevent gui from updating while function is running
+    noGuiUpdate = true;
+
     //psuh function parameters to stack
     for (int i = 0; i < parameters.size(); i++)
     {
@@ -2704,22 +2789,28 @@ bool PhyxCalculator::executeFunction(QString expression, QStringList parameters,
     //execute function
     QList<int> whiteSpaceList;
     m_expression = removeWhitespace(expression, &whiteSpaceList);
-    success = /*this->setExpression(expression);*/ earleyParser->parseWord(expression);
-    if (success)
+
+    if (expressionCacheMap.contains(m_expression))
     {
         if (!verifyOnly)
-        {
-            /*if (expressionCacheMap.contains(m_expression))
-                success = this->evaluate(expressionCacheMap.value(m_expression), m_expression, whiteSpaceList);
-            else
-            {*/
-                QList<EarleyTreeItem> earleyTree = earleyParser->getTree();                     //get a earley tree for the function
-            //    expressionCacheMap.insert(m_expression, earleyTree);
-                success = this->evaluate(earleyTree, m_expression, whiteSpaceList);
-            //}
-        }
+            success = this->evaluate(expressionCacheMap.value(m_expression), whiteSpaceList);
+        else
+            success = true;
     }
     else
+    {
+        success = /*this->setExpression(expression);*/ earleyParser->parseWord(expression);
+        if (success)
+        {
+            if (!verifyOnly)
+            {
+                QList<EarleyTreeItem> earleyTree = earleyParser->getTree();                     //get a earley tree for the function
+                expressionCacheMap.insert(m_expression, earleyTreeToCacheItem(earleyTree, m_expression));
+                success = this->evaluate(earleyTree, m_expression, whiteSpaceList);
+            }
+        }
+    }
+    if (!success)
         raiseException(SyntaxError);
 
     //clear temporary variables
@@ -2732,6 +2823,9 @@ bool PhyxCalculator::executeFunction(QString expression, QStringList parameters,
     //rename temporary renamed variables back
     for (int i = 0; i < newVariables.count(); i++)
         variableManager->addVariable(newVariables.at(i), oldVariables[i]);
+
+    //gui should update again
+    noGuiUpdate = false;
 
     return success;
 }
@@ -2935,7 +3029,8 @@ void PhyxCalculator::outputVariable()
                 m_resultUnit = variableList[0]->unit()->symbol();
                 m_result = variableList[0];
 
-                emit outputResult();
+                if (!noGuiUpdate)
+                    emit outputResult();
             }
             else
             {
@@ -3019,7 +3114,8 @@ void PhyxCalculator::outputVariable()
 
 void PhyxCalculator::outputString()
 {
-    emit outputText(stringBuffer);
+    if (!noGuiUpdate)
+        emit outputText(stringBuffer);
 }
 
 void PhyxCalculator::outputConvertedUnit()
@@ -3030,7 +3126,8 @@ void PhyxCalculator::outputConvertedUnit()
     m_resultUnit = "";
     m_result = variableList[0];
 
-    emit outputConverted(parameterBuffer);
+    if (!noGuiUpdate)
+        emit outputConverted(parameterBuffer);
     parameterBuffer.clear();
 }
 
@@ -3321,6 +3418,7 @@ void PhyxCalculator::tableCreate()
 {
     popVariables(3);
 
+    PhyxVariable *startVariable = variableList[0];
     PhyxFloatDataType start = variableList[0]->value().real();
     PhyxFloatDataType end = variableList[1]->value().real();
     PhyxFloatDataType step = variableList[2]->value().real();
@@ -3329,29 +3427,67 @@ void PhyxCalculator::tableCreate()
     PhyxVariable *tmpVariable;
     PhyxCompoundUnit *unit;
 
+    PhyxVariableManager::PhyxDataset *dataset;
+    QList<PhyxValueDataType> xData;
+    QList<PhyxValueDataType> yData;
+    PhyxCompoundUnit *xUnit;
+    PhyxCompoundUnit *yUnit;
+
     QStringList parameters;
     parameters.append(stringBuffer);
 
+    dataset = new PhyxVariableManager::PhyxDataset; //create dataset
+    dataset->name = expression;
+    xUnit = new PhyxCompoundUnit();
+    yUnit = new PhyxCompoundUnit();
+    PhyxCompoundUnit::copyCompoundUnit(startVariable->unit(), xUnit); //set x unit
+
+    //initialize first run
     tmpVariable = new PhyxVariable();
     unit = new PhyxCompoundUnit();
-    PhyxCompoundUnit::copyCompoundUnit(variableList[0]->unit(), unit);
+    PhyxCompoundUnit::copyCompoundUnit(startVariable->unit(), unit);
     tmpVariable->setUnit(unit);
     tmpVariable->setValue(PhyxValueDataType(value,PHYX_FLOAT_NULL));
     variableStack.push(tmpVariable);
-    if (executeFunction(expression, parameters, true))
+    //execute first run
+    if (executeFunction(expression, parameters, false))
     {
+        tmpVariable = variableStack.pop();
+        PhyxCompoundUnit::copyCompoundUnit(tmpVariable->unit(), yUnit); //set y unit
+        tmpVariable->deleteLater();
+
         while (value <= end)
         {
+            //initialize
             tmpVariable = new PhyxVariable();
             unit = new PhyxCompoundUnit();
-            PhyxCompoundUnit::copyCompoundUnit(variableList[0]->unit(), unit);
+            PhyxCompoundUnit::copyCompoundUnit(startVariable->unit(), unit);
             tmpVariable->setUnit(unit);
             tmpVariable->setValue(PhyxValueDataType(value,PHYX_FLOAT_NULL));
             variableStack.push(tmpVariable);
+            //execute
             executeFunction(expression, parameters,false);
-            outputVariable();
+            tmpVariable = variableStack.pop();
+            //save data
+            xData.append(PhyxValueDataType(value, PHYX_FLOAT_NULL));
+            yData.append(tmpVariable->value());
+            tmpVariable->deleteLater();
+            //outputVariable();
+            //increase
             value += step;
         }
+
+        dataset->unit.append(xUnit);
+        dataset->unit.append(yUnit);
+        dataset->data.append(xData);
+        dataset->data.append(yData);
+
+        variableManager->addDataset(dataset);
+        emit datasetsChanged();
+    }
+    else
+    {
+        //raise some error
     }
 
     pushVariables(0,3);

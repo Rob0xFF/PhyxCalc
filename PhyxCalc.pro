@@ -27,7 +27,7 @@ symbian:TARGET.CAPABILITY += NetworkServices
 # CONFIG += mobility
 # MOBILITY +=
 
-QT       += core gui
+QT       += core gui qwt
 
 TARGET = phyxcalc
 TEMPLATE = app
@@ -51,7 +51,8 @@ SOURCES += main.cpp\
     phyxtesting.cpp \
     phyxvariablemanager.cpp \
     phyxsyntaxhighlighter.cpp \
-    helpdialog.cpp
+    helpdialog.cpp \
+    plotwindow.cpp
 
 HEADERS  += mainwindow.h \
             lineparser.h \
@@ -69,12 +70,14 @@ HEADERS  += mainwindow.h \
     phyxtesting.h \
     phyxvariablemanager.h \
     phyxsyntaxhighlighter.h \
-    helpdialog.h
+    helpdialog.h \
+    plotwindow.h
 
 FORMS    += mainwindow.ui \
     exportdialog.ui \
     settingsdialog.ui \
-    helpdialog.ui
+    helpdialog.ui \
+    plotwindow.ui
 
 RESOURCES += \
     images.qrc \
@@ -90,6 +93,9 @@ OTHER_FILES += \
     settings/numbersDock.txt \
     settings/operatorsDock.txt \
     doc/doc_en.txt
+
+LIBS += -lqwt
+INCLUDEPATH += /usr/include/qwt5
 
 # Please do not modify the following two lines. Required for deployment.
 include(deployment.pri)
@@ -129,3 +135,6 @@ OTHER_FILES += \
     android/src/org/kde/necessitas/ministro/IMinistroCallback.aidl \
     android/AndroidManifest.xml \
     android/version.xml
+
+#QMAKE_CXXFLAGS_DEBUG += -pg
+#QMAKE_LFLAGS_DEBUG += -pg

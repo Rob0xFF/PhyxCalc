@@ -34,6 +34,7 @@
 #include "global.h"
 #include "phyxcalculator.h"
 #include "phyxsyntaxhighlighter.h"
+#include "plotwindow.h"
 
 class LineParser: public QObject
 {
@@ -44,6 +45,7 @@ class LineParser: public QObject
     Q_PROPERTY(QTableWidget *unitsTable READ unitsTable WRITE setUnitsTable)
     Q_PROPERTY(QTableWidget *prefixesTable READ prefixesTable WRITE setPrefixesTable)
     Q_PROPERTY(QListWidget  *functionsList READ functionsList WRITE setFunctionsList)
+    Q_PROPERTY(PlotWindow *plotWindow READ plotWindow WRITE setPlotWindow)
     Q_PROPERTY(AppSettings *appSettings READ appSettings WRITE setAppSettings)
     Q_PROPERTY(UnitLoader *unitLoader READ unitLoader WRITE setUnitLoader)
     Q_PROPERTY(PhyxCalculator *phyxCalculator READ phyxCalculator)
@@ -119,6 +121,11 @@ public:
         return m_prefixesTable;
     }
 
+    PlotWindow * plotWindow() const
+    {
+        return m_plotWindow;
+    }
+
 private:
     QTextEdit       *m_calculationEdit;
     QTableWidget    *m_variableTable;
@@ -149,6 +156,8 @@ private:
 
     QTableWidget * m_prefixesTable;
 
+    PlotWindow * m_plotWindow;
+
 signals:
     void listWidgetUpdate(QListWidget*, QStringList);
 
@@ -158,6 +167,7 @@ public slots:
     void updateUnits();
     void updatePrefixes();
     void updateFunctions();
+    void updateDatasets();
     void clearAllVariables();
     void outputResult();
     void outputError();
@@ -202,6 +212,10 @@ public slots:
     void setPrefixesTable(QTableWidget * arg)
     {
         m_prefixesTable = arg;
+    }
+    void setPlotWindow(PlotWindow * arg)
+    {
+        m_plotWindow = arg;
     }
 };
 
