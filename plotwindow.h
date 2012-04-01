@@ -2,6 +2,7 @@
 #define PLOTWINDOW_H
 
 #include <QMainWindow>
+#include <QFileDialog>
 #include <qwt_plot.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_curve.h>
@@ -38,13 +39,20 @@ public slots:
     }
 
 private slots:
+    void updateSettings();
+
     void on_datasetList_itemSelectionChanged();
+
+    void on_saveButton_clicked();
 
 private:
     Ui::PlotWindow *ui;
     PhyxVariableManager::PhyxDatasetList * m_datasets;
 
     QList<QwtPlotCurve*> plotCurves;
+    QwtPlotGrid *plotGrid;
+    QwtPlotZoomer *plotZoomer;
+    QwtLegend *legend;
 
     void updateDatasetList();
     void plotDataset(int index);

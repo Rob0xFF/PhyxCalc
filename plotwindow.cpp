@@ -8,11 +8,28 @@ PlotWindow::PlotWindow(QWidget *parent) :
     ui->setupUi(this);
     m_datasets = NULL;
 
-    QwtPlotGrid *grid = new QwtPlotGrid();
-    grid->setPen(QPen(Qt::lightGray));
-    grid->attach(ui->qwtPlot);
+    plotGrid = new QwtPlotGrid();
+    plotGrid->setPen(QPen(Qt::lightGray));
+    plotGrid->attach(ui->qwtPlot);
 
-    QwtPlotZoomer *zoom = new QwtPlotZoomer(ui->qwtPlot->canvas());
+    plotZoomer = new QwtPlotZoomer(ui->qwtPlot->canvas());
+
+    connect(ui->settingsLegendCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsTitleCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsXTitleCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYTitleCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsGridCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsLineThicknessSpin, SIGNAL(valueChanged(int)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsTitleEdit, SIGNAL(textChanged(QString)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsLegendPositionCombo, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(updateSettings()));
 }
 
 PlotWindow::~PlotWindow()
@@ -31,6 +48,46 @@ void PlotWindow::updateDatasetList()
             ui->datasetList->addItem(m_datasets->at(i)->name);
         }
     }
+}
+
+void PlotWindow::updateSettings()
+{
+    if (ui->settingsTitleCheck->isChecked())
+        ui->qwtPlot->setTitle(ui->settingsTitleEdit->text());
+    else
+        ui->qwtPlot->setTitle("");
+
+    plotGrid->setVisible(ui->settingsGridCheck->isChecked());
+
+    if (ui->settingsLegendCheck->isChecked())
+    {
+        ui->qwtPlot->insertLegend(NULL);
+        legend = new QwtLegend();
+
+        switch (ui->settingsLegendPositionCombo->currentIndex())
+        {
+        case 0: ui->qwtPlot->insertLegend(legend,QwtPlot::LeftLegend);
+                break;
+        case 1: ui->qwtPlot->insertLegend(legend,QwtPlot::RightLegend);
+                break;
+        case 2: ui->qwtPlot->insertLegend(legend,QwtPlot::BottomLegend);
+                break;
+        case 3: ui->qwtPlot->insertLegend(legend,QwtPlot::TopLegend);
+                break;
+        }
+    }
+    else
+        ui->qwtPlot->insertLegend(NULL);
+
+    //update line settings
+    for (int i = 0; i < plotCurves.size(); i++)
+    {
+        QPen pen = plotCurves.at(i)->pen();
+        pen.setWidth(ui->settingsLineThicknessSpin->value());
+        plotCurves.at(i)->setPen(pen);
+    }
+
+    ui->qwtPlot->replot();
 }
 
 void PlotWindow::plotDataset(int index)
@@ -87,5 +144,21 @@ void PlotWindow::on_datasetList_itemSelectionChanged()
         plotDataset(indexList.at(i));
     }
 
-    ui->qwtPlot->replot();
+    updateSettings();
+}
+
+void PlotWindow::on_saveButton_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Plot"), QDir::homePath() + "/" + ui->settingsTitleEdit->text(), tr("PNG images (*.png)"));
+
+    if (!fileName.isEmpty())
+    {
+        int width = ui->qwtPlot->width();
+        int height = ui->qwtPlot->height();
+        QPixmap pixmap(width, height);
+        pixmap.fill(Qt::transparent);
+
+        ui->qwtPlot->print(pixmap);
+        pixmap.save(fileName);
+    }
 }
