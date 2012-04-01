@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QFileDialog>
+#include <QListWidgetItem>
 #include <qwt_plot.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_curve.h>
@@ -12,6 +13,7 @@
 #include <qwt_data.h>
 #include "phyxvariablemanager.h"
 #include "global.h"
+#include <QDebug>
 
 namespace Ui {
 class PlotWindow;
@@ -44,6 +46,8 @@ private slots:
     void on_datasetList_itemSelectionChanged();
 
     void on_saveButton_clicked();
+
+    void on_datasetList_itemChanged(QListWidgetItem *item);
 
 private:
     Ui::PlotWindow *ui;

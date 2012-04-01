@@ -30,6 +30,10 @@ PlotWindow::PlotWindow(QWidget *parent) :
             this, SLOT(updateSettings()));
     connect(ui->settingsLegendPositionCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(updateSettings()));
+    connect(ui->settingsXTitleEdit, SIGNAL(textChanged(QString)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYTitleEdit, SIGNAL(textChanged(QString)),
+            this, SLOT(updateSettings()));
 }
 
 PlotWindow::~PlotWindow()
@@ -45,7 +49,9 @@ void PlotWindow::updateDatasetList()
     {
         for (int i = 0; i < m_datasets->size(); i++)
         {
-            ui->datasetList->addItem(m_datasets->at(i)->name);
+            QListWidgetItem *item = new QListWidgetItem(m_datasets->at(i)->name);
+            item->setFlags(item->flags() | Qt::ItemIsEditable);
+            ui->datasetList->addItem(item);
         }
     }
 }
@@ -78,6 +84,16 @@ void PlotWindow::updateSettings()
     }
     else
         ui->qwtPlot->insertLegend(NULL);
+
+    if (ui->settingsXTitleCheck->isChecked())
+        ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, ui->settingsXTitleEdit->text());
+    else
+        ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, "");
+
+    if (ui->settingsYTitleCheck->isChecked())
+        ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, ui->settingsYTitleEdit->text());
+    else
+        ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, "");
 
     //update line settings
     for (int i = 0; i < plotCurves.size(); i++)
@@ -161,4 +177,10 @@ void PlotWindow::on_saveButton_clicked()
         ui->qwtPlot->print(pixmap);
         pixmap.save(fileName);
     }
+}
+
+void PlotWindow::on_datasetList_itemChanged(QListWidgetItem *item)
+{
+    int index = item->listWidget()->row(item);
+    m_datasets->at(index)->name = item->text();
 }
