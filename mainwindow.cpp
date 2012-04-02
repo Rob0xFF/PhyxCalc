@@ -553,6 +553,7 @@ void MainWindow::initializeGUI()
     ui->actionUndo->setIcon(QIcon::fromTheme("edit-undo",QIcon(":/icons/edit-undo")));
     //ui->actionVariables
     //ui->action_Slim_Mode
+    ui->action_Plot_Window->setIcon(QIcon(":/icons/plot-icon"));
     configureButton->setIcon(QIcon(":/appicon/icon"));//QIcon::fromTheme("configure",QIcon(":/icons/configure")));
 
     //initialize Main Toolbar
@@ -567,6 +568,7 @@ void MainWindow::initializeGUI()
     //ui->mainToolBar->addAction(ui->actionUndo);
     //ui->mainToolBar->addAction(ui->actionRedo);
     //ui->mainToolBar->addSeparator();
+    ui->mainToolBar->addAction(ui->action_Plot_Window);
     ui->mainToolBar->addAction(ui->actionRecalculate_All);
     ui->mainToolBar->addAction(ui->actionRecalculate_from_Line);
     ui->mainToolBar->addAction(ui->actionClear_Variables);
