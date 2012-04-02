@@ -4,6 +4,9 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QListWidgetItem>
+#include <QPrinter>
+#include <QPrintDialog>
+#include <QColorDialog>
 #include <qwt_plot.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_curve.h>
@@ -11,9 +14,13 @@
 #include <qwt_plot_zoomer.h>
 #include <qwt_legend.h>
 #include <qwt_data.h>
+#include <qwt_scale_widget.h>
 #include "phyxvariablemanager.h"
 #include "global.h"
 #include <QDebug>
+#ifdef QT_SVG_LIB
+#include <QSvgGenerator>
+#endif
 
 namespace Ui {
 class PlotWindow;
@@ -43,11 +50,28 @@ public slots:
 private slots:
     void updateSettings();
 
+    void saveImage();
+    void saveVector();
+    void printPlot();
+
     void on_datasetList_itemSelectionChanged();
-
-    void on_saveButton_clicked();
-
     void on_datasetList_itemChanged(QListWidgetItem *item);
+
+    void on_colorBackgroundButton_clicked();
+
+    void on_colorBackgroundDeleteButton_clicked();
+
+    void on_colorGridButton_clicked();
+
+    void on_colorGridDeleteButton_clicked();
+
+    void on_colorAxisTicksButton_clicked();
+
+    void on_colorAxisTicksDeleteButton_clicked();
+
+    void on_colorAxisFontButton_clicked();
+
+    void on_colorAxisFontDeleteButton_clicked();
 
 private:
     Ui::PlotWindow *ui;
@@ -61,6 +85,8 @@ private:
     void updateDatasetList();
     void plotDataset(int index);
     void deletePlots();
+
+    void setButtonColor(QPushButton *button, QColor color);
 };
 
 #endif // PLOTWINDOW_H

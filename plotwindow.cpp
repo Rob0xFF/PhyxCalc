@@ -14,6 +14,18 @@ PlotWindow::PlotWindow(QWidget *parent) :
 
     plotZoomer = new QwtPlotZoomer(ui->qwtPlot->canvas());
 
+    setButtonColor(ui->colorBackgroundButton,Qt::white);
+    setButtonColor(ui->colorAxisTicksButton,Qt::black);
+    setButtonColor(ui->colorAxisFontButton,Qt::black);
+    setButtonColor(ui->colorGridButton,Qt::lightGray);
+
+    connect(ui->saveButton, SIGNAL(clicked()),
+            this, SLOT(saveImage()));
+    connect(ui->saveButton_2, SIGNAL(clicked()),
+            this, SLOT(saveVector()));
+    connect(ui->printButton, SIGNAL(clicked()),
+            this, SLOT(printPlot()));
+
     connect(ui->settingsLegendCheck, SIGNAL(clicked()),
             this, SLOT(updateSettings()));
     connect(ui->settingsTitleCheck, SIGNAL(clicked()),
@@ -103,7 +115,79 @@ void PlotWindow::updateSettings()
         plotCurves.at(i)->setPen(pen);
     }
 
+    ui->qwtPlot->setCanvasBackground(QColor(ui->colorBackgroundButton->toolTip()));
+    plotGrid->setPen(QPen(QColor(ui->colorGridButton->toolTip())));
+
+    QPalette palette = ui->qwtPlot->axisWidget(QwtPlot::yLeft)->palette();
+    palette.setColor(QPalette::WindowText, QColor(ui->colorAxisTicksButton->toolTip()));
+    palette.setColor(QPalette::Text, QColor(ui->colorAxisFontButton->toolTip()));
+    ui->qwtPlot->axisWidget(QwtPlot::yLeft)->setPalette(palette);
+    palette = ui->qwtPlot->axisWidget(QwtPlot::xBottom)->palette();
+    palette.setColor(QPalette::WindowText, QColor(ui->colorAxisTicksButton->toolTip()));
+    palette.setColor(QPalette::Text, QColor(ui->colorAxisFontButton->toolTip()));
+    ui->qwtPlot->axisWidget(QwtPlot::xBottom)->setPalette(palette);
+
     ui->qwtPlot->replot();
+}
+
+void PlotWindow::saveImage()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Plot"), QDir::homePath() + "/" + ui->qwtPlot->title().text(), tr("PNG Images (*.png)"));
+
+    if (!fileName.isEmpty())
+    {
+        int width = ui->qwtPlot->width();
+        int height = ui->qwtPlot->height();
+        QPixmap pixmap(width, height);
+        pixmap.fill(Qt::transparent);
+
+        ui->qwtPlot->print(pixmap);
+        pixmap.save(fileName);
+    }
+}
+
+void PlotWindow::saveVector()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Plot"), QDir::homePath() + "/" + ui->qwtPlot->title().text(), tr("SVG Documents (*.svg)"));
+#ifdef QT_SVG_LIB
+    if ( !fileName.isEmpty() )
+    {
+        QSvgGenerator generator;
+        generator.setFileName(fileName);
+        generator.setSize(QSize(ui->qwtPlot->width(), ui->qwtPlot->height()));
+
+        ui->qwtPlot->print(generator);
+    }
+#endif
+}
+
+void PlotWindow::printPlot()
+{
+    QPrinter printer;
+
+    QString docName = ui->qwtPlot->title().text();
+    if (!docName.isEmpty())
+    {
+        docName.replace (QRegExp(QString::fromLatin1("\n")), tr(" -- "));
+        printer.setDocName (docName);
+    }
+
+    printer.setCreator("PhyxCalc");
+    printer.setOrientation(QPrinter::Landscape);
+
+    QPrintDialog dialog(&printer);
+    if (dialog.exec())
+    {
+        QwtPlotPrintFilter filter;
+        if ( printer.colorMode() == QPrinter::GrayScale )
+        {
+            int options = QwtPlotPrintFilter::PrintAll;
+            options &= ~QwtPlotPrintFilter::PrintBackground;
+            options |= QwtPlotPrintFilter::PrintFrameWithScales;
+            filter.setOptions(options);
+        }
+        ui->qwtPlot->print(printer, filter);
+    }
 }
 
 void PlotWindow::plotDataset(int index)
@@ -142,6 +226,16 @@ void PlotWindow::deletePlots()
     }
 }
 
+void PlotWindow::setButtonColor(QPushButton *button, QColor color)
+{
+    button->setStyleSheet(QString("border-color: rgb(0, 0, 0);\nborder: 2px solid;\nbackground-color: rgba(%1,%2,%3,%4)")
+                                                       .arg(color.red())
+                                                       .arg(color.green())
+                                                       .arg(color.blue())
+                                                       .arg(color.alpha()));
+    button->setToolTip(color.name());
+}
+
 void PlotWindow::on_datasetList_itemSelectionChanged()
 {
     //get selected indexes
@@ -163,24 +257,76 @@ void PlotWindow::on_datasetList_itemSelectionChanged()
     updateSettings();
 }
 
-void PlotWindow::on_saveButton_clicked()
-{
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Plot"), QDir::homePath() + "/" + ui->settingsTitleEdit->text(), tr("PNG images (*.png)"));
-
-    if (!fileName.isEmpty())
-    {
-        int width = ui->qwtPlot->width();
-        int height = ui->qwtPlot->height();
-        QPixmap pixmap(width, height);
-        pixmap.fill(Qt::transparent);
-
-        ui->qwtPlot->print(pixmap);
-        pixmap.save(fileName);
-    }
-}
-
 void PlotWindow::on_datasetList_itemChanged(QListWidgetItem *item)
 {
     int index = item->listWidget()->row(item);
     m_datasets->at(index)->name = item->text();
+}
+
+void PlotWindow::on_colorBackgroundButton_clicked()
+{
+    QColor color = QColorDialog::getColor(QColor(ui->colorBackgroundButton->toolTip()),
+                                          this,
+                                          tr("Select Foreground Color"));
+    if (color.isValid())
+        setButtonColor(ui->colorBackgroundButton, color);
+
+    updateSettings();
+}
+
+void PlotWindow::on_colorBackgroundDeleteButton_clicked()
+{
+    setButtonColor(ui->colorBackgroundButton, QColor(255,255,255));
+    updateSettings();
+}
+
+void PlotWindow::on_colorGridButton_clicked()
+{
+    QColor color = QColorDialog::getColor(QColor(ui->colorGridButton->toolTip()),
+                                          this,
+                                          tr("Select Foreground Color"));
+    if (color.isValid())
+        setButtonColor(ui->colorGridButton, color);
+
+    updateSettings();
+}
+
+void PlotWindow::on_colorGridDeleteButton_clicked()
+{
+    setButtonColor(ui->colorGridButton, Qt::lightGray);
+    updateSettings();
+}
+
+void PlotWindow::on_colorAxisTicksButton_clicked()
+{
+    QColor color = QColorDialog::getColor(QColor(ui->colorAxisTicksButton->toolTip()),
+                                          this,
+                                          tr("Select Foreground Color"));
+    if (color.isValid())
+        setButtonColor(ui->colorAxisTicksButton, color);
+
+    updateSettings();
+}
+
+void PlotWindow::on_colorAxisTicksDeleteButton_clicked()
+{
+    setButtonColor(ui->colorAxisTicksButton, QColor(0,0,0));
+    updateSettings();
+}
+
+void PlotWindow::on_colorAxisFontButton_clicked()
+{
+    QColor color = QColorDialog::getColor(QColor(ui->colorAxisFontButton->toolTip()),
+                                          this,
+                                          tr("Select Foreground Color"));
+    if (color.isValid())
+        setButtonColor(ui->colorAxisFontButton, color);
+
+    updateSettings();
+}
+
+void PlotWindow::on_colorAxisFontDeleteButton_clicked()
+{
+    setButtonColor(ui->colorAxisFontButton, QColor(0,0,0));
+    updateSettings();
 }
