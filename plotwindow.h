@@ -15,6 +15,7 @@
 #include <qwt_legend.h>
 #include <qwt_data.h>
 #include <qwt_scale_widget.h>
+#include <qwt_scale_div.h>
 #include "phyxvariablemanager.h"
 #include "global.h"
 #include <QDebug>
@@ -72,6 +73,10 @@ private slots:
     void on_colorAxisFontButton_clicked();
 
     void on_colorAxisFontDeleteButton_clicked();
+
+    void on_colorGridMinButton_clicked();
+
+    void on_colorGridMinDeleteButton_clicked();
 
 private:
     Ui::PlotWindow *ui;

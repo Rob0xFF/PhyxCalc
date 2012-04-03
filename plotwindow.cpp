@@ -17,7 +17,8 @@ PlotWindow::PlotWindow(QWidget *parent) :
     setButtonColor(ui->colorBackgroundButton,Qt::white);
     setButtonColor(ui->colorAxisTicksButton,Qt::black);
     setButtonColor(ui->colorAxisFontButton,Qt::black);
-    setButtonColor(ui->colorGridButton,Qt::lightGray);
+    setButtonColor(ui->colorGridButton,QColor("#c3c3c3"));
+    setButtonColor(ui->colorGridMinButton, QColor("#dcdcdc"));
 
     connect(ui->saveButton, SIGNAL(clicked()),
             this, SLOT(saveImage()));
@@ -36,6 +37,14 @@ PlotWindow::PlotWindow(QWidget *parent) :
             this, SLOT(updateSettings()));
     connect(ui->settingsGridCheck, SIGNAL(clicked()),
             this, SLOT(updateSettings()));
+    connect(ui->settingsGridXCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsGridYCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsGridXMinCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsGridYMinCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
     connect(ui->settingsLineThicknessSpin, SIGNAL(valueChanged(int)),
             this, SLOT(updateSettings()));
     connect(ui->settingsTitleEdit, SIGNAL(textChanged(QString)),
@@ -45,6 +54,22 @@ PlotWindow::PlotWindow(QWidget *parent) :
     connect(ui->settingsXTitleEdit, SIGNAL(textChanged(QString)),
             this, SLOT(updateSettings()));
     connect(ui->settingsYTitleEdit, SIGNAL(textChanged(QString)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsXAutoscaleCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYAutoscaleCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsXScaleMinSpin, SIGNAL(valueChanged(double)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsXScaleMaxSpin, SIGNAL(valueChanged(double)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsXScaleStepSpin, SIGNAL(valueChanged(double)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYScaleMinSpin, SIGNAL(valueChanged(double)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYScaleMaxSpin, SIGNAL(valueChanged(double)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYScaleStepSpin, SIGNAL(valueChanged(double)),
             this, SLOT(updateSettings()));
 }
 
@@ -75,7 +100,12 @@ void PlotWindow::updateSettings()
     else
         ui->qwtPlot->setTitle("");
 
+
     plotGrid->setVisible(ui->settingsGridCheck->isChecked());
+    plotGrid->enableX(ui->settingsGridXCheck->isChecked());
+    plotGrid->enableXMin(ui->settingsGridXMinCheck->isChecked());
+    plotGrid->enableY(ui->settingsGridYCheck->isChecked());
+    plotGrid->enableYMin(ui->settingsGridYMinCheck->isChecked());
 
     if (ui->settingsLegendCheck->isChecked())
     {
@@ -107,6 +137,34 @@ void PlotWindow::updateSettings()
     else
         ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, "");
 
+    if (ui->settingsXAutoscaleCheck->isChecked())
+    {
+        ui->qwtPlot->setAxisAutoScale(QwtPlot::xBottom);
+        ui->qwtPlot->updateAxes();
+        ui->settingsXScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xBottom)->lowerBound());
+        ui->settingsXScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xBottom)->upperBound());
+        ui->settingsXScaleStepSpin->setValue(ui->qwtPlot->axisStepSize(QwtPlot::xBottom));
+    }
+    else
+        ui->qwtPlot->setAxisScale(QwtPlot::xBottom,
+                                  ui->settingsXScaleMinSpin->value(),
+                                  ui->settingsXScaleMaxSpin->value(),
+                                  ui->settingsXScaleStepSpin->value());
+
+    if (ui->settingsYAutoscaleCheck->isChecked())
+    {
+        ui->qwtPlot->setAxisAutoScale(QwtPlot::yLeft);
+        ui->qwtPlot->updateAxes();
+        ui->settingsYScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yLeft)->lowerBound());
+        ui->settingsYScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yLeft)->upperBound());
+        ui->settingsYScaleStepSpin->setValue(ui->qwtPlot->axisStepSize(QwtPlot::yLeft));
+    }
+    else
+        ui->qwtPlot->setAxisScale(QwtPlot::yLeft,
+                                  ui->settingsYScaleMinSpin->value(),
+                                  ui->settingsYScaleMaxSpin->value(),
+                                  ui->settingsYScaleStepSpin->value());
+
     //update line settings
     for (int i = 0; i < plotCurves.size(); i++)
     {
@@ -116,7 +174,8 @@ void PlotWindow::updateSettings()
     }
 
     ui->qwtPlot->setCanvasBackground(QColor(ui->colorBackgroundButton->toolTip()));
-    plotGrid->setPen(QPen(QColor(ui->colorGridButton->toolTip())));
+    plotGrid->setMajPen(QPen(QColor(ui->colorGridButton->toolTip())));
+    plotGrid->setMinPen(QPen(QColor(ui->colorGridMinButton->toolTip())));
 
     QPalette palette = ui->qwtPlot->axisWidget(QwtPlot::yLeft)->palette();
     palette.setColor(QPalette::WindowText, QColor(ui->colorAxisTicksButton->toolTip()));
@@ -267,7 +326,7 @@ void PlotWindow::on_colorBackgroundButton_clicked()
 {
     QColor color = QColorDialog::getColor(QColor(ui->colorBackgroundButton->toolTip()),
                                           this,
-                                          tr("Select Foreground Color"));
+                                          tr("Select Background Color"));
     if (color.isValid())
         setButtonColor(ui->colorBackgroundButton, color);
 
@@ -284,7 +343,7 @@ void PlotWindow::on_colorGridButton_clicked()
 {
     QColor color = QColorDialog::getColor(QColor(ui->colorGridButton->toolTip()),
                                           this,
-                                          tr("Select Foreground Color"));
+                                          tr("Select Grid Color"));
     if (color.isValid())
         setButtonColor(ui->colorGridButton, color);
 
@@ -293,7 +352,24 @@ void PlotWindow::on_colorGridButton_clicked()
 
 void PlotWindow::on_colorGridDeleteButton_clicked()
 {
-    setButtonColor(ui->colorGridButton, Qt::lightGray);
+    setButtonColor(ui->colorGridButton, QColor("#c3c3c3"));
+    updateSettings();
+}
+
+void PlotWindow::on_colorGridMinButton_clicked()
+{
+    QColor color = QColorDialog::getColor(QColor(ui->colorGridMinButton->toolTip()),
+                                          this,
+                                          tr("Select Grid Color"));
+    if (color.isValid())
+        setButtonColor(ui->colorGridMinButton, color);
+
+    updateSettings();
+}
+
+void PlotWindow::on_colorGridMinDeleteButton_clicked()
+{
+    setButtonColor(ui->colorGridMinButton, QColor("#dcdcdc"));
     updateSettings();
 }
 
@@ -301,7 +377,7 @@ void PlotWindow::on_colorAxisTicksButton_clicked()
 {
     QColor color = QColorDialog::getColor(QColor(ui->colorAxisTicksButton->toolTip()),
                                           this,
-                                          tr("Select Foreground Color"));
+                                          tr("Select Axis Color"));
     if (color.isValid())
         setButtonColor(ui->colorAxisTicksButton, color);
 
@@ -318,7 +394,7 @@ void PlotWindow::on_colorAxisFontButton_clicked()
 {
     QColor color = QColorDialog::getColor(QColor(ui->colorAxisFontButton->toolTip()),
                                           this,
-                                          tr("Select Foreground Color"));
+                                          tr("Select Axis Font Color"));
     if (color.isValid())
         setButtonColor(ui->colorAxisFontButton, color);
 

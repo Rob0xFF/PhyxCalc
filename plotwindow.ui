@@ -15,7 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0" colspan="2">
+    <item row="0" column="0">
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -36,7 +36,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>429</width>
+          <width>386</width>
           <height>319</height>
          </rect>
         </property>
@@ -73,8 +73,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>412</width>
-          <height>274</height>
+          <width>369</width>
+          <height>591</height>
          </rect>
         </property>
         <attribute name="label">
@@ -90,6 +90,44 @@
             <bool>true</bool>
            </property>
           </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_19">
+           <item>
+            <widget class="QCheckBox" name="settingsGridXCheck">
+             <property name="text">
+              <string>X</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="settingsGridXMinCheck">
+             <property name="text">
+              <string>X Min</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="settingsGridYCheck">
+             <property name="text">
+              <string>Y</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="settingsGridYMinCheck">
+             <property name="text">
+              <string>Y Min</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <widget class="QCheckBox" name="settingsLegendCheck">
@@ -179,6 +217,88 @@
           </layout>
          </item>
          <item>
+          <widget class="QGroupBox" name="groupBox">
+           <property name="title">
+            <string>X-Axis Scale</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <item>
+             <widget class="QCheckBox" name="settingsXAutoscaleCheck">
+              <property name="text">
+               <string>Autoscale</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_14">
+              <item>
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>Min:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="settingsXScaleMinSpin">
+                <property name="maximum">
+                 <double>999999999.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_15">
+              <item>
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Max:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="settingsXScaleMaxSpin">
+                <property name="maximum">
+                 <double>999999999.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>10.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_13">
+              <item>
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>Step:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="settingsXScaleStepSpin">
+                <property name="maximum">
+                 <double>999999999.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>10.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
           <widget class="QCheckBox" name="settingsYTitleCheck">
            <property name="text">
             <string>Show Y-Axis Title</string>
@@ -198,6 +318,88 @@
             <widget class="QLineEdit" name="settingsYTitleEdit"/>
            </item>
           </layout>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_2">
+           <property name="title">
+            <string>Y-AxisScale</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <item>
+             <widget class="QCheckBox" name="settingsYAutoscaleCheck">
+              <property name="text">
+               <string>Autoscale</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_16">
+              <item>
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Min:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="settingsYScaleMinSpin">
+                <property name="maximum">
+                 <double>999999999.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_17">
+              <item>
+               <widget class="QLabel" name="label_10">
+                <property name="text">
+                 <string>Max:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="settingsYScaleMaxSpin">
+                <property name="maximum">
+                 <double>999999999.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>10.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_18">
+              <item>
+               <widget class="QLabel" name="label_11">
+                <property name="text">
+                 <string>Step:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="settingsYScaleStepSpin">
+                <property name="maximum">
+                 <double>999999999.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>10.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -236,6 +438,14 @@
         </layout>
        </widget>
        <widget class="QWidget" name="page_4">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>369</width>
+          <height>153</height>
+         </rect>
+        </property>
         <attribute name="label">
          <string>Colors</string>
         </attribute>
@@ -295,7 +505,7 @@ border: 2px solid</string>
            <item>
             <widget class="QLabel" name="label_14">
              <property name="text">
-              <string>Grid:</string>
+              <string>Grid Major:</string>
              </property>
             </widget>
            </item>
@@ -324,6 +534,56 @@ border: 2px solid</string>
            </item>
            <item>
             <widget class="QToolButton" name="colorGridDeleteButton">
+             <property name="minimumSize">
+              <size>
+               <width>22</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>Erase foreground</string>
+             </property>
+             <property name="text">
+              <string>&lt;</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_20">
+           <item>
+            <widget class="QLabel" name="label_17">
+             <property name="text">
+              <string>Grid Minor:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="colorGridMinButton">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>22</width>
+               <height>22</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">border-color: rgb(0, 0, 0);
+border: 2px solid</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="colorGridMinDeleteButton">
              <property name="minimumSize">
               <size>
                <width>22</width>
@@ -460,7 +720,7 @@ border: 2px solid</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>429</width>
+          <width>386</width>
           <height>319</height>
          </rect>
         </property>
