@@ -419,8 +419,11 @@ void PlotWindow::plotDataset(int index)
     plotCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     plotCurve->setPen(QPen(qRgb(qrand() % 256,qrand() % 256,qrand() % 256)));
 
-    //plotCurve->setData(x,y); qwt5
-    plotCurve->setSamples(x,y); //qwt6
+#if QWT_VERSION >= 0x060000
+    plotCurve->setSamples(x,y);
+#else
+    plotCurve->setData(x,y);
+#endif
     plotCurve->attach(ui->qwtPlot);
     plotCurves.append(plotCurve);
 }
