@@ -46,7 +46,7 @@ symbian {
     INCLUDEPATH += ../qwt5
 }
 
-linux-g++ {
+linux-g++ | linux-g++-64 | linux-g++-32{
     INCLUDEPATH += /usr/include/qwt5 \  #openSUSE
                 /usr/include/qwt \      #Fedora
                 /usr/include/qwt-qt4    #ubuntu
