@@ -22,7 +22,7 @@
 #include <qwt_scale_widget.h>
 #include <qwt_scale_div.h>
 #include <qwt_scale_engine.h>
-#if QWT_VERSION >= 6
+#if QWT_VERSION >= 0x060000
 #include <qwt_plot_renderer.h>
 #endif
 #ifdef QT_SVG_LIB
