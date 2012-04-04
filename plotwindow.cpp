@@ -270,7 +270,7 @@ void PlotWindow::copyToClipboard()
     QPalette p = ui->qwtPlot->palette();
     pixmap.fill(p.color(QPalette::Window));
 
-#if QWT_VERSION >= 6
+#if QWT_VERSION >= 0x060000
         QwtPlotRenderer renderer;
 
         // flags to make the document look like the widget
@@ -295,7 +295,7 @@ void PlotWindow::saveDocument()
 #ifndef QWT_NO_SVG
     filter += "SVG Documents (*.svg)";
 #endif
-#if QWT_VERSION >= 6
+#if QWT_VERSION >= 0x060000
     filter += "PDF Documents (*.pdf)";
     filter += "Postscript Documents (*.ps)";
 #endif
@@ -327,7 +327,7 @@ void PlotWindow::saveDocument()
 
     if ( !fileName.isEmpty() )
     {
-#if QWT_VERSION >= 6
+#if QWT_VERSION >= 0x060000
         QwtPlotRenderer renderer;
 
         // flags to make the document look like the widget
@@ -374,7 +374,7 @@ void PlotWindow::printPlot()
     QPrintDialog dialog(&printer);
     if (dialog.exec())
     {
-#if QWT_VERSION >= 6
+#if QWT_VERSION >= 0x060000
         QwtPlotRenderer renderer;
 
         if ( printer.colorMode() == QPrinter::GrayScale )

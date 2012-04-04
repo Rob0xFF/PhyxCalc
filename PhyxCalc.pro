@@ -27,7 +27,7 @@ symbian:TARGET.CAPABILITY += NetworkServices
 # CONFIG += mobility
 # MOBILITY +=
 
-QT       += core gui svg qwt
+QT       += core gui svg
 
 TARGET = phyxcalc
 TEMPLATE = app
