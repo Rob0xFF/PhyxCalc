@@ -8,6 +8,12 @@ PlotWindow::PlotWindow(QWidget *parent) :
     ui->setupUi(this);
     m_datasets = NULL;
 
+    ui->splitter->setStretchFactor(0,20);
+    ui->splitter->setStretchFactor(1,1);
+
+    ui->qwtPlot->canvas()->setFrameStyle(QFrame::NoFrame);
+    ui->qwtPlot->setMargin(5);
+
     plotGrid = new QwtPlotGrid();
     plotGrid->setPen(QPen(Qt::lightGray));
     plotGrid->attach(ui->qwtPlot);
@@ -15,10 +21,13 @@ PlotWindow::PlotWindow(QWidget *parent) :
     plotZoomer = new QwtPlotZoomer(ui->qwtPlot->canvas());
 
     setButtonColor(ui->colorBackgroundButton,Qt::white);
+    setButtonColor(ui->colorPlotBackgroundButton, Qt::white);
     setButtonColor(ui->colorAxisTicksButton,Qt::black);
     setButtonColor(ui->colorAxisFontButton,Qt::black);
     setButtonColor(ui->colorGridButton,QColor("#c3c3c3"));
     setButtonColor(ui->colorGridMinButton, QColor("#dcdcdc"));
+
+    updateSettings();
 
     connect(ui->saveButton, SIGNAL(clicked()),
             this, SLOT(saveImage()));
@@ -27,15 +36,15 @@ PlotWindow::PlotWindow(QWidget *parent) :
     connect(ui->printButton, SIGNAL(clicked()),
             this, SLOT(printPlot()));
 
-    connect(ui->settingsLegendCheck, SIGNAL(clicked()),
+    connect(ui->settingsLegendGroup, SIGNAL(clicked(bool)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsTitleCheck, SIGNAL(clicked()),
+    connect(ui->settingsTitleGroup, SIGNAL(clicked(bool)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsXTitleCheck, SIGNAL(clicked()),
+    connect(ui->settingsXTitleGroup, SIGNAL(clicked(bool)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsYTitleCheck, SIGNAL(clicked()),
+    connect(ui->settingsYTitleGroup, SIGNAL(clicked(bool)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsGridCheck, SIGNAL(clicked()),
+    connect(ui->settingsGridGroup, SIGNAL(clicked(bool)),
             this, SLOT(updateSettings()));
     connect(ui->settingsGridXCheck, SIGNAL(clicked()),
             this, SLOT(updateSettings()));
@@ -71,6 +80,14 @@ PlotWindow::PlotWindow(QWidget *parent) :
             this, SLOT(updateSettings()));
     connect(ui->settingsYScaleStepSpin, SIGNAL(valueChanged(double)),
             this, SLOT(updateSettings()));
+    connect(ui->settingsXLogCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYLogCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsXInvCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYInvCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
 }
 
 PlotWindow::~PlotWindow()
@@ -95,19 +112,19 @@ void PlotWindow::updateDatasetList()
 
 void PlotWindow::updateSettings()
 {
-    if (ui->settingsTitleCheck->isChecked())
+    if (ui->settingsTitleGroup->isChecked())
         ui->qwtPlot->setTitle(ui->settingsTitleEdit->text());
     else
         ui->qwtPlot->setTitle("");
 
 
-    plotGrid->setVisible(ui->settingsGridCheck->isChecked());
+    plotGrid->setVisible(ui->settingsGridGroup->isChecked());
     plotGrid->enableX(ui->settingsGridXCheck->isChecked());
     plotGrid->enableXMin(ui->settingsGridXMinCheck->isChecked());
     plotGrid->enableY(ui->settingsGridYCheck->isChecked());
     plotGrid->enableYMin(ui->settingsGridYMinCheck->isChecked());
 
-    if (ui->settingsLegendCheck->isChecked())
+    if (ui->settingsLegendGroup->isChecked())
     {
         ui->qwtPlot->insertLegend(NULL);
         legend = new QwtLegend();
@@ -127,15 +144,29 @@ void PlotWindow::updateSettings()
     else
         ui->qwtPlot->insertLegend(NULL);
 
-    if (ui->settingsXTitleCheck->isChecked())
+    if (ui->settingsXTitleGroup->isChecked())
         ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, ui->settingsXTitleEdit->text());
     else
         ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, "");
 
-    if (ui->settingsYTitleCheck->isChecked())
+    if (ui->settingsYTitleGroup->isChecked())
         ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, ui->settingsYTitleEdit->text());
     else
         ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, "");
+
+    //axis things
+    if (ui->settingsXLogCheck->isChecked())
+        ui->qwtPlot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
+    else
+        ui->qwtPlot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine);
+
+    if (ui->settingsYLogCheck->isChecked())
+        ui->qwtPlot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
+    else
+        ui->qwtPlot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
+
+    ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Inverted,ui->settingsXInvCheck->isChecked());
+    ui->qwtPlot->axisScaleEngine(QwtPlot::yLeft)->setAttribute(QwtScaleEngine::Inverted,ui->settingsYInvCheck->isChecked());
 
     if (ui->settingsXAutoscaleCheck->isChecked())
     {
@@ -174,6 +205,10 @@ void PlotWindow::updateSettings()
     }
 
     ui->qwtPlot->setCanvasBackground(QColor(ui->colorBackgroundButton->toolTip()));
+    QPalette p = ui->qwtPlot->palette();
+    p.setColor(QPalette::Window, QColor(ui->colorPlotBackgroundButton->toolTip()));
+    ui->qwtPlot->setPalette(p);
+
     plotGrid->setMajPen(QPen(QColor(ui->colorGridButton->toolTip())));
     plotGrid->setMinPen(QPen(QColor(ui->colorGridMinButton->toolTip())));
 
@@ -191,14 +226,16 @@ void PlotWindow::updateSettings()
 
 void PlotWindow::saveImage()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Plot"), QDir::homePath() + "/" + ui->qwtPlot->title().text(), tr("PNG Images (*.png)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Plot"), QDir::homePath() + "/" + ui->qwtPlot->title().text() + ".png", tr("PNG Images (*.png)"));
 
     if (!fileName.isEmpty())
     {
         int width = ui->qwtPlot->width();
         int height = ui->qwtPlot->height();
         QPixmap pixmap(width, height);
-        pixmap.fill(Qt::transparent);
+
+        QPalette p = ui->qwtPlot->palette();
+        pixmap.fill(p.color(QPalette::Window));
 
         ui->qwtPlot->print(pixmap);
         pixmap.save(fileName);
@@ -207,7 +244,7 @@ void PlotWindow::saveImage()
 
 void PlotWindow::saveVector()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Plot"), QDir::homePath() + "/" + ui->qwtPlot->title().text(), tr("SVG Documents (*.svg)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Plot"), QDir::homePath() + "/" + ui->qwtPlot->title().text() + ".svg", tr("SVG Documents (*.svg)"));
 #ifdef QT_SVG_LIB
     if ( !fileName.isEmpty() )
     {
@@ -326,7 +363,7 @@ void PlotWindow::on_colorBackgroundButton_clicked()
 {
     QColor color = QColorDialog::getColor(QColor(ui->colorBackgroundButton->toolTip()),
                                           this,
-                                          tr("Select Background Color"));
+                                          tr("Select Canvas Background Color"));
     if (color.isValid())
         setButtonColor(ui->colorBackgroundButton, color);
 
@@ -336,6 +373,23 @@ void PlotWindow::on_colorBackgroundButton_clicked()
 void PlotWindow::on_colorBackgroundDeleteButton_clicked()
 {
     setButtonColor(ui->colorBackgroundButton, QColor(255,255,255));
+    updateSettings();
+}
+
+void PlotWindow::on_colorPlotBackgroundButton_clicked()
+{
+    QColor color = QColorDialog::getColor(QColor(ui->colorPlotBackgroundButton->toolTip()),
+                                          this,
+                                          tr("Select Plot Background Color"));
+    if (color.isValid())
+        setButtonColor(ui->colorPlotBackgroundButton, color);
+
+    updateSettings();
+}
+
+void PlotWindow::on_colorPlotBackgroundDeleteButton_clicked()
+{
+    setButtonColor(ui->colorPlotBackgroundButton, QColor(255,255,255));
     updateSettings();
 }
 
@@ -405,4 +459,35 @@ void PlotWindow::on_colorAxisFontDeleteButton_clicked()
 {
     setButtonColor(ui->colorAxisFontButton, QColor(0,0,0));
     updateSettings();
+}
+
+void PlotWindow::on_lineColorButton_clicked()
+{
+    for (int i = 0; i < plotCurves.size(); i++)
+    {
+        QPen pen = plotCurves.at(i)->pen();
+        pen.setColor(qRgb(qrand() % 256,qrand() % 256,qrand() % 256));
+        plotCurves.at(i)->setPen(pen);
+    }
+    ui->qwtPlot->replot();
+}
+
+void PlotWindow::on_settingsYAutoscaleCheck_toggled(bool checked)
+{
+    ui->settingsYScaleMaxSpin->setEnabled(!checked);
+    ui->settingsYScaleMinSpin->setEnabled(!checked);
+    ui->settingsYScaleStepSpin->setEnabled(!checked);
+    ui->yScaleLabel1->setEnabled(!checked);
+    ui->yScaleLabel2->setEnabled(!checked);
+    ui->yScaleLabel3->setEnabled(!checked);
+}
+
+void PlotWindow::on_settingsXAutoscaleCheck_toggled(bool checked)
+{
+    ui->settingsXScaleMaxSpin->setEnabled(!checked);
+    ui->settingsXScaleMinSpin->setEnabled(!checked);
+    ui->settingsXScaleStepSpin->setEnabled(!checked);
+    ui->xScaleLabel1->setEnabled(!checked);
+    ui->xScaleLabel2->setEnabled(!checked);
+    ui->xScaleLabel3->setEnabled(!checked);
 }

@@ -253,7 +253,8 @@ void PhyxCalculator::initialize()
     functionMap.insert("lowLevelCombinedAssignmentShiftRight", &PhyxCalculator::lowLevelCombinedAssignmentShiftRight);
     functionMap.insert("lowLevelOutput",                &PhyxCalculator::lowLevelOutput);
 
-    functionMap.insert("tableCreate",   &PhyxCalculator::tableCreate);
+    functionMap.insert("datasetCreate",   &PhyxCalculator::datasetCreate);
+    functionMap.insert("datasetCreateStep",   &PhyxCalculator::datasetCreateStep);
 
     loadGrammar(":/settings/grammar");
     earleyParser->setStartSymbol("S");
@@ -3414,16 +3415,8 @@ void PhyxCalculator::lowLevelOutput()
     }
 }
 
-void PhyxCalculator::tableCreate()
+void PhyxCalculator::calculateDataset(QString expression, QStringList parameters, PhyxVariable *startVariable, PhyxFloatDataType stop, PhyxFloatDataType step)
 {
-    popVariables(3);
-
-    PhyxVariable *startVariable = variableList[0];
-    PhyxFloatDataType start = variableList[0]->value().real();
-    PhyxFloatDataType end = variableList[1]->value().real();
-    PhyxFloatDataType step = variableList[2]->value().real();
-    PhyxFloatDataType value = start;
-    QString expression = expressionBuffer;
     PhyxVariable *tmpVariable;
     PhyxCompoundUnit *unit;
 
@@ -3433,8 +3426,8 @@ void PhyxCalculator::tableCreate()
     PhyxCompoundUnit *xUnit;
     PhyxCompoundUnit *yUnit;
 
-    QStringList parameters;
-    parameters.append(stringBuffer);
+    PhyxFloatDataType start = startVariable->value().real();
+    PhyxFloatDataType value = start;
 
     dataset = new PhyxVariableManager::PhyxDataset; //create dataset
     dataset->name = expression;
@@ -3456,7 +3449,7 @@ void PhyxCalculator::tableCreate()
         PhyxCompoundUnit::copyCompoundUnit(tmpVariable->unit(), yUnit); //set y unit
         tmpVariable->deleteLater();
 
-        while (value <= end)
+        while (value <= stop)
         {
             //initialize
             tmpVariable = new PhyxVariable();
@@ -3489,6 +3482,39 @@ void PhyxCalculator::tableCreate()
     {
         //raise some error
     }
+}
+
+void PhyxCalculator::datasetCreateStep()
+{
+    popVariables(3);
+
+    PhyxVariable *startVariable = variableList[0];
+    PhyxFloatDataType stop = variableList[1]->value().real();
+    PhyxFloatDataType step = variableList[2]->value().real();
+    QString expression = expressionBuffer;
+
+    QStringList parameters;
+    parameters.append(stringBuffer);
+
+    calculateDataset(expression, parameters, startVariable, stop, step);
 
     pushVariables(0,3);
+}
+
+void PhyxCalculator::datasetCreate()
+{
+    popVariables(2);
+
+    PhyxVariable *startVariable = variableList[0];
+    PhyxFloatDataType start = variableList[0]->value().real();
+    PhyxFloatDataType stop = variableList[1]->value().real();
+    PhyxFloatDataType step = (stop - start) / 1000.0L;
+    QString expression = expressionBuffer;
+
+    QStringList parameters;
+    parameters.append(stringBuffer);
+
+    calculateDataset(expression, parameters, startVariable, stop, step);
+
+    pushVariables(0,2);
 }

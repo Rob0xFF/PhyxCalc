@@ -13,9 +13,10 @@
 #include <qwt_plot_grid.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_legend.h>
-#include <qwt_data.h>
+//#include <qwt_data.h>
 #include <qwt_scale_widget.h>
 #include <qwt_scale_div.h>
+#include <qwt_scale_engine.h>
 #include "phyxvariablemanager.h"
 #include "global.h"
 #include <QDebug>
@@ -77,6 +78,16 @@ private slots:
     void on_colorGridMinButton_clicked();
 
     void on_colorGridMinDeleteButton_clicked();
+
+    void on_lineColorButton_clicked();
+
+    void on_colorPlotBackgroundButton_clicked();
+
+    void on_colorPlotBackgroundDeleteButton_clicked();
+
+    void on_settingsYAutoscaleCheck_toggled(bool checked);
+
+    void on_settingsXAutoscaleCheck_toggled(bool checked);
 
 private:
     Ui::PlotWindow *ui;

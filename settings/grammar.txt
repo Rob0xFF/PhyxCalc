@@ -53,7 +53,8 @@ S=|p3||NAND|        ; listNandStart, listValueSave
 S=|p3||XOR|         ; listXorStart, listValueSave
 S=|p3||OR|          ; listOrStart, listValueSave
 S=|p3||NOR|         ; listNorStart, listValueSave
-S=data([|functionString|],|string|,|p3|,|p3|,|p3|); valueCheckComplex3, tableCreate
+S=data([|functionString|],|string|,|p3|,|p3|,|p3|); valueCheckComplex3, datasetCreateStep
+S=data([|functionString|],|string|,|p3|,|p3|); valueCheckComplex2, datasetCreate
 
 #Priority 1: sequential operator
 p1=|p1|,|p2|       ; lowLevelAdd

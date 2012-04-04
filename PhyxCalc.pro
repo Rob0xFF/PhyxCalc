@@ -32,8 +32,27 @@ QT       += core gui svg qwt
 TARGET = phyxcalc
 TEMPLATE = app
 
-win32:INCLUDEPATH += ../boost
-android:INCLUDEPATH += ../boost
+#CONFIG += qwt
+
+win32 {
+    INCLUDEPATH += ../boost \
+                ../qwt5
+}
+android {
+    INCLUDEPATH += ../boost \
+                ../qwt5
+}
+symbian {
+    INCLUDEPATH += ../qwt5
+}
+
+linux-g++ {
+    INCLUDEPATH += /usr/include/qwt5 \  #openSUSE
+                /usr/include/qwt \      #Fedora
+                /usr/include/qwt-qt4    #ubuntu
+}
+
+LIBS += -lqwt
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -93,9 +112,6 @@ OTHER_FILES += \
     settings/numbersDock.txt \
     settings/operatorsDock.txt \
     doc/doc_en.txt
-
-LIBS += -lqwt
-INCLUDEPATH += /usr/include/qwt5
 
 # Please do not modify the following two lines. Required for deployment.
 include(deployment.pri)
