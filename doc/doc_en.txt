@@ -412,3 +412,24 @@ Braces behind functions can be left out. Multiplication without multiplication s
 sqr2
 =1.41421
 ----
+
+== Datasets and Plotting
+PhyxCalc provides an easy way to create datasets and to plot them. Datasets are multi-dimensional
+sets of data (currently only 2 dimensions are supported), similar to tables. To plot a function
+you need to create a dataset, all things concerning plotting can then be done in the plot window.
+
+These functions can be used to create datasets: +
+data([<expression>],<parameter>,<start value>,<stop value>) +
+data([<expression>],<parameter>,<start value>,<stop value>,<step size>) +
+
+The first function will calculate the size of the steps automatically.
+
+*Examples:*
+----
+data([x^2],x,-5,5) //creates a dataset from -5 to 5 for the expression x^2
+data([exp(y)],y,0,5,0.01) //creates a dataset from 0 to 5 with step size 0.01 for the exp function
+----
+
+To plot datasets you need to open the plot window and then click on a dataset, then configure
+the plot until you are satisfied. You can select multiple datasets to plot them in one window. 
+To rename datasets double click on them.

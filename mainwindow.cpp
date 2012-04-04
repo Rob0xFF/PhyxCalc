@@ -580,6 +580,8 @@ void MainWindow::initializeGUI()
     ui->mainToolBar->addAction(ui->actionClose);
 
     plotWindow = new PlotWindow(this); //create plotwindow
+    connect(plotWindow, SIGNAL(visibilityChanged(bool)),
+            ui->action_Plot_Window, SLOT(setChecked(bool)));
 }
 
 void MainWindow::switchLayout(int number)

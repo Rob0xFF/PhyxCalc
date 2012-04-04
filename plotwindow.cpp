@@ -28,12 +28,16 @@ PlotWindow::PlotWindow(QWidget *parent) :
     setButtonColor(ui->colorGridButton,QColor("#c3c3c3"));
     setButtonColor(ui->colorGridMinButton, QColor("#dcdcdc"));
 
+    updatePixels();
+
     updateSettings();
 
-    connect(ui->saveButton_2, SIGNAL(clicked()),
-            this, SLOT(saveVector()));
+    connect(ui->saveButton, SIGNAL(clicked()),
+            this, SLOT(saveDocument()));
     connect(ui->printButton, SIGNAL(clicked()),
             this, SLOT(printPlot()));
+    connect(ui->clipboardButton, SIGNAL(clicked()),
+            this, SLOT(copyToClipboard()));
 
     connect(ui->settingsLegendGroup, SIGNAL(clicked(bool)),
             this, SLOT(updateSettings()));
@@ -87,11 +91,36 @@ PlotWindow::PlotWindow(QWidget *parent) :
             this, SLOT(updateSettings()));
     connect(ui->settingsYInvCheck, SIGNAL(clicked()),
             this, SLOT(updateSettings()));
+
+    connect(ui->exportWidthSpin, SIGNAL(editingFinished()),
+            this, SLOT(updateMMs()));
+    connect(ui->exportHeightSpin, SIGNAL(editingFinished()),
+            this, SLOT(updateMMs()));
+    connect(ui->exportDpiXSpin, SIGNAL(editingFinished()),
+            this, SLOT(updateMMs()));
+    connect(ui->exportDpiYSpin, SIGNAL(editingFinished()),
+            this, SLOT(updateMMs()));
+    connect(ui->exportWidthMMSpin, SIGNAL(editingFinished()),
+            this, SLOT(updatePixels()));
+    connect(ui->exportHeightMMSpin, SIGNAL(editingFinished()),
+            this, SLOT(updatePixels()));
 }
 
 PlotWindow::~PlotWindow()
 {
     delete ui;
+}
+
+void PlotWindow::closeEvent(QCloseEvent *event)
+{
+    event->accept();
+    emit visibilityChanged(false);
+}
+
+void PlotWindow::showEvent(QShowEvent *event)
+{
+    event->accept();
+    emit visibilityChanged(true);
 }
 
 void PlotWindow::updateDatasetList()
@@ -223,38 +252,53 @@ void PlotWindow::updateSettings()
     ui->qwtPlot->replot();
 }
 
-void PlotWindow::saveImage()
+void PlotWindow::updatePixels()
 {
-#if QWT_VERSION < 6
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Plot"), QDir::homePath() + "/" + ui->qwtPlot->title().text() + ".png", tr("PNG Images (*.png)"));
-
-    if (!fileName.isEmpty())
-    {
-        int width = ui->qwtPlot->width();
-        int height = ui->qwtPlot->height();
-        QPixmap pixmap(width, height);
-
-        QPalette p = ui->qwtPlot->palette();
-        pixmap.fill(p.color(QPalette::Window));
-
-        ui->qwtPlot->print(pixmap);
-        pixmap.save(fileName);
-    }
-#endif
+    ui->exportHeightSpin->setValue(ui->exportHeightMMSpin->value() / 25.4 * ui->exportDpiXSpin->value());
+    ui->exportWidthSpin->setValue(ui->exportWidthMMSpin->value() / 25.4 * ui->exportDpiXSpin->value());
 }
 
-void PlotWindow::saveVector()
+void PlotWindow::updateMMs()
 {
+    ui->exportWidthMMSpin->setValue(ui->exportWidthSpin->value() / ui->exportDpiXSpin->value() * 25.4);
+    ui->exportHeightMMSpin->setValue(ui->exportHeightSpin->value() / ui->exportDpiYSpin->value() * 25.4);
+}
+
+void PlotWindow::copyToClipboard()
+{
+    QPixmap pixmap(ui->exportWidthSpin->value(), ui->exportHeightSpin->value());
+    QPalette p = ui->qwtPlot->palette();
+    pixmap.fill(p.color(QPalette::Window));
+
 #if QWT_VERSION >= 6
+        QwtPlotRenderer renderer;
+
+        // flags to make the document look like the widget
+        renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
+        renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true);
+
+        renderer.renderTo(ui->qwtPlot, pixmap);
+#else
+    ui->qwtPlot->print(pixmap);
+#endif
+
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setPixmap(pixmap);
+}
+
+void PlotWindow::saveDocument()
+{
     const QList<QByteArray> imageFormats =
         QImageWriter::supportedImageFormats();
 
     QStringList filter;
-    filter += "PDF Documents (*.pdf)";
 #ifndef QWT_NO_SVG
     filter += "SVG Documents (*.svg)";
 #endif
+#if QWT_VERSION >= 6
+    filter += "PDF Documents (*.pdf)";
     filter += "Postscript Documents (*.ps)";
+#endif
 
     if ( imageFormats.size() > 0 )
     {
@@ -271,12 +315,19 @@ void PlotWindow::saveVector()
         filter += imageFilter;
     }
 
+    QString docName = ui->qwtPlot->title().text();
+    if (!docName.isEmpty())
+        docName.replace (QRegExp(QString::fromLatin1("\n")), tr(" -- "));
+    else
+        docName = "plot";
+
     QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Save Plot"), QDir::homePath() + "/" + ui->qwtPlot->title().text() + ".png",
+        this, tr("Save Plot"), QDir::homePath() + "/" + docName + ".svg",
         filter.join(";;"));
 
     if ( !fileName.isEmpty() )
     {
+#if QWT_VERSION >= 6
         QwtPlotRenderer renderer;
 
         // flags to make the document look like the widget
@@ -284,20 +335,26 @@ void PlotWindow::saveVector()
         renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true);
 
         renderer.renderDocument(ui->qwtPlot, fileName, QSizeF(ui->exportWidthMMSpin->value(), ui->exportHeightMMSpin->value()), ui->exportDpiXSpin->value());
-    }
 #else
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Plot"), QDir::homePath() + "/" + ui->qwtPlot->title().text() + ".svg", tr("SVG Documents (*.svg)"));
-#ifdef QT_SVG_LIB
-    if ( !fileName.isEmpty() )
-    {
-        QSvgGenerator generator;
-        generator.setFileName(fileName);
-        generator.setSize(QSize(ui->exportWidthSpin->value(), ui->exportHeightSpin->value()));
+        QString extension = fileName.mid(fileName.lastIndexOf("."));
 
-        ui->qwtPlot->print(generator);
+        if (extension == ".svg")
+        {
+            QSvgGenerator generator;
+            generator.setFileName(fileName);
+            generator.setSize(QSize(ui->exportWidthSpin->value(), ui->exportHeightSpin->value()));
+            ui->qwtPlot->print(generator);
+        }
+        else
+        {
+            QPixmap pixmap(ui->exportWidthSpin->value(), ui->exportHeightSpin->value());
+            QPalette p = ui->qwtPlot->palette();
+            pixmap.fill(p.color(QPalette::Window));
+            ui->qwtPlot->print(pixmap);
+            pixmap.save(fileName);
+        }
+#endif
     }
-#endif
-#endif
 }
 
 void PlotWindow::printPlot()
@@ -555,36 +612,5 @@ void PlotWindow::on_exportCurrentButton_clicked()
     ui->exportHeightSpin->setValue(ui->qwtPlot->height());
     ui->exportDpiXSpin->setValue(QApplication::desktop()->physicalDpiX());
     ui->exportDpiYSpin->setValue(QApplication::desktop()->physicalDpiY());
-    ui->exportWidthMMSpin->setValue(ui->exportWidthSpin->value() / ui->exportDpiXSpin->value() * 25.4);
-    ui->exportHeightMMSpin->setValue(ui->exportHeightSpin->value() / ui->exportDpiYSpin->value() * 25.4);
-}
-
-void PlotWindow::on_exportWidthSpin_editingFinished()
-{
-    ui->exportWidthMMSpin->setValue(ui->exportWidthSpin->value() / ui->exportDpiXSpin->value() * 25.4);
-}
-
-void PlotWindow::on_exportWidthMMSpin_editingFinished()
-{
-    ui->exportWidthSpin->setValue(ui->exportWidthMMSpin->value() / 25.4 * ui->exportDpiXSpin->value());
-}
-
-void PlotWindow::on_exportHeightSpin_editingFinished()
-{
-    ui->exportHeightMMSpin->setValue(ui->exportHeightSpin->value() / ui->exportDpiYSpin->value() * 25.4);
-}
-
-void PlotWindow::on_exportHeightMMSpin_editingFinished()
-{
-    ui->exportHeightSpin->setValue(ui->exportHeightMMSpin->value() / 25.4 * ui->exportDpiXSpin->value());
-}
-
-void PlotWindow::on_exportDpiXSpin_editingFinished()
-{
-    ui->exportWidthMMSpin->setValue(ui->exportWidthSpin->value() / ui->exportDpiXSpin->value() * 25.4);
-}
-
-void PlotWindow::on_exportDpiYSpin_editingFinished()
-{
-    ui->exportHeightMMSpin->setValue(ui->exportHeightSpin->value() / ui->exportDpiYSpin->value() * 25.4);
+    updateMMs();
 }

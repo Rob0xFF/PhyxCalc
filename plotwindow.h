@@ -10,25 +10,26 @@
 #include <QImageWriter>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QClipboard>
+#include <QCloseEvent>
+#include <QShowEvent>
 #include <qwt_plot.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_legend.h>
-//#include <qwt_data.h>
 #include <qwt_scale_widget.h>
 #include <qwt_scale_div.h>
 #include <qwt_scale_engine.h>
 #if QWT_VERSION >= 6
 #include <qwt_plot_renderer.h>
 #endif
-#include "phyxvariablemanager.h"
-#include "global.h"
-#include <QDebug>
 #ifdef QT_SVG_LIB
 #include <QSvgGenerator>
 #endif
+#include "phyxvariablemanager.h"
+#include "global.h"
 
 namespace Ui {
 class PlotWindow;
@@ -38,6 +39,10 @@ class PlotWindow : public QMainWindow
 {
     Q_OBJECT
     Q_PROPERTY(PhyxVariableManager::PhyxDatasetList *datasets READ datasets WRITE setDatasets)
+
+protected:
+    void closeEvent(QCloseEvent *event);
+    void showEvent (QShowEvent * event);
     
 public:
     explicit PlotWindow(QWidget *parent = 0);
@@ -57,9 +62,11 @@ public slots:
 
 private slots:
     void updateSettings();
+    void updatePixels();
+    void updateMMs();
 
-    void saveImage();
-    void saveVector();
+    void copyToClipboard();
+    void saveDocument();
     void printPlot();
 
     void on_datasetList_itemSelectionChanged();
@@ -97,18 +104,6 @@ private slots:
 
     void on_exportCurrentButton_clicked();
 
-    void on_exportWidthSpin_editingFinished();
-
-    void on_exportWidthMMSpin_editingFinished();
-
-    void on_exportHeightSpin_editingFinished();
-
-    void on_exportHeightMMSpin_editingFinished();
-
-    void on_exportDpiXSpin_editingFinished();
-
-    void on_exportDpiYSpin_editingFinished();
-
 private:
     Ui::PlotWindow *ui;
     PhyxVariableManager::PhyxDatasetList * m_datasets;
@@ -123,6 +118,9 @@ private:
     void deletePlots();
 
     void setButtonColor(QPushButton *button, QColor color);
+
+signals:
+    void visibilityChanged(bool);
 };
 
 #endif // PLOTWINDOW_H

@@ -36,17 +36,17 @@ TEMPLATE = app
 
 win32 {
     INCLUDEPATH += ../boost \
-                ../qwt5
+                ../qwt6
 }
 android {
     INCLUDEPATH += ../boost \
-                ../qwt5
+                ../qwt6
 }
 symbian {
-    INCLUDEPATH += ../qwt5
+    INCLUDEPATH += ../qwt6
 }
 
-linux-g++ | linux-g++-64 | linux-g++-32{
+linux-g++ | linux-g++-64 | linux-g++-32 {
     INCLUDEPATH += /usr/include/qwt5 \  #openSUSE
                 /usr/include/qwt6 \  #openSUSE
                 /usr/include/qwt \      #Fedora
