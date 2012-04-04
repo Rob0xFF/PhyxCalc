@@ -7,6 +7,9 @@
 #include <QPrinter>
 #include <QPrintDialog>
 #include <QColorDialog>
+#include <QImageWriter>
+#include <QApplication>
+#include <QDesktopWidget>
 #include <qwt_plot.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_curve.h>
@@ -17,6 +20,9 @@
 #include <qwt_scale_widget.h>
 #include <qwt_scale_div.h>
 #include <qwt_scale_engine.h>
+#if QWT_VERSION >= 6
+#include <qwt_plot_renderer.h>
+#endif
 #include "phyxvariablemanager.h"
 #include "global.h"
 #include <QDebug>
@@ -88,6 +94,20 @@ private slots:
     void on_settingsYAutoscaleCheck_toggled(bool checked);
 
     void on_settingsXAutoscaleCheck_toggled(bool checked);
+
+    void on_exportCurrentButton_clicked();
+
+    void on_exportWidthSpin_editingFinished();
+
+    void on_exportWidthMMSpin_editingFinished();
+
+    void on_exportHeightSpin_editingFinished();
+
+    void on_exportHeightMMSpin_editingFinished();
+
+    void on_exportDpiXSpin_editingFinished();
+
+    void on_exportDpiYSpin_editingFinished();
 
 private:
     Ui::PlotWindow *ui;

@@ -57,15 +57,15 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>5</number>
        </property>
        <widget class="QWidget" name="page">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>407</width>
-          <height>76</height>
+          <width>761</width>
+          <height>267</height>
          </rect>
         </property>
         <attribute name="label">
@@ -101,7 +101,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>407</width>
+          <width>744</width>
           <height>254</height>
          </rect>
         </property>
@@ -276,6 +276,14 @@
         </layout>
        </widget>
        <widget class="QWidget" name="page_5">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>761</width>
+          <height>267</height>
+         </rect>
+        </property>
         <attribute name="label">
          <string>X-Axis</string>
         </attribute>
@@ -438,6 +446,14 @@
         </layout>
        </widget>
        <widget class="QWidget" name="page_6">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>761</width>
+          <height>267</height>
+         </rect>
+        </property>
         <attribute name="label">
          <string>Y-Axis</string>
         </attribute>
@@ -607,7 +623,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>424</width>
+          <width>761</width>
           <height>267</height>
          </rect>
         </property>
@@ -945,53 +961,163 @@ border: 2px solid</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>424</width>
+          <width>761</width>
           <height>267</height>
          </rect>
         </property>
         <attribute name="label">
          <string>Export</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
-         <property name="margin">
-          <number>0</number>
-         </property>
+        <layout class="QVBoxLayout" name="verticalLayout_15">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
-           <item>
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="saveButton">
-             <property name="text">
-              <string>Save Image</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
+          <widget class="QGroupBox" name="groupBox_3">
+           <property name="title">
+            <string>Size</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Width:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_22">
+              <item>
+               <widget class="QSpinBox" name="exportWidthSpin">
+                <property name="suffix">
+                 <string>px</string>
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>999999</number>
+                </property>
+                <property name="value">
+                 <number>300</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="exportWidthMMSpin">
+                <property name="suffix">
+                 <string>mm</string>
+                </property>
+                <property name="minimum">
+                 <double>0.010000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>9999.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_24">
+              <item>
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>at</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="exportDpiXSpin">
+                <property name="suffix">
+                 <string>dpi</string>
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>9999999</number>
+                </property>
+                <property name="value">
+                 <number>120</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>Height:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_23">
+              <item>
+               <widget class="QSpinBox" name="exportHeightSpin">
+                <property name="suffix">
+                 <string>px</string>
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>999999</number>
+                </property>
+                <property name="value">
+                 <number>200</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="exportHeightMMSpin">
+                <property name="suffix">
+                 <string>mm</string>
+                </property>
+                <property name="minimum">
+                 <double>0.010000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>9999.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_25">
+              <item>
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>at</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="exportDpiYSpin">
+                <property name="suffix">
+                 <string>dpi</string>
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>9999999</number>
+                </property>
+                <property name="value">
+                 <number>120</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QPushButton" name="exportCurrentButton">
+              <property name="text">
+               <string>Current Size</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -1011,39 +1137,9 @@ border: 2px solid</string>
            <item>
             <widget class="QPushButton" name="saveButton_2">
              <property name="text">
-              <string>Save Vector Graphic</string>
+              <string>Save</string>
              </property>
             </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_8">
-           <item>
-            <spacer name="horizontalSpacer_5">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
            </item>
            <item>
             <widget class="QPushButton" name="printButton">
@@ -1053,7 +1149,7 @@ border: 2px solid</string>
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_6">
+            <spacer name="horizontalSpacer_4">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>

@@ -8,11 +8,12 @@ PlotWindow::PlotWindow(QWidget *parent) :
     ui->setupUi(this);
     m_datasets = NULL;
 
-    ui->splitter->setStretchFactor(0,20);
+    ui->splitter->setStretchFactor(0,2);
     ui->splitter->setStretchFactor(1,1);
 
     ui->qwtPlot->canvas()->setFrameStyle(QFrame::NoFrame);
-    ui->qwtPlot->setMargin(5);
+    //ui->qwtPlot->setMargin(5);
+    ui->qwtPlot->setStyleSheet("QwtPlot { padding: 5px }"); //this is no fix at all
 
     plotGrid = new QwtPlotGrid();
     plotGrid->setPen(QPen(Qt::lightGray));
@@ -29,8 +30,6 @@ PlotWindow::PlotWindow(QWidget *parent) :
 
     updateSettings();
 
-    connect(ui->saveButton, SIGNAL(clicked()),
-            this, SLOT(saveImage()));
     connect(ui->saveButton_2, SIGNAL(clicked()),
             this, SLOT(saveVector()));
     connect(ui->printButton, SIGNAL(clicked()),
@@ -226,6 +225,7 @@ void PlotWindow::updateSettings()
 
 void PlotWindow::saveImage()
 {
+#if QWT_VERSION < 6
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Plot"), QDir::homePath() + "/" + ui->qwtPlot->title().text() + ".png", tr("PNG Images (*.png)"));
 
     if (!fileName.isEmpty())
@@ -240,20 +240,63 @@ void PlotWindow::saveImage()
         ui->qwtPlot->print(pixmap);
         pixmap.save(fileName);
     }
+#endif
 }
 
 void PlotWindow::saveVector()
 {
+#if QWT_VERSION >= 6
+    const QList<QByteArray> imageFormats =
+        QImageWriter::supportedImageFormats();
+
+    QStringList filter;
+    filter += "PDF Documents (*.pdf)";
+#ifndef QWT_NO_SVG
+    filter += "SVG Documents (*.svg)";
+#endif
+    filter += "Postscript Documents (*.ps)";
+
+    if ( imageFormats.size() > 0 )
+    {
+        QString imageFilter("Images (");
+        for ( int i = 0; i < imageFormats.size(); i++ )
+        {
+            if ( i > 0 )
+                imageFilter += " ";
+            imageFilter += "*.";
+            imageFilter += imageFormats[i];
+        }
+        imageFilter += ")";
+
+        filter += imageFilter;
+    }
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Save Plot"), QDir::homePath() + "/" + ui->qwtPlot->title().text() + ".png",
+        filter.join(";;"));
+
+    if ( !fileName.isEmpty() )
+    {
+        QwtPlotRenderer renderer;
+
+        // flags to make the document look like the widget
+        renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
+        renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true);
+
+        renderer.renderDocument(ui->qwtPlot, fileName, QSizeF(ui->exportWidthMMSpin->value(), ui->exportHeightMMSpin->value()), ui->exportDpiXSpin->value());
+    }
+#else
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Plot"), QDir::homePath() + "/" + ui->qwtPlot->title().text() + ".svg", tr("SVG Documents (*.svg)"));
 #ifdef QT_SVG_LIB
     if ( !fileName.isEmpty() )
     {
         QSvgGenerator generator;
         generator.setFileName(fileName);
-        generator.setSize(QSize(ui->qwtPlot->width(), ui->qwtPlot->height()));
+        generator.setSize(QSize(ui->exportWidthSpin->value(), ui->exportHeightSpin->value()));
 
         ui->qwtPlot->print(generator);
     }
+#endif
 #endif
 }
 
@@ -274,6 +317,17 @@ void PlotWindow::printPlot()
     QPrintDialog dialog(&printer);
     if (dialog.exec())
     {
+#if QWT_VERSION >= 6
+        QwtPlotRenderer renderer;
+
+        if ( printer.colorMode() == QPrinter::GrayScale )
+        {
+            renderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground);
+            renderer.setLayoutFlag(QwtPlotRenderer::FrameWithScales);
+        }
+
+        renderer.renderTo(ui->qwtPlot, printer);
+#else
         QwtPlotPrintFilter filter;
         if ( printer.colorMode() == QPrinter::GrayScale )
         {
@@ -283,6 +337,7 @@ void PlotWindow::printPlot()
             filter.setOptions(options);
         }
         ui->qwtPlot->print(printer, filter);
+#endif
     }
 }
 
@@ -306,7 +361,9 @@ void PlotWindow::plotDataset(int index)
     QwtPlotCurve *plotCurve = new QwtPlotCurve(dataset->name);
     plotCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     plotCurve->setPen(QPen(qRgb(qrand() % 256,qrand() % 256,qrand() % 256)));
-    plotCurve->setData(x,y);
+
+    //plotCurve->setData(x,y); qwt5
+    plotCurve->setSamples(x,y); //qwt6
     plotCurve->attach(ui->qwtPlot);
     plotCurves.append(plotCurve);
 }
@@ -490,4 +547,44 @@ void PlotWindow::on_settingsXAutoscaleCheck_toggled(bool checked)
     ui->xScaleLabel1->setEnabled(!checked);
     ui->xScaleLabel2->setEnabled(!checked);
     ui->xScaleLabel3->setEnabled(!checked);
+}
+
+void PlotWindow::on_exportCurrentButton_clicked()
+{
+    ui->exportWidthSpin->setValue(ui->qwtPlot->width());
+    ui->exportHeightSpin->setValue(ui->qwtPlot->height());
+    ui->exportDpiXSpin->setValue(QApplication::desktop()->physicalDpiX());
+    ui->exportDpiYSpin->setValue(QApplication::desktop()->physicalDpiY());
+    ui->exportWidthMMSpin->setValue(ui->exportWidthSpin->value() / ui->exportDpiXSpin->value() * 25.4);
+    ui->exportHeightMMSpin->setValue(ui->exportHeightSpin->value() / ui->exportDpiYSpin->value() * 25.4);
+}
+
+void PlotWindow::on_exportWidthSpin_editingFinished()
+{
+    ui->exportWidthMMSpin->setValue(ui->exportWidthSpin->value() / ui->exportDpiXSpin->value() * 25.4);
+}
+
+void PlotWindow::on_exportWidthMMSpin_editingFinished()
+{
+    ui->exportWidthSpin->setValue(ui->exportWidthMMSpin->value() / 25.4 * ui->exportDpiXSpin->value());
+}
+
+void PlotWindow::on_exportHeightSpin_editingFinished()
+{
+    ui->exportHeightMMSpin->setValue(ui->exportHeightSpin->value() / ui->exportDpiYSpin->value() * 25.4);
+}
+
+void PlotWindow::on_exportHeightMMSpin_editingFinished()
+{
+    ui->exportHeightSpin->setValue(ui->exportHeightMMSpin->value() / 25.4 * ui->exportDpiXSpin->value());
+}
+
+void PlotWindow::on_exportDpiXSpin_editingFinished()
+{
+    ui->exportWidthMMSpin->setValue(ui->exportWidthSpin->value() / ui->exportDpiXSpin->value() * 25.4);
+}
+
+void PlotWindow::on_exportDpiYSpin_editingFinished()
+{
+    ui->exportHeightMMSpin->setValue(ui->exportHeightSpin->value() / ui->exportDpiYSpin->value() * 25.4);
 }
