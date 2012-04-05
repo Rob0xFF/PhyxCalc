@@ -1179,7 +1179,7 @@ PhyxIntegerDataType PhyxCalculator::gcd(PhyxIntegerDataType x, PhyxIntegerDataTy
 
 PhyxIntegerDataType PhyxCalculator::lcm(PhyxIntegerDataType x, PhyxIntegerDataType y)
 {
-    return (fabs(x)/gcd(x,y))*fabs(y);
+    return (abs(x)/gcd(x,y))*abs(y);
 }
 
 PhyxFloatDataType PhyxCalculator::toInt(PhyxFloatDataType x)
@@ -2107,8 +2107,8 @@ void PhyxCalculator::valueGcd()
 {
     popVariables(2);
 
-    PhyxIntegerDataType x = fabs(variableList[0]->toInt());
-    PhyxIntegerDataType y = fabs(variableList[1]->toInt());
+    PhyxIntegerDataType x = abs(variableList[0]->toInt());
+    PhyxIntegerDataType y = abs(variableList[1]->toInt());
 
     variableList[0]->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(gcd(x,y)), PHYX_FLOAT_NULL));
 
@@ -2119,8 +2119,8 @@ void PhyxCalculator::valueLcm()
 {
     popVariables(2);
 
-    PhyxIntegerDataType x = fabs(variableList[0]->toInt());
-    PhyxIntegerDataType y = fabs(variableList[1]->toInt());
+    PhyxIntegerDataType x = abs(variableList[0]->toInt());
+    PhyxIntegerDataType y = abs(variableList[1]->toInt());
 
     variableList[0]->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(lcm(x,y)), PHYX_FLOAT_NULL));
 

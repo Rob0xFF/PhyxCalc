@@ -36,7 +36,8 @@ TEMPLATE = app
 
 win32 {
     INCLUDEPATH += ../boost \
-                ../qwt6
+                ../qwt6/src
+    LIBS += -L../qwt6/lib
 }
 android {
     INCLUDEPATH += ../boost \
