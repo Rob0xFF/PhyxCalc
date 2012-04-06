@@ -41,10 +41,10 @@ win32 {
 }
 android {
     INCLUDEPATH += ../boost \
-                ../qwt6
+                ../qwt6/src
 }
 symbian {
-    INCLUDEPATH += ../qwt6
+    INCLUDEPATH += ../qwt6/src
 }
 
 linux-g++ | linux-g++-64 | linux-g++-32 {

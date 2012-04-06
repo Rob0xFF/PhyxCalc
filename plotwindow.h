@@ -104,6 +104,8 @@ private slots:
 
     void on_exportCurrentButton_clicked();
 
+    void on_mobileSettingsButton_clicked(bool checked);
+
 private:
     Ui::PlotWindow *ui;
     PhyxVariableManager::PhyxDatasetList * m_datasets;
@@ -112,6 +114,8 @@ private:
     QwtPlotGrid *plotGrid;
     QwtPlotZoomer *plotZoomer;
     QwtLegend *legend;
+
+    void initializeGUI();
 
     void updateDatasetList();
     void plotDataset(int index);

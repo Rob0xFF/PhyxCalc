@@ -8,8 +8,7 @@ PlotWindow::PlotWindow(QWidget *parent) :
     ui->setupUi(this);
     m_datasets = NULL;
 
-    ui->splitter->setStretchFactor(0,2);
-    ui->splitter->setStretchFactor(1,1);
+    initializeGUI();
 
     ui->qwtPlot->canvas()->setFrameStyle(QFrame::NoFrame);
     //ui->qwtPlot->setMargin(5);
@@ -121,6 +120,29 @@ void PlotWindow::showEvent(QShowEvent *event)
 {
     event->accept();
     emit visibilityChanged(true);
+}
+
+void PlotWindow::initializeGUI()
+{
+#ifdef QWT_VERSION//MOBILE_VERSION
+    this->setWindowState(Qt::WindowMaximized);
+
+    ui->mobileCloseButton->setIcon(QIcon::fromTheme("dialog-close",QIcon(":/icons/dialog-close")));
+    ui->mobileSettingsButton->setIcon(QIcon::fromTheme("configure",QIcon(":/icons/configure")));
+
+    connect(ui->mobileCloseButton, SIGNAL(clicked()),
+            this, SLOT(close()));
+#else
+    ui->mobileCloseButton->setVisible(false);
+    ui->mobileSettingsButton->setVisible(false);
+
+    ui->splitter->setStretchFactor(0,2);
+    ui->splitter->setStretchFactor(1,1);
+#endif
+
+#ifdef QT_NO_PRINTER
+    ui->printButton->setVisible(false);
+#endif
 }
 
 void PlotWindow::updateDatasetList()
@@ -359,6 +381,7 @@ void PlotWindow::saveDocument()
 
 void PlotWindow::printPlot()
 {
+#ifndef QT_NO_PRINTER
     QPrinter printer;
 
     QString docName = ui->qwtPlot->title().text();
@@ -396,6 +419,7 @@ void PlotWindow::printPlot()
         ui->qwtPlot->print(printer, filter);
 #endif
     }
+#endif
 }
 
 void PlotWindow::plotDataset(int index)
@@ -616,4 +640,12 @@ void PlotWindow::on_exportCurrentButton_clicked()
     ui->exportDpiXSpin->setValue(QApplication::desktop()->physicalDpiX());
     ui->exportDpiYSpin->setValue(QApplication::desktop()->physicalDpiY());
     updateMMs();
+}
+
+void PlotWindow::on_mobileSettingsButton_clicked(bool checked)
+{
+    if (checked)
+        ui->toolBox->show();
+    else
+        ui->toolBox->hide();
 }

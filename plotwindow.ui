@@ -14,8 +14,8 @@
    <string>Plot Window</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
+   <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -64,7 +64,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>761</width>
+          <width>720</width>
           <height>267</height>
          </rect>
         </property>
@@ -101,7 +101,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>744</width>
+          <width>703</width>
           <height>254</height>
          </rect>
         </property>
@@ -280,7 +280,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>761</width>
+          <width>720</width>
           <height>267</height>
          </rect>
         </property>
@@ -450,7 +450,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>761</width>
+          <width>720</width>
           <height>267</height>
          </rect>
         </property>
@@ -623,7 +623,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>761</width>
+          <width>720</width>
           <height>267</height>
          </rect>
         </property>
@@ -961,8 +961,8 @@ border: 2px solid</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>744</width>
-          <height>248</height>
+          <width>720</width>
+          <height>267</height>
          </rect>
         </property>
         <attribute name="label">
@@ -1193,6 +1193,55 @@ border: 2px solid</string>
        </widget>
       </widget>
      </widget>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_16">
+      <item>
+       <widget class="QPushButton" name="mobileCloseButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_6">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="mobileSettingsButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
