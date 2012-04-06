@@ -90,6 +90,9 @@ typedef struct {
         bool useSyntaxHighlighter;
         QList<colorSchemeItem> colorScheme;
     } textEditor;
+    struct {
+        bool autoShowPlotWindow;
+    } plot;
 } AppSettings;
 
 #endif // GLOBAL_H

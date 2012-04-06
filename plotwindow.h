@@ -13,6 +13,7 @@
 #include <QClipboard>
 #include <QCloseEvent>
 #include <QShowEvent>
+#include <QDebug>
 #include <qwt_plot.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_curve.h>
@@ -61,6 +62,7 @@ public slots:
     }
 
 private slots:
+    void updatePlots();
     void updateSettings();
     void updatePixels();
     void updateMMs();
@@ -69,7 +71,6 @@ private slots:
     void saveDocument();
     void printPlot();
 
-    void on_datasetList_itemSelectionChanged();
     void on_datasetList_itemChanged(QListWidgetItem *item);
 
     void on_colorBackgroundButton_clicked();

@@ -34,6 +34,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui->listWidget->item(0)->setIcon(QIcon::fromTheme("code-context",QIcon(":/icons/code-context")));
     ui->listWidget->item(1)->setIcon(QIcon::fromTheme("edit-text-frame-update",QIcon(":/icons/edit-text-frame-update")));
     ui->listWidget->item(2)->setIcon(QIcon::fromTheme("accessories-text-editor",QIcon(":/icons/accessories-text-editor")));
+    ui->listWidget->item(3)->setIcon(QIcon(":/icons/plot-icon"));
 
     QPushButton *button = ui->buttonBox->addButton(tr("Open Settings Directory"), QDialogButtonBox::ActionRole);
     button->setIcon(QIcon::fromTheme("document-open",QIcon(":/icons/document-open")));
@@ -110,6 +111,8 @@ void SettingsDialog::setAppSettings(AppSettings *settings)
         setColorSchemeBold(settings->textEditor.colorScheme.at(i).bold);
         setColorSchemeItalic(settings->textEditor.colorScheme.at(i).italic);
     }
+
+    ui->plotWindowShowCheck->setChecked(settings->plot.autoShowPlotWindow);
 }
 
 void SettingsDialog::getAppSettings(AppSettings *settings)
@@ -172,6 +175,8 @@ void SettingsDialog::getAppSettings(AppSettings *settings)
         settings->textEditor.colorScheme[i].bold            = ui->colorSchemeList->currentItem()->font().bold();
         settings->textEditor.colorScheme[i].italic          = ui->colorSchemeList->currentItem()->font().italic();
     }
+
+    settings->plot.autoShowPlotWindow = ui->plotWindowShowCheck->isChecked();
 }
 
 void SettingsDialog::openSettingsDir()

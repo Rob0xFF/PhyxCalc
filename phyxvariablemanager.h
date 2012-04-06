@@ -41,6 +41,7 @@ public:
         QString name;
         QList<PhyxCompoundUnit*> unit;
         QList<QList<PhyxValueDataType> > data;
+        int selection;
     } PhyxDataset;
     typedef QList<PhyxDataset*> PhyxDatasetList;
 

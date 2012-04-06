@@ -305,6 +305,10 @@ void MainWindow::loadSettings()
         settings.endGroup();
     settings.endGroup();
 
+    settings.beginGroup("plot");
+        appSettings.plot.autoShowPlotWindow = settings.value("autoShowPlotWindow",true).toBool();
+    settings.endGroup();
+
     recentDocuments = settings.value("recentDocuments", QStringList()).toStringList();
     updateRecentDocuments();
 }
@@ -394,6 +398,10 @@ void MainWindow::saveSettings()
                 settings.endGroup();
             }
         settings.endGroup();
+    settings.endGroup();
+
+    settings.beginGroup("plot");
+        settings.setValue("autoShowPlotWindow", appSettings.plot.autoShowPlotWindow);
     settings.endGroup();
 
     settings.setValue("recentDocuments", recentDocuments);
@@ -687,8 +695,7 @@ bool MainWindow::closeAllTabs()
 void MainWindow::tabChanged(int index)
 {
     activeTab = index;
-    documentList.at(activeTab)->lineParser->showVariables();
-    documentList.at(activeTab)->lineParser->showConstants();
+    documentList.at(activeTab)->lineParser->updateSettings();
 }
 
 bool MainWindow::saveDocument(Document *document, bool force, bool exit)

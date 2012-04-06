@@ -64,7 +64,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>720</width>
+          <width>747</width>
           <height>267</height>
          </rect>
         </property>
@@ -101,7 +101,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>703</width>
+          <width>730</width>
           <height>254</height>
          </rect>
         </property>
@@ -280,7 +280,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>720</width>
+          <width>747</width>
           <height>267</height>
          </rect>
         </property>
@@ -450,7 +450,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>720</width>
+          <width>747</width>
           <height>267</height>
          </rect>
         </property>
@@ -623,7 +623,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>720</width>
+          <width>747</width>
           <height>267</height>
          </rect>
         </property>
@@ -961,7 +961,7 @@ border: 2px solid</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>720</width>
+          <width>747</width>
           <height>267</height>
          </rect>
         </property>
@@ -1204,6 +1204,12 @@ border: 2px solid</string>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="maximumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -1229,6 +1235,12 @@ border: 2px solid</string>
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
         </property>
         <property name="text">
          <string/>

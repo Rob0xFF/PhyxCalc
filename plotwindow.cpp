@@ -38,6 +38,9 @@ PlotWindow::PlotWindow(QWidget *parent) :
     connect(ui->clipboardButton, SIGNAL(clicked()),
             this, SLOT(copyToClipboard()));
 
+    connect(ui->datasetList, SIGNAL(itemSelectionChanged()),
+            this, SLOT(updatePlots()));
+
     connect(ui->settingsLegendGroup, SIGNAL(clicked(bool)),
             this, SLOT(updateSettings()));
     connect(ui->settingsTitleGroup, SIGNAL(clicked(bool)),
@@ -124,8 +127,11 @@ void PlotWindow::showEvent(QShowEvent *event)
 
 void PlotWindow::initializeGUI()
 {
-#ifdef QWT_VERSION//MOBILE_VERSION
+#ifdef MOBILE_VERSION
     this->setWindowState(Qt::WindowMaximized);
+
+    ui->toolBox->hide();
+    ui->mobileSettingsButton->setChecked(false);
 
     ui->mobileCloseButton->setIcon(QIcon::fromTheme("dialog-close",QIcon(":/icons/dialog-close")));
     ui->mobileSettingsButton->setIcon(QIcon::fromTheme("configure",QIcon(":/icons/configure")));
@@ -157,6 +163,71 @@ void PlotWindow::updateDatasetList()
             item->setFlags(item->flags() | Qt::ItemIsEditable);
             ui->datasetList->addItem(item);
         }
+    }
+
+    if (ui->datasetList->count() != 0)
+        ui->datasetList->setCurrentRow(ui->datasetList->count()-1);
+}
+
+void PlotWindow::updatePlots()
+{
+    //get selected indexes
+    QModelIndexList indexes = ui->datasetList->selectionModel()->selectedIndexes();
+
+    QList<int> indexList;
+    foreach(QModelIndex index, indexes)
+    {
+        indexList.append(index.row());
+    }
+
+    deletePlots();  //delete previous plots
+
+    for (int i = 0; i < indexList.size(); i++)
+    {
+        plotDataset(indexList.at(i));   //plot selected
+    }
+
+    updateSettings();
+}
+
+void PlotWindow::plotDataset(int index)
+{
+    if (m_datasets->size() <= index)
+        return;
+
+    PhyxVariableManager::PhyxDataset *dataset = (*m_datasets)[index];
+
+    //convert data
+    QVector<double> x;
+    QVector<double> y;
+
+    for (int i = 0; i < dataset->data.at(0).size(); i++)
+    {
+        x.append(static_cast<PhyxFloatDataType>(dataset->data.at(0).at(i).real()));
+        y.append(static_cast<PhyxFloatDataType>(dataset->data.at(1).at(i).real()));
+    }
+
+    QwtPlotCurve *plotCurve = new QwtPlotCurve(dataset->name);
+    plotCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    plotCurve->setPen(QPen(qRgb(qrand() % 256,qrand() % 256,qrand() % 256)));
+
+#if QWT_VERSION >= 0x060000
+    plotCurve->setSamples(x,y);
+#else
+    plotCurve->setData(x,y);
+#endif
+    plotCurve->attach(ui->qwtPlot);
+    plotCurves.append(plotCurve);
+}
+
+void PlotWindow::deletePlots()
+{
+    for (int i = plotCurves.size()-1; i >= 0; i--)
+    {
+        QwtPlotCurve *plot = plotCurves[i];
+        plotCurves.removeAt(i);
+        plot->detach();
+        delete plot;
     }
 }
 
@@ -265,6 +336,12 @@ void PlotWindow::updateSettings()
     QPalette palette = ui->qwtPlot->axisWidget(QwtPlot::yLeft)->palette();
     palette.setColor(QPalette::WindowText, QColor(ui->colorAxisTicksButton->toolTip()));
     palette.setColor(QPalette::Text, QColor(ui->colorAxisFontButton->toolTip()));
+    for (int i = 0; i < plotCurves.size(); i++)
+    {
+        QwtText title = plotCurves.at(i)->title();
+        title.setColor(QColor(ui->colorAxisFontButton->toolTip()));
+        plotCurves.at(i)->setTitle(title);
+    }
     ui->qwtPlot->axisWidget(QwtPlot::yLeft)->setPalette(palette);
     palette = ui->qwtPlot->axisWidget(QwtPlot::xBottom)->palette();
     palette.setColor(QPalette::WindowText, QColor(ui->colorAxisTicksButton->toolTip()));
@@ -422,47 +499,6 @@ void PlotWindow::printPlot()
 #endif
 }
 
-void PlotWindow::plotDataset(int index)
-{
-    if (m_datasets->size() <= index)
-        return;
-
-    PhyxVariableManager::PhyxDataset *dataset = (*m_datasets)[index];
-
-    //convert data
-    QVector<double> x;
-    QVector<double> y;
-
-    for (int i = 0; i < dataset->data.at(0).size(); i++)
-    {
-        x.append(static_cast<PhyxFloatDataType>(dataset->data.at(0).at(i).real()));
-        y.append(static_cast<PhyxFloatDataType>(dataset->data.at(1).at(i).real()));
-    }
-
-    QwtPlotCurve *plotCurve = new QwtPlotCurve(dataset->name);
-    plotCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    plotCurve->setPen(QPen(qRgb(qrand() % 256,qrand() % 256,qrand() % 256)));
-
-#if QWT_VERSION >= 0x060000
-    plotCurve->setSamples(x,y);
-#else
-    plotCurve->setData(x,y);
-#endif
-    plotCurve->attach(ui->qwtPlot);
-    plotCurves.append(plotCurve);
-}
-
-void PlotWindow::deletePlots()
-{
-    for (int i = plotCurves.size()-1; i >= 0; i--)
-    {
-        QwtPlotCurve *plot = plotCurves[i];
-        plotCurves.removeAt(i);
-        plot->detach();
-        delete plot;
-    }
-}
-
 void PlotWindow::setButtonColor(QPushButton *button, QColor color)
 {
     button->setStyleSheet(QString("border-color: rgb(0, 0, 0);\nborder: 2px solid;\nbackground-color: rgba(%1,%2,%3,%4)")
@@ -471,27 +507,6 @@ void PlotWindow::setButtonColor(QPushButton *button, QColor color)
                                                        .arg(color.blue())
                                                        .arg(color.alpha()));
     button->setToolTip(color.name());
-}
-
-void PlotWindow::on_datasetList_itemSelectionChanged()
-{
-    //get selected indexes
-    QModelIndexList indexes = ui->datasetList->selectionModel()->selectedIndexes();
-
-    QList<int> indexList;
-    foreach(QModelIndex index, indexes)
-    {
-        indexList.append(index.row());
-    }
-
-    deletePlots();  //delete previous plots
-
-    for (int i = 0; i < indexList.size(); i++)
-    {
-        plotDataset(indexList.at(i));
-    }
-
-    updateSettings();
 }
 
 void PlotWindow::on_datasetList_itemChanged(QListWidgetItem *item)
@@ -645,7 +660,13 @@ void PlotWindow::on_exportCurrentButton_clicked()
 void PlotWindow::on_mobileSettingsButton_clicked(bool checked)
 {
     if (checked)
+    {
         ui->toolBox->show();
+        ui->plotFrame->setVisible(false);
+    }
     else
+    {
         ui->toolBox->hide();
+        ui->plotFrame->setVisible(true);
+    }
 }

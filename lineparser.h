@@ -168,6 +168,7 @@ public slots:
     void updatePrefixes();
     void updateFunctions();
     void updateDatasets();
+    void showPlotWindow();
     void clearAllVariables();
     void outputResult();
     void outputError();

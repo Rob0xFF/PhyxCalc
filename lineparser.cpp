@@ -43,6 +43,8 @@ LineParser::LineParser(QObject *)
             this, SLOT(updateFunctions()));
     connect(m_phyxCalculator, SIGNAL(datasetsChanged()),
             this, SLOT(updateDatasets()));
+    connect(m_phyxCalculator,SIGNAL(datasetsChanged()),
+            this, SLOT(showPlotWindow()));
 }
 
 LineParser::~LineParser()
@@ -836,6 +838,12 @@ void LineParser::updateFunctions()
 void LineParser::updateDatasets()
 {
     m_plotWindow->setDatasets(m_phyxCalculator->datasets());
+}
+
+void LineParser::showPlotWindow()
+{
+    if (m_appSettings->plot.autoShowPlotWindow)
+        m_plotWindow->show();
 }
 
 void LineParser::clearAllVariables()
