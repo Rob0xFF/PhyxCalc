@@ -38,7 +38,7 @@ PlotWindow::PlotWindow(QWidget *parent) :
     connect(ui->clipboardButton, SIGNAL(clicked()),
             this, SLOT(copyToClipboard()));
 
-    connect(ui->datasetList, SIGNAL(itemSelectionChanged()),
+    connect(ui->datasetTable, SIGNAL(itemSelectionChanged()),
             this, SLOT(updatePlots()));
 
     connect(ui->settingsLegendGroup, SIGNAL(clicked(bool)),
@@ -106,6 +106,14 @@ PlotWindow::PlotWindow(QWidget *parent) :
             this, SLOT(updatePixels()));
     connect(ui->exportHeightMMSpin, SIGNAL(editingFinished()),
             this, SLOT(updatePixels()));
+
+    connect(ui->datasetTable,SIGNAL(cellChanged(int,int)),
+            this, SLOT(renameDataSet(int,int)));
+
+    //initialize signalmapper
+    deleteSignalMapper = new QSignalMapper();
+    connect(deleteSignalMapper,SIGNAL(mapped(int)),
+            this, SLOT(deleteDataset(int)));
 }
 
 PlotWindow::~PlotWindow()
@@ -149,48 +157,150 @@ void PlotWindow::initializeGUI()
 #ifdef QT_NO_PRINTER
     ui->printButton->setVisible(false);
 #endif
+
+    //initialize dataset table
+    ui->datasetTable->setColumnCount(7);
+    ui->datasetTable->verticalHeader()->hide();
+    ui->datasetTable->horizontalHeader()->hide();
+    ui->datasetTable->clearContents();
+    ui->datasetTable->setShowGrid(false);
+    ui->datasetTable->setSelectionMode(QAbstractItemView::NoSelection);
 }
 
-void PlotWindow::updateDatasetList()
-{
-    ui->datasetList->clear();
+void PlotWindow::updateDatasetTable()
+{   
+    deleteDatasetTableItems();
 
     if (m_datasets != NULL)
     {
+        ui->datasetTable->setRowCount(m_datasets->size());
+
         for (int i = 0; i < m_datasets->size(); i++)
         {
-            QListWidgetItem *item = new QListWidgetItem(m_datasets->at(i)->name);
+            QTableWidgetItem *item = new QTableWidgetItem(m_datasets->at(i)->name);
             item->setFlags(item->flags() | Qt::ItemIsEditable);
-            ui->datasetList->addItem(item);
+            ui->datasetTable->setItem(i,1,item);
+
+            QCheckBox *checkBox = new QCheckBox();
+            QButtonGroup *buttonGroupX = new QButtonGroup();
+            QButtonGroup *buttonGroupY = new QButtonGroup();
+            QRadioButton *radioButtonXL = new QRadioButton();
+            QRadioButton *radioButtonXR = new QRadioButton();
+            QRadioButton *radioButtonYB = new QRadioButton();
+            QRadioButton *radioButtonYT = new QRadioButton();
+            QPushButton *button =new QPushButton("x");
+
+            buttonGroupX->addButton(radioButtonXL);
+            buttonGroupX->addButton(radioButtonXR);
+            buttonGroupY->addButton(radioButtonYB);
+            buttonGroupY->addButton(radioButtonYT);
+
+            radioButtonXL->setChecked(true);
+            radioButtonYB->setChecked(true);
+
+            ui->datasetTable->setCellWidget(i, 0, checkBox);
+            ui->datasetTable->setCellWidget(i, 2, radioButtonXL);
+            ui->datasetTable->setCellWidget(i, 3, radioButtonXR);
+            ui->datasetTable->setCellWidget(i, 4, radioButtonYB);
+            ui->datasetTable->setCellWidget(i, 5, radioButtonYT);
+            ui->datasetTable->setCellWidget(i, 6, button);
+
+            radioButtonXL->setEnabled(false);
+            radioButtonXR->setEnabled(false);
+            radioButtonYB->setEnabled(false);
+            radioButtonYT->setEnabled(false);
+
+            visibiltyCheckList.append(checkBox);
+            xLRadioList.append(radioButtonXL);
+            xRRadioList.append(radioButtonXR);
+            yBRadioList.append(radioButtonYB);
+            yTRadioList.append(radioButtonYT);
+            xGroupList.append(buttonGroupX);
+            yGroupList.append(buttonGroupY);
+            deleteButtonList.append(button);
+
+            connect(checkBox,SIGNAL(clicked()),
+                    this,SLOT(updatePlots()));
+            connect(radioButtonXL,SIGNAL(clicked()),
+                    this,SLOT(updatePlots()));
+            connect(radioButtonXR,SIGNAL(clicked()),
+                    this,SLOT(updatePlots()));
+            connect(radioButtonYB,SIGNAL(clicked()),
+                    this,SLOT(updatePlots()));
+            connect(radioButtonYT,SIGNAL(clicked()),
+                    this,SLOT(updatePlots()));
+
+            deleteSignalMapper->setMapping(button, i);
+            connect(button,SIGNAL(clicked()),
+                    deleteSignalMapper, SLOT(map()));
         }
     }
 
-    if (ui->datasetList->count() != 0)
-        ui->datasetList->setCurrentRow(ui->datasetList->count()-1);
+    ui->datasetTable->resizeColumnToContents(0);
+    ui->datasetTable->resizeColumnToContents(2);
+    ui->datasetTable->resizeColumnToContents(3);
+    ui->datasetTable->resizeColumnToContents(4);
+    ui->datasetTable->resizeColumnToContents(5);
+    ui->datasetTable->resizeColumnToContents(6);
 }
 
 void PlotWindow::updatePlots()
 {
-    //get selected indexes
-    QModelIndexList indexes = ui->datasetList->selectionModel()->selectedIndexes();
-
-    QList<int> indexList;
-    foreach(QModelIndex index, indexes)
-    {
-        indexList.append(index.row());
-    }
+    bool xBAxisInUse = false;
+    bool xTAxisInUse = false;
+    bool yLAxisInUse = false;
+    bool yRAxisInUse = false;
 
     deletePlots();  //delete previous plots
 
-    for (int i = 0; i < indexList.size(); i++)
+    for (int i = 0; i < visibiltyCheckList.size(); i++)
     {
-        plotDataset(indexList.at(i));   //plot selected
+        bool checked = visibiltyCheckList.at(i)->isChecked();
+
+        if (checked)
+        {
+            int xAxis;
+            int yAxis;
+
+            if (xLRadioList.at(i)->isChecked())
+            {
+                xBAxisInUse = true;
+                xAxis = QwtPlot::xBottom;
+            }
+            else
+            {
+                xTAxisInUse = true;
+                xAxis = QwtPlot::xTop;
+            }
+            if (yBRadioList.at(i)->isChecked())
+            {
+                yLAxisInUse = true;
+                yAxis = QwtPlot::yLeft;
+            }
+            else
+            {
+                yRAxisInUse = true;
+                yAxis = QwtPlot::yRight;
+            }
+
+            plotDataset(i, xAxis, yAxis);   //plot selected
+        }
+
+        xLRadioList.at(i)->setEnabled(checked);
+        xRRadioList.at(i)->setEnabled(checked);
+        yBRadioList.at(i)->setEnabled(checked);
+        yTRadioList.at(i)->setEnabled(checked);
     }
+
+    ui->qwtPlot->enableAxis(QwtPlot::xBottom,xBAxisInUse);
+    ui->qwtPlot->enableAxis(QwtPlot::xTop,xTAxisInUse);
+    ui->qwtPlot->enableAxis(QwtPlot::yLeft,yLAxisInUse);
+    ui->qwtPlot->enableAxis(QwtPlot::yRight,yRAxisInUse);
 
     updateSettings();
 }
 
-void PlotWindow::plotDataset(int index)
+void PlotWindow::plotDataset(int index, int xAxis, int yAxis)
 {
     if (m_datasets->size() <= index)
         return;
@@ -210,6 +320,7 @@ void PlotWindow::plotDataset(int index)
     QwtPlotCurve *plotCurve = new QwtPlotCurve(dataset->name);
     plotCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     plotCurve->setPen(QPen(qRgb(qrand() % 256,qrand() % 256,qrand() % 256)));
+    plotCurve->setAxes(xAxis, yAxis);
 
 #if QWT_VERSION >= 0x060000
     plotCurve->setSamples(x,y);
@@ -229,6 +340,32 @@ void PlotWindow::deletePlots()
         plot->detach();
         delete plot;
     }
+}
+
+void PlotWindow::deleteDatasetTableItems()
+{
+    for (int i = 0; i < visibiltyCheckList.size(); i++)
+    {
+        visibiltyCheckList.at(i)->deleteLater();
+        xLRadioList.at(i)->deleteLater();
+        xRRadioList.at(i)->deleteLater();
+        yBRadioList.at(i)->deleteLater();
+        yTRadioList.at(i)->deleteLater();
+        xGroupList.at(i)->deleteLater();
+        yGroupList.at(i)->deleteLater();
+        deleteButtonList.at(i)->deleteLater();
+    }
+
+    ui->datasetTable->clearContents();
+
+    visibiltyCheckList.clear();
+    xLRadioList.clear();
+    xRRadioList.clear();
+    yBRadioList.clear();
+    yTRadioList.clear();
+    xGroupList.clear();
+    yGroupList.clear();
+    deleteButtonList.clear();
 }
 
 void PlotWindow::updateSettings()
@@ -361,6 +498,17 @@ void PlotWindow::updateMMs()
 {
     ui->exportWidthMMSpin->setValue(ui->exportWidthSpin->value() / ui->exportDpiXSpin->value() * 25.4);
     ui->exportHeightMMSpin->setValue(ui->exportHeightSpin->value() / ui->exportDpiYSpin->value() * 25.4);
+}
+
+void PlotWindow::deleteDataset(int index)
+{
+    qDebug() << index;
+}
+
+void PlotWindow::renameDataSet(int row, int column)
+{
+    m_datasets->at(row)->name = ui->datasetTable->item(row, column)->text();
+    updatePlots();
 }
 
 void PlotWindow::copyToClipboard()
@@ -507,12 +655,6 @@ void PlotWindow::setButtonColor(QPushButton *button, QColor color)
                                                        .arg(color.blue())
                                                        .arg(color.alpha()));
     button->setToolTip(color.name());
-}
-
-void PlotWindow::on_datasetList_itemChanged(QListWidgetItem *item)
-{
-    int index = item->listWidget()->row(item);
-    m_datasets->at(index)->name = item->text();
 }
 
 void PlotWindow::on_colorBackgroundButton_clicked()

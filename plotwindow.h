@@ -13,6 +13,9 @@
 #include <QClipboard>
 #include <QCloseEvent>
 #include <QShowEvent>
+#include <QRadioButton>
+#include <QCheckBox>
+#include <QSignalMapper>
 #include <QDebug>
 #include <qwt_plot.h>
 #include <qwt_plot_marker.h>
@@ -58,7 +61,7 @@ public slots:
     void setDatasets(PhyxVariableManager::PhyxDatasetList * arg)
     {
         m_datasets = arg;
-        updateDatasetList();
+        updateDatasetTable();
     }
 
 private slots:
@@ -67,11 +70,12 @@ private slots:
     void updatePixels();
     void updateMMs();
 
+    void deleteDataset(int index);
+    void renameDataSet(int row, int column);
+
     void copyToClipboard();
     void saveDocument();
     void printPlot();
-
-    void on_datasetList_itemChanged(QListWidgetItem *item);
 
     void on_colorBackgroundButton_clicked();
 
@@ -112,15 +116,27 @@ private:
     PhyxVariableManager::PhyxDatasetList * m_datasets;
 
     QList<QwtPlotCurve*> plotCurves;
-    QwtPlotGrid *plotGrid;
-    QwtPlotZoomer *plotZoomer;
-    QwtLegend *legend;
+    QwtPlotGrid         *plotGrid;
+    QwtPlotZoomer       *plotZoomer;
+    QwtLegend           *legend;
+
+    QList<QCheckBox*>       visibiltyCheckList;
+    QList<QRadioButton*>    xLRadioList;
+    QList<QRadioButton*>    xRRadioList;
+    QList<QRadioButton*>    yBRadioList;
+    QList<QRadioButton*>    yTRadioList;
+    QList<QButtonGroup*>    xGroupList;
+    QList<QButtonGroup*>    yGroupList;
+    QList<QPushButton*>     deleteButtonList;
+
+    QSignalMapper *deleteSignalMapper;
 
     void initializeGUI();
 
-    void updateDatasetList();
-    void plotDataset(int index);
+    void updateDatasetTable();
+    void plotDataset(int index, int xAxis, int yAxis);
     void deletePlots();
+    void deleteDatasetTableItems();
 
     void setButtonColor(QPushButton *button, QColor color);
 

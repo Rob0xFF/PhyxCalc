@@ -57,15 +57,15 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>5</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="page">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>747</width>
-          <height>267</height>
+          <width>730</width>
+          <height>76</height>
          </rect>
         </property>
         <attribute name="label">
@@ -76,7 +76,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QListWidget" name="datasetList">
+          <widget class="QTableWidget" name="datasetTable">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
