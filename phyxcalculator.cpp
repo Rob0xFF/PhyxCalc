@@ -1367,7 +1367,9 @@ void PhyxCalculator::popVariables(int count)
         return;
     }
     for (int i = count-1; i >= 0; i--)
+    {
         variableList[i] = variableStack.pop();
+    }
 }
 
 void PhyxCalculator::pushVariables(int count, int deleteCount)
@@ -1378,8 +1380,11 @@ void PhyxCalculator::pushVariables(int count, int deleteCount)
     }
     for (int i = count; i < (count + deleteCount); i++)
     {
-        variableList[i]->deleteLater();
-        variableList[i] = NULL;
+        if (variableList[i] != NULL)
+        {
+            variableList[i]->deleteLater();
+            variableList[i] = NULL;
+        }
     }
 }
 
@@ -3473,6 +3478,7 @@ void PhyxCalculator::calculateDataset(QString expression,
     tmpVariable->setUnit(unit);
     tmpVariable->setValue(PhyxValueDataType(value,PHYX_FLOAT_NULL));
     variableStack.push(tmpVariable);
+
     //execute first run
     if (executeFunction(expression, parameters, false))
     {
@@ -3489,15 +3495,17 @@ void PhyxCalculator::calculateDataset(QString expression,
             tmpVariable->setUnit(unit);
             tmpVariable->setValue(PhyxValueDataType(value,PHYX_FLOAT_NULL));
             variableStack.push(tmpVariable);
+
             //execute
             executeFunction(expression, parameters,false);
             tmpVariable = variableStack.pop();
+
             //save data
             xData.append(PhyxValueDataType(value, PHYX_FLOAT_NULL));
             yData.append(tmpVariable->value());
             tmpVariable->deleteLater();
 
-            //increase
+            //increase value
             if (datasetType == PhyxVariableManager::LogarithmicDataset)
             {
                 value = pow(PHYX_FLOAT_TEN,logParamStartDecade+logParamStep*i);

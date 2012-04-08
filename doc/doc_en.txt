@@ -417,19 +417,30 @@ sqr2
 PhyxCalc provides an easy way to create datasets and to plot them. Datasets are multi-dimensional
 sets of data (currently only 2 dimensions are supported), similar to tables. To plot a function
 you need to create a dataset, all things concerning plotting can then be done in the plot window.
+Depending on the function you use, a dataset with linear or logarithmic scale will be created. 
+Logarithmic scales are especially usable where you need to plot a big range of data, like for 
+example frequency analysis.
 
 These functions can be used to create datasets: +
+*Linear datasets:* +
 data([<expression>],<parameter>,<start value>,<stop value>) +
 data([<expression>],<parameter>,<start value>,<stop value>,<step size>) +
+The first function will calculate the size of the steps automatically. +
+*Logarithmic datasets:* +
+datalog([<expression>],<parameter>,<start value>,<stop value>) +
+datalog([<expression>],<parameter>,<start value>,<stop value>,<steps>) +
+The first function will use 1000 steps.
 
-The first function will calculate the size of the steps automatically.
 
 *Examples:*
 ----
-data([x^2],x,-5,5) //creates a dataset from -5 to 5 for the expression x^2
-data([exp(y)],y,0,5,0.01) //creates a dataset from 0 to 5 with step size 0.01 for the exp function
+data([x^2],x,-5,5) //creates a linear dataset from -5 to 5 for the expression x^2
+data([exp(y)],y,0,5,0.01) //creates a linear dataset from 0 to 5 with step size 0.01 for the exp function
+datalog([H(j*2*pi*f)],f,1Hz,1MHz) //creates a logarithmic dataset from 1Hz to 1MHz
 ----
 
 To plot datasets you need to open the plot window and then click on a dataset, then configure
 the plot until you are satisfied. You can select multiple datasets to plot them in one window. 
 To rename datasets double click on them.
+
+*NOTE:* To plot logarithmic datasets correctly use logarithmic axis scales.
