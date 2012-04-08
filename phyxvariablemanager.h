@@ -37,11 +37,19 @@ public:
     } PhyxFunction;
     typedef QMap<QString, PhyxFunction*> PhyxFunctionMap;
 
+    enum DatasetType {
+        LinearDataset,
+        LogarithmicDataset
+    };
+
     typedef struct {
         QString name;
         QList<PhyxCompoundUnit*> unit;
         QList<QList<PhyxValueDataType> > data;
-        int selection;
+        bool plotted;
+        int plotXAxis;
+        int plotYAxis;
+        DatasetType type;
     } PhyxDataset;
     typedef QList<PhyxDataset*> PhyxDatasetList;
 

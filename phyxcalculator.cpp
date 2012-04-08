@@ -253,8 +253,10 @@ void PhyxCalculator::initialize()
     functionMap.insert("lowLevelCombinedAssignmentShiftRight", &PhyxCalculator::lowLevelCombinedAssignmentShiftRight);
     functionMap.insert("lowLevelOutput",                &PhyxCalculator::lowLevelOutput);
 
-    functionMap.insert("datasetCreate",   &PhyxCalculator::datasetCreate);
-    functionMap.insert("datasetCreateStep",   &PhyxCalculator::datasetCreateStep);
+    functionMap.insert("datasetCreate",         &PhyxCalculator::datasetCreate);
+    functionMap.insert("datasetCreateStep",     &PhyxCalculator::datasetCreateStep);
+    functionMap.insert("datasetLogCreate",      &PhyxCalculator::datasetLogCreate);
+    functionMap.insert("datasetLogCreateStep",  &PhyxCalculator::datasetLogCreateStep);
 
     loadGrammar(":/settings/grammar");
     earleyParser->setStartSymbol("S");
@@ -329,6 +331,9 @@ void PhyxCalculator::initialize()
     standardFunctionList.append("ans");
     standardFunctionList.append("gcd");
     standardFunctionList.append("lcm");
+
+    standardFunctionList.append("data");
+    standardFunctionList.append("datalog");
 
     for (int i = standardFunctionList.size()-1; i >= 0 ; i--)
     {
@@ -1079,7 +1084,7 @@ PhyxIntegerDataType PhyxCalculator::bcdToLongInt(PhyxIntegerDataType number)
     while (number != 0)
     {
         PhyxIntegerDataType digit = number & 0x0F;
-        output += pow(10.0,i) * digit;
+        output += pow(PHYX_FLOAT_TEN,i) * digit;
 
         number = number >> 4;
         i++;
@@ -2841,7 +2846,7 @@ void PhyxCalculator::functionAdd()
     while (!functionParameterStack.isEmpty())
     {
         functionParameters.append(functionParameterStack.pop());
-        valueBuffer = 1;
+        valueBuffer = PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL);
         pushVariable();     //for each parameter push 1 to stack for verifying the syntax of the expression
     }
 
@@ -3415,7 +3420,12 @@ void PhyxCalculator::lowLevelOutput()
     }
 }
 
-void PhyxCalculator::calculateDataset(QString expression, QStringList parameters, PhyxVariable *startVariable, PhyxFloatDataType stop, PhyxFloatDataType step)
+void PhyxCalculator::calculateDataset(QString expression,
+                                      QStringList parameters,
+                                      PhyxVariable *startVariable,
+                                      PhyxFloatDataType stop,
+                                      PhyxFloatDataType step,
+                                      PhyxVariableManager::DatasetType datasetType)
 {
     PhyxVariable *tmpVariable;
     PhyxCompoundUnit *unit;
@@ -3429,11 +3439,32 @@ void PhyxCalculator::calculateDataset(QString expression, QStringList parameters
     PhyxFloatDataType start = startVariable->value().real();
     PhyxFloatDataType value = start;
 
+    PhyxFloatDataType logParamStep = PHYX_FLOAT_ONE; //variable needed for logarithmic datasets
+    PhyxFloatDataType logParamStartDecade = PHYX_FLOAT_NULL; //variable needed for logarithmic datasets
+    int i = 2;
+
     dataset = new PhyxVariableManager::PhyxDataset; //create dataset
     dataset->name = expression;
+    dataset->type = datasetType;
+    dataset->plotted = true;
+    dataset->plotXAxis = 0;
+    dataset->plotYAxis = 0;
     xUnit = new PhyxCompoundUnit();
     yUnit = new PhyxCompoundUnit();
     PhyxCompoundUnit::copyCompoundUnit(startVariable->unit(), xUnit); //set x unit
+
+    //create parameters for logarithmic dataset
+    if (datasetType == PhyxVariableManager::LogarithmicDataset)
+    {
+        PhyxFloatDataType stopDecade;
+        PhyxFloatDataType decade;
+
+        logParamStartDecade = log10(start);
+        stopDecade = log10(stop);
+        decade = stopDecade - logParamStartDecade;
+
+        logParamStep = decade/step;
+    }
 
     //initialize first run
     tmpVariable = new PhyxVariable();
@@ -3465,9 +3496,15 @@ void PhyxCalculator::calculateDataset(QString expression, QStringList parameters
             xData.append(PhyxValueDataType(value, PHYX_FLOAT_NULL));
             yData.append(tmpVariable->value());
             tmpVariable->deleteLater();
-            //outputVariable();
+
             //increase
-            value += step;
+            if (datasetType == PhyxVariableManager::LogarithmicDataset)
+            {
+                value = pow(PHYX_FLOAT_TEN,logParamStartDecade+logParamStep*i);
+                i++;
+            }
+            else
+                value += step;
         }
 
         dataset->unit.append(xUnit);
@@ -3480,7 +3517,7 @@ void PhyxCalculator::calculateDataset(QString expression, QStringList parameters
     }
     else
     {
-        //raise some error
+        //raiseException(SyntaxError);
     }
 }
 
@@ -3496,7 +3533,7 @@ void PhyxCalculator::datasetCreateStep()
     QStringList parameters;
     parameters.append(stringBuffer);
 
-    calculateDataset(expression, parameters, startVariable, stop, step);
+    calculateDataset(expression, parameters, startVariable, stop, step, PhyxVariableManager::LinearDataset);
 
     pushVariables(0,3);
 }
@@ -3508,13 +3545,47 @@ void PhyxCalculator::datasetCreate()
     PhyxVariable *startVariable = variableList[0];
     PhyxFloatDataType start = variableList[0]->value().real();
     PhyxFloatDataType stop = variableList[1]->value().real();
-    PhyxFloatDataType step = (stop - start) / 1000.0L;
+    PhyxFloatDataType step = (stop - start) / PHYX_FLOAT_THOUSAND;
     QString expression = expressionBuffer;
 
     QStringList parameters;
     parameters.append(stringBuffer);
 
-    calculateDataset(expression, parameters, startVariable, stop, step);
+    calculateDataset(expression, parameters, startVariable, stop, step, PhyxVariableManager::LinearDataset);
+
+    pushVariables(0,2);
+}
+
+void PhyxCalculator::datasetLogCreateStep()
+{
+    popVariables(3);
+
+    PhyxVariable *startVariable = variableList[0];
+    PhyxFloatDataType stop = variableList[1]->value().real();
+    PhyxFloatDataType step = variableList[2]->value().real();
+    QString expression = expressionBuffer;
+
+    QStringList parameters;
+    parameters.append(stringBuffer);
+
+    calculateDataset(expression, parameters, startVariable, stop, step, PhyxVariableManager::LinearDataset);
+
+    pushVariables(0,3);
+}
+
+void PhyxCalculator::datasetLogCreate()
+{
+    popVariables(2);
+
+    PhyxVariable *startVariable = variableList[0];
+    PhyxFloatDataType stop = variableList[1]->value().real();
+    PhyxFloatDataType step = PHYX_FLOAT_THOUSAND;
+    QString expression = expressionBuffer;
+
+    QStringList parameters;
+    parameters.append(stringBuffer);
+
+    calculateDataset(expression, parameters, startVariable, stop, step, PhyxVariableManager::LogarithmicDataset);
 
     pushVariables(0,2);
 }

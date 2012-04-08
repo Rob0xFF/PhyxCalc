@@ -25,6 +25,10 @@
         <file alias="accessories-text-editor">images/accessories-text-editor.png</file>
         <file alias="help-contents">images/help-contents.png</file>
         <file alias="plot-icon">images/plot_icon.png</file>
+        <file alias="edit-delete">images/edit-delete.png</file>
+        <file alias="layer-visible-off">images/layer-visible-off.png</file>
+        <file alias="layer-visible-on">images/layer-visible-on.png</file>
+        <file alias="document-print">images/document-print.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="splash">images/splash.png</file>

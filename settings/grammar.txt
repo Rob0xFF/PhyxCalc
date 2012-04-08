@@ -55,6 +55,16 @@ S=|p3||OR|          ; listOrStart, listValueSave
 S=|p3||NOR|         ; listNorStart, listValueSave
 S=data([|functionString|],|string|,|p3|,|p3|,|p3|); valueCheckComplex3, datasetCreateStep
 S=data([|functionString|],|string|,|p3|,|p3|); valueCheckComplex2, datasetCreate
+S=datalog([|functionString|],|string|,|p3|,|p3|,|p3|); valueCheckComplex3, datasetLogCreateStep
+S=datalog([|functionString|],|string|,|p3|,|p3|); valueCheckComplex2, datasetLogCreate
+S=Data([|functionString|],|string|,|p3|,|p3|,|p3|); valueCheckComplex3, datasetCreateStep
+S=Data([|functionString|],|string|,|p3|,|p3|); valueCheckComplex2, datasetCreate
+S=Datalog([|functionString|],|string|,|p3|,|p3|,|p3|); valueCheckComplex3, datasetLogCreateStep
+S=Datalog([|functionString|],|string|,|p3|,|p3|); valueCheckComplex2, datasetLogCreate
+S=DATA([|functionString|],|string|,|p3|,|p3|,|p3|); valueCheckComplex3, datasetCreateStep
+S=DATA([|functionString|],|string|,|p3|,|p3|); valueCheckComplex2, datasetCreate
+S=DATALOG([|functionString|],|string|,|p3|,|p3|,|p3|); valueCheckComplex3, datasetLogCreateStep
+S=DATALOG([|functionString|],|string|,|p3|,|p3|); valueCheckComplex2, datasetLogCreate
 
 #Priority 1: sequential operator
 p1=|p1|,|p2|       ; lowLevelAdd

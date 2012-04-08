@@ -43,6 +43,7 @@
 #define PHYX_FLOAT_TWO 2.0L
 #define PHYX_FLOAT_THREE 3.0L
 #define PHYX_FLOAT_TEN 10.0L
+#define PHYX_FLOAT_THOUSAND 1000.0L
 #define FRACTION_MAX 1.0e-19L
 #define FRACTION_MIN 1.0e+19L
 #define FRACTION_BIGGEST 999999999999999999.0L
@@ -53,6 +54,7 @@ typedef long double                 PhyxFloatDataType;      /// the data type fo
 #define PHYX_FLOAT_TWO 2.0
 #define PHYX_FLOAT_THREE 3.0
 #define PHYX_FLOAT_TEN 10.0
+#define PHYX_FLOAT_THOUSAND 1000.0
 #define FRACTION_MAX 1.0e-19
 #define FRACTION_MIN 1.0e+19
 #define FRACTION_BIGGEST 999999999999999999.0

@@ -511,9 +511,16 @@ private:
     void lowLevelCombinedAssignmentShiftRight();
     void lowLevelOutput();
 
-    void calculateDataset(QString expression, QStringList parameters, PhyxVariable *startVariable, PhyxFloatDataType stop, PhyxFloatDataType step);
+    void calculateDataset(QString expression,
+                          QStringList parameters,
+                          PhyxVariable *startVariable,
+                          PhyxFloatDataType stop,
+                          PhyxFloatDataType step,
+                          PhyxVariableManager::DatasetType datasetType);
     void datasetCreateStep();
     void datasetCreate();
+    void datasetLogCreateStep();
+    void datasetLogCreate();
 
 signals:
     void variablesChanged();        ///< is emited when variables have changed

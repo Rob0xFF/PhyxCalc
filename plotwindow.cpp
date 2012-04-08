@@ -45,9 +45,13 @@ PlotWindow::PlotWindow(QWidget *parent) :
             this, SLOT(updateSettings()));
     connect(ui->settingsTitleGroup, SIGNAL(clicked(bool)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsXTitleGroup, SIGNAL(clicked(bool)),
+    connect(ui->settingsXBTitleGroup, SIGNAL(clicked(bool)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsYTitleGroup, SIGNAL(clicked(bool)),
+    connect(ui->settingsXTTitleGroup, SIGNAL(clicked(bool)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYLTitleGroup, SIGNAL(clicked(bool)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYRTitleGroup, SIGNAL(clicked(bool)),
             this, SLOT(updateSettings()));
     connect(ui->settingsGridGroup, SIGNAL(clicked(bool)),
             this, SLOT(updateSettings()));
@@ -65,33 +69,61 @@ PlotWindow::PlotWindow(QWidget *parent) :
             this, SLOT(updateSettings()));
     connect(ui->settingsLegendPositionCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsXTitleEdit, SIGNAL(textChanged(QString)),
+    connect(ui->settingsXBTitleEdit, SIGNAL(textChanged(QString)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsYTitleEdit, SIGNAL(textChanged(QString)),
+    connect(ui->settingsXTTitleEdit, SIGNAL(textChanged(QString)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsXAutoscaleCheck, SIGNAL(clicked()),
+    connect(ui->settingsYLTitleEdit, SIGNAL(textChanged(QString)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsYAutoscaleCheck, SIGNAL(clicked()),
+    connect(ui->settingsYRTitleEdit, SIGNAL(textChanged(QString)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsXScaleMinSpin, SIGNAL(valueChanged(double)),
+    connect(ui->settingsXBAutoscaleCheck, SIGNAL(clicked()),
             this, SLOT(updateSettings()));
-    connect(ui->settingsXScaleMaxSpin, SIGNAL(valueChanged(double)),
+    connect(ui->settingsXTAutoscaleCheck, SIGNAL(clicked()),
             this, SLOT(updateSettings()));
-    connect(ui->settingsXScaleStepSpin, SIGNAL(valueChanged(double)),
+    connect(ui->settingsYLAutoscaleCheck, SIGNAL(clicked()),
             this, SLOT(updateSettings()));
-    connect(ui->settingsYScaleMinSpin, SIGNAL(valueChanged(double)),
+    connect(ui->settingsYRAutoscaleCheck, SIGNAL(clicked()),
             this, SLOT(updateSettings()));
-    connect(ui->settingsYScaleMaxSpin, SIGNAL(valueChanged(double)),
+    connect(ui->settingsXBScaleMinSpin, SIGNAL(valueChanged(double)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsYScaleStepSpin, SIGNAL(valueChanged(double)),
+    connect(ui->settingsXBScaleMaxSpin, SIGNAL(valueChanged(double)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsXLogCheck, SIGNAL(clicked()),
+    connect(ui->settingsXBScaleStepSpin, SIGNAL(valueChanged(double)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsYLogCheck, SIGNAL(clicked()),
+    connect(ui->settingsXTScaleMinSpin, SIGNAL(valueChanged(double)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsXInvCheck, SIGNAL(clicked()),
+    connect(ui->settingsXTScaleMaxSpin, SIGNAL(valueChanged(double)),
             this, SLOT(updateSettings()));
-    connect(ui->settingsYInvCheck, SIGNAL(clicked()),
+    connect(ui->settingsXTScaleStepSpin, SIGNAL(valueChanged(double)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYLScaleMinSpin, SIGNAL(valueChanged(double)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYLScaleMaxSpin, SIGNAL(valueChanged(double)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYLScaleStepSpin, SIGNAL(valueChanged(double)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYRScaleMinSpin, SIGNAL(valueChanged(double)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYRScaleMaxSpin, SIGNAL(valueChanged(double)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYRScaleStepSpin, SIGNAL(valueChanged(double)),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsXBLogCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsXTLogCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYLLogCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYRLogCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsXBInvCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsXTInvCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYLInvCheck, SIGNAL(clicked()),
+            this, SLOT(updateSettings()));
+    connect(ui->settingsYRInvCheck, SIGNAL(clicked()),
             this, SLOT(updateSettings()));
 
     connect(ui->exportWidthSpin, SIGNAL(editingFinished()),
@@ -135,6 +167,10 @@ void PlotWindow::showEvent(QShowEvent *event)
 
 void PlotWindow::initializeGUI()
 {
+    ui->printButton->setIcon(QIcon::fromTheme("document-print",QIcon(":/icons/document-print")));
+    ui->saveButton->setIcon(QIcon::fromTheme("document-save",QIcon(":/icons/document-save")));
+    ui->clipboardButton->setIcon(QIcon::fromTheme("edit-copy",QIcon(":/icons/edit-copy")));
+
 #ifdef MOBILE_VERSION
     this->setWindowState(Qt::WindowMaximized);
 
@@ -184,50 +220,72 @@ void PlotWindow::updateDatasetTable()
             QCheckBox *checkBox = new QCheckBox();
             QButtonGroup *buttonGroupX = new QButtonGroup();
             QButtonGroup *buttonGroupY = new QButtonGroup();
-            QRadioButton *radioButtonXL = new QRadioButton();
-            QRadioButton *radioButtonXR = new QRadioButton();
-            QRadioButton *radioButtonYB = new QRadioButton();
-            QRadioButton *radioButtonYT = new QRadioButton();
-            QPushButton *button =new QPushButton("x");
+            QRadioButton *radioButtonXB = new QRadioButton();
+            QRadioButton *radioButtonXT = new QRadioButton();
+            QRadioButton *radioButtonYL = new QRadioButton();
+            QRadioButton *radioButtonYR = new QRadioButton();
+            QToolButton *button =new QToolButton();
 
-            buttonGroupX->addButton(radioButtonXL);
-            buttonGroupX->addButton(radioButtonXR);
-            buttonGroupY->addButton(radioButtonYB);
-            buttonGroupY->addButton(radioButtonYT);
-
-            radioButtonXL->setChecked(true);
-            radioButtonYB->setChecked(true);
+            buttonGroupX->addButton(radioButtonXB);
+            buttonGroupX->addButton(radioButtonXT);
+            buttonGroupY->addButton(radioButtonYL);
+            buttonGroupY->addButton(radioButtonYR);
 
             ui->datasetTable->setCellWidget(i, 0, checkBox);
-            ui->datasetTable->setCellWidget(i, 2, radioButtonXL);
-            ui->datasetTable->setCellWidget(i, 3, radioButtonXR);
-            ui->datasetTable->setCellWidget(i, 4, radioButtonYB);
-            ui->datasetTable->setCellWidget(i, 5, radioButtonYT);
+            ui->datasetTable->setCellWidget(i, 2, radioButtonXB);
+            ui->datasetTable->setCellWidget(i, 3, radioButtonXT);
+            ui->datasetTable->setCellWidget(i, 4, radioButtonYL);
+            ui->datasetTable->setCellWidget(i, 5, radioButtonYR);
             ui->datasetTable->setCellWidget(i, 6, button);
 
-            radioButtonXL->setEnabled(false);
-            radioButtonXR->setEnabled(false);
-            radioButtonYB->setEnabled(false);
-            radioButtonYT->setEnabled(false);
+            if (m_datasets->at(i)->plotXAxis == 0)
+                radioButtonXB->setChecked(true);
+            else
+                radioButtonXT->setChecked(true);
+
+            if(m_datasets->at(i)->plotYAxis == 0)
+                radioButtonYL->setChecked(true);
+            else
+                radioButtonYL->setChecked(true);
+
+            if (m_datasets->at(i)->plotted)
+                checkBox->setChecked(true);
+
+            button->setAutoRaise(true);
+            button->setIcon(QIcon::fromTheme("edit-delete",QIcon(":/icons/edit-delete")));
+
+            checkBox->setStyleSheet("QCheckBox::indicator {"
+                                    "width: 16px;"
+                                    "height: 16px;"
+                                    "margin-left: 2px"
+                                    "}"
+                                    "QCheckBox::indicator:checked"
+                                    "{"
+                                    "image: url(:/icons/layer-visible-on);"
+                                    "}"
+                                    "QCheckBox::indicator:unchecked"
+                                    "{"
+                                    "image: url(:/icons/layer-visible-off);"
+                                    "}");
 
             visibiltyCheckList.append(checkBox);
-            xLRadioList.append(radioButtonXL);
-            xRRadioList.append(radioButtonXR);
-            yBRadioList.append(radioButtonYB);
-            yTRadioList.append(radioButtonYT);
+            xBRadioList.append(radioButtonXB);
+            xTRadioList.append(radioButtonXT);
+            yLRadioList.append(radioButtonYL);
+            yRRadioList.append(radioButtonYR);
             xGroupList.append(buttonGroupX);
             yGroupList.append(buttonGroupY);
             deleteButtonList.append(button);
 
             connect(checkBox,SIGNAL(clicked()),
                     this,SLOT(updatePlots()));
-            connect(radioButtonXL,SIGNAL(clicked()),
+            connect(radioButtonXB,SIGNAL(clicked()),
                     this,SLOT(updatePlots()));
-            connect(radioButtonXR,SIGNAL(clicked()),
+            connect(radioButtonXT,SIGNAL(clicked()),
                     this,SLOT(updatePlots()));
-            connect(radioButtonYB,SIGNAL(clicked()),
+            connect(radioButtonYL,SIGNAL(clicked()),
                     this,SLOT(updatePlots()));
-            connect(radioButtonYT,SIGNAL(clicked()),
+            connect(radioButtonYR,SIGNAL(clicked()),
                     this,SLOT(updatePlots()));
 
             deleteSignalMapper->setMapping(button, i);
@@ -242,6 +300,8 @@ void PlotWindow::updateDatasetTable()
     ui->datasetTable->resizeColumnToContents(4);
     ui->datasetTable->resizeColumnToContents(5);
     ui->datasetTable->resizeColumnToContents(6);
+
+    updatePlots();
 }
 
 void PlotWindow::updatePlots()
@@ -262,34 +322,39 @@ void PlotWindow::updatePlots()
             int xAxis;
             int yAxis;
 
-            if (xLRadioList.at(i)->isChecked())
+            if (xBRadioList.at(i)->isChecked())
             {
                 xBAxisInUse = true;
                 xAxis = QwtPlot::xBottom;
+                m_datasets->at(i)->plotXAxis = 0;
             }
             else
             {
                 xTAxisInUse = true;
                 xAxis = QwtPlot::xTop;
+                m_datasets->at(i)->plotXAxis = 1;
             }
-            if (yBRadioList.at(i)->isChecked())
+            if (yLRadioList.at(i)->isChecked())
             {
                 yLAxisInUse = true;
                 yAxis = QwtPlot::yLeft;
+                m_datasets->at(i)->plotYAxis = 0;
             }
             else
             {
                 yRAxisInUse = true;
                 yAxis = QwtPlot::yRight;
+                m_datasets->at(i)->plotYAxis = 1;
             }
 
             plotDataset(i, xAxis, yAxis);   //plot selected
         }
 
-        xLRadioList.at(i)->setEnabled(checked);
-        xRRadioList.at(i)->setEnabled(checked);
-        yBRadioList.at(i)->setEnabled(checked);
-        yTRadioList.at(i)->setEnabled(checked);
+        xBRadioList.at(i)->setEnabled(checked);
+        xTRadioList.at(i)->setEnabled(checked);
+        yLRadioList.at(i)->setEnabled(checked);
+        yRRadioList.at(i)->setEnabled(checked);
+        m_datasets->at(i)->plotted = checked;
     }
 
     ui->qwtPlot->enableAxis(QwtPlot::xBottom,xBAxisInUse);
@@ -347,10 +412,10 @@ void PlotWindow::deleteDatasetTableItems()
     for (int i = 0; i < visibiltyCheckList.size(); i++)
     {
         visibiltyCheckList.at(i)->deleteLater();
-        xLRadioList.at(i)->deleteLater();
-        xRRadioList.at(i)->deleteLater();
-        yBRadioList.at(i)->deleteLater();
-        yTRadioList.at(i)->deleteLater();
+        xBRadioList.at(i)->deleteLater();
+        xTRadioList.at(i)->deleteLater();
+        yLRadioList.at(i)->deleteLater();
+        yRRadioList.at(i)->deleteLater();
         xGroupList.at(i)->deleteLater();
         yGroupList.at(i)->deleteLater();
         deleteButtonList.at(i)->deleteLater();
@@ -359,10 +424,10 @@ void PlotWindow::deleteDatasetTableItems()
     ui->datasetTable->clearContents();
 
     visibiltyCheckList.clear();
-    xLRadioList.clear();
-    xRRadioList.clear();
-    yBRadioList.clear();
-    yTRadioList.clear();
+    xBRadioList.clear();
+    xTRadioList.clear();
+    yLRadioList.clear();
+    yRRadioList.clear();
     xGroupList.clear();
     yGroupList.clear();
     deleteButtonList.clear();
@@ -402,57 +467,113 @@ void PlotWindow::updateSettings()
     else
         ui->qwtPlot->insertLegend(NULL);
 
-    if (ui->settingsXTitleGroup->isChecked())
-        ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, ui->settingsXTitleEdit->text());
+    //X title
+    if (ui->settingsXBTitleGroup->isChecked())
+        ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, ui->settingsXBTitleEdit->text());
     else
         ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, "");
 
-    if (ui->settingsYTitleGroup->isChecked())
-        ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, ui->settingsYTitleEdit->text());
+    if (ui->settingsXTTitleGroup->isChecked())
+        ui->qwtPlot->setAxisTitle(QwtPlot::xTop, ui->settingsXTTitleEdit->text());
+    else
+        ui->qwtPlot->setAxisTitle(QwtPlot::xTop, "");
+
+    //Y title
+    if (ui->settingsYLTitleGroup->isChecked())
+        ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, ui->settingsYLTitleEdit->text());
     else
         ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, "");
 
-    //axis things
-    if (ui->settingsXLogCheck->isChecked())
+    if (ui->settingsYRTitleGroup->isChecked())
+        ui->qwtPlot->setAxisTitle(QwtPlot::yRight, ui->settingsYRTitleEdit->text());
+    else
+        ui->qwtPlot->setAxisTitle(QwtPlot::yRight, "");
+
+    //X scale engine
+    if (ui->settingsXBLogCheck->isChecked())
         ui->qwtPlot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
     else
         ui->qwtPlot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine);
 
-    if (ui->settingsYLogCheck->isChecked())
+    if (ui->settingsXTLogCheck->isChecked())
+        ui->qwtPlot->setAxisScaleEngine(QwtPlot::xTop, new QwtLog10ScaleEngine);
+    else
+        ui->qwtPlot->setAxisScaleEngine(QwtPlot::xTop, new QwtLinearScaleEngine);
+
+    //Y scale engine
+    if (ui->settingsYLLogCheck->isChecked())
         ui->qwtPlot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
     else
         ui->qwtPlot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
 
-    ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Inverted,ui->settingsXInvCheck->isChecked());
-    ui->qwtPlot->axisScaleEngine(QwtPlot::yLeft)->setAttribute(QwtScaleEngine::Inverted,ui->settingsYInvCheck->isChecked());
+    if (ui->settingsYRLogCheck->isChecked())
+        ui->qwtPlot->setAxisScaleEngine(QwtPlot::yRight, new QwtLog10ScaleEngine);
+    else
+        ui->qwtPlot->setAxisScaleEngine(QwtPlot::yRight, new QwtLinearScaleEngine);
 
-    if (ui->settingsXAutoscaleCheck->isChecked())
+    //axis inverting
+    ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Inverted,ui->settingsXBInvCheck->isChecked());
+    ui->qwtPlot->axisScaleEngine(QwtPlot::xTop)->setAttribute(QwtScaleEngine::Inverted,ui->settingsXTInvCheck->isChecked());
+    ui->qwtPlot->axisScaleEngine(QwtPlot::yLeft)->setAttribute(QwtScaleEngine::Inverted,ui->settingsYLInvCheck->isChecked());
+    ui->qwtPlot->axisScaleEngine(QwtPlot::yRight)->setAttribute(QwtScaleEngine::Inverted,ui->settingsYRInvCheck->isChecked());
+
+    //X axis scale
+    if (ui->settingsXBAutoscaleCheck->isChecked())
     {
         ui->qwtPlot->setAxisAutoScale(QwtPlot::xBottom);
         ui->qwtPlot->updateAxes();
-        ui->settingsXScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xBottom)->lowerBound());
-        ui->settingsXScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xBottom)->upperBound());
-        ui->settingsXScaleStepSpin->setValue(ui->qwtPlot->axisStepSize(QwtPlot::xBottom));
+        ui->settingsXBScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xBottom)->lowerBound());
+        ui->settingsXBScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xBottom)->upperBound());
+        ui->settingsXBScaleStepSpin->setValue(ui->qwtPlot->axisStepSize(QwtPlot::xBottom));
     }
     else
         ui->qwtPlot->setAxisScale(QwtPlot::xBottom,
-                                  ui->settingsXScaleMinSpin->value(),
-                                  ui->settingsXScaleMaxSpin->value(),
-                                  ui->settingsXScaleStepSpin->value());
+                                  ui->settingsXBScaleMinSpin->value(),
+                                  ui->settingsXBScaleMaxSpin->value(),
+                                  ui->settingsXBScaleStepSpin->value());
 
-    if (ui->settingsYAutoscaleCheck->isChecked())
+    if (ui->settingsXTAutoscaleCheck->isChecked())
+    {
+        ui->qwtPlot->setAxisAutoScale(QwtPlot::xTop);
+        ui->qwtPlot->updateAxes();
+        ui->settingsXTScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xTop)->lowerBound());
+        ui->settingsXTScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xTop)->upperBound());
+        ui->settingsXTScaleStepSpin->setValue(ui->qwtPlot->axisStepSize(QwtPlot::xTop));
+    }
+    else
+        ui->qwtPlot->setAxisScale(QwtPlot::xTop,
+                                  ui->settingsXTScaleMinSpin->value(),
+                                  ui->settingsXTScaleMaxSpin->value(),
+                                  ui->settingsXTScaleStepSpin->value());
+
+    //Y axis scale
+    if (ui->settingsYLAutoscaleCheck->isChecked())
     {
         ui->qwtPlot->setAxisAutoScale(QwtPlot::yLeft);
         ui->qwtPlot->updateAxes();
-        ui->settingsYScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yLeft)->lowerBound());
-        ui->settingsYScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yLeft)->upperBound());
-        ui->settingsYScaleStepSpin->setValue(ui->qwtPlot->axisStepSize(QwtPlot::yLeft));
+        ui->settingsYLScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yLeft)->lowerBound());
+        ui->settingsYLScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yLeft)->upperBound());
+        ui->settingsYLScaleStepSpin->setValue(ui->qwtPlot->axisStepSize(QwtPlot::yLeft));
     }
     else
         ui->qwtPlot->setAxisScale(QwtPlot::yLeft,
-                                  ui->settingsYScaleMinSpin->value(),
-                                  ui->settingsYScaleMaxSpin->value(),
-                                  ui->settingsYScaleStepSpin->value());
+                                  ui->settingsYLScaleMinSpin->value(),
+                                  ui->settingsYLScaleMaxSpin->value(),
+                                  ui->settingsYLScaleStepSpin->value());
+
+    if (ui->settingsYRAutoscaleCheck->isChecked())
+    {
+        ui->qwtPlot->setAxisAutoScale(QwtPlot::yLeft);
+        ui->qwtPlot->updateAxes();
+        ui->settingsYRScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yRight)->lowerBound());
+        ui->settingsYRScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yRight)->upperBound());
+        ui->settingsYRScaleStepSpin->setValue(ui->qwtPlot->axisStepSize(QwtPlot::yRight));
+    }
+    else
+        ui->qwtPlot->setAxisScale(QwtPlot::yRight,
+                                  ui->settingsYRScaleMinSpin->value(),
+                                  ui->settingsYRScaleMaxSpin->value(),
+                                  ui->settingsYRScaleStepSpin->value());
 
     //update line settings
     for (int i = 0; i < plotCurves.size(); i++)
@@ -502,7 +623,9 @@ void PlotWindow::updateMMs()
 
 void PlotWindow::deleteDataset(int index)
 {
-    qDebug() << index;
+    delete (*m_datasets)[index];
+    m_datasets->removeAt(index);
+    updateDatasetTable();
 }
 
 void PlotWindow::renameDataSet(int row, int column)
@@ -770,24 +893,44 @@ void PlotWindow::on_lineColorButton_clicked()
     ui->qwtPlot->replot();
 }
 
-void PlotWindow::on_settingsYAutoscaleCheck_toggled(bool checked)
+void PlotWindow::on_settingsYLAutoscaleCheck_toggled(bool checked)
 {
-    ui->settingsYScaleMaxSpin->setEnabled(!checked);
-    ui->settingsYScaleMinSpin->setEnabled(!checked);
-    ui->settingsYScaleStepSpin->setEnabled(!checked);
-    ui->yScaleLabel1->setEnabled(!checked);
-    ui->yScaleLabel2->setEnabled(!checked);
-    ui->yScaleLabel3->setEnabled(!checked);
+    ui->settingsYLScaleMaxSpin->setEnabled(!checked);
+    ui->settingsYLScaleMinSpin->setEnabled(!checked);
+    ui->settingsYLScaleStepSpin->setEnabled(!checked);
+    ui->yLScaleLabel1->setEnabled(!checked);
+    ui->yLScaleLabel2->setEnabled(!checked);
+    ui->yLScaleLabel3->setEnabled(!checked);
 }
 
-void PlotWindow::on_settingsXAutoscaleCheck_toggled(bool checked)
+void PlotWindow::on_settingsYRAutoscaleCheck_toggled(bool checked)
 {
-    ui->settingsXScaleMaxSpin->setEnabled(!checked);
-    ui->settingsXScaleMinSpin->setEnabled(!checked);
-    ui->settingsXScaleStepSpin->setEnabled(!checked);
-    ui->xScaleLabel1->setEnabled(!checked);
-    ui->xScaleLabel2->setEnabled(!checked);
-    ui->xScaleLabel3->setEnabled(!checked);
+    ui->settingsYRScaleMaxSpin->setEnabled(!checked);
+    ui->settingsYRScaleMinSpin->setEnabled(!checked);
+    ui->settingsYRScaleStepSpin->setEnabled(!checked);
+    ui->yRScaleLabel1->setEnabled(!checked);
+    ui->yRScaleLabel2->setEnabled(!checked);
+    ui->yRScaleLabel3->setEnabled(!checked);
+}
+
+void PlotWindow::on_settingsXBAutoscaleCheck_toggled(bool checked)
+{
+    ui->settingsXBScaleMaxSpin->setEnabled(!checked);
+    ui->settingsXBScaleMinSpin->setEnabled(!checked);
+    ui->settingsXBScaleStepSpin->setEnabled(!checked);
+    ui->xBScaleLabel1->setEnabled(!checked);
+    ui->xBScaleLabel2->setEnabled(!checked);
+    ui->xBScaleLabel3->setEnabled(!checked);
+}
+
+void PlotWindow::on_settingsXTAutoscaleCheck_toggled(bool checked)
+{
+    ui->settingsXTScaleMaxSpin->setEnabled(!checked);
+    ui->settingsXTScaleMinSpin->setEnabled(!checked);
+    ui->settingsXTScaleStepSpin->setEnabled(!checked);
+    ui->xTScaleLabel1->setEnabled(!checked);
+    ui->xTScaleLabel2->setEnabled(!checked);
+    ui->xTScaleLabel3->setEnabled(!checked);
 }
 
 void PlotWindow::on_exportCurrentButton_clicked()
@@ -803,12 +946,12 @@ void PlotWindow::on_mobileSettingsButton_clicked(bool checked)
 {
     if (checked)
     {
-        ui->toolBox->show();
+        ui->tabWidget->show();
         ui->plotFrame->setVisible(false);
     }
     else
     {
-        ui->toolBox->hide();
+        ui->tabWidget->hide();
         ui->plotFrame->setVisible(true);
     }
 }

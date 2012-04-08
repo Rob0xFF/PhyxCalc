@@ -14,6 +14,7 @@
 #include <QCloseEvent>
 #include <QShowEvent>
 #include <QRadioButton>
+#include <QToolButton>
 #include <QCheckBox>
 #include <QSignalMapper>
 #include <QDebug>
@@ -103,9 +104,13 @@ private slots:
 
     void on_colorPlotBackgroundDeleteButton_clicked();
 
-    void on_settingsYAutoscaleCheck_toggled(bool checked);
+    void on_settingsYLAutoscaleCheck_toggled(bool checked);
 
-    void on_settingsXAutoscaleCheck_toggled(bool checked);
+    void on_settingsYRAutoscaleCheck_toggled(bool checked);
+
+    void on_settingsXBAutoscaleCheck_toggled(bool checked);
+
+    void on_settingsXTAutoscaleCheck_toggled(bool checked);
 
     void on_exportCurrentButton_clicked();
 
@@ -121,13 +126,13 @@ private:
     QwtLegend           *legend;
 
     QList<QCheckBox*>       visibiltyCheckList;
-    QList<QRadioButton*>    xLRadioList;
-    QList<QRadioButton*>    xRRadioList;
-    QList<QRadioButton*>    yBRadioList;
-    QList<QRadioButton*>    yTRadioList;
+    QList<QRadioButton*>    xBRadioList;
+    QList<QRadioButton*>    xTRadioList;
+    QList<QRadioButton*>    yLRadioList;
+    QList<QRadioButton*>    yRRadioList;
     QList<QButtonGroup*>    xGroupList;
     QList<QButtonGroup*>    yGroupList;
-    QList<QPushButton*>     deleteButtonList;
+    QList<QToolButton*>     deleteButtonList;
 
     QSignalMapper *deleteSignalMapper;
 
