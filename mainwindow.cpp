@@ -591,6 +591,10 @@ void MainWindow::initializeGUI()
     plotWindow = new PlotWindow(this);
     connect(plotWindow, SIGNAL(visibilityChanged(bool)),
             ui->action_Plot_Window, SLOT(setChecked(bool)));
+
+    //initialize plot action
+    connect(ui->actionPlot, SIGNAL(triggered()),
+            this, SLOT(showPlotDialog()));
 }
 
 void MainWindow::switchLayout(int number)
@@ -825,14 +829,8 @@ void MainWindow::dockWidgetPressed(QListWidgetItem *item)
 void MainWindow::showContexMenu(const QPoint &point)
 {
     QMenu *menu = documentList.at(activeTab)->expressionEdit->createStandardContextMenu();
-    QAction *actionPlotDialog = new QAction(this);
-
-    actionPlotDialog->setText(tr("Plot..."));
-    connect(actionPlotDialog, SIGNAL(triggered()),
-            this, SLOT(showPlotDialog()));
     menu->addSeparator();
-    menu->addAction(actionPlotDialog);
-
+    menu->addAction(ui->actionPlot);
     menu->exec(documentList.at(activeTab)->expressionEdit->mapToGlobal(point));
 }
 
@@ -841,10 +839,7 @@ void MainWindow::showPlotDialog()
     PlotDialog plotDialog;
     plotDialog.setExpression(documentList.at(activeTab)->expressionEdit->textCursor().selectedText());
     if (plotDialog.exec() == QDialog::Accepted)
-    {
-        //
         documentList.at(activeTab)->lineParser->appendLine(plotDialog.output());
-    }
 }
 
 void MainWindow::loadDock(const QString &name, const QStringList &items)
@@ -1165,9 +1160,11 @@ void MainWindow::on_actionAbout_triggered()
     version.remove("$Rev: ");
     version.remove(" $");
     version.prepend(VERSION_MAJOR);
+    QString qtVersion(QT_VERSION_STR);
+    QString qwtVersion(QWT_VERSION_STR);
     QMessageBox::about(this, tr("About PhyxCalc"),
                        tr("<h2>PhyxCalc %1</h2>"
-                          "Based on Qt 4.8 <br><br>"
+                          "Based on Qt %3 and Qwt %4 <br><br>"
                           "Built on %2 <br><br>"
                           "Copyright 2011 by Christian Schirm and Alexander R&ouml;ssler"
                           "<br><br>"
@@ -1184,7 +1181,10 @@ void MainWindow::on_actionAbout_triggered()
                           "You should have received a copy of the GNU General Public License<br>"
                           "along with PhyxCalc.  If not, see <a href='http://www.gnu.org/licenses'>http://www.gnu.org/licenses</a>"
                           "<br><br>"
-                          "For questions, improvements or bugs visit: <a href='https://sourceforge.net/p/phyxcalc/'>https://sourceforge.net/p/phyxcalc/</a>").arg(version, LAST_CHANGE));
+                          "For questions, improvements or bugs visit: <a href='https://sourceforge.net/p/phyxcalc/'>https://sourceforge.net/p/phyxcalc/</a>")
+                       .arg(version, LAST_CHANGE)
+                       .arg(qtVersion)
+                       .arg(qwtVersion));
 }
 
 void MainWindow::on_actionRecalculate_All_triggered()

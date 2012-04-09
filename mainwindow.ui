@@ -147,6 +147,7 @@
     <addaction name="actionRecalculate_All"/>
     <addaction name="actionRecalculate_from_Line"/>
     <addaction name="actionClear_Variables"/>
+    <addaction name="actionPlot"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -594,6 +595,14 @@
    </property>
    <property name="text">
     <string>&amp;Plot Window</string>
+   </property>
+  </action>
+  <action name="actionPlot">
+   <property name="text">
+    <string>&amp;Plot...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
   <zorder>prefixesDock</zorder>
