@@ -73,7 +73,8 @@ SOURCES += main.cpp\
     phyxvariablemanager.cpp \
     phyxsyntaxhighlighter.cpp \
     helpdialog.cpp \
-    plotwindow.cpp
+    plotwindow.cpp \
+    plotdialog.cpp
 
 HEADERS  += mainwindow.h \
             lineparser.h \
@@ -92,13 +93,15 @@ HEADERS  += mainwindow.h \
     phyxvariablemanager.h \
     phyxsyntaxhighlighter.h \
     helpdialog.h \
-    plotwindow.h
+    plotwindow.h \
+    plotdialog.h
 
 FORMS    += mainwindow.ui \
     exportdialog.ui \
     settingsdialog.ui \
     helpdialog.ui \
-    plotwindow.ui
+    plotwindow.ui \
+    plotdialog.ui
 
 RESOURCES += \
     images.qrc \

@@ -89,6 +89,10 @@ void LineParser::parseAll()
 
 void LineParser::parseFromCurrentPosition()
 {
+    QTextCursor textCursor = m_calculationEdit->textCursor();
+    textCursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
+    m_calculationEdit->setTextCursor(textCursor);
+
     while (!m_calculationEdit->textCursor().atEnd())
     {
         if (commentLineSelected())
@@ -245,7 +249,10 @@ void LineParser::insertOutput(QString text)
     textCursor.clearSelection();
     textCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
     if (textCursor.atEnd())
-        textCursor.insertText("\n");
+    {
+        if (!textCursor.block().text().isEmpty())
+            textCursor.insertText("\n");
+    }
     else
     {
         textCursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor);       // move cursor to the next line
@@ -296,6 +303,22 @@ void LineParser::deleteLine()
     textCursor.removeSelectedText();
     textCursor.deletePreviousChar();    //delete newline character
     m_calculationEdit->setTextCursor(textCursor);
+}
+
+void LineParser::appendLine(const QString &line)
+{
+    QTextCursor textCursor = m_calculationEdit->textCursor();
+    textCursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor); //move to the end
+    m_calculationEdit->setTextCursor(textCursor);
+
+    //insertNewLine();    //insert new line
+    insertOutput(line); //insert line
+
+    textCursor = m_calculationEdit->textCursor();
+    textCursor.movePosition(QTextCursor::PreviousBlock, QTextCursor::MoveAnchor);   //move to the line
+    m_calculationEdit->setTextCursor(textCursor);
+
+    parseFromCurrentPosition(); //parse the line
 }
 
 QString LineParser::replaceVariables(QString expression, bool insertValue, bool insertUnit)

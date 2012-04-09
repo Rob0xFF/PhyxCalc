@@ -587,7 +587,8 @@ void MainWindow::initializeGUI()
 #endif
     ui->mainToolBar->addAction(ui->actionClose);
 
-    plotWindow = new PlotWindow(this); //create plotwindow
+    //intialize plot window
+    plotWindow = new PlotWindow(this);
     connect(plotWindow, SIGNAL(visibilityChanged(bool)),
             ui->action_Plot_Window, SLOT(setChecked(bool)));
 }
@@ -647,6 +648,11 @@ void MainWindow::addNewTab()
     ui->tabWidget->addTab(newTab,QIcon(),tr("Untitled"));
     ui->tabWidget->setCurrentIndex(activeTab);
     newDocument->lineParser->setLoading(false);
+
+    //initialize custom context menu
+    newDocument->expressionEdit->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(newDocument->expressionEdit, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(showContexMenu(QPoint)));
 }
 
 bool MainWindow::closeTab(int index)
@@ -814,6 +820,31 @@ void MainWindow::dockWidgetPressed(QListWidgetItem *item)
 {
     documentList.at(activeTab)->expressionEdit->insertPlainText(item->toolTip().split(":").at(1).trimmed());
     documentList.at(activeTab)->expressionEdit->setFocus();
+}
+
+void MainWindow::showContexMenu(const QPoint &point)
+{
+    QMenu *menu = documentList.at(activeTab)->expressionEdit->createStandardContextMenu();
+    QAction *actionPlotDialog = new QAction(this);
+
+    actionPlotDialog->setText(tr("Plot..."));
+    connect(actionPlotDialog, SIGNAL(triggered()),
+            this, SLOT(showPlotDialog()));
+    menu->addSeparator();
+    menu->addAction(actionPlotDialog);
+
+    menu->exec(documentList.at(activeTab)->expressionEdit->mapToGlobal(point));
+}
+
+void MainWindow::showPlotDialog()
+{
+    PlotDialog plotDialog;
+    plotDialog.setExpression(documentList.at(activeTab)->expressionEdit->textCursor().selectedText());
+    if (plotDialog.exec() == QDialog::Accepted)
+    {
+        //
+        documentList.at(activeTab)->lineParser->appendLine(plotDialog.output());
+    }
 }
 
 void MainWindow::loadDock(const QString &name, const QStringList &items)

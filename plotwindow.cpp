@@ -310,6 +310,8 @@ void PlotWindow::updatePlots()
     bool xTAxisInUse = false;
     bool yLAxisInUse = false;
     bool yRAxisInUse = false;
+    bool xBLogarithmic = false;
+    bool xTLogarithmic = false;
 
     deletePlots();  //delete previous plots
 
@@ -327,12 +329,18 @@ void PlotWindow::updatePlots()
                 xBAxisInUse = true;
                 xAxis = QwtPlot::xBottom;
                 m_datasets->at(i)->plotXAxis = 0;
+
+                if (m_datasets->at(i)->type == PhyxVariableManager::LogarithmicDataset)
+                    xBLogarithmic = true;
             }
             else
             {
                 xTAxisInUse = true;
                 xAxis = QwtPlot::xTop;
                 m_datasets->at(i)->plotXAxis = 1;
+
+                if (m_datasets->at(i)->type == PhyxVariableManager::LogarithmicDataset)
+                    xTLogarithmic = true;
             }
             if (yLRadioList.at(i)->isChecked())
             {
@@ -361,6 +369,15 @@ void PlotWindow::updatePlots()
     ui->qwtPlot->enableAxis(QwtPlot::xTop,xTAxisInUse);
     ui->qwtPlot->enableAxis(QwtPlot::yLeft,yLAxisInUse);
     ui->qwtPlot->enableAxis(QwtPlot::yRight,yRAxisInUse);
+
+    if (xBLogarithmic)
+        ui->settingsXBLogCheck->setChecked(true);
+    else
+        ui->settingsXBLogCheck->setChecked(false);
+    if (xTLogarithmic)
+        ui->settingsXTLogCheck->setChecked(true);
+    else
+        ui->settingsXTLogCheck->setChecked(false);
 
     updateSettings();
 }

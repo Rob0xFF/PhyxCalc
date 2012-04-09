@@ -24,6 +24,7 @@
 #define VERSION_REV "$Rev$"
 #define LAST_CHANGE __DATE__ " " __TIME__
 #define MATH_OPERATORS "[+\\-\\*/\\(\\)<>!\\^=]"
+//push
 
 #if defined(Q_OS_SYMBIAN) || defined(Q_OS_ANDROID) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
 #define MOBILE_VERSION

@@ -67,6 +67,8 @@ public:
 
     void updateSettings();      ///< updates settings
 
+    void appendLine(const QString &line);
+
     QString variableToolTip(QString name);
     QString constantToolTip(QString name);
     QString functionToolTip(QString name);

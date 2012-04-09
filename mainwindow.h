@@ -38,6 +38,7 @@
 //#include "flowlayout.h"
 #include "settingsdialog.h"
 #include "plotwindow.h"
+#include "plotdialog.h"
 #include "global.h"
 
 typedef struct {
@@ -116,6 +117,9 @@ private slots:
     void loadListWidget(QListWidget *listWidget, const QStringList &items);
     void dockButtonPressed(QAbstractButton *button);
     void dockWidgetPressed(QListWidgetItem *item);
+
+    void showContexMenu(const QPoint &point);
+    void showPlotDialog();
 
     void openRecentDocument();
 
