@@ -192,7 +192,7 @@ void PlotWindow::initializeGUI()
 #ifdef MOBILE_VERSION
     this->setWindowState(Qt::WindowMaximized);
 
-    ui->toolBox->hide();
+    ui->tabWidget->hide();
     ui->mobileSettingsButton->setChecked(false);
 
     ui->mobileCloseButton->setIcon(QIcon::fromTheme("dialog-close",QIcon(":/icons/dialog-close")));
