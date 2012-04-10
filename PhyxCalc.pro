@@ -7,7 +7,7 @@
 # by adapting the examples below.
 # file1.source = myfile
 # dir1.source = mydir
-DEPLOYMENTFOLDERS = # file1 dir1
+#DEPLOYMENTFOLDERS = # file1 dir1
 
 symbian:TARGET.UID3 = 0xE4EA669C
 
@@ -19,7 +19,7 @@ symbian:TARGET.UID3 = 0xE4EA669C
 #symbian:DEPLOYMENT.installer_header = 0x2002CCCF
 
 # Allow network access on Symbian
-symbian:TARGET.CAPABILITY += NetworkServices
+# symbian:TARGET.CAPABILITY += NetworkServices
 
 # If your application uses the Qt Mobility libraries, uncomment
 # the following lines and add the respective components to the 
@@ -32,8 +32,6 @@ QT       += core gui svg
 TARGET = phyxcalc
 TEMPLATE = app
 
-#CONFIG += qwt
-
 win32 {
     INCLUDEPATH += ../boost \
                 ../qwt6/src
@@ -44,7 +42,8 @@ android {
                 ../qwt6/src
 }
 symbian {
-    INCLUDEPATH += ../qwt6/src
+    INCLUDEPATH += ../boost \
+                ../qwt6/src
 }
 
 linux-g++ | linux-g++-64 | linux-g++-32 {
@@ -69,7 +68,6 @@ SOURCES += main.cpp\
     phyxvariable.cpp \
     phyxunitsystem.cpp \
     phyxcompoundunit.cpp \
-    phyxtesting.cpp \
     phyxvariablemanager.cpp \
     phyxsyntaxhighlighter.cpp \
     helpdialog.cpp \
@@ -89,7 +87,6 @@ HEADERS  += mainwindow.h \
     phyxvariable.h \
     phyxunitsystem.h \
     phyxcompoundunit.h \
-    phyxtesting.h \
     phyxvariablemanager.h \
     phyxsyntaxhighlighter.h \
     helpdialog.h \
@@ -106,6 +103,9 @@ FORMS    += mainwindow.ui \
 RESOURCES += \
     images.qrc \
     settings.qrc
+
+TRANSLATIONS = l10n/phyxcalc_de.ts \
+    l10n/phyxcalc_fr.ts
 
 OTHER_FILES += \
     settings/grammar.txt \

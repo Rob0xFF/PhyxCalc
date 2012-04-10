@@ -297,7 +297,7 @@ private:
 
     void clearFlags();
 
-    void popVariables(int count);                       /// checks wheter enough variables are in the stack and loads them
+    bool popVariables(int count);                       /// checks wheter enough variables are in the stack and loads them
     void pushVariables(int count, int deleteCount);     /// push the given number of variables to the stack and delete the given number
 
     /** functions for value calculation */

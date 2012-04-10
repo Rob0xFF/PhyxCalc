@@ -591,7 +591,7 @@ void PhyxCalculator::removeUnitGroupRule(QString name)
 void PhyxCalculator::addFunctionRule(QString name, int parameterCount)
 {
     QString ruleString;
-    ruleString.append(QString("function=%1").arg(name));
+    ruleString.append(QString("custom_function=%1").arg(name));
     if (parameterCount == 1)
     {
         ruleString.append("|funcParam|");
@@ -615,7 +615,7 @@ void PhyxCalculator::addFunctionRule(QString name, int parameterCount)
 void PhyxCalculator::removeFunctionRule(QString name, int parameterCount)
 {
     QString ruleString;
-    ruleString.append(QString("function=%1").arg(name));
+    ruleString.append(QString("custom_function=%1").arg(name));
     if (parameterCount == 1)
     {
         ruleString.append("|funcParam|");
@@ -1359,17 +1359,18 @@ const PhyxCalculator::ExpressionCacheItem PhyxCalculator::earleyTreeToCacheItem(
     return cacheItem;
 }
 
-void PhyxCalculator::popVariables(int count)
+bool PhyxCalculator::popVariables(int count)
 {
     if (variableStack.size() < count)
     {
         raiseException(ProgramError);
-        return;
+        return false;
     }
     for (int i = count-1; i >= 0; i--)
     {
         variableList[i] = variableStack.pop();
     }
+    return true;
 }
 
 void PhyxCalculator::pushVariables(int count, int deleteCount)
@@ -1390,7 +1391,8 @@ void PhyxCalculator::pushVariables(int count, int deleteCount)
 
 void PhyxCalculator::valueCheckComplex()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     if (variableList[0]->isComplex())
         raiseException(ValueComplexError);
@@ -1400,7 +1402,8 @@ void PhyxCalculator::valueCheckComplex()
 
 void PhyxCalculator::valueCheckComplex2()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     if (variableList[0]->isComplex() || variableList[1]->isComplex())
         raiseException(ValueComplexError);
@@ -1410,7 +1413,8 @@ void PhyxCalculator::valueCheckComplex2()
 
 void PhyxCalculator::valueCheckComplex3()
 {
-    popVariables(3);
+    if (!popVariables(3))
+        return;
 
     if (variableList[0]->isComplex() || variableList[1]->isComplex() || variableList[2]->isComplex())
         raiseException(ValueComplexError);
@@ -1420,7 +1424,8 @@ void PhyxCalculator::valueCheckComplex3()
 
 void PhyxCalculator::valueCheckComplex2th()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     if (variableList[1]->isComplex())
         raiseException(ValueComplexError);
@@ -1430,7 +1435,8 @@ void PhyxCalculator::valueCheckComplex2th()
 
 void PhyxCalculator::valueCheckComplex3th()
 {
-    popVariables(3);
+    if (!popVariables(3))
+        return;
 
     if (variableList[0]->isComplex())
         raiseException(ValueComplexError);
@@ -1440,7 +1446,8 @@ void PhyxCalculator::valueCheckComplex3th()
 
 void PhyxCalculator::valueCheckPositive()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     if (!variableList[0]->isPositive())
         raiseException(ValueNotPositiveError);
@@ -1450,7 +1457,8 @@ void PhyxCalculator::valueCheckPositive()
 
 void PhyxCalculator::valueCheckInteger()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     if (!variableList[0]->isInteger())
         raiseException(ValueNotIntegerError);
@@ -1460,7 +1468,8 @@ void PhyxCalculator::valueCheckInteger()
 
 void PhyxCalculator::valueCheckInteger2()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     if (!variableList[0]->isInteger())
         raiseException(ValueNotIntegerError);
@@ -1472,7 +1481,8 @@ void PhyxCalculator::valueCheckInteger2()
 
 void PhyxCalculator::valueCheckInteger2th()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     if (!variableList[0]->isInteger())
         raiseException(ValueNotIntegerError);
@@ -1482,7 +1492,8 @@ void PhyxCalculator::valueCheckInteger2th()
 
 void PhyxCalculator::valueCheckInteger3th()
 {
-    popVariables(3);
+    if (!popVariables(3))
+        return;
 
     if (!variableList[0]->isInteger())
         raiseException(ValueNotIntegerError);
@@ -1510,7 +1521,8 @@ void PhyxCalculator::valuePush3()
 
 void PhyxCalculator::valueCopy()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[1] = new PhyxVariable(this);
     PhyxVariable::copyVariable(variableList[0], variableList[1]);
@@ -1520,7 +1532,8 @@ void PhyxCalculator::valueCopy()
 
 void PhyxCalculator::valueAdd()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(variableList[0]->value() + variableList[1]->value());
 
@@ -1529,7 +1542,8 @@ void PhyxCalculator::valueAdd()
 
 void PhyxCalculator::valueSub()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(variableList[0]->value() - variableList[1]->value());
 
@@ -1538,7 +1552,8 @@ void PhyxCalculator::valueSub()
 
 void PhyxCalculator::valueMul()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(variableList[0]->value() * variableList[1]->value());
 
@@ -1547,7 +1562,8 @@ void PhyxCalculator::valueMul()
 
 void PhyxCalculator::valueDiv()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(variableList[0]->value() / variableList[1]->value());
 
@@ -1556,7 +1572,8 @@ void PhyxCalculator::valueDiv()
 
 void PhyxCalculator::valueMod()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(variableList[0]->toInt() % variableList[1]->toInt()), PHYX_FLOAT_NULL));
 
@@ -1565,7 +1582,8 @@ void PhyxCalculator::valueMod()
 
 void PhyxCalculator::valueNeg()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(-variableList[0]->value());
 
@@ -1574,7 +1592,8 @@ void PhyxCalculator::valueNeg()
 
 void PhyxCalculator::valueNoPow()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     if (variableList[0]->unit()->isOne())
     {
@@ -1589,7 +1608,8 @@ void PhyxCalculator::valueNoPow()
 
 void PhyxCalculator::valuePow()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     if (variableList[1]->value().imag() == PHYX_FLOAT_NULL)     // precision fix
         variableList[0]->setValue(pow(variableList[0]->value(),variableList[1]->value().real()));
@@ -1601,7 +1621,8 @@ void PhyxCalculator::valuePow()
 
 void PhyxCalculator::valueSin()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(sin(variableList[0]->value()));
 
@@ -1610,7 +1631,8 @@ void PhyxCalculator::valueSin()
 
 void PhyxCalculator::valueArcsin()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(boost::math::asin(variableList[0]->value()));
 
@@ -1619,7 +1641,8 @@ void PhyxCalculator::valueArcsin()
 
 void PhyxCalculator::valueCos()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(cos(variableList[0]->value()));
 
@@ -1628,7 +1651,8 @@ void PhyxCalculator::valueCos()
 
 void PhyxCalculator::valueArccos()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(boost::math::acos(variableList[0]->value()));
 
@@ -1637,7 +1661,8 @@ void PhyxCalculator::valueArccos()
 
 void PhyxCalculator::valueTan()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(tan(variableList[0]->value()));
 
@@ -1646,7 +1671,8 @@ void PhyxCalculator::valueTan()
 
 void PhyxCalculator::valueArctan()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(boost::math::atan(variableList[0]->value()));
 
@@ -1655,7 +1681,8 @@ void PhyxCalculator::valueArctan()
 
 void PhyxCalculator::valueCot()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/tan(variableList[0]->value()));
 
@@ -1664,7 +1691,8 @@ void PhyxCalculator::valueCot()
 
 void PhyxCalculator::valueArccot()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/boost::math::atan(variableList[0]->value()));
 
@@ -1673,7 +1701,8 @@ void PhyxCalculator::valueArccot()
 
 void PhyxCalculator::valueSec()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/cos(variableList[0]->value()));
 
@@ -1682,7 +1711,8 @@ void PhyxCalculator::valueSec()
 
 void PhyxCalculator::valueArcsec()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/boost::math::acos(variableList[0]->value()));
 
@@ -1691,7 +1721,8 @@ void PhyxCalculator::valueArcsec()
 
 void PhyxCalculator::valueCsc()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/sin(variableList[0]->value()));
 
@@ -1700,7 +1731,8 @@ void PhyxCalculator::valueCsc()
 
 void PhyxCalculator::valueArccsc()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/boost::math::asin(variableList[0]->value()));
 
@@ -1709,7 +1741,8 @@ void PhyxCalculator::valueArccsc()
 
 void PhyxCalculator::valueSinh()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(sinh(variableList[0]->value()));
 
@@ -1718,7 +1751,8 @@ void PhyxCalculator::valueSinh()
 
 void PhyxCalculator::valueArcsinh()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(boost::math::asinh(variableList[0]->value()));
 
@@ -1727,7 +1761,8 @@ void PhyxCalculator::valueArcsinh()
 
 void PhyxCalculator::valueCosh()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(cosh(variableList[0]->value()));
 
@@ -1736,7 +1771,8 @@ void PhyxCalculator::valueCosh()
 
 void PhyxCalculator::valueArccosh()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(boost::math::acosh(variableList[0]->value()));
 
@@ -1745,7 +1781,8 @@ void PhyxCalculator::valueArccosh()
 
 void PhyxCalculator::valueTanh()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(tanh(variableList[0]->value()));
 
@@ -1754,7 +1791,8 @@ void PhyxCalculator::valueTanh()
 
 void PhyxCalculator::valueArctanh()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(boost::math::atanh(variableList[0]->value()));
 
@@ -1763,7 +1801,8 @@ void PhyxCalculator::valueArctanh()
 
 void PhyxCalculator::valueCoth()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/tanh(variableList[0]->value()));
 
@@ -1772,7 +1811,8 @@ void PhyxCalculator::valueCoth()
 
 void PhyxCalculator::valueArccoth()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/boost::math::atanh(variableList[0]->value()));
 
@@ -1781,7 +1821,8 @@ void PhyxCalculator::valueArccoth()
 
 void PhyxCalculator::valueSech()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/cosh(variableList[0]->value()));
 
@@ -1790,7 +1831,8 @@ void PhyxCalculator::valueSech()
 
 void PhyxCalculator::valueArcsech()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/boost::math::acosh(variableList[0]->value()));
 
@@ -1799,7 +1841,8 @@ void PhyxCalculator::valueArcsech()
 
 void PhyxCalculator::valueCsch()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/sinh(variableList[0]->value()));
 
@@ -1808,7 +1851,8 @@ void PhyxCalculator::valueCsch()
 
 void PhyxCalculator::valueArccsch()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(PHYX_FLOAT_ONE, PHYX_FLOAT_NULL)/boost::math::asinh(variableList[0]->value()));
 
@@ -1817,7 +1861,8 @@ void PhyxCalculator::valueArccsch()
 
 void PhyxCalculator::valueExp()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(exp(variableList[0]->value()));
 
@@ -1826,7 +1871,8 @@ void PhyxCalculator::valueExp()
 
 void PhyxCalculator::valueLn()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(log(variableList[0]->value()));
 
@@ -1835,7 +1881,8 @@ void PhyxCalculator::valueLn()
 
 void PhyxCalculator::valueLog10()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(log10(variableList[0]->value()));
 
@@ -1844,7 +1891,8 @@ void PhyxCalculator::valueLog10()
 
 void PhyxCalculator::valueLog2()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(log(variableList[0]->value()));
 
@@ -1853,7 +1901,8 @@ void PhyxCalculator::valueLog2()
 
 void PhyxCalculator::valueLogn()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(log(variableList[1]->value()) / log(variableList[0]->value()));
 
@@ -1862,7 +1911,8 @@ void PhyxCalculator::valueLogn()
 
 void PhyxCalculator::valueRoot()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(exp(log(variableList[1]->value()) / variableList[0]->value()));
 
@@ -1871,7 +1921,8 @@ void PhyxCalculator::valueRoot()
 
 void PhyxCalculator::valueSqrt()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(sqrt(variableList[0]->value()));
 
@@ -1880,7 +1931,8 @@ void PhyxCalculator::valueSqrt()
 
 void PhyxCalculator::valueAbs()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(abs(variableList[0]->value()));
 
@@ -1889,7 +1941,8 @@ void PhyxCalculator::valueAbs()
 
 void PhyxCalculator::valueMax()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     if (variableList[0]->value().real() >= variableList[1]->value().real())
     {
@@ -1905,7 +1958,8 @@ void PhyxCalculator::valueMax()
 
 void PhyxCalculator::valueMin()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     if (variableList[0]->value().real()<= variableList[1]->value().real())
     {
@@ -1921,7 +1975,8 @@ void PhyxCalculator::valueMin()
 
 void PhyxCalculator::valueAvg()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue((variableList[0]->value() + variableList[1]->value())
                         / PhyxValueDataType(PHYX_FLOAT_TWO,PHYX_FLOAT_NULL));
@@ -1953,7 +2008,8 @@ void PhyxCalculator::valueE()
 
 void PhyxCalculator::valueInt()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(variableList[0]->toInt()),PHYX_FLOAT_NULL));
 
@@ -1962,7 +2018,8 @@ void PhyxCalculator::valueInt()
 
 void PhyxCalculator::valueTrunc()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
 #ifndef Q_WS_S60
     PhyxValueDataType value(boost::math::trunc<PhyxFloatDataType>(variableList[0]->value().real()),PHYX_FLOAT_NULL);
@@ -1976,7 +2033,8 @@ void PhyxCalculator::valueTrunc()
 
 void PhyxCalculator::valueFloor()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
 
     variableList[0]->setValue(PhyxValueDataType(floor(variableList[0]->value().real()),PHYX_FLOAT_NULL));
@@ -1986,7 +2044,8 @@ void PhyxCalculator::valueFloor()
 
 void PhyxCalculator::valueRound()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
 #ifndef Q_WS_S60
     PhyxValueDataType value(boost::math::round<PhyxFloatDataType>(variableList[0]->value().real()),PHYX_FLOAT_NULL);
@@ -2000,7 +2059,8 @@ void PhyxCalculator::valueRound()
 
 void PhyxCalculator::valueCeil()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(ceil(variableList[0]->value().real()),PHYX_FLOAT_NULL));
 
@@ -2009,7 +2069,8 @@ void PhyxCalculator::valueCeil()
 
 void PhyxCalculator::valueSign()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     if (variableList[0]->value().real() > PHYX_FLOAT_NULL)
     {
@@ -2029,7 +2090,8 @@ void PhyxCalculator::valueSign()
 
 void PhyxCalculator::valueHeaviside()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     if (variableList[0]->value().real() >= PHYX_FLOAT_NULL)
         variableList[0]->setValue(PhyxValueDataType(PHYX_FLOAT_ONE,PHYX_FLOAT_NULL));
@@ -2048,7 +2110,8 @@ void PhyxCalculator::valueRand()
 
 void PhyxCalculator::valueRandint()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     PhyxIntegerDataType max = variableList[0]->toInt();
     valueBuffer = static_cast<PhyxIntegerDataType>(static_cast<PhyxFloatDataType>(max) * static_cast<PhyxFloatDataType>(qrand())/static_cast<PhyxFloatDataType>(RAND_MAX));
@@ -2060,7 +2123,8 @@ void PhyxCalculator::valueRandint()
 
 void PhyxCalculator::valueRandg()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     PhyxFloatDataType mean, standard;
     mean = variableList[0]->value().real();
@@ -2076,7 +2140,8 @@ void PhyxCalculator::valueRandg()
 
 void PhyxCalculator::valueFaculty()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     PhyxFloatDataType value = PHYX_FLOAT_ONE;
     int n = static_cast<int>(variableList[0]->toInt());
@@ -2091,7 +2156,8 @@ void PhyxCalculator::valueFaculty()
 
 void PhyxCalculator::valueBcd()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(bcdToLongInt(variableList[0]->toInt())),PHYX_FLOAT_NULL));
 
@@ -2100,7 +2166,8 @@ void PhyxCalculator::valueBcd()
 
 void PhyxCalculator::valueToBcd()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(static_cast<PhyxFloatDataType>(longIntToBcd(variableList[0]->toInt())),PHYX_FLOAT_NULL));
 
@@ -2115,7 +2182,8 @@ void PhyxCalculator::valueAns()
 
 void PhyxCalculator::valueGcd()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     PhyxIntegerDataType x = abs(variableList[0]->toInt());
     PhyxIntegerDataType y = abs(variableList[1]->toInt());
@@ -2127,7 +2195,8 @@ void PhyxCalculator::valueGcd()
 
 void PhyxCalculator::valueLcm()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     PhyxIntegerDataType x = abs(variableList[0]->toInt());
     PhyxIntegerDataType y = abs(variableList[1]->toInt());
@@ -2139,7 +2208,8 @@ void PhyxCalculator::valueLcm()
 
 void PhyxCalculator::complexReal()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(real(variableList[0]->value()),PHYX_FLOAT_NULL));
 
@@ -2148,7 +2218,8 @@ void PhyxCalculator::complexReal()
 
 void PhyxCalculator::complexImag()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(imag(variableList[0]->value()),PHYX_FLOAT_NULL));
 
@@ -2157,7 +2228,8 @@ void PhyxCalculator::complexImag()
 
 void PhyxCalculator::complexArg()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(arg(variableList[0]->value()),PHYX_FLOAT_NULL));
 
@@ -2166,7 +2238,8 @@ void PhyxCalculator::complexArg()
 
 void PhyxCalculator::complexNorm()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(PhyxValueDataType(norm(variableList[0]->value()),PHYX_FLOAT_NULL));
 
@@ -2175,7 +2248,8 @@ void PhyxCalculator::complexNorm()
 
 void PhyxCalculator::complexConj()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(conj(variableList[0]->value()));
 
@@ -2184,7 +2258,8 @@ void PhyxCalculator::complexConj()
 
 void PhyxCalculator::complexPolar()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(std::polar(variableList[0]->value().real(), variableList[1]->value().real()));
 
@@ -2193,7 +2268,8 @@ void PhyxCalculator::complexPolar()
 
 void PhyxCalculator::logicAnd()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(variableList[0]->value().real() && variableList[1]->value().real());
 
@@ -2202,7 +2278,8 @@ void PhyxCalculator::logicAnd()
 
 void PhyxCalculator::logicOr()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(variableList[0]->value().real() || variableList[1]->value().real());
 
@@ -2211,7 +2288,8 @@ void PhyxCalculator::logicOr()
 
 void PhyxCalculator::logicNand()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(!(variableList[0]->value().real() && variableList[1]->value().real()));
 
@@ -2220,7 +2298,8 @@ void PhyxCalculator::logicNand()
 
 void PhyxCalculator::logicNor()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(!(variableList[0]->value().real() || variableList[1]->value().real()));
 
@@ -2229,7 +2308,8 @@ void PhyxCalculator::logicNor()
 
 void PhyxCalculator::logicXand()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue((variableList[0]->value().real() && variableList[1]->value().real())
                         || (!variableList[0]->value().real() && !variableList[1]->value().real()));
@@ -2239,7 +2319,8 @@ void PhyxCalculator::logicXand()
 
 void PhyxCalculator::logicXor()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue((variableList[0]->value().real() && !variableList[1]->value().real())
                         || (!variableList[0]->value().real() && variableList[1]->value().real()));
@@ -2249,7 +2330,8 @@ void PhyxCalculator::logicXor()
 
 void PhyxCalculator::logicNot()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(!variableList[0]->value().real());
 
@@ -2258,7 +2340,8 @@ void PhyxCalculator::logicNot()
 
 void PhyxCalculator::logicEqual()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[2] = new PhyxVariable(this);
     variableList[2]->setValue((variableList[0]->value() == variableList[1]->value()) && variableList[0]->unit()->isSame(variableList[1]->unit()));
@@ -2269,7 +2352,8 @@ void PhyxCalculator::logicEqual()
 
 void PhyxCalculator::logicNotEqual()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[2] = new PhyxVariable(this);
     variableList[2]->setValue((variableList[0]->value() != variableList[1]->value()) || !variableList[0]->unit()->isSame(variableList[1]->unit()));
@@ -2280,7 +2364,8 @@ void PhyxCalculator::logicNotEqual()
 
 void PhyxCalculator::logicGreater()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[2] = new PhyxVariable(this);
     variableList[2]->setValue(variableList[0]->value().real() > variableList[1]->value().real());
@@ -2291,7 +2376,8 @@ void PhyxCalculator::logicGreater()
 
 void PhyxCalculator::logicGreaterOrEqual()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[2] = new PhyxVariable(this);
     variableList[2]->setValue(variableList[0]->value().real() >= variableList[1]->value().real());
@@ -2302,7 +2388,8 @@ void PhyxCalculator::logicGreaterOrEqual()
 
 void PhyxCalculator::logicSmaller()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[2] = new PhyxVariable(this);
     variableList[2]->setValue(variableList[0]->value().real() < variableList[1]->value().real());
@@ -2313,7 +2400,8 @@ void PhyxCalculator::logicSmaller()
 
 void PhyxCalculator::logicSmallerOrEqual()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[2] = new PhyxVariable(this);
     variableList[2]->setValue(variableList[0]->value().real() <= variableList[1]->value().real());
@@ -2324,7 +2412,8 @@ void PhyxCalculator::logicSmallerOrEqual()
 
 void PhyxCalculator::bitAnd()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(variableList[0]->toInt() & variableList[1]->toInt());
 
@@ -2333,7 +2422,8 @@ void PhyxCalculator::bitAnd()
 
 void PhyxCalculator::bitOr()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(variableList[0]->toInt() | variableList[1]->toInt());
 
@@ -2342,7 +2432,8 @@ void PhyxCalculator::bitOr()
 
 void PhyxCalculator::bitXor()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(variableList[0]->toInt() ^ variableList[1]->toInt());
 
@@ -2351,7 +2442,8 @@ void PhyxCalculator::bitXor()
 
 void PhyxCalculator::bitInv()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setValue(~variableList[0]->toInt());
 
@@ -2360,7 +2452,8 @@ void PhyxCalculator::bitInv()
 
 void PhyxCalculator::bitShiftLeft()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(variableList[0]->toInt() << variableList[1]->toInt());
 
@@ -2369,7 +2462,8 @@ void PhyxCalculator::bitShiftLeft()
 
 void PhyxCalculator::bitShiftRight()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->setValue(variableList[0]->toInt() >> variableList[1]->toInt());
 
@@ -2378,7 +2472,8 @@ void PhyxCalculator::bitShiftRight()
 
 void PhyxCalculator::conditionIfElse()
 {
-    popVariables(3);
+    if (!popVariables(3))
+        return;
 
     if (variableList[0]->toInt())
     {
@@ -2396,7 +2491,8 @@ void PhyxCalculator::conditionIfElse()
 
 void PhyxCalculator::unitCheckDimensionless()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     if (!variableList[0]->unit()->isDimensionlessUnit())
         raiseException(UnitNotDimensionlessError);
@@ -2408,7 +2504,8 @@ void PhyxCalculator::unitCheckDimensionless()
 
 void PhyxCalculator::unitCheckDimensionless2()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     if (!variableList[0]->unit()->isDimensionlessUnit() || !variableList[1]->unit()->isDimensionlessUnit())
         raiseException(UnitNotDimensionlessError);
@@ -2423,7 +2520,8 @@ void PhyxCalculator::unitCheckDimensionless2()
 
 void PhyxCalculator::unitCheckDimensionless2th()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     if (!variableList[0]->unit()->isDimensionlessUnit())
         raiseException(UnitNotDimensionlessError);
@@ -2435,7 +2533,8 @@ void PhyxCalculator::unitCheckDimensionless2th()
 
 void PhyxCalculator::unitCheckDimensionless3th()
 {
-    popVariables(3);
+    if (!popVariables(3))
+        return;
 
     if (!variableList[0]->unit()->isDimensionlessUnit())
         raiseException(UnitNotDimensionlessError);
@@ -2447,7 +2546,8 @@ void PhyxCalculator::unitCheckDimensionless3th()
 
 void PhyxCalculator::unitCheckConvertible()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     if (!variableList[0]->unit()->isConvertible(variableList[1]->unit()))
         raiseException(UnitsNotConvertibleError);
@@ -2459,7 +2559,8 @@ void PhyxCalculator::unitCheckConvertible()
 
 void PhyxCalculator::unitConvert()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     if (parameterBuffer.at(0).isNumber())   //add a multiplication sign if output seems to be something other than a unit
     {
@@ -2474,7 +2575,8 @@ void PhyxCalculator::unitConvert()
 
 void PhyxCalculator::unitMul()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->unit()->multiply(variableList[1]->unit());
 
@@ -2483,7 +2585,8 @@ void PhyxCalculator::unitMul()
 
 void PhyxCalculator::unitDiv()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->unit()->divide(variableList[1]->unit());
 
@@ -2492,7 +2595,8 @@ void PhyxCalculator::unitDiv()
 
 void PhyxCalculator::unitPow()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->unit()->raise(variableList[1]->value().real());
 
@@ -2501,7 +2605,8 @@ void PhyxCalculator::unitPow()
 
 void PhyxCalculator::unitRoot()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[0]->unit()->root(variableList[1]->value().real());
 
@@ -2510,7 +2615,8 @@ void PhyxCalculator::unitRoot()
 
 void PhyxCalculator::unitSqrt()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->unit()->root(PHYX_FLOAT_TWO);
 
@@ -2519,7 +2625,8 @@ void PhyxCalculator::unitSqrt()
 
 void PhyxCalculator::unitClear()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableList[0]->setUnit(new PhyxCompoundUnit(this));
 
@@ -2536,10 +2643,14 @@ void PhyxCalculator::unitAdd()
     {
         if (variableStack.size() == 2)
         {
-            popVariables(2);
+            if (!popVariables(2))
+                return;
         }
         else if (variableStack.size() == 1)
-            popVariables(1);
+        {
+            if (!popVariables(1))
+                return;
+        }
         else
         {
             raiseException(ProgramError);
@@ -2579,7 +2690,8 @@ void PhyxCalculator::unitRemove()
 
 void PhyxCalculator::variableAdd()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableManager->addVariable(stringBuffer, variableList[0]);
     stringBuffer.clear();
@@ -2638,7 +2750,8 @@ void PhyxCalculator::variablePostDec()
 
 void PhyxCalculator::constantAdd()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     variableManager->addConstant(stringBuffer, variableList[0]);
     stringBuffer.clear();
@@ -2759,7 +2872,8 @@ void PhyxCalculator::listValueLoad()
 
 void PhyxCalculator::listValueSwap()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     variableList[2]=variableList[0];
     variableList[0]=variableList[1];
@@ -2914,7 +3028,8 @@ void PhyxCalculator::bufferBin()
 
 void PhyxCalculator::bufferHexString()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     stringBuffer = longIntToHex(static_cast<PhyxIntegerDataType>(variableList[0]->value().real()));
 
@@ -2923,7 +3038,8 @@ void PhyxCalculator::bufferHexString()
 
 void PhyxCalculator::bufferOctString()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     stringBuffer = longIntToOct(static_cast<PhyxIntegerDataType>(variableList[0]->value().real()));
 
@@ -2932,7 +3048,8 @@ void PhyxCalculator::bufferOctString()
 
 void PhyxCalculator::bufferBinString()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     stringBuffer = longIntToBin(static_cast<PhyxIntegerDataType>(variableList[0]->value().real()));
 
@@ -3030,7 +3147,8 @@ void PhyxCalculator::outputVariable()
         {
             if (!listModeActive)
             {
-                popVariables(1);
+                if (!popVariables(1))
+                    return;
 
                 //set the special variable #
                 variableManager->addVariable("#", variableList[0]);
@@ -3131,7 +3249,8 @@ void PhyxCalculator::outputString()
 
 void PhyxCalculator::outputConvertedUnit()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     m_resultValue = variableList[0]->value();
     m_resultUnit = "";
@@ -3156,7 +3275,8 @@ void PhyxCalculator::unitGroupRemove()
 
 void PhyxCalculator::prefixAdd()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     unitSystem->addPrefix(stringBuffer, variableList[0]->value().real(), unitGroupBuffer, (flagBuffer & InputOnlyFlag));
 
@@ -3323,7 +3443,8 @@ void PhyxCalculator::lowLevelRun()
 
 void PhyxCalculator::lowLevelAssignment()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     appendLowLevelOperation(stringBuffer, AssignmentOperation, variableList[0]);
     stringBuffer.clear();
@@ -3337,7 +3458,8 @@ void PhyxCalculator::lowLevelAssignmentRemove()
 
 void PhyxCalculator::lowLevelCombinedAssignmentAdd()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationAdd, variableList[0]);
     nameBuffer.clear();
@@ -3345,7 +3467,8 @@ void PhyxCalculator::lowLevelCombinedAssignmentAdd()
 
 void PhyxCalculator::lowLevelCombinedAssignmentSub()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationSub, variableList[0]);
     nameBuffer.clear();
@@ -3353,7 +3476,8 @@ void PhyxCalculator::lowLevelCombinedAssignmentSub()
 
 void PhyxCalculator::lowLevelCombinedAssignmentMul()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationMul, variableList[0]);
     nameBuffer.clear();
@@ -3361,7 +3485,8 @@ void PhyxCalculator::lowLevelCombinedAssignmentMul()
 
 void PhyxCalculator::lowLevelCombinedAssignmentDiv()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationDiv, variableList[0]);
     nameBuffer.clear();
@@ -3369,7 +3494,8 @@ void PhyxCalculator::lowLevelCombinedAssignmentDiv()
 
 void PhyxCalculator::lowLevelCombinedAssignmentMod()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationMod, variableList[0]);
     nameBuffer.clear();
@@ -3377,7 +3503,8 @@ void PhyxCalculator::lowLevelCombinedAssignmentMod()
 
 void PhyxCalculator::lowLevelCombinedAssignmentAnd()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationAnd, variableList[0]);
     nameBuffer.clear();
@@ -3385,7 +3512,8 @@ void PhyxCalculator::lowLevelCombinedAssignmentAnd()
 
 void PhyxCalculator::lowLevelCombinedAssignmentOr()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationOr, variableList[0]);
     nameBuffer.clear();
@@ -3393,7 +3521,8 @@ void PhyxCalculator::lowLevelCombinedAssignmentOr()
 
 void PhyxCalculator::lowLevelCombinedAssignmentXor()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationXor, variableList[0]);
     nameBuffer.clear();
@@ -3401,7 +3530,8 @@ void PhyxCalculator::lowLevelCombinedAssignmentXor()
 
 void PhyxCalculator::lowLevelCombinedAssignmentShiftLeft()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationShiftLeft, variableList[0]);
     nameBuffer.clear();
@@ -3409,7 +3539,8 @@ void PhyxCalculator::lowLevelCombinedAssignmentShiftLeft()
 
 void PhyxCalculator::lowLevelCombinedAssignmentShiftRight()
 {
-    popVariables(1);
+    if (!popVariables(1))
+        return;
 
     appendLowLevelOperation(nameBuffer, CombinedAssignmentOperationShiftRight, variableList[0]);
     nameBuffer.clear();
@@ -3419,7 +3550,8 @@ void PhyxCalculator::lowLevelOutput()
 {
     if (stackLevel <= 1)    //deactivate this function for stack levels > 1
     {
-        popVariables(1);
+        if (!popVariables(1))
+            return;
 
         appendLowLevelOperation(QString(), OutputOperation, variableList[0]);
     }
@@ -3531,7 +3663,8 @@ void PhyxCalculator::calculateDataset(QString expression,
 
 void PhyxCalculator::datasetCreateStep()
 {
-    popVariables(3);
+    if (!popVariables(3))
+        return;
 
     PhyxVariable *startVariable = variableList[0];
     PhyxFloatDataType stop = variableList[1]->value().real();
@@ -3548,7 +3681,8 @@ void PhyxCalculator::datasetCreateStep()
 
 void PhyxCalculator::datasetCreate()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     PhyxVariable *startVariable = variableList[0];
     PhyxFloatDataType start = variableList[0]->value().real();
@@ -3566,7 +3700,8 @@ void PhyxCalculator::datasetCreate()
 
 void PhyxCalculator::datasetLogCreateStep()
 {
-    popVariables(3);
+    if (!popVariables(3))
+        return;
 
     PhyxVariable *startVariable = variableList[0];
     PhyxFloatDataType stop = variableList[1]->value().real();
@@ -3583,7 +3718,8 @@ void PhyxCalculator::datasetLogCreateStep()
 
 void PhyxCalculator::datasetLogCreate()
 {
-    popVariables(2);
+    if (!popVariables(2))
+        return;
 
     PhyxVariable *startVariable = variableList[0];
     PhyxFloatDataType stop = variableList[1]->value().real();

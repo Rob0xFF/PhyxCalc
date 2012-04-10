@@ -1099,7 +1099,10 @@ void MainWindow::on_actionOpen_triggered()
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::homePath(), tr("Text files (*.txt)"));
     if (!fileName.isEmpty())
     {
-        openDocument(fileName);
+        if (documentList.at(activeTab)->expressionEdit->document()->isModified())
+            openDocument(fileName,true);
+        else
+            openDocument(fileName, false);
     }
 }
 

@@ -1,3 +1,21 @@
+/**************************************************************************
+**
+** This file is part of PhyxCalc.
+**
+** PhyxCalc is free software: you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation, either version 3 of the License, or
+** (at your option) any later version.
+**
+** PhyxCalc is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with PhyxCalc.  If not, see <http://www.gnu.org/licenses/>.
+**
+***************************************************************************/
 #include "plotwindow.h"
 #include "ui_plotwindow.h"
 
@@ -580,7 +598,7 @@ void PlotWindow::updateSettings()
 
     if (ui->settingsYRAutoscaleCheck->isChecked())
     {
-        ui->qwtPlot->setAxisAutoScale(QwtPlot::yLeft);
+        ui->qwtPlot->setAxisAutoScale(QwtPlot::yRight);
         ui->qwtPlot->updateAxes();
         ui->settingsYRScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yRight)->lowerBound());
         ui->settingsYRScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yRight)->upperBound());
@@ -608,20 +626,42 @@ void PlotWindow::updateSettings()
     plotGrid->setMajPen(QPen(QColor(ui->colorGridButton->toolTip())));
     plotGrid->setMinPen(QPen(QColor(ui->colorGridMinButton->toolTip())));
 
-    QPalette palette = ui->qwtPlot->axisWidget(QwtPlot::yLeft)->palette();
-    palette.setColor(QPalette::WindowText, QColor(ui->colorAxisTicksButton->toolTip()));
-    palette.setColor(QPalette::Text, QColor(ui->colorAxisFontButton->toolTip()));
+    QPalette palette;
+    if (ui->qwtPlot->axisEnabled(QwtPlot::yLeft))
+    {
+        palette = ui->qwtPlot->axisWidget(QwtPlot::yLeft)->palette();
+        palette.setColor(QPalette::WindowText, QColor(ui->colorAxisTicksButton->toolTip()));
+        palette.setColor(QPalette::Text, QColor(ui->colorAxisFontButton->toolTip()));
+        ui->qwtPlot->axisWidget(QwtPlot::yLeft)->setPalette(palette);
+    }
+    if (ui->qwtPlot->axisEnabled(QwtPlot::yRight))
+    {
+        palette = ui->qwtPlot->axisWidget(QwtPlot::yRight)->palette();
+        palette.setColor(QPalette::WindowText, QColor(ui->colorAxisTicksButton->toolTip()));
+        palette.setColor(QPalette::Text, QColor(ui->colorAxisFontButton->toolTip()));
+        ui->qwtPlot->axisWidget(QwtPlot::yRight)->setPalette(palette);
+    }
+    if (ui->qwtPlot->axisEnabled(QwtPlot::xBottom))
+    {
+        palette = ui->qwtPlot->axisWidget(QwtPlot::xBottom)->palette();
+        palette.setColor(QPalette::WindowText, QColor(ui->colorAxisTicksButton->toolTip()));
+        palette.setColor(QPalette::Text, QColor(ui->colorAxisFontButton->toolTip()));
+        ui->qwtPlot->axisWidget(QwtPlot::xBottom)->setPalette(palette);
+    }
+    if (ui->qwtPlot->axisEnabled(QwtPlot::xTop))
+    {
+        palette = ui->qwtPlot->axisWidget(QwtPlot::xTop)->palette();
+        palette.setColor(QPalette::WindowText, QColor(ui->colorAxisTicksButton->toolTip()));
+        palette.setColor(QPalette::Text, QColor(ui->colorAxisFontButton->toolTip()));
+        ui->qwtPlot->axisWidget(QwtPlot::xTop)->setPalette(palette);
+    }
+
     for (int i = 0; i < plotCurves.size(); i++)
     {
         QwtText title = plotCurves.at(i)->title();
         title.setColor(QColor(ui->colorAxisFontButton->toolTip()));
         plotCurves.at(i)->setTitle(title);
     }
-    ui->qwtPlot->axisWidget(QwtPlot::yLeft)->setPalette(palette);
-    palette = ui->qwtPlot->axisWidget(QwtPlot::xBottom)->palette();
-    palette.setColor(QPalette::WindowText, QColor(ui->colorAxisTicksButton->toolTip()));
-    palette.setColor(QPalette::Text, QColor(ui->colorAxisFontButton->toolTip()));
-    ui->qwtPlot->axisWidget(QwtPlot::xBottom)->setPalette(palette);
 
     ui->qwtPlot->replot();
 }
