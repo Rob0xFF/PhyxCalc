@@ -219,7 +219,7 @@ void PhyxCompoundUnit::compoundsClear()
 {
     for (int i = (m_compounds.size()-1); i >= 0; i--)
     {
-        //m_compounds.at(i).unit->deleteLater();
+        m_compounds.at(i).unit->deleteLater();
         m_compounds.removeAt(i);
     }
 }

@@ -41,6 +41,10 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_zoomer.h>
+#include <qwt_plot_marker.h>
+#include <qwt_plot_picker.h>
+#include <qwt_picker_machine.h>
+#include <qwt_symbol.h>
 #include <qwt_legend.h>
 #include <qwt_scale_widget.h>
 #include <qwt_scale_div.h>
@@ -85,6 +89,7 @@ public slots:
 
 private slots:
     void updatePlots();
+    void updateMarkers();
     void updateSettings();
     void updatePixels();
     void updateMMs();
@@ -134,13 +139,23 @@ private slots:
 
     void on_mobileSettingsButton_clicked(bool checked);
 
+    void on_colorMarkerLineButton_clicked();
+
+    void on_colorMarkerLineDeleteButton_clicked();
+
+    void on_colorMarkerSymbolButton_clicked();
+
+    void on_colorMarkerSymbolDeleteButton_clicked();
+
 private:
     Ui::PlotWindow *ui;
     PhyxVariableManager::PhyxDatasetList * m_datasets;
 
     QList<QwtPlotCurve*> plotCurves;
+    QList<QwtPlotMarker*> plotMarkers;
     QwtPlotGrid         *plotGrid;
     QwtPlotZoomer       *plotZoomer;
+    QwtPlotPicker       *plotPicker;
     QwtLegend           *legend;
 
     QList<QCheckBox*>       visibiltyCheckList;

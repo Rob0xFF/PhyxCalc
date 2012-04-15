@@ -70,6 +70,8 @@ void setValue(PhyxValueDataType arg)
 }
 void setUnit(PhyxCompoundUnit * arg)
 {
+    m_unit->deleteLater();
+
     m_unit = arg;
     connect(m_unit, SIGNAL(offsetValue(PhyxFloatDataType)),
             this, SLOT(offsetValue(PhyxFloatDataType)));

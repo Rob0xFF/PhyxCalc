@@ -37,7 +37,6 @@
 #include "phyxunitsystem.h"
 #include "phyxvariable.h"
 #include "phyxvariablemanager.h"
-#include "phyxtesting.h"
 
 #ifndef Q_OS_SYMBIAN
 #include <boost/math/special_functions.hpp>

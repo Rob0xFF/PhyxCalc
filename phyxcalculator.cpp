@@ -53,7 +53,7 @@ void PhyxCalculator::initialize()
     qsrand(QDateTime::currentMSecsSinceEpoch());
 
     // create earley parser
-    earleyParser = new QEarleyParser();
+    earleyParser = new QEarleyParser(this);
 
     //map functions
     functionMap.insert("valueCheckComplex",     &PhyxCalculator::valueCheckComplex);
@@ -639,7 +639,13 @@ void PhyxCalculator::removeFunctionRule(QString name, int parameterCount)
 void PhyxCalculator::clearStack()
 {
     foreach (PhyxVariable *variable, variableStack)
-        variable->deleteLater();
+    {
+        if (variable)
+        {
+            variable->deleteLater();
+            variable = NULL;
+        }
+    }
     variableStack.clear();
     lowLevelStack.clear();
     functionParameterStack.clear();
@@ -2897,7 +2903,7 @@ bool PhyxCalculator::executeFunction(QString expression, QStringList parameters,
     //prevent gui from updating while function is running
     noGuiUpdate = true;
 
-    //psuh function parameters to stack
+    //push function parameters to stack
     for (int i = 0; i < parameters.size(); i++)
     {
         QString parameterName = parameters.at(i);
@@ -2910,6 +2916,8 @@ bool PhyxCalculator::executeFunction(QString expression, QStringList parameters,
         }
         variableManager->addVariable(parameterName, variableStack.pop());
     }
+
+    noGuiUpdate = false;
 
     //execute function
     QList<int> whiteSpaceList;
@@ -2935,8 +2943,16 @@ bool PhyxCalculator::executeFunction(QString expression, QStringList parameters,
             }
         }
     }
+
     if (!success)
+    {
+        if (m_error)
+            noGuiUpdate = true;
+
         raiseException(SyntaxError);
+    }
+
+    noGuiUpdate = true;
 
     //clear temporary variables
     for (int i = 0; i < parameters.size(); i++)
@@ -3629,8 +3645,10 @@ void PhyxCalculator::calculateDataset(QString expression,
             variableStack.push(tmpVariable);
 
             //execute
-            executeFunction(expression, parameters,false);
-            tmpVariable = variableStack.pop();
+            if (executeFunction(expression, parameters,false))
+                tmpVariable = variableStack.pop();
+            else
+                return;
 
             //save data
             xData.append(PhyxValueDataType(value, PHYX_FLOAT_NULL));
@@ -3657,7 +3675,9 @@ void PhyxCalculator::calculateDataset(QString expression,
     }
     else
     {
-        //raiseException(SyntaxError);
+        delete dataset;
+        delete xUnit;
+        delete yUnit;
     }
 }
 

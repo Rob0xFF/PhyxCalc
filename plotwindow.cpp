@@ -29,7 +29,6 @@ PlotWindow::PlotWindow(QWidget *parent) :
     initializeGUI();
 
     ui->qwtPlot->canvas()->setFrameStyle(QFrame::NoFrame);
-    //ui->qwtPlot->setMargin(5);
     ui->qwtPlot->setStyleSheet("QwtPlot { padding: 5px }"); //this is no fix at all
 
     plotGrid = new QwtPlotGrid();
@@ -37,6 +36,21 @@ PlotWindow::PlotWindow(QWidget *parent) :
     plotGrid->attach(ui->qwtPlot);
 
     plotZoomer = new QwtPlotZoomer(ui->qwtPlot->canvas());
+    plotZoomer->setTrackerMode(QwtPicker::AlwaysOn);
+
+    QwtPlotPicker *plotPicker = new QwtPlotPicker(ui->qwtPlot->canvas());
+    plotPicker->setRubberBand(QwtPlotPicker::CrossRubberBand);
+    plotPicker->setTrackerMode(QwtPicker::AlwaysOff);
+    plotPicker->setStateMachine(new QwtPickerDragPointMachine());
+    plotPicker->setRubberBandPen(QColor(Qt::black));
+    plotPicker->setRubberBand(QwtPicker::CrossRubberBand);
+    plotPicker->setTrackerPen(QColor(Qt::black));
+
+    //initialize marker
+    QwtPlotMarker *plotMarker = new QwtPlotMarker();
+    plotMarker->attach(ui->qwtPlot);
+    plotMarkers.append(plotMarker);
+    updateMarkers();
 
     setButtonColor(ui->colorBackgroundButton,Qt::white);
     setButtonColor(ui->colorPlotBackgroundButton, Qt::white);
@@ -44,6 +58,8 @@ PlotWindow::PlotWindow(QWidget *parent) :
     setButtonColor(ui->colorAxisFontButton,Qt::black);
     setButtonColor(ui->colorGridButton,QColor("#c3c3c3"));
     setButtonColor(ui->colorGridMinButton, QColor("#dcdcdc"));
+    setButtonColor(ui->colorMarkerLineButton, QColor(0,0,0));
+    setButtonColor(ui->colorMarkerSymbolButton, QColor(0,0,0));
 
     updatePixels();
 
@@ -157,11 +173,24 @@ PlotWindow::PlotWindow(QWidget *parent) :
     connect(ui->exportHeightMMSpin, SIGNAL(editingFinished()),
             this, SLOT(updatePixels()));
 
+    connect(ui->marker1Group, SIGNAL(toggled(bool)),
+            this, SLOT(updateMarkers()));
+    connect(ui->marker1XSpin, SIGNAL(valueChanged(double)),
+            this, SLOT(updateMarkers()));
+    connect(ui->marker1YSpin, SIGNAL(valueChanged(double)),
+            this, SLOT(updateMarkers()));
+    connect(ui->marker1LineCombo, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(updateMarkers()));
+    connect(ui->marker1SymbolCombo, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(updateMarkers()));
+    connect(ui->marker1SymbolSizeSpin, SIGNAL(valueChanged(int)),
+            this, SLOT(updateMarkers()));
+
     connect(ui->datasetTable,SIGNAL(cellChanged(int,int)),
             this, SLOT(renameDataSet(int,int)));
 
     //initialize signalmapper
-    deleteSignalMapper = new QSignalMapper();
+    deleteSignalMapper = new QSignalMapper(this);
     connect(deleteSignalMapper,SIGNAL(mapped(int)),
             this, SLOT(deleteDataset(int)));
 }
@@ -468,6 +497,23 @@ void PlotWindow::deleteDatasetTableItems()
     deleteButtonList.clear();
 }
 
+void PlotWindow::updateMarkers()
+{
+    QwtPlotMarker *plotMarker = plotMarkers.at(0);
+
+    plotMarker->setVisible(ui->marker1Group->isChecked());
+    plotMarker->setValue(ui->marker1XSpin->value(), ui->marker1YSpin->value());
+    plotMarker->setLineStyle((QwtPlotMarker::LineStyle)ui->marker1LineCombo->currentIndex());
+    plotMarker->setLinePen(QPen(QColor(ui->colorMarkerLineButton->toolTip())));
+    QwtSymbol *symbol = new QwtSymbol((QwtSymbol::Style)(ui->marker1SymbolCombo->currentIndex()-1));
+    symbol->setPen(QPen(QColor(ui->colorMarkerSymbolButton->toolTip())));
+    symbol->setBrush(QBrush(QColor(ui->colorMarkerSymbolButton->toolTip())));
+    symbol->setSize(ui->marker1SymbolSizeSpin->value(),ui->marker1SymbolSizeSpin->value());
+    plotMarker->setSymbol(symbol);
+
+    ui->qwtPlot->replot();
+}
+
 void PlotWindow::updateSettings()
 {
     if (ui->settingsTitleGroup->isChecked())
@@ -664,6 +710,7 @@ void PlotWindow::updateSettings()
     }
 
     ui->qwtPlot->replot();
+    plotZoomer->setZoomBase();
 }
 
 void PlotWindow::updatePixels()
@@ -937,6 +984,40 @@ void PlotWindow::on_colorAxisFontDeleteButton_clicked()
 {
     setButtonColor(ui->colorAxisFontButton, QColor(0,0,0));
     updateSettings();
+}
+
+void PlotWindow::on_colorMarkerLineButton_clicked()
+{
+    QColor color = QColorDialog::getColor(QColor(ui->colorMarkerLineButton->toolTip()),
+                                          this,
+                                          tr("Select Marker Line Color"));
+    if (color.isValid())
+        setButtonColor(ui->colorMarkerLineButton, color);
+
+    updateMarkers();
+}
+
+void PlotWindow::on_colorMarkerLineDeleteButton_clicked()
+{
+    setButtonColor(ui->colorMarkerLineButton, QColor(0,0,0));
+    updateMarkers();
+}
+
+void PlotWindow::on_colorMarkerSymbolButton_clicked()
+{
+    QColor color = QColorDialog::getColor(QColor(ui->colorMarkerSymbolButton->toolTip()),
+                                          this,
+                                          tr("Select Marker Line Color"));
+    if (color.isValid())
+        setButtonColor(ui->colorMarkerSymbolButton, color);
+
+    updateMarkers();
+}
+
+void PlotWindow::on_colorMarkerSymbolDeleteButton_clicked()
+{
+    setButtonColor(ui->colorMarkerSymbolButton, QColor(0,0,0));
+    updateMarkers();
 }
 
 void PlotWindow::on_lineColorButton_clicked()

@@ -49,7 +49,6 @@ LineParser::LineParser(QObject *)
 
 LineParser::~LineParser()
 {
-
 }
 
 void LineParser::parseLine(bool linebreak)
@@ -311,12 +310,7 @@ void LineParser::appendLine(const QString &line)
     textCursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor); //move to the end
     m_calculationEdit->setTextCursor(textCursor);
 
-    //insertNewLine();    //insert new line
     insertOutput(line); //insert line
-
-    textCursor = m_calculationEdit->textCursor();
-    textCursor.movePosition(QTextCursor::PreviousBlock, QTextCursor::MoveAnchor);   //move to the line
-    m_calculationEdit->setTextCursor(textCursor);
 
     parseFromCurrentPosition(); //parse the line
 }

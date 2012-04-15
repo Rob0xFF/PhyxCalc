@@ -516,7 +516,7 @@ void MainWindow::initializeGUI()
             ui->actionFunctions, SLOT(setChecked(bool)));
 
     //initialize special buttons
-    QMenu *configureMenu = new QMenu();
+    QMenu *configureMenu = new QMenu(this);
     configureMenu->addMenu(ui->menuFile);
     configureMenu->addMenu(ui->menuEdit);
     configureMenu->addMenu(ui->menuCalculation);
@@ -671,8 +671,8 @@ bool MainWindow::closeTab(int index)
     if (ui->tabWidget->count() != 1)
     {
         ui->tabWidget->removeTab(index);
-        delete document->lineParser;
-        delete document->expressionEdit;
+        document->lineParser->deleteLater();
+        document->expressionEdit->deleteLater();
         documentList.removeAt(index);;
         delete document;
     }
