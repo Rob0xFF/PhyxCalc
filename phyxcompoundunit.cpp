@@ -219,7 +219,7 @@ void PhyxCompoundUnit::compoundsClear()
 {
     for (int i = (m_compounds.size()-1); i >= 0; i--)
     {
-        m_compounds.at(i).unit->deleteLater();
+        //m_compounds.at(i).unit->deleteLater();
         m_compounds.removeAt(i);
     }
 }
@@ -380,7 +380,7 @@ bool PhyxCompoundUnit::convertTo(PhyxCompoundUnit *unit)
         scaleValue(pow(unit->compounds().at(i).unit->scaleFactor(), -unit->compounds().at(i).power));
     }
 
-    this->compoundsClear();
+    this->compoundsSetNull();
     this->compoundsMultiply(unit->compounds());
 
     return true;
