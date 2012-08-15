@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //nasty workaround for finding the settings directory
     QSettings tmpConfig(QSettings::IniFormat, QSettings::UserScope, "phyxcalc", "settings");
     settingsDir = QFileInfo(tmpConfig.fileName()).absolutePath() + "/";
+    autosaveFilename = settingsDir + "autosave.txt";
     //settingsDir = QDir::currentPath() + "/settings/";
     firstStartConfig();
 
@@ -53,6 +54,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     loadSettings();
     addNewTab();
+
+    restoreDocument();  //in case of a crash restore the document
 }
 
 MainWindow::~MainWindow()
@@ -67,6 +70,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     else
     {
         saveSettings();
+        deleteAutosaves();
     }
 }
 
@@ -89,6 +93,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                     documentList.at(activeTab)->lineParser->parseLine(false);
                  else
                     documentList.at(activeTab)->lineParser->parseLine(true);
+
+                 autosaveDocument();
 
                  return true;
              }
@@ -641,7 +647,7 @@ void MainWindow::addNewTab()
 
     newDocument->expressionEdit->installEventFilter(this);
     connect(newDocument->expressionEdit->document(), SIGNAL(modificationChanged(bool)),
-            this, SLOT(documentModified(bool)));
+            this, SLOT(documentModified()));
     connect(newDocument->lineParser, SIGNAL(listWidgetUpdate(QListWidget*,QStringList)),
             this, SLOT(loadListWidget(QListWidget*,QStringList)));
 
@@ -649,9 +655,10 @@ void MainWindow::addNewTab()
     layout->setMargin(0);
     newTab->setLayout(layout);
 
-    ui->tabWidget->addTab(newTab,QIcon(),tr("Untitled"));
+    ui->tabWidget->addTab(newTab,QIcon(),"");
     ui->tabWidget->setCurrentIndex(activeTab);
     newDocument->lineParser->setLoading(false);
+    syncDocumentTitle();
 
     //initialize custom context menu
     newDocument->expressionEdit->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -678,12 +685,11 @@ bool MainWindow::closeTab(int index)
     }
     else
     {
-        document->name = "";
+        document->name = tr("Untitled");
         document->path = "";
         document->expressionEdit->clear();
         document->lineParser->clearAllVariables();
         document->expressionEdit->document()->setModified(false);
-        ui->tabWidget->setTabText(0, tr("Untitled"));
     }
 
     emit tabChanged(activeTab);
@@ -706,12 +712,15 @@ void MainWindow::tabChanged(int index)
 {
     activeTab = index;
     documentList.at(activeTab)->lineParser->updateSettings();
+    syncDocumentTitle();
 }
 
 bool MainWindow::saveDocument(Document *document, bool force, bool exit)
 {
     //check wheter the document is unchanged or not
-    if (!document->expressionEdit->document()->isModified() && !force)
+    if (!(document->expressionEdit->document()->isModified() ||
+            ((document->name == "") && !exit)
+            || force))
         return true;
 
     //exit = if tab is closed
@@ -739,7 +748,7 @@ bool MainWindow::saveDocument(Document *document, bool force, bool exit)
     //ask for a filename
     if (document->name.isEmpty() || force)
     {
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save Document"), QDir::homePath() + "/" + document->name, tr("Text files (*.txt)"));
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save Document"), QDir::homePath() + "/" + document->name, tr("Text files (*.txt)(*.txt)"));
 
         if (fileName.isEmpty())
             return false;
@@ -761,7 +770,7 @@ bool MainWindow::saveDocument(Document *document, bool force, bool exit)
         file.close();
 
         document->expressionEdit->document()->setModified(false);
-        ui->tabWidget->setTabText(documentList.indexOf(document), document->name);
+        syncDocumentTitle();
 
         addRecentDocument(file.fileName());
     }
@@ -794,7 +803,7 @@ void MainWindow::openDocument(QString fileName, bool newTab)
         document->name = fileName.mid(pos+1);
         document->expressionEdit->document()->setModified(false);
 
-        ui->tabWidget->setTabText(activeTab, document->name);
+        syncDocumentTitle();
 
         addRecentDocument(fileName);
     }
@@ -804,14 +813,59 @@ void MainWindow::openDocument(QString fileName, bool newTab)
     }
 }
 
-void MainWindow::documentModified(bool modified)
+void MainWindow::autosaveDocument()
 {
-    //Document *document = documentList.at(activeTab);
-    if (modified)
+    QFile file(autosaveFilename);
+    if (file.open(QIODevice::WriteOnly))
     {
-        if (ui->tabWidget->tabText(activeTab).at(ui->tabWidget->tabText(activeTab).size()-1) != '*')
-            ui->tabWidget->setTabText(activeTab, ui->tabWidget->tabText(activeTab) + "*");
+        file.write(documentList.at(activeTab)->expressionEdit->toPlainText().toUtf8());
+        file.close();
     }
+    else
+    {
+        QMessageBox::warning(this, tr("Error"), tr("An Error occured, can't save file %1").arg(file.fileName()));
+    }
+}
+
+void MainWindow::restoreDocument()
+{
+    if (QFile::exists(autosaveFilename))
+        openDocument(autosaveFilename,false);
+}
+
+void MainWindow::deleteAutosaves()
+{
+    if (QFile::exists(autosaveFilename))
+        QFile::remove(autosaveFilename);
+}
+
+void MainWindow::syncDocumentTitle()
+{
+    QString name;
+
+    if (documentList.at(activeTab)->name == "")
+        name = tr("Untitled");
+    else
+        name = documentList.at(activeTab)->name;
+
+    QString tabText = name;
+    QString windowText = name;
+
+    if (documentList.at(activeTab)->expressionEdit->document()->isModified())
+    {
+        tabText.append("*");
+        windowText.append(tr(" [modified]"));
+    }
+
+    windowText.append(tr(" - PhyxCalc"));
+
+    ui->tabWidget->setTabText(activeTab, tabText);
+    this->setWindowTitle(windowText);
+}
+
+void MainWindow::documentModified()
+{
+    syncDocumentTitle();
 }
 
 void MainWindow::dockButtonPressed(QAbstractButton *button)
@@ -1096,7 +1150,7 @@ void MainWindow::on_actionSave_All_triggered()
 
 void MainWindow::on_actionOpen_triggered()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::homePath(), tr("Text files (*.txt)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::homePath(), tr("Text files (*.txt)(*.txt)"));
     if (!fileName.isEmpty())
     {
         if (documentList.at(activeTab)->expressionEdit->document()->isModified())

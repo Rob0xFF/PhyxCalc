@@ -87,6 +87,7 @@ private:
     QStringList     recentDocuments;
 
     QString settingsDir;                /// the directory in which the settigs are stored
+    QString autosaveFilename;           /// the name of the file used for autosaves
 
     void addNewTab();
 
@@ -96,6 +97,9 @@ private:
     void saveSettings();
     bool saveDocument(Document *document, bool force = false, bool exit = false);
     void openDocument(QString fileName, bool newTab = true);
+    void restoreDocument();
+    void deleteAutosaves();
+    void syncDocumentTitle();
 
     void loadAllDocks();
     void loadDock(const QString &name, const QStringList & items);
@@ -112,7 +116,8 @@ private slots:
     bool closeTab(int index);
     bool closeAllTabs();
 
-    void documentModified(bool modified);
+    void documentModified();
+    void autosaveDocument();
 
     void loadListWidget(QListWidget *listWidget, const QStringList &items);
     void dockButtonPressed(QAbstractButton *button);
@@ -125,35 +130,20 @@ private slots:
 
     void on_actionNew_Tab_triggered();
     void on_actionExport_triggered();
-
     void on_actionSave_triggered();
-
     void on_actionSave_As_triggered();
-
     void on_actionOpen_triggered();
-
     void on_actionClose_triggered();
-
     void on_actionUndo_triggered();
-
     void on_actionRedo_triggered();
-
     void on_actionSave_All_triggered();
-
     void on_actionSettings_triggered();
-
     void on_actionAbout_triggered();
-
     void on_actionCut_triggered();
-
     void on_actionCopy_triggered();
-
     void on_actionPaste_triggered();
-
     void on_actionClose_Other_triggered();
-
     void on_actionRecalculate_All_triggered();
-
     void on_actionRecalculate_from_Line_triggered();
     void on_action_Slim_Mode_triggered();
     void on_actionClear_Variables_triggered();
