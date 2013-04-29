@@ -289,7 +289,7 @@ private:
     void raiseException(int errorNumber);                                       ///< raises an exception
     void addRule(QString rule, QString functions = "");                         ///< adds a rule
 
-    PhyxUnitSystem::PhyxPrefix getBestPrefix(PhyxFloatDataType value, QString unitGroup, QString preferedPrefix) const;     ///< gets the best fitting prefix
+    PhyxUnitSystem::PhyxPrefix getBestPrefix(PhyxFloatDataType value, PhyxFloatDataType power, QString unitGroup, QString preferedPrefix) const;     ///< gets the best fitting prefix
 
     void clearStack();
     void clearResult();

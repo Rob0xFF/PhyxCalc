@@ -116,7 +116,14 @@ OTHER_FILES += \
     settings/electronicFunctions.txt \
     settings/numbersDock.txt \
     settings/operatorsDock.txt \
-    doc/doc_en.txt
+    doc/doc_en.txt \
+    qtc_packaging/debian_harmattan/rules \
+    qtc_packaging/debian_harmattan/README \
+    qtc_packaging/debian_harmattan/manifest.aegis \
+    qtc_packaging/debian_harmattan/copyright \
+    qtc_packaging/debian_harmattan/control \
+    qtc_packaging/debian_harmattan/compat \
+    qtc_packaging/debian_harmattan/changelog
 
 # Please do not modify the following two lines. Required for deployment.
 include(deployment.pri)

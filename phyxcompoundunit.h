@@ -28,6 +28,12 @@ class PhyxUnitSystem;
 
 class PhyxCompoundUnit : public PhyxUnit
 {
+    Q_OBJECT
+    Q_PROPERTY(PhyxUnitSystem *unitSystem READ unitSystem WRITE setUnitSystem)
+    Q_PROPERTY(PhyxCompoundList compounds READ compounds WRITE setCompounds)
+
+public:
+
     /// a compound of the compound unit
     typedef struct CompoundStruct{
         PhyxUnit                *unit;  /// the unit of the compound
@@ -36,14 +42,12 @@ class PhyxCompoundUnit : public PhyxUnit
         bool operator == (CompoundStruct compound){
             return (unit->isSame(compound.unit) && (power == compound.power));
         }
+        void operator = (CompoundStruct compound){
+            PhyxUnit::copyUnit(compound.unit, this->unit);
+            this->power = compound.power;
+        }
     } PhyxCompound;
     typedef QList<PhyxCompound>     PhyxCompoundList;
-
-    Q_OBJECT
-    Q_PROPERTY(PhyxUnitSystem *unitSystem READ unitSystem WRITE setUnitSystem)
-    Q_PROPERTY(PhyxCompoundList compounds READ compounds WRITE setCompounds)
-
-public:
     explicit PhyxCompoundUnit(QObject *parent = 0);
     ~PhyxCompoundUnit();
 

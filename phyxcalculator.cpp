@@ -1252,11 +1252,11 @@ PhyxCalculator::PhyxFraction PhyxCalculator::decimalToFraction(PhyxFloatDataType
     return fraction;
 }
 
-PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefix(PhyxFloatDataType value, QString unitGroup, QString preferedPrefix) const
+PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefix(PhyxFloatDataType value, PhyxFloatDataType power, QString unitGroup, QString preferedPrefix) const
 {
     PhyxFloatDataType preferedPrefixValue = PHYX_FLOAT_ONE;
     if (!preferedPrefix.isEmpty())
-        preferedPrefixValue = unitSystem->prefix(preferedPrefix, unitGroup).value;
+        preferedPrefixValue = pow(unitSystem->prefix(preferedPrefix, unitGroup).value, power);
 
     if (!unitGroup.isEmpty())
     {
@@ -1266,6 +1266,7 @@ PhyxUnitSystem::PhyxPrefix PhyxCalculator::getBestPrefix(PhyxFloatDataType value
             if (prefixes.at(i).inputOnly)
                 continue;
 
+            prefixes[i].value = pow(prefixes[i].value, power);
             prefixes[i].value /= preferedPrefixValue;
             PhyxFloatDataType tmpValue = value / prefixes.at(i).value;
 
@@ -1306,9 +1307,7 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
             {
                 if (value.imag() == PHYX_FLOAT_NULL)
                 {
-                    PhyxUnitSystem::PhyxPrefix realPrefix = getBestPrefix(value.real(), unit->unitGroup(), unit->preferedPrefix());     //get best prefix
-                    //PhyxUnitSystem::PhyxPrefix imagPrefix = getBestPrefx(value.imag(), unit->unitGroup(), unit->preferedPrefix());     //get best prefix
-                    //value = PhyxValueDataType(value.real() / realPrefix.value, value.imag() / imagPrefix.value);
+                    PhyxUnitSystem::PhyxPrefix realPrefix = getBestPrefix(value.real(), unit->compounds().first().power, unit->unitGroup(), unit->preferedPrefix());     //get best prefix
                     value = PhyxValueDataType(value.real() / realPrefix.value, PHYX_FLOAT_NULL);
 
                     if (!unit->preferedPrefix().isEmpty())      // preferd prefix handling
@@ -1317,7 +1316,7 @@ PhyxCalculator::ResultVariable PhyxCalculator::formatVariable(PhyxVariable *vari
                     result.unit.prepend(realPrefix.symbol);
                 } else if (value.real() == PHYX_FLOAT_NULL)
                 {
-                    PhyxUnitSystem::PhyxPrefix imagPrefix = getBestPrefix(value.imag(), unit->unitGroup(), unit->preferedPrefix());     //get best prefix
+                    PhyxUnitSystem::PhyxPrefix imagPrefix = getBestPrefix(value.imag(), unit->compounds().first().power, unit->unitGroup(), unit->preferedPrefix());     //get best prefix
                     value = PhyxValueDataType(PHYX_FLOAT_NULL, value.imag() / imagPrefix.value);
 
                     if (!unit->preferedPrefix().isEmpty())      // preferd prefix handling
