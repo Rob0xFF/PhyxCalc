@@ -31,6 +31,7 @@
 #include <QToolButton>
 #include <QToolTip>
 #include <QTextLayout>
+#include <QVariant>
 #include "lineparser.h"
 #include "unitloader.h"
 #include "exportdialog.h"

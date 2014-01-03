@@ -28,6 +28,7 @@ symbian:TARGET.UID3 = 0xE4EA669C
 # MOBILITY +=
 
 QT       += core gui svg
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET = phyxcalc
 TEMPLATE = app

@@ -232,8 +232,8 @@ void MainWindow::loadSettings()
         settings.beginGroup("colorScheme");
             colorSchemeItem item;
             settings.beginGroup("text");
-                item.foregroundColor = settings.value("foregroundColor", Qt::black).value<QColor>();
-                item.backgroundColor = settings.value("backgroundColor", Qt::transparent).value<QColor>();
+                item.foregroundColor = settings.value("foregroundColor", QColor(Qt::black)).value<QColor>();
+                item.backgroundColor = settings.value("backgroundColor", QColor(Qt::transparent)).value<QColor>();
                 item.bold            = settings.value("bold", false).toBool();
                 item.italic          = settings.value("italic", false).toBool();
                 appSettings.textEditor.colorScheme.append(item);
@@ -246,64 +246,64 @@ void MainWindow::loadSettings()
                 appSettings.textEditor.colorScheme.append(item);
             settings.endGroup();
             settings.beginGroup("number");
-                item.foregroundColor = settings.value("foregroundColor", Qt::darkBlue).value<QColor>();
-                item.backgroundColor = settings.value("backgroundColor", Qt::transparent).value<QColor>();
+                item.foregroundColor = settings.value("foregroundColor", QColor(Qt::darkBlue)).value<QColor>();
+                item.backgroundColor = settings.value("backgroundColor", QColor(Qt::transparent)).value<QColor>();
                 item.bold            = settings.value("bold", false).toBool();
                 item.italic          = settings.value("italic", false).toBool();
                 appSettings.textEditor.colorScheme.append(item);
             settings.endGroup();
             settings.beginGroup("string");
-                item.foregroundColor = settings.value("foregroundColor", Qt::darkGreen).value<QColor>();
-                item.backgroundColor = settings.value("backgroundColor", Qt::transparent).value<QColor>();
+                item.foregroundColor = settings.value("foregroundColor", QColor(Qt::darkGreen)).value<QColor>();
+                item.backgroundColor = settings.value("backgroundColor", QColor(Qt::transparent)).value<QColor>();
                 item.bold            = settings.value("bold", false).toBool();
                 item.italic          = settings.value("italic", false).toBool();
                 appSettings.textEditor.colorScheme.append(item);
             settings.endGroup();
             settings.beginGroup("comment");
-                item.foregroundColor = settings.value("foregroundColor", Qt::darkGreen).value<QColor>();
-                item.backgroundColor = settings.value("backgroundColor", Qt::transparent).value<QColor>();
+                item.foregroundColor = settings.value("foregroundColor", QColor(Qt::darkGreen)).value<QColor>();
+                item.backgroundColor = settings.value("backgroundColor", QColor(Qt::transparent)).value<QColor>();
                 item.bold            = settings.value("bold", false).toBool();
                 item.italic          = settings.value("italic", false).toBool();
                 appSettings.textEditor.colorScheme.append(item);
             settings.endGroup();
             settings.beginGroup("keyword");
-                item.foregroundColor = settings.value("foregroundColor", Qt::darkYellow).value<QColor>();
-                item.backgroundColor = settings.value("backgroundColor", Qt::transparent).value<QColor>();
+                item.foregroundColor = settings.value("foregroundColor", QColor(Qt::darkYellow)).value<QColor>();
+                item.backgroundColor = settings.value("backgroundColor", QColor(Qt::transparent)).value<QColor>();
                 item.bold            = settings.value("bold", false).toBool();
                 item.italic          = settings.value("italic", false).toBool();
                 appSettings.textEditor.colorScheme.append(item);
             settings.endGroup();
             settings.beginGroup("function");
-                item.foregroundColor = settings.value("foregroundColor", Qt::black).value<QColor>();
-                item.backgroundColor = settings.value("backgroundColor", Qt::transparent).value<QColor>();
+                item.foregroundColor = settings.value("foregroundColor", QColor(Qt::black)).value<QColor>();
+                item.backgroundColor = settings.value("backgroundColor", QColor(Qt::transparent)).value<QColor>();
                 item.bold            = settings.value("bold", false).toBool();
                 item.italic          = settings.value("italic", true).toBool();
                 appSettings.textEditor.colorScheme.append(item);
             settings.endGroup();
             settings.beginGroup("variable");
-                item.foregroundColor = settings.value("foregroundColor", Qt::darkMagenta).value<QColor>();
-                item.backgroundColor = settings.value("backgroundColor", Qt::transparent).value<QColor>();
+                item.foregroundColor = settings.value("foregroundColor", QColor(Qt::darkMagenta)).value<QColor>();
+                item.backgroundColor = settings.value("backgroundColor", QColor(Qt::transparent)).value<QColor>();
                 item.bold            = settings.value("bold", false).toBool();
                 item.italic          = settings.value("italic", false).toBool();
                 appSettings.textEditor.colorScheme.append(item);
             settings.endGroup();
             settings.beginGroup("constant");
-                item.foregroundColor = settings.value("foregroundColor", Qt::darkRed).value<QColor>();
-                item.backgroundColor = settings.value("backgroundColor", Qt::transparent).value<QColor>();
+                item.foregroundColor = settings.value("foregroundColor", QColor(Qt::darkRed)).value<QColor>();
+                item.backgroundColor = settings.value("backgroundColor", QColor(Qt::transparent)).value<QColor>();
                 item.bold            = settings.value("bold", false).toBool();
                 item.italic          = settings.value("italic", false).toBool();
                 appSettings.textEditor.colorScheme.append(item);
             settings.endGroup();
             settings.beginGroup("unit");
-                item.foregroundColor = settings.value("foregroundColor", Qt::black).value<QColor>();
-                item.backgroundColor = settings.value("backgroundColor", Qt::transparent).value<QColor>();
+                item.foregroundColor = settings.value("foregroundColor", QColor(Qt::black)).value<QColor>();
+                item.backgroundColor = settings.value("backgroundColor", QColor(Qt::transparent)).value<QColor>();
                 item.bold            = settings.value("bold", false).toBool();
                 item.italic          = settings.value("italic", false).toBool();
                 appSettings.textEditor.colorScheme.append(item);
             settings.endGroup();
             settings.beginGroup("error");
-                item.foregroundColor = settings.value("foregroundColor", Qt::red).value<QColor>();
-                item.backgroundColor = settings.value("backgroundColor", Qt::transparent).value<QColor>();
+                item.foregroundColor = settings.value("foregroundColor", QColor(Qt::red)).value<QColor>();
+                item.backgroundColor = settings.value("backgroundColor", QColor(Qt::transparent)).value<QColor>();
                 item.bold            = settings.value("bold", false).toBool();
                 item.italic          = settings.value("italic", false).toBool();
                 appSettings.textEditor.colorScheme.append(item);
@@ -1101,7 +1101,7 @@ void MainWindow::setOrientation(MainWindow::ScreenOrientation orientation)
     case ScreenOrientationAuto:
         attribute = static_cast<Qt::WidgetAttribute>(130);
         break;
-#else // QT_VERSION < 0x040702
+#elif QT_VERSION < 0x050001
     case ScreenOrientationLockPortrait:
         attribute = Qt::WA_LockPortraitOrientation;
         break;
@@ -1112,6 +1112,9 @@ void MainWindow::setOrientation(MainWindow::ScreenOrientation orientation)
     case ScreenOrientationAuto:
         attribute = Qt::WA_AutoOrientation;
         break;
+#else
+    default:
+    return;
 #endif // QT_VERSION < 0x040702
     };
     setAttribute(attribute, true);

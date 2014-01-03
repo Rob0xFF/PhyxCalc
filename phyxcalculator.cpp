@@ -759,7 +759,7 @@ bool PhyxCalculator::evaluate(QList<EarleyTreeItem> earleyTree, const QString ex
                         (this->*functionMap.value(function))();
 #ifdef QT_DEBUG
                     else
-                        qFatal("Function %s not found!", function.toAscii().constData());
+                        qFatal("Function %s not found!", function.toLatin1().constData());
 #endif
                 }
             }
@@ -807,7 +807,7 @@ bool PhyxCalculator::evaluate(PhyxCalculator::ExpressionCacheItem cacheItem, con
             (this->*functionMap.value(function))();
 #ifdef QT_DEBUG
         else
-             qFatal("Function %s not found!", function.toAscii().constData());
+             qFatal("Function %s not found!", function.toLatin1().constData());
 #endif
         }
     }
@@ -1043,9 +1043,9 @@ PhyxIntegerDataType PhyxCalculator::hexToLongInt(QString string)
     for (int i = string.size()-1; i >= 0; i--)
     {
         if (string.at(i).isNumber())
-            value += (string.at(i).toAscii()-48)*n;
+            value += (string.at(i).toLatin1()-48)*n;
         else
-            value += (string.at(i).toAscii()-55)*n;
+            value += (string.at(i).toLatin1()-55)*n;
         n *= 16;
     }
 
@@ -1060,7 +1060,7 @@ PhyxIntegerDataType PhyxCalculator::octToLongInt(QString string)
     string.remove("0o");
     for (int i = string.size()-1; i >= 0; i--)
     {
-        value += (string.at(i).toAscii()-48)*n;
+        value += (string.at(i).toLatin1()-48)*n;
         n *= 8;
     }
 
@@ -1075,7 +1075,7 @@ long PhyxCalculator::binToLongInt(QString string)
     string.remove("0b");
     for (int i = string.size()-1; i >= 0; i--)
     {
-        value += (string.at(i).toAscii()-48)*n;
+        value += (string.at(i).toLatin1()-48)*n;
         n *= 2;
     }
 
@@ -1107,9 +1107,9 @@ QString PhyxCalculator::longIntToHex(PhyxIntegerDataType number)
     {
         int rest = number % 16;
         if (rest < 10)
-            output.prepend(QChar::fromAscii(rest+48));
+            output.prepend(QChar::fromLatin1(rest+48));
         else
-            output.prepend(QChar::fromAscii(rest+55));
+            output.prepend(QChar::fromLatin1(rest+55));
         number /= 16;
         i++;
     }
@@ -1128,7 +1128,7 @@ QString PhyxCalculator::longIntToOct(PhyxIntegerDataType number)
     while (number != 0)
     {
         int rest = number % 8;
-        output.prepend(QChar::fromAscii(rest+48));
+        output.prepend(QChar::fromLatin1(rest+48));
         number /= 8;
     }
 
@@ -1144,7 +1144,7 @@ QString PhyxCalculator::longIntToBin(PhyxIntegerDataType number)
     while (number != 0)
     {
         int rest = number % 2;
-        output.prepend(QChar::fromAscii(rest+48));
+        output.prepend(QChar::fromLatin1(rest+48));
         number /= 2;
         i++;
     }

@@ -28,7 +28,9 @@ PlotWindow::PlotWindow(QWidget *parent) :
 
     initializeGUI();
 
+#if QT_VERSION < 0x050000
     ui->qwtPlot->canvas()->setFrameStyle(QFrame::NoFrame);
+#endif
     ui->qwtPlot->setStyleSheet("QwtPlot { padding: 5px }"); //this is no fix at all
 
     plotGrid = new QwtPlotGrid();
@@ -572,23 +574,23 @@ void PlotWindow::updateSettings()
 
     //X scale engine
     if (ui->settingsXBLogCheck->isChecked())
-        ui->qwtPlot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
+        ui->qwtPlot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLogScaleEngine);
     else
         ui->qwtPlot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine);
 
     if (ui->settingsXTLogCheck->isChecked())
-        ui->qwtPlot->setAxisScaleEngine(QwtPlot::xTop, new QwtLog10ScaleEngine);
+        ui->qwtPlot->setAxisScaleEngine(QwtPlot::xTop, new QwtLogScaleEngine);
     else
         ui->qwtPlot->setAxisScaleEngine(QwtPlot::xTop, new QwtLinearScaleEngine);
 
     //Y scale engine
     if (ui->settingsYLLogCheck->isChecked())
-        ui->qwtPlot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
+        ui->qwtPlot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine);
     else
         ui->qwtPlot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
 
     if (ui->settingsYRLogCheck->isChecked())
-        ui->qwtPlot->setAxisScaleEngine(QwtPlot::yRight, new QwtLog10ScaleEngine);
+        ui->qwtPlot->setAxisScaleEngine(QwtPlot::yRight, new QwtLogScaleEngine);
     else
         ui->qwtPlot->setAxisScaleEngine(QwtPlot::yRight, new QwtLinearScaleEngine);
 
@@ -603,8 +605,8 @@ void PlotWindow::updateSettings()
     {
         ui->qwtPlot->setAxisAutoScale(QwtPlot::xBottom);
         ui->qwtPlot->updateAxes();
-        ui->settingsXBScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xBottom)->lowerBound());
-        ui->settingsXBScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xBottom)->upperBound());
+        ui->settingsXBScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xBottom).lowerBound());
+        ui->settingsXBScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xBottom).upperBound());
         ui->settingsXBScaleStepSpin->setValue(ui->qwtPlot->axisStepSize(QwtPlot::xBottom));
     }
     else
@@ -617,8 +619,8 @@ void PlotWindow::updateSettings()
     {
         ui->qwtPlot->setAxisAutoScale(QwtPlot::xTop);
         ui->qwtPlot->updateAxes();
-        ui->settingsXTScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xTop)->lowerBound());
-        ui->settingsXTScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xTop)->upperBound());
+        ui->settingsXTScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xTop).lowerBound());
+        ui->settingsXTScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::xTop).upperBound());
         ui->settingsXTScaleStepSpin->setValue(ui->qwtPlot->axisStepSize(QwtPlot::xTop));
     }
     else
@@ -632,8 +634,8 @@ void PlotWindow::updateSettings()
     {
         ui->qwtPlot->setAxisAutoScale(QwtPlot::yLeft);
         ui->qwtPlot->updateAxes();
-        ui->settingsYLScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yLeft)->lowerBound());
-        ui->settingsYLScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yLeft)->upperBound());
+        ui->settingsYLScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yLeft).lowerBound());
+        ui->settingsYLScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yLeft).upperBound());
         ui->settingsYLScaleStepSpin->setValue(ui->qwtPlot->axisStepSize(QwtPlot::yLeft));
     }
     else
@@ -646,8 +648,8 @@ void PlotWindow::updateSettings()
     {
         ui->qwtPlot->setAxisAutoScale(QwtPlot::yRight);
         ui->qwtPlot->updateAxes();
-        ui->settingsYRScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yRight)->lowerBound());
-        ui->settingsYRScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yRight)->upperBound());
+        ui->settingsYRScaleMinSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yRight).lowerBound());
+        ui->settingsYRScaleMaxSpin->setValue(ui->qwtPlot->axisScaleDiv(QwtPlot::yRight).upperBound());
         ui->settingsYRScaleStepSpin->setValue(ui->qwtPlot->axisStepSize(QwtPlot::yRight));
     }
     else
@@ -669,8 +671,8 @@ void PlotWindow::updateSettings()
     p.setColor(QPalette::Window, QColor(ui->colorPlotBackgroundButton->toolTip()));
     ui->qwtPlot->setPalette(p);
 
-    plotGrid->setMajPen(QPen(QColor(ui->colorGridButton->toolTip())));
-    plotGrid->setMinPen(QPen(QColor(ui->colorGridMinButton->toolTip())));
+    plotGrid->setMajorPen(QPen(QColor(ui->colorGridButton->toolTip())));
+    plotGrid->setMinorPen(QPen(QColor(ui->colorGridMinButton->toolTip())));
 
     QPalette palette;
     if (ui->qwtPlot->axisEnabled(QwtPlot::yLeft))
@@ -744,12 +746,15 @@ void PlotWindow::copyToClipboard()
     QPalette p = ui->qwtPlot->palette();
     pixmap.fill(p.color(QPalette::Window));
 
-#if QWT_VERSION >= 0x060000
-        QwtPlotRenderer renderer;
 
-        // flags to make the document look like the widget
-        renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
+#if QWT_VERSION >= 0x060000
+    QwtPlotRenderer renderer;
+
+    // flags to make the document look like the widget
+    renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
+#if QWT_VERSION < 0x060100
         renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true);
+#endif
 
         renderer.renderTo(ui->qwtPlot, pixmap);
 #else
@@ -806,7 +811,9 @@ void PlotWindow::saveDocument()
 
         // flags to make the document look like the widget
         renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
+#if QWT_VERSION < 0x060100
         renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, true);
+#endif
 
         renderer.renderDocument(ui->qwtPlot, fileName, QSizeF(ui->exportWidthMMSpin->value(), ui->exportHeightMMSpin->value()), ui->exportDpiXSpin->value());
 #else
