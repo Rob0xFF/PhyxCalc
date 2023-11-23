@@ -17,7 +17,7 @@
 **
 ***************************************************************************/
 
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QSplashScreen>
 #include <QTime>
 #include "mainwindow.h"

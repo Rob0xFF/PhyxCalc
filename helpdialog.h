@@ -21,6 +21,7 @@
 
 #include <QDialog>
 #include <QFile>
+#include <QIcon>
 
 namespace Ui {
 class HelpDialog;

@@ -54,7 +54,14 @@ linux-g++ | linux-g++-64 | linux-g++-32 {
                 /usr/include/qwt-qt4    #ubuntu
 }
 
-LIBS += -lqwt
+osx {
+    ICON = images/phyxcalc80.icns
+    INCLUDEPATH += /opt/homebrew/Cellar/boost/1.83.0/include/ /opt/homebrew/Cellar/qwt-qt5/6.2.0/lib/qwt.framework/Versions/6/Headers
+    LIBS += -F"/opt/homebrew/Cellar/qwt-qt5/6.2.0/lib"
+    LIBS += -framework qwt
+}
+
+CONFIG += c++11
 
 SOURCES += main.cpp\
         mainwindow.cpp \

@@ -36,6 +36,7 @@
 #include <QCheckBox>
 #include <QSignalMapper>
 #include <QDebug>
+#include <QButtonGroup>
 #include <qwt_plot.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_curve.h>
